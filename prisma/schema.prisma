@@ -17,6 +17,7 @@ enum OrderStatusType {
 
 enum PaymentMethodType {
   Card
+  PIX
   Money
 }
 
