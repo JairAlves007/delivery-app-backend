@@ -6,17 +6,22 @@
 	"scripts": {
 		"dev": "tsx watch --env-file .env src/http/server.ts"
 	},
+	"prisma": {
+		"seed": "ts-node prisma/seed.ts"
+	},
 	"keywords": [],
 	"author": "Jair Alves",
 	"license": "MIT",
 	"devDependencies": {
 		"@types/node": "^24.1.0",
 		"prisma": "^6.13.0",
+		"ts-node": "^10.9.2",
 		"tsx": "^4.20.3",
 		"typescript": "^5.9.2"
 	},
 	"dependencies": {
 		"@prisma/client": "^6.13.0",
+		"bcrypt-ts": "^7.1.0",
 		"fastify": "^5.4.0",
 		"zod": "^4.0.14"
 	}

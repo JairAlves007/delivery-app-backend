@@ -221,7 +221,7 @@ model Product {
   categoryId      String
   name            String
   description     String
-  price           Decimal
+  price           Int
   imageUrl        String
   slug            String    @unique
   discountPercent Float?
@@ -249,20 +249,20 @@ model AddonCategory {
 }
 
 model Addon {
-  id         Int     @id @default(autoincrement())
+  id         Int    @id @default(autoincrement())
   categoryId Int
   name       String
-  price      Decimal @default(0)
+  price      Int    @default(0)
 
   category       AddonCategory    @relation(fields: [categoryId], references: [id])
   OrderItemAddon OrderItemAddon[]
 }
 
 model District {
-  id              Int     @id @default(autoincrement())
+  id              Int    @id @default(autoincrement())
   establishmentId String
   name            String
-  shippingCost    Decimal
+  shippingCost    Int
 
   establishment Establishment @relation(fields: [establishmentId], references: [id])
   addresses     Address[]
@@ -274,7 +274,7 @@ model Coupon {
   code            String       @unique
   type            CouponType
   discountType    DiscountType
-  value           Decimal
+  value           Int
   startsAt        DateTime?
   endsAt          DateTime?
   maxUses         Int?
@@ -313,11 +313,11 @@ model Order {
   addressId       Int?
   couponId        Int?
   comment         String?
-  changeAmount    Decimal?
+  changeAmount    Int?
   paymentMethod   PaymentMethodType
   deliveryType    DeliveryType
-  shippingFee     Decimal
-  subtotal        Decimal
+  shippingFee     Int
+  subtotal        Int
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   deletedAt       DateTime?
@@ -331,11 +331,11 @@ model Order {
 }
 
 model OrderItem {
-  id            Int     @id @default(autoincrement())
+  id            Int    @id @default(autoincrement())
   orderId       Int
   productId     String
   productName   String
-  productPrice  Decimal
+  productPrice  Int
   customerName  String
   customerPhone String
   quantity      Int
@@ -346,9 +346,9 @@ model OrderItem {
 }
 
 model OrderItemAddon {
-  id          Int     @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   orderItemId Int
-  addonPrice  Decimal @default(0)
+  addonPrice  Int    @default(0)
   addonName   String
   addonId     Int
   quantity    Int
