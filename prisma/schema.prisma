@@ -1,0 +1,374 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatusType {
+  Preparing
+  Shipped
+  Delivered
+  Cancelled
+}
+
+enum PaymentMethodType {
+  Card
+  Money
+}
+
+enum DeliveryType {
+  Delivery
+  Pickup
+}
+
+enum BannerLinkType {
+  NONE
+  PRODUCT
+  CATEGORY
+}
+
+enum CouponType {
+  Shipping
+  Order
+}
+
+enum DiscountType {
+  Percentage
+  Fixed
+}
+
+enum AddonType {
+  Quantity
+  Selection
+}
+
+enum SocialPlatform {
+  Facebook
+  Instagram
+  Twitter
+  WhatsApp
+  TikTok
+}
+
+enum WeekDay {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+}
+
+enum RoleType {
+  CLIENT
+  ESTABLISHMENT_OWNER
+  ADMIN
+}
+
+enum PermissionType {
+  // Client
+  VIEW_CATALOG
+  ADD_TO_CART
+  MANAGE_ADDRESSES
+  VIEW_OWN_ORDERS
+  CANCEL_OWN_ORDER
+
+  // Establishment Owner
+  MANAGE_PRODUCTS
+  MANAGE_CATEGORIES
+  MANAGE_PRODUCT_OPTIONS
+  MANAGE_DISTRICTS
+  MANAGE_ORDERS
+  MANAGE_OWN_STORE
+  MANAGE_BANNERS
+  MANAGE_COUPONS
+  VIEW_CUSTOMERS
+
+  // Admin
+  MANAGE_STORES
+  MANAGE_USERS
+}
+
+model Role {
+  id          Int              @id @default(autoincrement())
+  name        RoleType
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id    Int              @id @default(autoincrement())
+  name  PermissionType   @unique
+  roles RolePermission[]
+}
+
+model RolePermission {
+  roleId       Int
+  permissionId Int
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  phone     String
+  roleId    Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  role      Role       @relation(fields: [roleId], references: [id])
+  addresses Address[]
+  orders    Order[]
+  favorites Favorite[]
+}
+
+model Address {
+  id             Int       @id @default(autoincrement())
+  userId         String
+  districtId     Int
+  referencePoint String?
+  street         String
+  number         String
+  neighborhood   String
+  city           String
+  state          String
+  zipCode        String
+  complement     String?
+  deletedAt      DateTime?
+
+  user     User     @relation(fields: [userId], references: [id])
+  district District @relation(fields: [districtId], references: [id])
+  Order    Order[]
+}
+
+model Establishment {
+  id              String        @id @default(uuid())
+  name            String
+  slug            String        @unique
+  logoUrl         String
+  address         String
+  phone           String
+  description     String
+  email           String
+  cnpj            String?
+  onlyDelivery    Boolean
+  acceptsCard     Boolean
+  socialLinks     SocialLink[]
+  openingHours    OpeningHour[]
+  nextBillingDate DateTime?
+  deletedAt       DateTime?
+
+  products      Product[]
+  categories    ProductCategory[]
+  banners       Banner[]
+  districts     District[]
+  coupons       Coupon[]
+  AddonCategory AddonCategory[]
+  Order         Order[]
+}
+
+model OpeningHour {
+  id              Int      @id @default(autoincrement())
+  establishmentId String
+  dayOfWeek       WeekDay
+  opensAt         String
+  closesAt        String
+  isClosed        Boolean
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id])
+}
+
+model SocialLink {
+  id              Int            @id @default(autoincrement())
+  establishmentId String
+  platform        SocialPlatform
+  url             String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id])
+}
+
+model ProductCategory {
+  id              String    @id @default(uuid())
+  establishmentId String
+  name            String
+  slug            String    @unique
+  order           Int?
+  deletedAt       DateTime?
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id])
+  products      Product[]
+}
+
+model Product {
+  id              String    @id @default(uuid())
+  establishmentId String
+  categoryId      String
+  name            String
+  description     String
+  price           Decimal
+  imageUrl        String
+  slug            String    @unique
+  discountPercent Float?
+  validUntil      DateTime?
+  stock           Int?
+  deletedAt       DateTime?
+
+  establishment Establishment   @relation(fields: [establishmentId], references: [id])
+  category      ProductCategory @relation(fields: [categoryId], references: [id])
+  favorites     Favorite[]
+  orderItems    OrderItem[]
+}
+
+model AddonCategory {
+  id              Int       @id @default(autoincrement())
+  establishmentId String
+  name            String
+  status          Boolean   @default(true)
+  type            AddonType
+  maxQuantity     Int?
+  deletedAt       DateTime?
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id])
+  addons        Addon[]
+}
+
+model Addon {
+  id         Int     @id @default(autoincrement())
+  categoryId Int
+  name       String
+  price      Decimal @default(0)
+
+  category       AddonCategory    @relation(fields: [categoryId], references: [id])
+  OrderItemAddon OrderItemAddon[]
+}
+
+model District {
+  id              Int     @id @default(autoincrement())
+  establishmentId String
+  name            String
+  shippingCost    Decimal
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id])
+  addresses     Address[]
+}
+
+model Coupon {
+  id              Int          @id @default(autoincrement())
+  establishmentId String
+  code            String       @unique
+  type            CouponType
+  discountType    DiscountType
+  value           Decimal
+  startsAt        DateTime?
+  endsAt          DateTime?
+  maxUses         Int?
+  usesPerUser     Int?
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id])
+  orders        Order[]
+}
+
+model Favorite {
+  id        Int    @id @default(autoincrement())
+  userId    String
+  productId String
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Banner {
+  id              Int            @id @default(autoincrement())
+  name            String
+  imageUrl        String
+  establishmentId String
+  linkType        BannerLinkType
+  productId       String?
+  categoryId      Int?
+  deletedAt       DateTime?
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id])
+}
+
+model Order {
+  id              Int               @id @default(autoincrement())
+  userId          String
+  establishmentId String
+  addressId       Int?
+  couponId        Int?
+  comment         String?
+  changeAmount    Decimal?
+  paymentMethod   PaymentMethodType
+  deliveryType    DeliveryType
+  shippingFee     Decimal
+  subtotal        Decimal
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  deletedAt       DateTime?
+
+  user          User                 @relation(fields: [userId], references: [id])
+  establishment Establishment        @relation(fields: [establishmentId], references: [id])
+  address       Address?             @relation(fields: [addressId], references: [id])
+  coupon        Coupon?              @relation(fields: [couponId], references: [id])
+  items         OrderItem[]
+  statuses      OrderStatusHistory[]
+}
+
+model OrderItem {
+  id            Int     @id @default(autoincrement())
+  orderId       Int
+  productId     String
+  productName   String
+  productPrice  Decimal
+  customerName  String
+  customerPhone String
+  quantity      Int
+
+  order   Order            @relation(fields: [orderId], references: [id])
+  product Product          @relation(fields: [productId], references: [id])
+  addons  OrderItemAddon[]
+}
+
+model OrderItemAddon {
+  id          Int     @id @default(autoincrement())
+  orderItemId Int
+  addonPrice  Decimal @default(0)
+  addonName   String
+  addonId     Int
+  quantity    Int
+
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id])
+  addon     Addon     @relation(fields: [addonId], references: [id])
+}
+
+model OrderStatus {
+  id      Int                  @id @default(autoincrement())
+  label   String
+  value   OrderStatusType      @unique
+  history OrderStatusHistory[]
+}
+
+model OrderStatusHistory {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  statusId  Int
+  createdAt DateTime @default(now())
+
+  order  Order       @relation(fields: [orderId], references: [id])
+  status OrderStatus @relation(fields: [statusId], references: [id])
+}
