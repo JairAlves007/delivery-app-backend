@@ -219,6 +219,7 @@ model ProductCategory {
 
   establishment Establishment @relation(fields: [establishment_id], references: [id])
   products      Product[]
+  banner        Banner[]
 
   @@map("product_categories")
 }
@@ -242,6 +243,7 @@ model Product {
   category            ProductCategory @relation(fields: [category_id], references: [id])
   favorites           Favorite[]
   orderItems          OrderItem[]
+  banner              Banner[]
 
   @@map("products")
 }
@@ -321,17 +323,19 @@ model Favorite {
 }
 
 model Banner {
-  id               Int            @id @default(autoincrement())
+  id               Int              @id @default(autoincrement())
   name             String
   image_url        String
   establishment_id String
   linkType         BannerLinkType
   product_id       String?
-  category_id      Int?
-  created_at       DateTime       @default(now())
-  updated_at       DateTime       @updatedAt
+  category_id      String?
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
   deleted_at       DateTime?
-  establishment    Establishment  @relation(fields: [establishment_id], references: [id])
+  product          Product?         @relation(fields: [product_id], references: [id])
+  category         ProductCategory? @relation(fields: [category_id], references: [id])
+  establishment    Establishment    @relation(fields: [establishment_id], references: [id])
 
   @@map("banners")
 }
