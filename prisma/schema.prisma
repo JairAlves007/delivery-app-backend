@@ -112,294 +112,291 @@ model Permission {
 }
 
 model RolePermission {
-  roleId       Int
-  permissionId Int
-  role         Role       @relation(fields: [roleId], references: [id])
-  permission   Permission @relation(fields: [permissionId], references: [id])
+  role_id       Int
+  permission_id Int
+  role          Role       @relation(fields: [role_id], references: [id])
+  permission    Permission @relation(fields: [permission_id], references: [id])
 
-  @@id([roleId, permissionId])
+  @@id([role_id, permission_id])
   @@map("role_permissions")
 }
 
 model User {
-  id        String    @id @default(uuid())
-  name      String
-  email     String    @unique
-  password  String
-  phone     String
-  roleId    Int
-  createdAt DateTime  @default(now())
-  deletedAt DateTime?
-
-  role      Role       @relation(fields: [roleId], references: [id])
-  addresses Address[]
-  orders    Order[]
-  favorites Favorite[]
+  id         String       @id @default(uuid())
+  name       String
+  email      String       @unique
+  password   String
+  phone      String
+  role_id    Int
+  created_at DateTime     @default(now())
+  deleted_at DateTime?
+  role       Role         @relation(fields: [role_id], references: [id])
+  addresses  Address[]
+  orders     Order[]
+  favorites  Favorite[]
+  userCoupon UserCoupon[]
 
   @@map("users")
 }
 
 model Address {
-  id             Int       @id @default(autoincrement())
-  userId         String
-  districtId     Int
-  referencePoint String?
-  street         String
-  number         String
-  neighborhood   String
-  city           String
-  state          String
-  zipCode        String
-  complement     String?
-  deletedAt      DateTime?
-
-  user     User     @relation(fields: [userId], references: [id])
-  district District @relation(fields: [districtId], references: [id])
-  order    Order[]
+  id              Int       @id @default(autoincrement())
+  user_id         String
+  district_id     Int
+  reference_point String?
+  street          String
+  number          String
+  neighborhood    String
+  city            String
+  state           String
+  zip_code        String
+  complement      String?
+  deleted_at      DateTime?
+  user            User      @relation(fields: [user_id], references: [id])
+  district        District  @relation(fields: [district_id], references: [id])
+  order           Order[]
 
   @@map("addresses")
 }
 
 model Establishment {
-  id              String        @id @default(uuid())
-  name            String
-  slug            String        @unique
-  logoUrl         String
-  address         String
-  phone           String
-  description     String
-  email           String
-  cnpj            String?
-  onlyDelivery    Boolean
-  acceptsCard     Boolean
-  socialLinks     SocialLink[]
-  openingHours    OpeningHour[]
-  nextBillingDate DateTime?
-  deletedAt       DateTime?
-
-  products      Product[]
-  categories    ProductCategory[]
-  banners       Banner[]
-  districts     District[]
-  coupons       Coupon[]
-  addonCategory AddonCategory[]
-  order         Order[]
+  id                  String            @id @default(uuid())
+  name                String
+  slug                String            @unique
+  logo_url            String
+  address             String
+  phone               String
+  description         String
+  email               String
+  cnpj                String?
+  only_delivery       Boolean
+  accepts_credit_card Boolean
+  next_billing_date   DateTime?
+  deleted_at          DateTime?
+  openingHours        OpeningHour[]
+  socialLinks         SocialLink[]
+  products            Product[]
+  categories          ProductCategory[]
+  banners             Banner[]
+  districts           District[]
+  coupons             Coupon[]
+  addonCategory       AddonCategory[]
+  order               Order[]
 
   @@map("establishments")
 }
 
 model OpeningHour {
-  id              Int     @id @default(autoincrement())
-  establishmentId String
-  dayOfWeek       WeekDay
-  opensAt         String
-  closesAt        String
-  isClosed        Boolean
-
-  establishment Establishment @relation(fields: [establishmentId], references: [id])
+  id               Int           @id @default(autoincrement())
+  establishment_id String
+  day_of_week      WeekDay
+  opens_at         String
+  closes_at        String
+  is_closed        Boolean
+  establishment    Establishment @relation(fields: [establishment_id], references: [id])
 
   @@map("opening_hours")
 }
 
 model SocialLink {
-  id              Int            @id @default(autoincrement())
-  establishmentId String
-  platform        SocialPlatform
-  url             String
+  id               Int            @id @default(autoincrement())
+  establishment_id String
+  platform         SocialPlatform
+  url              String
 
-  establishment Establishment @relation(fields: [establishmentId], references: [id])
+  establishment Establishment @relation(fields: [establishment_id], references: [id])
 
   @@map("social_links")
 }
 
 model ProductCategory {
-  id              String    @id @default(uuid())
-  establishmentId String
-  name            String
-  slug            String    @unique
-  order           Int?
-  deletedAt       DateTime?
+  id               String    @id @default(uuid())
+  establishment_id String
+  name             String
+  slug             String    @unique
+  order            Int?
+  deleted_at       DateTime?
 
-  establishment Establishment @relation(fields: [establishmentId], references: [id])
+  establishment Establishment @relation(fields: [establishment_id], references: [id])
   products      Product[]
 
   @@map("product_categories")
 }
 
 model Product {
-  id              String    @id @default(uuid())
-  establishmentId String
-  categoryId      String
-  name            String
-  description     String
-  price           Int
-  imageUrl        String
-  slug            String    @unique
-  discountPercent Float?
-  stock           Int?
-  validUntil      DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  deletedAt       DateTime?
-
-  establishment Establishment   @relation(fields: [establishmentId], references: [id])
-  category      ProductCategory @relation(fields: [categoryId], references: [id])
-  favorites     Favorite[]
-  orderItems    OrderItem[]
+  id                  String          @id @default(uuid())
+  establishment_id    String
+  category_id         String
+  name                String
+  description         String
+  price               Int
+  image_url           String
+  slug                String          @unique
+  discount_percentage Float?
+  stock               Int?
+  valid_until         DateTime?
+  created_at          DateTime        @default(now())
+  updated_at          DateTime        @updatedAt
+  deleted_at          DateTime?
+  establishment       Establishment   @relation(fields: [establishment_id], references: [id])
+  category            ProductCategory @relation(fields: [category_id], references: [id])
+  favorites           Favorite[]
+  orderItems          OrderItem[]
 
   @@map("products")
 }
 
 model AddonCategory {
-  id              Int       @id @default(autoincrement())
-  establishmentId String
-  name            String
-  status          Boolean   @default(true)
-  type            AddonType
-  maxQuantity     Int?
-  deletedAt       DateTime?
-
-  establishment Establishment @relation(fields: [establishmentId], references: [id])
-  addons        Addon[]
+  id               Int           @id @default(autoincrement())
+  establishment_id String
+  name             String
+  status           Boolean       @default(true)
+  type             AddonType
+  max_quantity     Int?
+  deleted_at       DateTime?
+  establishment    Establishment @relation(fields: [establishment_id], references: [id])
+  addons           Addon[]
 
   @@map("addon_categories")
 }
 
 model Addon {
-  id         Int    @id @default(autoincrement())
-  categoryId Int
-  name       String
-  price      Int    @default(0)
-
-  category       AddonCategory    @relation(fields: [categoryId], references: [id])
+  id             Int              @id @default(autoincrement())
+  category_id    Int
+  name           String
+  price          Int              @default(0)
+  category       AddonCategory    @relation(fields: [category_id], references: [id])
   orderItemAddon OrderItemAddon[]
 
   @@map("addons")
 }
 
 model District {
-  id              Int    @id @default(autoincrement())
-  establishmentId String
-  name            String
-  shippingCost    Int
-
-  establishment Establishment @relation(fields: [establishmentId], references: [id])
-  addresses     Address[]
+  id               Int           @id @default(autoincrement())
+  establishment_id String
+  name             String
+  shipping_cost    Int
+  establishment    Establishment @relation(fields: [establishment_id], references: [id])
+  addresses        Address[]
 
   @@map("districts")
 }
 
 model Coupon {
-  id              Int          @id @default(autoincrement())
-  establishmentId String
-  code            String       @unique
-  type            CouponType
-  discountType    DiscountType
-  value           Int
-  startsAt        DateTime?
-  endsAt          DateTime?
-  maxUses         Int?
-  usesPerUser     Int?
-
-  establishment Establishment @relation(fields: [establishmentId], references: [id])
-  orders        Order[]
+  id               Int           @id @default(autoincrement())
+  establishment_id String
+  code             String        @unique
+  type             CouponType
+  discount_type    DiscountType
+  value            Int
+  starts_at        DateTime?
+  ends_at          DateTime?
+  max_uses         Int?
+  uses_per_user    Int?
+  establishment    Establishment @relation(fields: [establishment_id], references: [id])
+  orders           Order[]
+  userCoupon       UserCoupon[]
 
   @@map("coupons")
 }
 
-model Favorite {
+model UserCoupon {
   id        Int    @id @default(autoincrement())
-  userId    String
-  productId String
+  user_id   String
+  coupon_id Int
+  user      User   @relation(fields: [user_id], references: [id])
+  coupon    Coupon @relation(fields: [coupon_id], references: [id])
 
-  user    User    @relation(fields: [userId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
+  @@map("user_coupons")
+}
+
+model Favorite {
+  id         Int     @id @default(autoincrement())
+  user_id    String
+  product_id String
+  user       User    @relation(fields: [user_id], references: [id])
+  product    Product @relation(fields: [product_id], references: [id])
 
   @@map("favorites")
 }
 
 model Banner {
-  id              Int            @id @default(autoincrement())
-  name            String
-  imageUrl        String
-  establishmentId String
-  linkType        BannerLinkType
-  productId       String?
-  categoryId      Int?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  deletedAt       DateTime?
-
-  establishment Establishment @relation(fields: [establishmentId], references: [id])
+  id               Int            @id @default(autoincrement())
+  name             String
+  image_url        String
+  establishment_id String
+  linkType         BannerLinkType
+  product_id       String?
+  category_id      Int?
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+  deleted_at       DateTime?
+  establishment    Establishment  @relation(fields: [establishment_id], references: [id])
 
   @@map("banners")
 }
 
 model Order {
-  id              Int               @id @default(autoincrement())
-  userId          String
-  establishmentId String
-  addressId       Int?
-  couponId        Int?
-  comment         String?
-  changeAmount    Int?
-  paymentMethod   PaymentMethodType
-  deliveryType    DeliveryType
-  shippingFee     Int
-  subtotal        Int
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  deletedAt       DateTime?
-
-  user          User          @relation(fields: [userId], references: [id])
-  establishment Establishment @relation(fields: [establishmentId], references: [id])
-  address       Address?      @relation(fields: [addressId], references: [id])
-  coupon        Coupon?       @relation(fields: [couponId], references: [id])
-  items         OrderItem[]
-  statuses      OrderStatus[]
+  id               Int               @id @default(autoincrement())
+  user_id          String
+  establishment_id String
+  addressId        Int?
+  couponId         Int?
+  comment          String?
+  change_amount    Int?
+  payment_method   PaymentMethodType
+  delivery_type    DeliveryType
+  shipping_fee     Int
+  subtotal         Int
+  created_at       DateTime          @default(now())
+  updated_at       DateTime          @updatedAt
+  deleted_at       DateTime?
+  user             User              @relation(fields: [user_id], references: [id])
+  establishment    Establishment     @relation(fields: [establishment_id], references: [id])
+  address          Address?          @relation(fields: [addressId], references: [id])
+  coupon           Coupon?           @relation(fields: [couponId], references: [id])
+  items            OrderItem[]
+  statuses         OrderStatus[]
 
   @@map("orders")
 }
 
 model OrderItem {
-  id            Int    @id @default(autoincrement())
-  orderId       Int
-  productId     String
-  productName   String
-  productPrice  Int
-  customerName  String
-  customerPhone String
-  quantity      Int
-
-  order   Order            @relation(fields: [orderId], references: [id])
-  product Product          @relation(fields: [productId], references: [id])
-  addons  OrderItemAddon[]
+  id             Int              @id @default(autoincrement())
+  orderId        Int
+  product_id     String
+  product_name   String
+  product_price  Int
+  customer_name  String
+  customer_phone String
+  quantity       Int
+  order          Order            @relation(fields: [orderId], references: [id])
+  product        Product          @relation(fields: [product_id], references: [id])
+  addons         OrderItemAddon[]
 
   @@map("order_items")
 }
 
 model OrderItemAddon {
-  id          Int    @id @default(autoincrement())
-  orderItemId Int
-  addonPrice  Int    @default(0)
-  addonName   String
-  addonId     Int
-  quantity    Int
-
-  orderItem OrderItem @relation(fields: [orderItemId], references: [id])
-  addon     Addon     @relation(fields: [addonId], references: [id])
+  id            Int       @id @default(autoincrement())
+  order_item_id Int
+  addonPrice    Int       @default(0)
+  addonName     String
+  addon_id      Int
+  quantity      Int
+  orderItem     OrderItem @relation(fields: [order_item_id], references: [id])
+  addon         Addon     @relation(fields: [addon_id], references: [id])
 
   @@map("order_item_addons")
 }
 
 model OrderStatus {
-  id        Int             @id @default(autoincrement())
-  orderId   Int
-  label     String
-  value     OrderStatusType @unique
-  createdAt DateTime        @default(now())
-
-  order Order @relation(fields: [orderId], references: [id])
+  id         Int             @id @default(autoincrement())
+  order_id   Int
+  label      String
+  value      OrderStatusType @unique
+  created_at DateTime        @default(now())
+  order      Order           @relation(fields: [order_id], references: [id])
 
   @@map("order_statuses")
 }

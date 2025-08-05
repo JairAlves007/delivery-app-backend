@@ -10,7 +10,8 @@ import {
 	DiscountType,
 	OrderStatusType,
 	BannerLinkType,
-	SocialPlatform
+	SocialPlatform,
+	WeekDay
 } from "@prisma/client";
 import { hash } from "bcrypt-ts";
 import { transformPriceToDatabase } from "../src/helpers/price";
@@ -85,7 +86,7 @@ async function main() {
 			email: "admin@delivery.com",
 			password: await hash("admin123", Constants.HASH_SALT_LENGTH),
 			phone: "85996072547",
-			roleId: adminRole.id
+			role_id: adminRole.id
 		}
 	});
 
@@ -97,7 +98,7 @@ async function main() {
 			email: "jair@pizzaria.com",
 			password: await hash("jair123", Constants.HASH_SALT_LENGTH),
 			phone: "11999999999",
-			roleId: establishmentOwnerRole.id
+			role_id: establishmentOwnerRole.id
 		}
 	});
 
@@ -109,7 +110,7 @@ async function main() {
 			email: "cliente@email.com",
 			password: await hash("cliente123", Constants.HASH_SALT_LENGTH),
 			phone: "11999999999",
-			roleId: clientRole.id
+			role_id: clientRole.id
 		}
 	});
 
@@ -118,13 +119,13 @@ async function main() {
 		data: {
 			name: "Pizzaria do Jair",
 			slug: "pizzaria-do-jair",
-			logoUrl: "https://avatar.iran.liara.run/public/17",
+			logo_url: "https://avatar.iran.liara.run/public/17",
 			address: "Rua Principal, 123",
 			phone: "11999999999",
 			description: "A melhor pizzaria da região!",
 			email: "contato@pizzariadojair.com",
-			acceptsCard: true,
-			onlyDelivery: false
+			accepts_credit_card: true,
+			only_delivery: false
 		}
 	});
 
@@ -135,17 +136,17 @@ async function main() {
 				{
 					name: "Bebidas",
 					slug: "bebidas",
-					establishmentId: establishment.id
+					establishment_id: establishment.id
 				},
 				{
 					name: "Pizzas",
 					slug: "pizzas",
-					establishmentId: establishment.id
+					establishment_id: establishment.id
 				},
 				{
 					name: "Hambúrgueres",
 					slug: "hamburgueres",
-					establishmentId: establishment.id
+					establishment_id: establishment.id
 				}
 			]
 		});
@@ -158,27 +159,27 @@ async function main() {
 				slug: slugify("Coca Cola 2L"),
 				description: "Refrigerante Coca-cola de 2 litros tamanho família.",
 				price: transformPriceToDatabase(12),
-				imageUrl: "https://placehold.co/100x100",
-				establishmentId: establishment.id,
-				categoryId: categories[1].id
+				image_url: "https://placehold.co/100x100",
+				establishment_id: establishment.id,
+				category_id: categories[1].id
 			},
 			{
 				name: "Pizza Calabresa",
 				slug: slugify("Pizza Calabresa"),
 				description: "Deliciosa pizza de calabresa com cebola.",
 				price: transformPriceToDatabase(24),
-				imageUrl: "https://placehold.co/100x100",
-				establishmentId: establishment.id,
-				categoryId: categories[1].id
+				image_url: "https://placehold.co/100x100",
+				establishment_id: establishment.id,
+				category_id: categories[1].id
 			},
 			{
 				name: "X-Tudo",
 				slug: slugify("X-Tudo"),
 				description: "Delicioso hambúrguer com tudo o que você tem direito!",
 				price: transformPriceToDatabase(17.5),
-				imageUrl: "https://placehold.co/100x100",
-				establishmentId: establishment.id,
-				categoryId: categories[1].id
+				image_url: "https://placehold.co/100x100",
+				establishment_id: establishment.id,
+				category_id: categories[1].id
 			}
 		]
 	});
@@ -190,43 +191,43 @@ async function main() {
 				{
 					name: "Bordas",
 					type: AddonType.Selection,
-					establishmentId: establishment.id
+					establishment_id: establishment.id
 				},
 				{
 					name: "Queijos",
 					type: AddonType.Quantity,
-					establishmentId: establishment.id
+					establishment_id: establishment.id
 				}
 			]
 		});
 
 	await prisma.addon.createMany({
 		data: [
-			{ name: "Sem borda", price: 0, categoryId: addonCategories[0].id },
+			{ name: "Sem borda", price: 0, category_id: addonCategories[0].id },
 			{
 				name: "Catupiry",
 				price: transformPriceToDatabase(5),
-				categoryId: addonCategories[0].id
+				category_id: addonCategories[0].id
 			},
 			{
 				name: "Cheddar",
 				price: transformPriceToDatabase(4),
-				categoryId: addonCategories[0].id
+				category_id: addonCategories[0].id
 			},
 			{
 				name: "Parmesão",
 				price: transformPriceToDatabase(3),
-				categoryId: addonCategories[1].id
+				category_id: addonCategories[1].id
 			},
 			{
 				name: "Mussarela",
 				price: transformPriceToDatabase(2),
-				categoryId: addonCategories[1].id
+				category_id: addonCategories[1].id
 			},
 			{
 				name: "Cheddar",
 				price: transformPriceToDatabase(2),
-				categoryId: addonCategories[1].id
+				category_id: addonCategories[1].id
 			}
 		]
 	});
@@ -235,8 +236,8 @@ async function main() {
 	await prisma.district.create({
 		data: {
 			name: "Centro",
-			shippingCost: transformPriceToDatabase(3),
-			establishmentId: establishment.id
+			shipping_cost: transformPriceToDatabase(3),
+			establishment_id: establishment.id
 		}
 	});
 
@@ -246,16 +247,16 @@ async function main() {
 			{
 				code: "FRETEGRATIS",
 				type: CouponType.Shipping,
-				discountType: DiscountType.Percentage,
+				discount_type: DiscountType.Percentage,
 				value: transformPriceToDatabase(100),
-				establishmentId: establishment.id
+				establishment_id: establishment.id
 			},
 			{
 				code: "PIZZA10",
 				type: CouponType.Order,
-				discountType: DiscountType.Fixed,
+				discount_type: DiscountType.Fixed,
 				value: transformPriceToDatabase(10),
-				establishmentId: establishment.id
+				establishment_id: establishment.id
 			}
 		]
 	});
@@ -264,10 +265,10 @@ async function main() {
 	await prisma.banner.create({
 		data: {
 			name: "Promoção de Calabresa",
-			imageUrl: "https://placehold.co/600x300",
+			image_url: "https://placehold.co/600x300",
 			linkType: BannerLinkType.PRODUCT,
-			productId: products[1].id,
-			establishmentId: establishment.id
+			product_id: products[1].id,
+			establishment_id: establishment.id
 		}
 	});
 
@@ -275,25 +276,25 @@ async function main() {
 	await prisma.openingHour.createMany({
 		data: [
 			{
-				dayOfWeek: "Monday",
-				opensAt: "18:00",
-				closesAt: "23:00",
-				isClosed: false,
-				establishmentId: establishment.id
+				day_of_week: WeekDay.Friday,
+				opens_at: "18:00",
+				closes_at: "23:00",
+				is_closed: false,
+				establishment_id: establishment.id
 			},
 			{
-				dayOfWeek: "Tuesday",
-				opensAt: "18:00",
-				closesAt: "23:00",
-				isClosed: false,
-				establishmentId: establishment.id
+				day_of_week: WeekDay.Saturday,
+				opens_at: "18:00",
+				closes_at: "23:00",
+				is_closed: false,
+				establishment_id: establishment.id
 			},
 			{
-				dayOfWeek: "Wednesday",
-				opensAt: "18:00",
-				closesAt: "23:00",
-				isClosed: false,
-				establishmentId: establishment.id
+				day_of_week: WeekDay.Sunday,
+				opens_at: "18:00",
+				closes_at: "23:00",
+				is_closed: false,
+				establishment_id: establishment.id
 			}
 		]
 	});
@@ -303,7 +304,7 @@ async function main() {
 		data: {
 			platform: SocialPlatform.Instagram,
 			url: "https://instagram.com/pizzariadojair",
-			establishmentId: establishment.id
+			establishment_id: establishment.id
 		}
 	});
 
