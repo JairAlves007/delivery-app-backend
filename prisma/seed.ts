@@ -260,16 +260,6 @@ async function main() {
 		]
 	});
 
-	// ----- Order Status -----
-	const orderStatuses = Object.values(OrderStatusType);
-	await prisma.orderStatus.createMany({
-		data: orderStatuses.map(value => ({
-			value,
-			label: value
-		})),
-		skipDuplicates: true
-	});
-
 	// ----- Banner -----
 	await prisma.banner.create({
 		data: {

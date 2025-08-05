@@ -129,7 +129,6 @@ model User {
   phone     String
   roleId    Int
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   role      Role       @relation(fields: [roleId], references: [id])
@@ -190,14 +189,12 @@ model Establishment {
 }
 
 model OpeningHour {
-  id              Int      @id @default(autoincrement())
+  id              Int     @id @default(autoincrement())
   establishmentId String
   dayOfWeek       WeekDay
   opensAt         String
   closesAt        String
   isClosed        Boolean
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 
   establishment Establishment @relation(fields: [establishmentId], references: [id])
 
@@ -209,8 +206,6 @@ model SocialLink {
   establishmentId String
   platform        SocialPlatform
   url             String
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
 
   establishment Establishment @relation(fields: [establishmentId], references: [id])
 
@@ -241,8 +236,10 @@ model Product {
   imageUrl        String
   slug            String    @unique
   discountPercent Float?
-  validUntil      DateTime?
   stock           Int?
+  validUntil      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
   deletedAt       DateTime?
 
   establishment Establishment   @relation(fields: [establishmentId], references: [id])
@@ -329,6 +326,8 @@ model Banner {
   linkType        BannerLinkType
   productId       String?
   categoryId      Int?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
   deletedAt       DateTime?
 
   establishment Establishment @relation(fields: [establishmentId], references: [id])
@@ -352,12 +351,12 @@ model Order {
   updatedAt       DateTime          @updatedAt
   deletedAt       DateTime?
 
-  user          User                 @relation(fields: [userId], references: [id])
-  establishment Establishment        @relation(fields: [establishmentId], references: [id])
-  address       Address?             @relation(fields: [addressId], references: [id])
-  coupon        Coupon?              @relation(fields: [couponId], references: [id])
+  user          User          @relation(fields: [userId], references: [id])
+  establishment Establishment @relation(fields: [establishmentId], references: [id])
+  address       Address?      @relation(fields: [addressId], references: [id])
+  coupon        Coupon?       @relation(fields: [couponId], references: [id])
   items         OrderItem[]
-  statuses      OrderStatusHistory[]
+  statuses      OrderStatus[]
 
   @@map("orders")
 }
@@ -394,22 +393,13 @@ model OrderItemAddon {
 }
 
 model OrderStatus {
-  id      Int                  @id @default(autoincrement())
-  label   String
-  value   OrderStatusType      @unique
-  history OrderStatusHistory[]
+  id        Int             @id @default(autoincrement())
+  orderId   Int
+  label     String
+  value     OrderStatusType @unique
+  createdAt DateTime        @default(now())
+
+  order Order @relation(fields: [orderId], references: [id])
 
   @@map("order_statuses")
-}
-
-model OrderStatusHistory {
-  id        Int      @id @default(autoincrement())
-  orderId   Int
-  statusId  Int
-  createdAt DateTime @default(now())
-
-  order  Order       @relation(fields: [orderId], references: [id])
-  status OrderStatus @relation(fields: [statusId], references: [id])
-
-  @@map("order_status_history")
 }

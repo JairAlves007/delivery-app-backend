@@ -64,7 +64,6 @@ CREATE TABLE "public"."users" (
     "phone" TEXT NOT NULL,
     "roleId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
@@ -115,8 +114,6 @@ CREATE TABLE "public"."opening_hours" (
     "opensAt" TEXT NOT NULL,
     "closesAt" TEXT NOT NULL,
     "isClosed" BOOLEAN NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "opening_hours_pkey" PRIMARY KEY ("id")
 );
@@ -127,8 +124,6 @@ CREATE TABLE "public"."social_links" (
     "establishmentId" TEXT NOT NULL,
     "platform" "public"."SocialPlatform" NOT NULL,
     "url" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "social_links_pkey" PRIMARY KEY ("id")
 );
@@ -156,8 +151,10 @@ CREATE TABLE "public"."products" (
     "imageUrl" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
     "discountPercent" DOUBLE PRECISION,
-    "validUntil" TIMESTAMP(3),
     "stock" INTEGER,
+    "validUntil" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "products_pkey" PRIMARY KEY ("id")
@@ -230,6 +227,8 @@ CREATE TABLE "public"."banners" (
     "linkType" "public"."BannerLinkType" NOT NULL,
     "productId" TEXT,
     "categoryId" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "banners_pkey" PRIMARY KEY ("id")
@@ -284,20 +283,12 @@ CREATE TABLE "public"."order_item_addons" (
 -- CreateTable
 CREATE TABLE "public"."order_statuses" (
     "id" SERIAL NOT NULL,
+    "orderId" INTEGER NOT NULL,
     "label" TEXT NOT NULL,
     "value" "public"."OrderStatusType" NOT NULL,
-
-    CONSTRAINT "order_statuses_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "public"."order_status_history" (
-    "id" SERIAL NOT NULL,
-    "orderId" INTEGER NOT NULL,
-    "statusId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "order_status_history_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "order_statuses_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -397,7 +388,4 @@ ALTER TABLE "public"."order_item_addons" ADD CONSTRAINT "order_item_addons_order
 ALTER TABLE "public"."order_item_addons" ADD CONSTRAINT "order_item_addons_addonId_fkey" FOREIGN KEY ("addonId") REFERENCES "public"."addons"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."order_status_history" ADD CONSTRAINT "order_status_history_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "public"."orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."order_status_history" ADD CONSTRAINT "order_status_history_statusId_fkey" FOREIGN KEY ("statusId") REFERENCES "public"."order_statuses"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."order_statuses" ADD CONSTRAINT "order_statuses_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "public"."orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
