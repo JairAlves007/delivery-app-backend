@@ -8,7 +8,6 @@ import {
 	AddonType,
 	CouponType,
 	DiscountType,
-	OrderStatusType,
 	BannerLinkType,
 	SocialPlatform,
 	WeekDay
