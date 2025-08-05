@@ -1,18 +1,17 @@
 import {
 	PrismaClient,
-	RoleType,
 	PermissionType,
-	OrderStatusType,
-	DiscountType,
-	BannerLinkType,
-	SocialPlatform,
+	RoleType,
 	ProductCategory,
 	Product,
 	AddonCategory,
 	AddonType,
-	CouponType
-} from "../src/generated/prisma";
-
+	CouponType,
+	DiscountType,
+	OrderStatusType,
+	BannerLinkType,
+	SocialPlatform
+} from "@prisma/client";
 import { hash } from "bcrypt-ts";
 import { transformPriceToDatabase } from "../src/helpers/price";
 import Constants from "../src/helpers/constants";

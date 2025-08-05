@@ -1,19 +1,9 @@
-import { fastify } from "fastify";
-import { fastifyCors } from "@fastify/cors";
 import { env } from "@/env";
-import { routes } from "@/routes";
-
-const app = fastify();
-
-app.register(fastifyCors, {
-	origin: env.CORS_ORIGIN
-});
-
-app.register(routes);
+import { app } from "./app";
 
 app
 	.listen({
-		port: +env.PORT,
+		port: env.PORT,
 		host: "0.0.0.0"
 	})
 	.then(() => {

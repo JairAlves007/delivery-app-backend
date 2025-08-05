@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -100,12 +99,16 @@ model Role {
   name        RoleType
   users       User[]
   permissions RolePermission[]
+
+  @@map("roles")
 }
 
 model Permission {
   id    Int              @id @default(autoincrement())
   name  PermissionType   @unique
   roles RolePermission[]
+
+  @@map("permissions")
 }
 
 model RolePermission {
@@ -115,6 +118,7 @@ model RolePermission {
   permission   Permission @relation(fields: [permissionId], references: [id])
 
   @@id([roleId, permissionId])
+  @@map("role_permissions")
 }
 
 model User {
@@ -132,6 +136,8 @@ model User {
   addresses Address[]
   orders    Order[]
   favorites Favorite[]
+
+  @@map("users")
 }
 
 model Address {
@@ -150,7 +156,9 @@ model Address {
 
   user     User     @relation(fields: [userId], references: [id])
   district District @relation(fields: [districtId], references: [id])
-  Order    Order[]
+  order    Order[]
+
+  @@map("addresses")
 }
 
 model Establishment {
@@ -175,8 +183,10 @@ model Establishment {
   banners       Banner[]
   districts     District[]
   coupons       Coupon[]
-  AddonCategory AddonCategory[]
-  Order         Order[]
+  addonCategory AddonCategory[]
+  order         Order[]
+
+  @@map("establishments")
 }
 
 model OpeningHour {
@@ -190,6 +200,8 @@ model OpeningHour {
   updatedAt       DateTime @updatedAt
 
   establishment Establishment @relation(fields: [establishmentId], references: [id])
+
+  @@map("opening_hours")
 }
 
 model SocialLink {
@@ -201,6 +213,8 @@ model SocialLink {
   updatedAt       DateTime       @updatedAt
 
   establishment Establishment @relation(fields: [establishmentId], references: [id])
+
+  @@map("social_links")
 }
 
 model ProductCategory {
@@ -213,6 +227,8 @@ model ProductCategory {
 
   establishment Establishment @relation(fields: [establishmentId], references: [id])
   products      Product[]
+
+  @@map("product_categories")
 }
 
 model Product {
@@ -233,6 +249,8 @@ model Product {
   category      ProductCategory @relation(fields: [categoryId], references: [id])
   favorites     Favorite[]
   orderItems    OrderItem[]
+
+  @@map("products")
 }
 
 model AddonCategory {
@@ -246,6 +264,8 @@ model AddonCategory {
 
   establishment Establishment @relation(fields: [establishmentId], references: [id])
   addons        Addon[]
+
+  @@map("addon_categories")
 }
 
 model Addon {
@@ -255,7 +275,9 @@ model Addon {
   price      Int    @default(0)
 
   category       AddonCategory    @relation(fields: [categoryId], references: [id])
-  OrderItemAddon OrderItemAddon[]
+  orderItemAddon OrderItemAddon[]
+
+  @@map("addons")
 }
 
 model District {
@@ -266,6 +288,8 @@ model District {
 
   establishment Establishment @relation(fields: [establishmentId], references: [id])
   addresses     Address[]
+
+  @@map("districts")
 }
 
 model Coupon {
@@ -282,6 +306,8 @@ model Coupon {
 
   establishment Establishment @relation(fields: [establishmentId], references: [id])
   orders        Order[]
+
+  @@map("coupons")
 }
 
 model Favorite {
@@ -291,6 +317,8 @@ model Favorite {
 
   user    User    @relation(fields: [userId], references: [id])
   product Product @relation(fields: [productId], references: [id])
+
+  @@map("favorites")
 }
 
 model Banner {
@@ -304,6 +332,8 @@ model Banner {
   deletedAt       DateTime?
 
   establishment Establishment @relation(fields: [establishmentId], references: [id])
+
+  @@map("banners")
 }
 
 model Order {
@@ -328,6 +358,8 @@ model Order {
   coupon        Coupon?              @relation(fields: [couponId], references: [id])
   items         OrderItem[]
   statuses      OrderStatusHistory[]
+
+  @@map("orders")
 }
 
 model OrderItem {
@@ -343,6 +375,8 @@ model OrderItem {
   order   Order            @relation(fields: [orderId], references: [id])
   product Product          @relation(fields: [productId], references: [id])
   addons  OrderItemAddon[]
+
+  @@map("order_items")
 }
 
 model OrderItemAddon {
@@ -355,6 +389,8 @@ model OrderItemAddon {
 
   orderItem OrderItem @relation(fields: [orderItemId], references: [id])
   addon     Addon     @relation(fields: [addonId], references: [id])
+
+  @@map("order_item_addons")
 }
 
 model OrderStatus {
@@ -362,6 +398,8 @@ model OrderStatus {
   label   String
   value   OrderStatusType      @unique
   history OrderStatusHistory[]
+
+  @@map("order_statuses")
 }
 
 model OrderStatusHistory {
@@ -372,4 +410,6 @@ model OrderStatusHistory {
 
   order  Order       @relation(fields: [orderId], references: [id])
   status OrderStatus @relation(fields: [statusId], references: [id])
+
+  @@map("order_status_history")
 }
