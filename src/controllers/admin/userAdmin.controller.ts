@@ -1,8 +1,7 @@
 import { InvalidCredentials } from "@/errors/user/invalid-credentials-error";
-import { generateToken } from "@/lib/jwt";
 import { UserPrismaRepository } from "@/repositories/user-prisma-repository";
 import { adminSignInBodySchema } from "@/schemas/admin/auth/signInSchema";
-import { AuthService } from "@/services/user/auth-service";
+import { SignInService } from "@/services/user/sign-in-service";
 import { FastifyReply, FastifyRequest } from "fastify";
 
 export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
@@ -10,11 +9,9 @@ export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
 
 	try {
 		const userRepository = new UserPrismaRepository();
-		const signInService = new AuthService(userRepository);
+		const signInService = new SignInService(userRepository);
 
-		const user = await signInService.signIn(email, password);
-
-		const token = generateToken(user);
+		const { user, token } = await signInService.handle(email, password);
 
 		return reply.status(200).send({
 			success: true,

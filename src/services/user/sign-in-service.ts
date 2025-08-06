@@ -1,11 +1,21 @@
 import { InvalidCredentials } from "@/errors/user/invalid-credentials-error";
 import { UserRepository } from "@/interfaces/user-repository";
+import { generateToken } from "@/lib/jwt";
+import type { Role, User } from "@prisma/client";
 import { compare } from "bcrypt-ts";
 
-export class AuthService {
+interface SignInServiceResponse {
+	user: User & { role: Role };
+	token: string;
+}
+
+export class SignInService {
 	constructor(private userRepository: UserRepository) {}
 
-	async signIn(email: string, password: string) {
+	async handle(
+		email: string,
+		password: string
+	): Promise<SignInServiceResponse> {
 		const user = await this.userRepository.findByEmail(email);
 
 		if (!user) throw new InvalidCredentials();
@@ -14,6 +24,11 @@ export class AuthService {
 
 		if (!passwordMatch) throw new InvalidCredentials();
 
-		return user;
+		const token = generateToken(user);
+
+		return {
+			user,
+			token
+		};
 	}
 }
