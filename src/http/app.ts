@@ -15,14 +15,24 @@ app.register(routes);
 app.setErrorHandler((error, _request, reply) => {
 	if (error instanceof ZodError) {
 		return reply.status(400).send({
-			error: "Validation Error",
+			success: false,
+			message: "Validation Error",
 			details: flattenError(error).fieldErrors
 		});
 	}
 
 	if (env.NODE_ENV !== "production") console.error(error);
 
-	return reply.status(500).send({ error: "Internal Server Error" });
+	return reply.status(500).send({
+		success: false,
+		message: "Internal Server Error",
+		details: {
+			error: {
+				code: error.code,
+				message: error.message
+			}
+		}
+	});
 });
 
 export { app };
