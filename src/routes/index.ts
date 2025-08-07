@@ -1,5 +1,5 @@
-import { healthRoutes } from "./health/health";
 import { adminRoutes } from "./admin";
+import { healthRoutes } from "./health/health.route";
 import { FastifyInstance } from "fastify";
 
 export const routes = (app: FastifyInstance) => {

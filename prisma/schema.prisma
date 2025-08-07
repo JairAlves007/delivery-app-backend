@@ -96,7 +96,7 @@ enum PermissionType {
 
 model Role {
   id          Int              @id @default(autoincrement())
-  name        RoleType
+  name        RoleType         @unique
   users       User[]
   permissions RolePermission[]
 
@@ -126,7 +126,6 @@ model User {
   name       String
   email      String       @unique
   password   String
-  phone      String
   role_id    Int
   created_at DateTime     @default(now())
   deleted_at DateTime?
@@ -150,6 +149,7 @@ model Address {
   city            String
   state           String
   zip_code        String
+  phone           String
   complement      String?
   deleted_at      DateTime?
   user            User      @relation(fields: [user_id], references: [id])

@@ -1,13 +1,18 @@
 import { env } from "@/env";
-import { Role, User } from "@prisma/client";
+import { UserUnauthenticated } from "@/errors/user/user-unauthenticated";
+import { UserWithRoleType } from "@/interfaces/user-with-role-type";
 import jwt from "jsonwebtoken";
 
-interface UserWithRole extends User {
-	role: Role;
-}
+export const generateToken = (user: UserWithRoleType): string => {
+	const { id, name, email, roleType } = user;
 
-export const generateToken = (user: UserWithRole): string => {
-	const { id, name, email, role } = user;
+	return jwt.sign({ id, name, email, roleType }, env.JWT_SECRET);
+};
 
-	return jwt.sign({ id, name, email, role: role.name }, env.JWT_SECRET);
+export const verifyToken = (token: string): UserWithRoleType | null => {
+	try {
+		return jwt.verify(token, env.JWT_SECRET) as UserWithRoleType;
+	} catch (error) {
+		throw new UserUnauthenticated();
+	}
 };

@@ -1,13 +1,11 @@
 import { FastifyInstance } from "fastify";
-import { authRoutes } from "./auth/sign-in.routes";
+import { adminAuthRoutes } from "./auth/auth.route";
 
 export const adminRoutes = (app: FastifyInstance) => {
 	app.register(
 		async api => {
-			api.register(authRoutes, { prefix: "/auth" });
+			api.register(adminAuthRoutes, { prefix: "/auth" });
 		},
-		{
-			prefix: "/admin"
-		}
+		{ prefix: "/admin" }
 	);
 };

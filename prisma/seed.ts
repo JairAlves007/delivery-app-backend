@@ -84,7 +84,6 @@ async function main() {
 			name: "Admin",
 			email: "admin@delivery.com",
 			password: await hash("admin123", Constants.HASH_SALT_LENGTH),
-			phone: "85996072547",
 			role_id: adminRole.id
 		}
 	});
@@ -96,7 +95,6 @@ async function main() {
 			name: "Jair",
 			email: "jair@pizzaria.com",
 			password: await hash("jair123", Constants.HASH_SALT_LENGTH),
-			phone: "11999999999",
 			role_id: establishmentOwnerRole.id
 		}
 	});
@@ -108,7 +106,6 @@ async function main() {
 			name: "Cliente",
 			email: "cliente@email.com",
 			password: await hash("cliente123", Constants.HASH_SALT_LENGTH),
-			phone: "11999999999",
 			role_id: clientRole.id
 		}
 	});

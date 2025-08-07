@@ -1,3 +1,6 @@
+import { verifyToken } from "@/lib/jwt";
+import Constants from "./constants";
+
 export function slugify(text: string): string {
 	return text
 		.normalize("NFD")
@@ -7,4 +10,10 @@ export function slugify(text: string): string {
 		.replace(/[^a-z0-9]+/g, "-")
 		.replace(/^-+|-+$/g, "")
 		.replace(/--+/g, "-");
+}
+
+export function getAuthUser(authorization: string) {
+	const token = authorization?.replace(`${Constants.TOKEN_TYPE} `, "");
+
+	return token ? verifyToken(token) : null;
 }
