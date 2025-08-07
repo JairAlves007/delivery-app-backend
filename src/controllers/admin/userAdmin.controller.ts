@@ -1,24 +1,22 @@
 import { InvalidCredentials } from "@/errors/user/invalid-credentials-error";
 import { UserAlreadyExistsError } from "@/errors/user/user-already-exists-error";
 import { UserUnauthorized } from "@/errors/user/user-unauthorized";
+import { makeSignInService } from "@/factories/make-sign-in-service";
+import { makeSignUpService } from "@/factories/make-sign-up-service";
 import { ApiResponse } from "@/helpers/api";
 import Constants from "@/helpers/constants";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes";
-import { UserPrismaRepository } from "@/repositories/user-prisma-repository";
 import {
 	signInBodySchema,
 	signUpBodySchema
 } from "@/schemas/admin/auth/authSchema";
-import { SignInService } from "@/services/user/sign-in/sign-in-service";
-import { SignUpService } from "@/services/user/sign-up/sign-up-service";
 import { FastifyReply, FastifyRequest } from "fastify";
 
 export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
 	const body = signInBodySchema.parse(request.body);
 
 	try {
-		const userRepository = new UserPrismaRepository();
-		const signInService = new SignInService(userRepository);
+		const signInService = makeSignInService();
 
 		const { user, token } = await signInService.handle(body);
 
@@ -48,8 +46,7 @@ export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
 	const body = signUpBodySchema.parse(request.body);
 
 	try {
-		const userRepository = new UserPrismaRepository();
-		const signUpService = new SignUpService(userRepository);
+		const signUpService = makeSignUpService();
 
 		const { token } = await signUpService.handle({
 			...body,
