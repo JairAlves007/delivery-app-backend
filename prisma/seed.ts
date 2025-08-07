@@ -1,3 +1,6 @@
+import Constants from "@/helpers/constants";
+import { transformPriceToDatabase } from "@/helpers/price";
+import { slugify } from "@/helpers/utils";
 import {
 	PrismaClient,
 	PermissionType,
@@ -13,9 +16,6 @@ import {
 	WeekDay
 } from "@prisma/client";
 import { hash } from "bcrypt-ts";
-import { transformPriceToDatabase } from "../src/helpers/price";
-import Constants from "../src/helpers/constants";
-import { slugify } from "../src/helpers/utils";
 
 const prisma = new PrismaClient();
 
@@ -24,6 +24,25 @@ async function main() {
 
 	// ----- Permissions -----
 	const allPermissions = Object.values(PermissionType);
+	const establishmentOwnerPermissions: PermissionType[] = [
+		PermissionType.MANAGE_PRODUCTS,
+		PermissionType.MANAGE_CATEGORIES,
+		PermissionType.MANAGE_PRODUCT_OPTIONS,
+		PermissionType.MANAGE_DISTRICTS,
+		PermissionType.MANAGE_ORDERS,
+		PermissionType.MANAGE_OWN_STORE,
+		PermissionType.MANAGE_BANNERS,
+		PermissionType.MANAGE_COUPONS,
+		PermissionType.VIEW_CUSTOMERS
+	];
+	const clientPermissions: PermissionType[] = [
+		PermissionType.VIEW_CATALOG,
+		PermissionType.ADD_TO_CART,
+		PermissionType.MANAGE_ADDRESSES,
+		PermissionType.VIEW_OWN_ORDERS,
+		PermissionType.CANCEL_OWN_ORDER
+	];
+
 	await prisma.permission.createMany({
 		data: allPermissions.map(name => ({ name })),
 		skipDuplicates: true
@@ -48,9 +67,7 @@ async function main() {
 				name: RoleType.ESTABLISHMENT_OWNER,
 				permissions: {
 					create: allPermissions
-						.filter(
-							p => p.startsWith("MANAGE") || p.startsWith("VIEW_CUSTOMERS")
-						)
+						.filter(p => establishmentOwnerPermissions.includes(p))
 						.map(name => ({ permission: { connect: { name } } }))
 				}
 			}
@@ -60,12 +77,7 @@ async function main() {
 				name: RoleType.CLIENT,
 				permissions: {
 					create: allPermissions
-						.filter(
-							p =>
-								p.startsWith("VIEW") ||
-								p.startsWith("ADD") ||
-								p.startsWith("CANCEL")
-						)
+						.filter(p => clientPermissions.includes(p))
 						.map(name => ({ permission: { connect: { name } } }))
 				}
 			}
