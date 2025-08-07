@@ -19,12 +19,6 @@ export const ensureAuthenticated = async (
 
 		request.user = user;
 	} catch (error) {
-		if (error instanceof UserUnauthenticated) {
-			return reply
-				.status(HTTPStatusCodes.UNAUTHORIZED)
-				.send(ApiResponse.error(error));
-		}
-
-		throw error;
+		return reply.sendError(error);
 	}
 };

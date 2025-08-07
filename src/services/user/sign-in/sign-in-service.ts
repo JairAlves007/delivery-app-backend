@@ -2,11 +2,13 @@ import { InvalidCredentials } from "@/errors/user/invalid-credentials-error";
 import { UserRepository } from "@/interfaces/repositories/user-repository";
 import { generateToken } from "@/lib/jwt";
 import { signInBodySchema } from "@/schemas/admin/auth/authSchema";
-import type { Role, User } from "@prisma/client";
+import type { Role, RoleType, User } from "@prisma/client";
 import { compare } from "bcrypt-ts";
 import z from "zod";
 
-type SignInServiceRequest = z.infer<typeof signInBodySchema>;
+type SignInServiceRequest = z.infer<typeof signInBodySchema> & {
+	allowedRoles: RoleType[];
+};
 
 interface SignInServiceResponse {
 	user: User & { role: Role };
@@ -18,12 +20,16 @@ export class SignInService {
 
 	async handle({
 		email,
-		password
+		password,
+		allowedRoles
 	}: SignInServiceRequest): Promise<SignInServiceResponse> {
 		try {
 			const user = await this.userRepository.findByEmail(email);
 
 			if (!user) throw new InvalidCredentials();
+
+			if (!allowedRoles.includes(user.role.name))
+				throw new InvalidCredentials();
 
 			const doesPasswordMatches = await compare(password, user.password);
 

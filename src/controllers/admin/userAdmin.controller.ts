@@ -10,15 +10,23 @@ import {
 	signInBodySchema,
 	signUpBodySchema
 } from "@/schemas/admin/auth/authSchema";
+import { RoleType } from "@prisma/client";
 import { FastifyReply, FastifyRequest } from "fastify";
 
-export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
+export const signIn = async (
+	request: FastifyRequest,
+	reply: FastifyReply,
+	allowedRoles: RoleType[]
+) => {
 	const body = signInBodySchema.parse(request.body);
 
 	try {
 		const signInService = makeSignInService();
 
-		const { user, token } = await signInService.handle(body);
+		const { user, token } = await signInService.handle({
+			...body,
+			allowedRoles
+		});
 
 		return reply.status(HTTPStatusCodes.OK).send(
 			ApiResponse.success("User signed in successfully", {
@@ -32,13 +40,7 @@ export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
 			})
 		);
 	} catch (error) {
-		if (error instanceof InvalidCredentials) {
-			return reply
-				.status(HTTPStatusCodes.UNAUTHORIZED)
-				.send(ApiResponse.error(error));
-		}
-
-		throw error;
+		return reply.sendError(error);
 	}
 };
 
@@ -53,25 +55,20 @@ export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
 			role: request.role
 		});
 
-		return reply.status(HTTPStatusCodes.CREATED).send(
-			ApiResponse.success("User signed up successfully", {
-				type: Constants.TOKEN_TYPE,
-				token
-			})
-		);
+		const responseDetails =
+			request.user?.roleType === RoleType.ADMIN
+				? null
+				: {
+						type: Constants.TOKEN_TYPE,
+						token
+				  };
+
+		return reply
+			.status(HTTPStatusCodes.CREATED)
+			.send(
+				ApiResponse.success("User signed up successfully", responseDetails)
+			);
 	} catch (error) {
-		if (error instanceof UserAlreadyExistsError) {
-			return reply
-				.status(HTTPStatusCodes.CONFLICT)
-				.send(ApiResponse.error(error));
-		}
-
-		if (error instanceof UserUnauthorized) {
-			return reply
-				.status(HTTPStatusCodes.UNAUTHORIZED)
-				.send(ApiResponse.error(error));
-		}
-
-		throw error;
+		return reply.sendError(error);
 	}
 };

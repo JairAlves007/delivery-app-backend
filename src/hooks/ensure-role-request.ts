@@ -18,12 +18,6 @@ export const ensureRoleRequest = async (
 
 		request.role = roleFound.name;
 	} catch (error) {
-		if (error instanceof UserUnauthorized) {
-			return reply
-				.status(HTTPStatusCodes.UNAUTHORIZED)
-				.send(ApiResponse.error(error));
-		}
-
-		throw error;
+		return reply.sendError(error);
 	}
 };
