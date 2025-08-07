@@ -1,9 +1,11 @@
 import { UserAlreadyExistsError } from "@/errors/user/user-already-exists-error";
 import { UserUnauthorized } from "@/errors/user/user-unauthorized";
+import Constants from "@/helpers/constants";
 import { UserRepository } from "@/interfaces/repositories/user-repository";
 import { generateToken } from "@/lib/jwt";
 import { signUpBodySchema } from "@/schemas/admin/auth/authSchema";
 import { RoleType, User } from "@prisma/client";
+import { hash } from "bcrypt-ts";
 import z from "zod";
 
 type SignUpServiceRequest = z.infer<typeof signUpBodySchema> & {
@@ -25,12 +27,14 @@ export class SignUpService {
 
 		if (!!userWithEmail) throw new UserAlreadyExistsError();
 
-		// if (!role) throw new UserUnauthorized();
+		if (!role) throw new UserUnauthorized();
+
+		const password_hash = await hash(password, Constants.HASH_SALT_LENGTH);
 
 		const user = await this.userRepository.create({
 			name,
 			email,
-			password,
+			password: password_hash,
 			role: {
 				connect: {
 					name: RoleType.ESTABLISHMENT_OWNER
