@@ -4,8 +4,14 @@ export type SuccessResponse<T = any> = {
 	details?: T;
 };
 
-export type ErrorResponse = {
+export type ErrorResponse<T = any> = {
 	success: false;
 	message: string;
-	details: any;
+	details: T;
 };
+
+export type DefaultErrorResponse = ErrorResponse<{
+	error: {
+		message: string;
+	};
+}>;

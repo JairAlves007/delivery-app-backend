@@ -1,4 +1,3 @@
-import { UserAlreadyExistsError } from "@/errors/user/user-already-exists-error";
 import { UserUnauthorized } from "@/errors/user/user-unauthorized";
 import Constants from "@/helpers/constants";
 import { IRoleRepository } from "@/interfaces/repositories/role-repository";
@@ -29,13 +28,11 @@ export class SignUpService {
 
 		if (!roleType) throw new UserUnauthorized();
 
-		const [userWithEmail, role, password_hash] = await Promise.all([
-			this.userRepository.findByEmail(email),
+		const [role, password_hash] = await Promise.all([
 			this.roleRepository.findByName(roleType),
 			hash(password, Constants.HASH_SALT_LENGTH)
 		]);
 
-		if (userWithEmail) throw new UserAlreadyExistsError();
 		if (!role) throw new UserUnauthorized();
 
 		const user = await this.userRepository.create({

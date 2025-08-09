@@ -168,7 +168,7 @@ model Establishment {
   phone               String
   description         String
   email               String
-  cnpj                String?
+  cnpj                String?           @unique
   only_delivery       Boolean
   accepts_credit_card Boolean
   next_billing_date   DateTime?

@@ -54,11 +54,11 @@ export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
 		if (request.user?.roleType === RoleType.ADMIN) {
 			return reply
 				.status(HTTPStatusCodes.CREATED)
-				.send(ApiResponse.success("User signed up successfully", {}));
+				.send(ApiResponse.success("Usuário criado com sucesso", {}));
 		}
 
 		return reply.status(HTTPStatusCodes.CREATED).send(
-			ApiResponse.success("User signed up successfully", {
+			ApiResponse.success("Usuário criado com sucesso", {
 				type: Constants.TOKEN_TYPE,
 				token
 			})

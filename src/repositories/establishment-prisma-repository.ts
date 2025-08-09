@@ -26,18 +26,34 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	}
 
 	async findById(id: string): Promise<Establishment | null> {
-		throw new Error("Method not implemented.");
+		return await prisma.establishment.findUnique({
+			where: {
+				id
+			}
+		});
 	}
 
 	async create(data: Prisma.EstablishmentCreateInput): Promise<Establishment> {
-		throw new Error("Method not implemented.");
+		return await prisma.establishment.create({ data });
 	}
 
-	async update(data: Prisma.EstablishmentUpdateInput): Promise<Establishment> {
-		throw new Error("Method not implemented.");
+	async update(
+		id: string,
+		data: Prisma.EstablishmentUpdateInput
+	): Promise<Establishment> {
+		return await prisma.establishment.update({
+			where: {
+				id
+			},
+			data
+		});
 	}
 
 	async delete(id: string): Promise<Establishment> {
-		throw new Error("Method not implemented.");
+		return await prisma.establishment.delete({
+			where: {
+				id
+			}
+		});
 	}
 }

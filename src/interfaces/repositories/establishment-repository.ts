@@ -6,6 +6,9 @@ export interface IEstablishmentRepository {
 	paginate(page: number, limit: number): Promise<Establishment[]>;
 	findById(id: string): Promise<Establishment | null>;
 	create(data: Prisma.EstablishmentCreateInput): Promise<Establishment>;
-	update(data: Prisma.EstablishmentUpdateInput): Promise<Establishment>;
+	update(
+		id: string,
+		data: Prisma.EstablishmentUpdateInput
+	): Promise<Establishment>;
 	delete(id: string): Promise<Establishment>;
 }
