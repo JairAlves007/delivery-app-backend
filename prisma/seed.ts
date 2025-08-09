@@ -85,10 +85,6 @@ async function main() {
 	]);
 
 	const adminRole = roles.find(r => r.name === RoleType.ADMIN)!;
-	const establishmentOwnerRole = roles.find(
-		r => r.name === RoleType.ESTABLISHMENT_OWNER
-	)!;
-	const clientRole = roles.find(r => r.name === RoleType.CLIENT)!;
 
 	// ----- Admin user -----
 	await prisma.user.create({
@@ -97,28 +93,6 @@ async function main() {
 			email: "admin@delivery.com",
 			password: await hash("admin123", Constants.HASH_SALT_LENGTH),
 			role_id: adminRole.id
-		}
-	});
-
-	// ----- Establishment Owner user -----
-
-	await prisma.user.create({
-		data: {
-			name: "Jair",
-			email: "jair@pizzaria.com",
-			password: await hash("jair123", Constants.HASH_SALT_LENGTH),
-			role_id: establishmentOwnerRole.id
-		}
-	});
-
-	// ----- Client user -----
-
-	await prisma.user.create({
-		data: {
-			name: "Cliente",
-			email: "cliente@email.com",
-			password: await hash("cliente123", Constants.HASH_SALT_LENGTH),
-			role_id: clientRole.id
 		}
 	});
 
