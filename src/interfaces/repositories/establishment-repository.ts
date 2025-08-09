@@ -10,5 +10,5 @@ export interface IEstablishmentRepository {
 		id: string,
 		data: Prisma.EstablishmentUpdateInput
 	): Promise<Establishment>;
-	delete(id: string): Promise<Establishment>;
+	delete(id: string, force: boolean): Promise<Establishment>;
 }

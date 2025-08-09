@@ -33,3 +33,7 @@ export const createEstablishmentBodySchema = z.object({
 	),
 	accepts_credit_card: z.boolean("Precisamos saber se aceita cartão de crédito")
 });
+
+export const deleteEstablishmentParamsSchema = z.object({
+	id: z.string().min(1, "O id do estabelecimento deve ser preenchido")
+});
