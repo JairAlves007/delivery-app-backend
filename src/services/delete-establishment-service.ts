@@ -1,9 +1,9 @@
-import { EstablishmentPrismaRepository } from "@/repositories/establishment-prisma-repository";
+import { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository";
 
 export class DeleteEstablishmentService {
-	constructor(private establishmentRepository: EstablishmentPrismaRepository) {}
+	constructor(private establishmentRepository: IEstablishmentRepository) {}
 
 	public async handle(id: string) {
-		await this.establishmentRepository.delete(id);
+		await this.establishmentRepository.delete(id, false);
 	}
 }

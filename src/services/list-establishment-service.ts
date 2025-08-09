@@ -1,5 +1,5 @@
 import { InvalidPage } from "@/errors/establishment/invalid-page";
-import { EstablishmentPrismaRepository } from "@/repositories/establishment-prisma-repository";
+import { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository";
 import { listEstablishmentQueryParamsSchema } from "@/schemas/establishment-schema";
 import { Establishment } from "@prisma/client";
 import z from "zod";
@@ -17,7 +17,7 @@ interface ListEstablishmentServiceResponse
 }
 
 export class ListEstablishmentService {
-	constructor(private establishmentRepository: EstablishmentPrismaRepository) {}
+	constructor(private establishmentRepository: IEstablishmentRepository) {}
 
 	async handle({
 		page,

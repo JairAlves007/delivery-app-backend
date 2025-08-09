@@ -1,14 +1,4 @@
-import { Establishment, Prisma } from "@prisma/client";
+import { Establishment, Product } from "@prisma/client";
+import { ICRUDBase } from "../crud-base";
 
-export interface IEstablishmentRepository {
-	listAll(): Promise<Establishment[]>;
-	count(): Promise<number>;
-	paginate(page: number, limit: number): Promise<Establishment[]>;
-	findById(id: string): Promise<Establishment | null>;
-	create(data: Prisma.EstablishmentCreateInput): Promise<Establishment>;
-	update(
-		id: string,
-		data: Prisma.EstablishmentUpdateInput
-	): Promise<Establishment>;
-	delete(id: string, force: boolean): Promise<Establishment>;
-}
+export interface IEstablishmentRepository extends ICRUDBase<Establishment> {}

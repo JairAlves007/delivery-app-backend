@@ -1,5 +1,5 @@
 import { slugify } from "@/helpers/utils";
-import { EstablishmentPrismaRepository } from "@/repositories/establishment-prisma-repository";
+import { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository";
 import { createEstablishmentBodySchema } from "@/schemas/establishment-schema";
 import { Prisma } from "@prisma/client";
 import z from "zod";
@@ -9,7 +9,7 @@ type CreateEstablishmentServiceRequest = z.infer<
 >;
 
 export class CreateEstablishmentService {
-	constructor(private establishmentRepository: EstablishmentPrismaRepository) {}
+	constructor(private establishmentRepository: IEstablishmentRepository) {}
 
 	async handle({
 		name,

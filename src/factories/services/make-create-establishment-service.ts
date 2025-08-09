@@ -1,7 +1,7 @@
-import { EstablishmentPrismaRepository } from "@/repositories/establishment-prisma-repository";
 import { CreateEstablishmentService } from "@/services/create-establishment-service";
+import { makeEstablishmentRepository } from "../repositories/make-establishment-repository";
 
 export const makeCreateEstablishmentService = () => {
-	const establishmentRepository = new EstablishmentPrismaRepository();
+	const establishmentRepository = makeEstablishmentRepository();
 	return new CreateEstablishmentService(establishmentRepository);
 };
