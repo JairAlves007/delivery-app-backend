@@ -1,4 +1,9 @@
-import { destroy, index, store } from "@/controllers/establishment.controller";
+import {
+	destroy,
+	index,
+	store,
+	update
+} from "@/controllers/establishment.controller";
 import { ensureUserHasPermission } from "@/hooks/ensure-user-has-permission";
 import { isAuthenticated } from "@/hooks/is-auth";
 import { PermissionType } from "@prisma/client";
@@ -19,6 +24,11 @@ export const establishmentRoutes = async (app: FastifyInstance) => {
 	app.post("/", {
 		preHandler: adminEstablishmentGuards,
 		handler: store
+	});
+
+	app.patch("/:id", {
+		preHandler: adminEstablishmentGuards,
+		handler: update
 	});
 
 	app.delete("/:id", {

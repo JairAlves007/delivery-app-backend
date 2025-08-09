@@ -1,12 +1,14 @@
 import { makeCreateEstablishmentService } from "@/factories/services/make-create-establishment-service";
 import { makeDeleteEstablishmentService } from "@/factories/services/make-delete-establishment-service";
 import { makeListEstablishmentService } from "@/factories/services/make-list-establishment-service";
+import { makeUpdateEstablishmentService } from "@/factories/services/make-update-establishment-service";
 import { ApiResponse } from "@/helpers/api";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes";
 import {
 	createEstablishmentBodySchema,
-	deleteEstablishmentParamsSchema,
-	listEstablishmentQueryParamsSchema
+	establishmentParamsSchema,
+	listEstablishmentQueryParamsSchema,
+	updateEstablishmentBodySchema
 } from "@/schemas/establishment-schema";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
@@ -47,8 +49,25 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 	}
 };
 
+export const update = async (request: FastifyRequest, reply: FastifyReply) => {
+	const data = updateEstablishmentBodySchema.parse(request.body);
+	const { id } = establishmentParamsSchema.parse(request.params);
+
+	try {
+		const updateEstablishmentService = makeUpdateEstablishmentService();
+
+		await updateEstablishmentService.handle(id, data);
+
+		return reply
+			.status(HTTPStatusCodes.NO_CONTENT)
+			.send(ApiResponse.success("Estabelecimento atualizado com sucesso", {}));
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
 export const destroy = async (request: FastifyRequest, reply: FastifyReply) => {
-	const { id } = deleteEstablishmentParamsSchema.parse(request.params);
+	const { id } = establishmentParamsSchema.parse(request.params);
 
 	try {
 		const deleteEstablishmentService = makeDeleteEstablishmentService();
