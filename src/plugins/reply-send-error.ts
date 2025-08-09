@@ -9,7 +9,6 @@ import { env } from "@/env";
 import { flattenError, ZodError } from "zod";
 import { ErrorResponse } from "@/types/response";
 
-// Tipagem extra para adicionar o método ao reply
 declare module "fastify" {
 	interface FastifyReply {
 		sendError: (error: unknown) => FastifyReply;

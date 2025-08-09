@@ -1,10 +1,8 @@
 import { UserUnauthenticated } from "@/errors/user/user-unauthenticated";
-import { ApiResponse } from "@/helpers/api";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes";
 import { getAuthUser } from "@/helpers/utils";
 import { FastifyReply, FastifyRequest } from "fastify";
 
-export const ensureAuthenticated = async (
+export const isAuthenticated = async (
 	request: FastifyRequest,
 	reply: FastifyReply
 ) => {

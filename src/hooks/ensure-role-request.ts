@@ -1,6 +1,4 @@
 import { UserUnauthorized } from "@/errors/user/user-unauthorized";
-import { ApiResponse } from "@/helpers/api";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes";
 import { RolePrismaRepository } from "@/repositories/role-prisma-repository";
 import { RoleType } from "@prisma/client";
 import { FastifyReply, FastifyRequest } from "fastify";

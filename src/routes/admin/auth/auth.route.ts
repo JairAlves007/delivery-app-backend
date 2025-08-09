@@ -1,14 +1,15 @@
 import { signIn, signUp } from "@/controllers/admin/userAdmin.controller";
-import { ensureAuthenticated } from "@/hooks/ensure-authenticated";
 import { ensureRoleRequest } from "@/hooks/ensure-role-request";
-import { ensureHasRoles } from "@/hooks/ensure-has-roles";
+import { ensureUserHasRoles } from "@/hooks/ensure-user-has-roles";
+import { isAuthenticated } from "@/hooks/is-auth";
 import { RoleType } from "@prisma/client";
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 const adminSignUpGuards = [
-	ensureAuthenticated,
-	(req: any, res: any) => ensureHasRoles(req, res, [RoleType.ADMIN]),
-	(req: any, res: any) =>
+	isAuthenticated,
+	(req: FastifyRequest, res: FastifyReply) =>
+		ensureUserHasRoles(req, res, [RoleType.ADMIN]),
+	(req: FastifyRequest, res: FastifyReply) =>
 		ensureRoleRequest(req, res, RoleType.ESTABLISHMENT_OWNER)
 ];
 
