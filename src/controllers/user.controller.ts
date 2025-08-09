@@ -1,17 +1,12 @@
-import { InvalidCredentials } from "@/errors/user/invalid-credentials-error";
-import { UserAlreadyExistsError } from "@/errors/user/user-already-exists-error";
-import { UserUnauthorized } from "@/errors/user/user-unauthorized";
-import { makeSignInService } from "@/factories/make-sign-in-service";
-import { makeSignUpService } from "@/factories/make-sign-up-service";
-import { ApiResponse } from "@/helpers/api";
 import Constants from "@/helpers/constants";
+import { makeSignInService } from "@/factories/services/make-sign-in-service";
+import { makeSignUpService } from "@/factories/services/make-sign-up-service";
+import { ApiResponse } from "@/helpers/api";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes";
-import {
-	signInBodySchema,
-	signUpBodySchema
-} from "@/schemas/admin/auth/authSchema";
+import { signInBodySchema, signUpBodySchema } from "@/schemas/auth-schema";
 import { RoleType } from "@prisma/client";
-import { FastifyReply, FastifyRequest } from "fastify";
+import type { FastifyReply, FastifyRequest } from "fastify";
+import { requestRoleSchema } from "@/schemas/request-role-schema";
 
 export const signIn = async (
 	request: FastifyRequest,
@@ -46,28 +41,28 @@ export const signIn = async (
 
 export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
 	const body = signUpBodySchema.parse(request.body);
+	const roleType = requestRoleSchema.parse(request.role);
 
 	try {
 		const signUpService = makeSignUpService();
 
 		const { token } = await signUpService.handle({
 			...body,
-			role: request.role
+			roleType
 		});
 
-		const responseDetails =
-			request.user?.roleType === RoleType.ADMIN
-				? null
-				: {
-						type: Constants.TOKEN_TYPE,
-						token
-				  };
+		if (request.user?.roleType === RoleType.ADMIN) {
+			return reply
+				.status(HTTPStatusCodes.CREATED)
+				.send(ApiResponse.success("User signed up successfully", {}));
+		}
 
-		return reply
-			.status(HTTPStatusCodes.CREATED)
-			.send(
-				ApiResponse.success("User signed up successfully", responseDetails)
-			);
+		return reply.status(HTTPStatusCodes.CREATED).send(
+			ApiResponse.success("User signed up successfully", {
+				type: Constants.TOKEN_TYPE,
+				token
+			})
+		);
 	} catch (error) {
 		return reply.sendError(error);
 	}

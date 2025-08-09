@@ -1,5 +1,6 @@
-import { Role, RoleType } from "@prisma/client";
+import { RoleType } from "@prisma/client";
+import { RoleWithPermissions } from "../role";
 
-export interface RoleRepository {
-	findByName(name: RoleType): Promise<Role | null>;
+export interface IRoleRepository {
+	findByName(name: RoleType): Promise<RoleWithPermissions | null>;
 }

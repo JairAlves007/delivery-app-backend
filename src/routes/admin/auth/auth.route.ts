@@ -1,16 +1,14 @@
-import { signIn, signUp } from "@/controllers/admin/userAdmin.controller";
+import { signIn, signUp } from "@/controllers/user.controller";
 import { ensureRoleRequest } from "@/hooks/ensure-role-request";
 import { ensureUserHasRoles } from "@/hooks/ensure-user-has-roles";
 import { isAuthenticated } from "@/hooks/is-auth";
 import { RoleType } from "@prisma/client";
-import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
 
 const adminSignUpGuards = [
 	isAuthenticated,
-	(req: FastifyRequest, res: FastifyReply) =>
-		ensureUserHasRoles(req, res, [RoleType.ADMIN]),
-	(req: FastifyRequest, res: FastifyReply) =>
-		ensureRoleRequest(req, res, RoleType.ESTABLISHMENT_OWNER)
+	(req: FastifyRequest) => ensureUserHasRoles(req, [RoleType.ADMIN]),
+	(req: FastifyRequest) => ensureRoleRequest(req, RoleType.ESTABLISHMENT_OWNER)
 ];
 
 export const adminAuthRoutes = async (app: FastifyInstance) => {

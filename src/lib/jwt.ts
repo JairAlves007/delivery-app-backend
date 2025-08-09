@@ -1,6 +1,6 @@
 import { env } from "@/env";
 import { UserUnauthenticated } from "@/errors/user/user-unauthenticated";
-import { UserWithRoleType } from "@/interfaces/user-with-role-type";
+import { UserWithRoleType } from "@/interfaces/user";
 import jwt from "jsonwebtoken";
 
 export const generateToken = (user: UserWithRoleType): string => {

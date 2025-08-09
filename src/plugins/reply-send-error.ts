@@ -1,13 +1,11 @@
 import { FastifyPluginAsync } from "fastify";
 import fp from "fastify-plugin";
 import { ApiResponse } from "@/helpers/api";
-import { UserAlreadyExistsError } from "@/errors/user/user-already-exists-error";
-import { UserUnauthorized } from "@/errors/user/user-unauthorized";
-import { InvalidCredentials } from "@/errors/user/invalid-credentials-error";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes";
 import { env } from "@/env";
 import { flattenError, ZodError } from "zod";
 import { ErrorResponse } from "@/types/response";
+import { ErrorBase } from "@/errors/error-base";
 
 declare module "fastify" {
 	interface FastifyReply {
@@ -17,6 +15,9 @@ declare module "fastify" {
 
 const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 	fastify.decorateReply("sendError", function (error: unknown) {
+		if (env.NODE_ENV !== "production")
+			console.error("Unexpected error:", error);
+
 		if (error instanceof ZodError) {
 			error.name = "VALIDATION_ERROR";
 
@@ -25,19 +26,8 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 			);
 		}
 
-		if (error instanceof UserAlreadyExistsError) {
-			return this.status(HTTPStatusCodes.CONFLICT).send(
-				ApiResponse.error(error)
-			);
-		}
-
-		if (
-			error instanceof UserUnauthorized ||
-			error instanceof InvalidCredentials
-		) {
-			return this.status(HTTPStatusCodes.UNAUTHORIZED).send(
-				ApiResponse.error(error)
-			);
+		if (error instanceof ErrorBase) {
+			return this.status(error.statusCode).send(ApiResponse.error(error));
 		}
 
 		if (error instanceof Error) {
@@ -47,9 +37,6 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 				ApiResponse.error(error)
 			);
 		}
-
-		if (env.NODE_ENV !== "production")
-			console.error("Unexpected error:", error);
 
 		const errorResponse: ErrorResponse = {
 			success: false,

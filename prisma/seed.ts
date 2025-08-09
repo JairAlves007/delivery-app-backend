@@ -30,7 +30,7 @@ async function main() {
 		PermissionType.MANAGE_PRODUCT_OPTIONS,
 		PermissionType.MANAGE_DISTRICTS,
 		PermissionType.MANAGE_ORDERS,
-		PermissionType.MANAGE_OWN_STORE,
+		PermissionType.MANAGE_OWN_ESTABLISHMENT,
 		PermissionType.MANAGE_BANNERS,
 		PermissionType.MANAGE_COUPONS,
 		PermissionType.VIEW_CUSTOMERS

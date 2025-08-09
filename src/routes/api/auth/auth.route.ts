@@ -1,4 +1,4 @@
-import { signIn, signUp } from "@/controllers/admin/userAdmin.controller";
+import { signIn, signUp } from "@/controllers/user.controller";
 import { ensureRoleRequest } from "@/hooks/ensure-role-request";
 import { RoleType } from "@prisma/client";
 import type { FastifyInstance } from "fastify";

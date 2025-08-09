@@ -1,11 +1,8 @@
 import { UserUnauthenticated } from "@/errors/user/user-unauthenticated";
 import { getAuthUser } from "@/helpers/utils";
-import { FastifyReply, FastifyRequest } from "fastify";
+import type { FastifyRequest } from "fastify";
 
-export const isAuthenticated = async (
-	request: FastifyRequest,
-	reply: FastifyReply
-) => {
+export const isAuthenticated = async (request: FastifyRequest) => {
 	try {
 		const authorization = request.headers.authorization;
 
@@ -17,6 +14,6 @@ export const isAuthenticated = async (
 
 		request.user = user;
 	} catch (error) {
-		return reply.sendError(error);
+		throw error;
 	}
 };

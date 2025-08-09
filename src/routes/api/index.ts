@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import { authRoutes } from "./auth/auth.route";
 
 export const apiRoutes = (app: FastifyInstance) => {

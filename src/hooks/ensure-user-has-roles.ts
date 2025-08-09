@@ -1,11 +1,10 @@
 import { UserUnauthenticated } from "@/errors/user/user-unauthenticated";
 import { UserUnauthorized } from "@/errors/user/user-unauthorized";
-import { RoleType } from "@prisma/client";
-import { FastifyReply, FastifyRequest } from "fastify";
+import type { RoleType } from "@prisma/client";
+import type { FastifyRequest } from "fastify";
 
 export const ensureUserHasRoles = async (
 	request: FastifyRequest,
-	reply: FastifyReply,
 	roles: RoleType[]
 ) => {
 	try {
@@ -14,9 +13,7 @@ export const ensureUserHasRoles = async (
 		if (!user) throw new UserUnauthenticated();
 
 		if (!roles.includes(user.roleType)) throw new UserUnauthorized();
-
-		request.role = user.roleType;
 	} catch (error) {
-		return reply.sendError(error);
+		throw error;
 	}
 };

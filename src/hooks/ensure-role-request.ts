@@ -1,21 +1,20 @@
 import { UserUnauthorized } from "@/errors/user/user-unauthorized";
-import { RolePrismaRepository } from "@/repositories/role-prisma-repository";
-import { RoleType } from "@prisma/client";
-import { FastifyReply, FastifyRequest } from "fastify";
+import { makeRoleRepository } from "@/factories/repositories/make-role-repository";
+import type { RoleType } from "@prisma/client";
+import type { FastifyRequest } from "fastify";
 
 export const ensureRoleRequest = async (
 	request: FastifyRequest,
-	reply: FastifyReply,
 	role: RoleType
 ) => {
 	try {
-		const roleRepository = new RolePrismaRepository();
+		const roleRepository = makeRoleRepository();
 		const roleFound = await roleRepository.findByName(role);
 
 		if (!roleFound) throw new UserUnauthorized();
 
 		request.role = roleFound.name;
 	} catch (error) {
-		return reply.sendError(error);
+		throw error;
 	}
 };

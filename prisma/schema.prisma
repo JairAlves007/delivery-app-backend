@@ -84,13 +84,13 @@ enum PermissionType {
   MANAGE_PRODUCT_OPTIONS
   MANAGE_DISTRICTS
   MANAGE_ORDERS
-  MANAGE_OWN_STORE
+  MANAGE_OWN_ESTABLISHMENT
   MANAGE_BANNERS
   MANAGE_COUPONS
   VIEW_CUSTOMERS
 
   // Admin
-  MANAGE_STORES
+  MANAGE_ESTABLISHMENTS
   MANAGE_USERS
 }
 
@@ -172,6 +172,7 @@ model Establishment {
   only_delivery       Boolean
   accepts_credit_card Boolean
   next_billing_date   DateTime?
+  created_at          DateTime          @default(now())
   deleted_at          DateTime?
   openingHours        OpeningHour[]
   socialLinks         SocialLink[]
