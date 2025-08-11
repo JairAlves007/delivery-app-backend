@@ -6,7 +6,7 @@ import { PermissionType, Prisma, User } from "@prisma/client";
 export class UserPrismaRepository implements IUserRepository {
 	async findById(id: string): Promise<UserWithRole | null> {
 		const user = await prisma.user.findUnique({
-			where: { id },
+			where: { id, deleted_at: null },
 			include: { role: true }
 		});
 
@@ -15,7 +15,7 @@ export class UserPrismaRepository implements IUserRepository {
 
 	async findByEmail(email: string): Promise<UserWithRole | null> {
 		const user = await prisma.user.findUnique({
-			where: { email },
+			where: { email, deleted_at: null },
 			include: { role: true }
 		});
 

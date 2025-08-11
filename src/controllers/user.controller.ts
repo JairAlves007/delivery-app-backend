@@ -6,6 +6,7 @@ import { HTTPStatusCodes } from "@/helpers/http-request-codes";
 import { signInBodySchema, signUpBodySchema } from "@/schemas/auth-schema";
 import { RoleType } from "@prisma/client";
 import type { FastifyReply, FastifyRequest } from "fastify";
+import { makeProfileService } from "@/factories/services/make-get-profile-service";
 
 export const signIn = (allowedRoles: RoleType[]) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
@@ -77,4 +78,20 @@ export const signUp = (roleType: RoleType) => {
 			return reply.sendError(error);
 		}
 	};
+};
+
+export const me = async (request: FastifyRequest, reply: FastifyReply) => {
+	try {
+		const getProfileService = makeProfileService();
+
+		const profile = await getProfileService.handle({
+			id: request.user.sub
+		});
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(ApiResponse.success("Usuário listado com sucesso", profile));
+	} catch (error) {
+		return reply.sendError(error);
+	}
 };
