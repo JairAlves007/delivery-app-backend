@@ -6,7 +6,6 @@ import { HTTPStatusCodes } from "@/helpers/http-request-codes";
 import { signInBodySchema, signUpBodySchema } from "@/schemas/auth-schema";
 import { RoleType } from "@prisma/client";
 import type { FastifyReply, FastifyRequest } from "fastify";
-import { requestRoleSchema } from "@/schemas/request-role-schema";
 
 export const signIn = (allowedRoles: RoleType[]) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
@@ -41,40 +40,41 @@ export const signIn = (allowedRoles: RoleType[]) => {
 	};
 };
 
-export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
-	const body = signUpBodySchema.parse(request.body);
-	const roleType = request.role;
+export const signUp = (roleType: RoleType) => {
+	return async (request: FastifyRequest, reply: FastifyReply) => {
+		const body = signUpBodySchema.parse(request.body);
 
-	try {
-		const signUpService = makeSignUpService();
+		try {
+			const signUpService = makeSignUpService();
 
-		const { user, role } = await signUpService.handle({
-			...body,
-			role: roleType
-		});
+			const { user, role } = await signUpService.handle({
+				...body,
+				role: roleType
+			});
 
-		const token = await reply.jwtSign(
-			{
-				role
-			},
-			{
-				sub: user.id
+			const token = await reply.jwtSign(
+				{
+					role
+				},
+				{
+					sub: user.id
+				}
+			);
+
+			if (request.user?.role === RoleType.ADMIN) {
+				return reply
+					.status(HTTPStatusCodes.CREATED)
+					.send(ApiResponse.success("Usuário registrado com sucesso", {}));
 			}
-		);
 
-		if (request.user.role === RoleType.ADMIN) {
-			return reply
-				.status(HTTPStatusCodes.CREATED)
-				.send(ApiResponse.success("Usuário registrado com sucesso", {}));
+			return reply.status(HTTPStatusCodes.CREATED).send(
+				ApiResponse.success("Usuário registrado com sucesso", {
+					type: Constants.TOKEN_TYPE,
+					token
+				})
+			);
+		} catch (error) {
+			return reply.sendError(error);
 		}
-
-		return reply.status(HTTPStatusCodes.CREATED).send(
-			ApiResponse.success("Usuário registrado com sucesso", {
-				type: Constants.TOKEN_TYPE,
-				token
-			})
-		);
-	} catch (error) {
-		return reply.sendError(error);
-	}
+	};
 };
