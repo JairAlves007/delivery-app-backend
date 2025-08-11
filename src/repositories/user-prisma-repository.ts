@@ -1,10 +1,18 @@
 import type { IUserRepository } from "@/interfaces/repositories/user-repository";
-import { RoleWithPermissions } from "@/interfaces/role";
 import type { UserWithRole } from "@/interfaces/user";
 import { prisma } from "@/lib/prisma";
 import { PermissionType, Prisma, User } from "@prisma/client";
 
 export class UserPrismaRepository implements IUserRepository {
+	async findById(id: string): Promise<UserWithRole | null> {
+		const user = await prisma.user.findUnique({
+			where: { id },
+			include: { role: true }
+		});
+
+		return user;
+	}
+
 	async findByEmail(email: string): Promise<UserWithRole | null> {
 		const user = await prisma.user.findUnique({
 			where: { email },

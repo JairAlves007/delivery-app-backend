@@ -8,57 +8,68 @@ import { RoleType } from "@prisma/client";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { requestRoleSchema } from "@/schemas/request-role-schema";
 
-export const signIn = async (
-	request: FastifyRequest,
-	reply: FastifyReply,
-	allowedRoles: RoleType[]
-) => {
-	const body = signInBodySchema.parse(request.body);
+export const signIn = (allowedRoles: RoleType[]) => {
+	return async (request: FastifyRequest, reply: FastifyReply) => {
+		const body = signInBodySchema.parse(request.body);
 
-	try {
-		const signInService = makeSignInService();
+		try {
+			const signInService = makeSignInService();
 
-		const { user, token } = await signInService.handle({
-			...body,
-			allowedRoles
-		});
+			const { user } = await signInService.handle({
+				...body,
+				allowedRoles
+			});
 
-		return reply.status(HTTPStatusCodes.OK).send(
-			ApiResponse.success("User signed in successfully", {
-				type: Constants.TOKEN_TYPE,
-				token,
-				user: {
-					id: user.id,
-					name: user.name,
-					email: user.email
+			const token = await reply.jwtSign(
+				{
+					role: user.role.name
+				},
+				{
+					sub: user.id
 				}
-			})
-		);
-	} catch (error) {
-		return reply.sendError(error);
-	}
+			);
+
+			return reply.status(HTTPStatusCodes.OK).send(
+				ApiResponse.success("Usuário autenticado com sucesso", {
+					type: Constants.TOKEN_TYPE,
+					token
+				})
+			);
+		} catch (error) {
+			return reply.sendError(error);
+		}
+	};
 };
 
 export const signUp = async (request: FastifyRequest, reply: FastifyReply) => {
 	const body = signUpBodySchema.parse(request.body);
-	const roleType = requestRoleSchema.parse(request.role);
+	const roleType = request.role;
 
 	try {
 		const signUpService = makeSignUpService();
 
-		const { token } = await signUpService.handle({
+		const { user, role } = await signUpService.handle({
 			...body,
-			roleType
+			role: roleType
 		});
 
-		if (request.user?.roleType === RoleType.ADMIN) {
+		const token = await reply.jwtSign(
+			{
+				role
+			},
+			{
+				sub: user.id
+			}
+		);
+
+		if (request.user.role === RoleType.ADMIN) {
 			return reply
 				.status(HTTPStatusCodes.CREATED)
-				.send(ApiResponse.success("Usuário criado com sucesso", {}));
+				.send(ApiResponse.success("Usuário registrado com sucesso", {}));
 		}
 
 		return reply.status(HTTPStatusCodes.CREATED).send(
-			ApiResponse.success("Usuário criado com sucesso", {
+			ApiResponse.success("Usuário registrado com sucesso", {
 				type: Constants.TOKEN_TYPE,
 				token
 			})

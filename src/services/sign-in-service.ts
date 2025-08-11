@@ -1,7 +1,6 @@
 import { InvalidCredentials } from "@/errors/user/invalid-credentials-error";
 import { IUserRepository } from "@/interfaces/repositories/user-repository";
 import type { UserWithRole } from "@/interfaces/user";
-import { generateToken } from "@/lib/jwt";
 import { signInBodySchema } from "@/schemas/auth-schema";
 import type { RoleType } from "@prisma/client";
 import { compare } from "bcrypt-ts";
@@ -13,7 +12,6 @@ type SignInServiceRequest = z.infer<typeof signInBodySchema> & {
 
 interface SignInServiceResponse {
 	user: UserWithRole;
-	token: string;
 }
 
 export class SignInService {
@@ -36,14 +34,8 @@ export class SignInService {
 
 			if (!doesPasswordMatches) throw new InvalidCredentials();
 
-			const token = generateToken({
-				...user,
-				roleType: user.role.name
-			});
-
 			return {
-				user,
-				token
+				user
 			};
 		} catch (error) {
 			throw error;

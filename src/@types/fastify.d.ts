@@ -5,7 +5,6 @@ import "fastify";
 
 declare module "fastify" {
 	interface FastifyRequest {
-		role: RoleType | null;
-		user: UserWithRoleType | null;
+		role: RoleType;
 	}
 }

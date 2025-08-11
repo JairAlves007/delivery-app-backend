@@ -2,19 +2,18 @@ import { UserUnauthorized } from "@/errors/user/user-unauthorized";
 import Constants from "@/helpers/constants";
 import { IRoleRepository } from "@/interfaces/repositories/role-repository";
 import { IUserRepository } from "@/interfaces/repositories/user-repository";
-import { generateToken } from "@/lib/jwt";
 import { signUpBodySchema } from "@/schemas/auth-schema";
 import { RoleType, User } from "@prisma/client";
 import { hash } from "bcrypt-ts";
 import z from "zod";
 
 type SignUpServiceRequest = z.infer<typeof signUpBodySchema> & {
-	roleType: RoleType;
+	role: RoleType;
 };
 
 interface SignUpServiceResponse {
 	user: User;
-	token: string;
+	role: RoleType;
 }
 
 export class SignUpService {
@@ -24,16 +23,16 @@ export class SignUpService {
 	) {}
 
 	async handle(data: SignUpServiceRequest): Promise<SignUpServiceResponse> {
-		const { name, email, password, roleType } = data;
+		const { name, email, password, role } = data;
 
-		if (!roleType) throw new UserUnauthorized();
+		if (!role) throw new UserUnauthorized();
 
-		const [role, password_hash] = await Promise.all([
-			this.roleRepository.findByName(roleType),
+		const [roleData, password_hash] = await Promise.all([
+			this.roleRepository.findByName(role),
 			hash(password, Constants.HASH_SALT_LENGTH)
 		]);
 
-		if (!role) throw new UserUnauthorized();
+		if (!roleData) throw new UserUnauthorized();
 
 		const user = await this.userRepository.create({
 			name,
@@ -41,12 +40,12 @@ export class SignUpService {
 			password: password_hash,
 			role: {
 				connect: {
-					id: role.id,
+					id: roleData.id,
 					permissions: {
 						every: {
 							permission: {
 								name: {
-									in: role.permissions.map(
+									in: roleData.permissions.map(
 										permission => permission.permission.name
 									)
 								}
@@ -57,14 +56,9 @@ export class SignUpService {
 			}
 		});
 
-		const token = generateToken({
-			...user,
-			roleType
-		});
-
 		return {
 			user,
-			token
+			role
 		};
 	}
 }

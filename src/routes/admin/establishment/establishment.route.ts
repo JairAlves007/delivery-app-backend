@@ -4,35 +4,24 @@ import {
 	store,
 	update
 } from "@/controllers/establishment.controller";
-import { ensureUserHasPermission } from "@/hooks/ensure-user-has-permission";
-import { isAuthenticated } from "@/hooks/is-auth";
+import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission";
+import { isAuthenticated } from "@/middlewares/is-auth";
 import { PermissionType } from "@prisma/client";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 
-const adminEstablishmentGuards = [
-	isAuthenticated,
-	(req: FastifyRequest) =>
-		ensureUserHasPermission(req, PermissionType.MANAGE_ESTABLISHMENTS)
-];
+const establishmentMiddlewares = {
+	onRequest: [
+		isAuthenticated,
+		ensureUserHasPermission(PermissionType.MANAGE_ESTABLISHMENTS)
+	]
+};
 
 export const establishmentRoutes = async (app: FastifyInstance) => {
-	app.get("/", {
-		preHandler: adminEstablishmentGuards,
-		handler: index
-	});
+	app.get("/", establishmentMiddlewares, index);
 
-	app.post("/", {
-		preHandler: adminEstablishmentGuards,
-		handler: store
-	});
+	app.post("/", establishmentMiddlewares, store);
 
-	app.patch("/:id", {
-		preHandler: adminEstablishmentGuards,
-		handler: update
-	});
+	app.patch("/:id", establishmentMiddlewares, update);
 
-	app.delete("/:id", {
-		preHandler: adminEstablishmentGuards,
-		handler: destroy
-	});
+	app.delete("/:id", establishmentMiddlewares, destroy);
 };

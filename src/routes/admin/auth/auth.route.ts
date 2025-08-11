@@ -1,22 +1,19 @@
 import { signIn, signUp } from "@/controllers/user.controller";
-import { ensureRoleRequest } from "@/hooks/ensure-role-request";
-import { ensureUserHasRoles } from "@/hooks/ensure-user-has-roles";
-import { isAuthenticated } from "@/hooks/is-auth";
+import { ensureRoleRequest } from "@/middlewares/ensure-role-request";
+import { ensureUserHasRoles } from "@/middlewares/ensure-user-has-roles";
+import { isAuthenticated } from "@/middlewares/is-auth";
 import { RoleType } from "@prisma/client";
-import type { FastifyInstance, FastifyRequest } from "fastify";
+import type { FastifyInstance } from "fastify";
 
-const adminSignUpGuards = [
-	isAuthenticated,
-	(req: FastifyRequest) => ensureUserHasRoles(req, [RoleType.ADMIN]),
-	(req: FastifyRequest) => ensureRoleRequest(req, RoleType.ESTABLISHMENT_OWNER)
-];
+const authMiddlewares = {
+	onRequest: [
+		isAuthenticated,
+		ensureUserHasRoles([RoleType.ADMIN]),
+		ensureRoleRequest(RoleType.ESTABLISHMENT_OWNER)
+	]
+};
 
 export const adminAuthRoutes = async (app: FastifyInstance) => {
-	app.post("/sign-in", (request, reply) =>
-		signIn(request, reply, [RoleType.ADMIN, RoleType.ESTABLISHMENT_OWNER])
-	);
-	app.post("/sign-up", {
-		preHandler: adminSignUpGuards,
-		handler: signUp
-	});
+	app.post("/sign-in", signIn([RoleType.ADMIN, RoleType.ESTABLISHMENT_OWNER]));
+	app.post("/sign-up", authMiddlewares, signUp);
 };
