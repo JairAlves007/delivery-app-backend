@@ -7,7 +7,17 @@ import fastify from "fastify";
 import replySendErrorPlugin from "@/plugins/reply-send-error";
 import fastifyJwt from "@fastify/jwt";
 
-const app = fastify();
+const app = fastify({
+	logger: {
+		transport: {
+			target: "pino-pretty",
+			options: {
+				translateTime: "HH:MM:ss Z",
+				ignore: "pid,hostname"
+			}
+		}
+	}
+});
 
 app.register(fastifyCors, {
 	origin: env.CORS_ORIGIN
