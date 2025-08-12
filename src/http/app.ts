@@ -1,7 +1,7 @@
 import { env } from "@/env";
 import { routes } from "@/routes";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes";
-import { DefaultErrorResponse } from "@/types/response";
+import type { DefaultErrorResponse } from "@/types/response";
 import fastifyCors from "@fastify/cors";
 import fastify from "fastify";
 import replySendErrorPlugin from "@/plugins/reply-send-error";
