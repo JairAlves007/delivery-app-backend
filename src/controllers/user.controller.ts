@@ -5,8 +5,9 @@ import { ApiResponse } from "@/helpers/api";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes";
 import { signInBodySchema, signUpBodySchema } from "@/schemas/auth-schema";
 import { RoleType } from "@prisma/client";
-import type { FastifyReply, FastifyRequest } from "fastify";
 import { makeProfileService } from "@/factories/services/make-get-profile-service";
+import { FastifyRequest } from "fastify/types/request";
+import { FastifyReply } from "fastify/types/reply";
 
 export const signIn = (allowedRoles: RoleType[]) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {

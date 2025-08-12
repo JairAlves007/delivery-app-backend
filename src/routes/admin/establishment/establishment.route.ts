@@ -12,7 +12,7 @@ import type { FastifyInstance, FastifyRequest } from "fastify";
 const establishmentMiddlewares = {
 	onRequest: [
 		isAuthenticated,
-		ensureUserHasPermission(PermissionType.MANAGE_ESTABLISHMENTS)
+		ensureUserHasPermission([PermissionType.MANAGE_ESTABLISHMENTS])
 	]
 };
 

@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify/types/instance";
 import { adminAuthRoutes } from "./auth/auth.route";
 import { establishmentRoutes } from "./establishment/establishment.route";
 

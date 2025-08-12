@@ -10,7 +10,8 @@ import {
 	listEstablishmentQueryParamsSchema,
 	updateEstablishmentBodySchema
 } from "@/schemas/establishment-schema";
-import type { FastifyReply, FastifyRequest } from "fastify";
+import { FastifyReply } from "fastify/types/reply";
+import { FastifyRequest } from "fastify/types/request";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const query = listEstablishmentQueryParamsSchema.parse(request.query);

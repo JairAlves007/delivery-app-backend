@@ -1,6 +1,6 @@
 import { me } from "@/controllers/user.controller";
 import { isAuthenticated } from "@/middlewares/is-auth";
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify/types/instance";
 
 const meMiddlewares = {
 	onRequest: [isAuthenticated]

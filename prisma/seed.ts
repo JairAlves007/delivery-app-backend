@@ -101,7 +101,7 @@ async function main() {
 		data: {
 			name: "Pizzaria do Jair",
 			slug: "pizzaria-do-jair",
-			logo_url: "https://avatar.iran.liara.run/public/17",
+			logo_image_key: "",
 			address: "Rua Principal, 123",
 			phone: "11999999999",
 			description: "A melhor pizzaria da região!",
@@ -141,7 +141,7 @@ async function main() {
 				slug: slugify("Coca Cola 2L"),
 				description: "Refrigerante Coca-cola de 2 litros tamanho família.",
 				price: transformPriceToDatabase(12),
-				image_url: "https://placehold.co/100x100",
+				image_key: "https://placehold.co/100x100",
 				establishment_id: establishment.id,
 				category_id: categories[1].id
 			},
@@ -150,7 +150,7 @@ async function main() {
 				slug: slugify("Pizza Calabresa"),
 				description: "Deliciosa pizza de calabresa com cebola.",
 				price: transformPriceToDatabase(24),
-				image_url: "https://placehold.co/100x100",
+				image_key: "https://placehold.co/100x100",
 				establishment_id: establishment.id,
 				category_id: categories[1].id
 			},
@@ -159,7 +159,7 @@ async function main() {
 				slug: slugify("X-Tudo"),
 				description: "Delicioso hambúrguer com tudo o que você tem direito!",
 				price: transformPriceToDatabase(17.5),
-				image_url: "https://placehold.co/100x100",
+				image_key: "https://placehold.co/100x100",
 				establishment_id: establishment.id,
 				category_id: categories[1].id
 			}
@@ -247,7 +247,7 @@ async function main() {
 	await prisma.banner.create({
 		data: {
 			name: "Promoção de Calabresa",
-			image_url: "https://placehold.co/600x300",
+			image_key: "https://placehold.co/600x300",
 			linkType: BannerLinkType.PRODUCT,
 			product_id: products[1].id,
 			establishment_id: establishment.id

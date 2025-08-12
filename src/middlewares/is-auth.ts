@@ -1,5 +1,5 @@
 import { UserUnauthenticated } from "@/errors/user/user-unauthenticated";
-import type { FastifyReply, FastifyRequest } from "fastify";
+import { FastifyRequest } from "fastify/types/request";
 
 export const isAuthenticated = async (request: FastifyRequest) => {
 	try {

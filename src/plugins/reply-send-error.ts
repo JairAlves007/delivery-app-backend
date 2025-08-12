@@ -22,7 +22,7 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 		if (error instanceof ZodError) {
 			error.name = "VALIDATION_ERROR";
 
-			return this.status(HTTPStatusCodes.INTERNAL_SERVER_ERROR).send(
+			return this.status(HTTPStatusCodes.UNPROCESSABLE_ENTITY).send(
 				ApiResponse.error(error, flattenError(error).fieldErrors)
 			);
 		}
@@ -31,6 +31,7 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 			return this.status(error.statusCode).send(ApiResponse.error(error));
 		}
 
+		let errorCode: number = HTTPStatusCodes.INTERNAL_SERVER_ERROR;
 		const errorResponse: DefaultErrorResponse = {
 			success: false,
 			message: "UNKNOWN_ERROR",
@@ -49,6 +50,7 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 					const target = error.meta?.target as string[];
 					const fields = target.join(", ");
 
+					errorCode = HTTPStatusCodes.CONFLICT;
 					errorResponse.details = {
 						error: {
 							message: `Já existe dados com este(s) campo(s): ${fields}`
@@ -56,6 +58,8 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 					};
 					break;
 				case "P2025":
+					errorCode = HTTPStatusCodes.NOT_FOUND;
+
 					errorResponse.details = {
 						error: {
 							message: "Nenhuma informação encontrada"
@@ -64,7 +68,7 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 					break;
 			}
 
-			return this.status(HTTPStatusCodes.CONFLICT).send(errorResponse);
+			return this.status(errorCode).send(errorResponse);
 		}
 
 		if (error instanceof Error) {
@@ -75,9 +79,7 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 			);
 		}
 
-		return this.status(HTTPStatusCodes.INTERNAL_SERVER_ERROR).send(
-			errorResponse
-		);
+		return this.status(errorCode).send(errorResponse);
 	});
 };
 

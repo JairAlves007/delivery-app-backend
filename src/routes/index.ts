@@ -1,7 +1,7 @@
 import { adminRoutes } from "./admin";
 import { apiRoutes } from "./api";
 import { healthRoutes } from "./health/health.route";
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify/types/instance";
 
 export const routes = (app: FastifyInstance) => {
 	app.register(

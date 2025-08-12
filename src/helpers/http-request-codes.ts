@@ -7,5 +7,6 @@ export class HTTPStatusCodes {
 	public static readonly FORBIDDEN = 403;
 	public static readonly NOT_FOUND = 404;
 	public static readonly CONFLICT = 409;
+	public static readonly UNPROCESSABLE_ENTITY = 422;
 	public static readonly INTERNAL_SERVER_ERROR = 500;
 }

@@ -6,7 +6,17 @@ const envSchema = z.object({
 	BASE_URL: z.url().default("http://localhost:3000"),
 	DATABASE_URL: z.url(),
 	CORS_ORIGIN: z.string().default("*"),
-	JWT_SECRET: z.string().min(1, "JWT secret is required")
+	JWT_SECRET: z.string().min(1, "JWT secret is required"),
+	CLOUDFLARE_ENDPOINT: z.url("Cloudflare endpoint is required"),
+	CLOUDFLARE_ACCESS_KEY_ID: z
+		.string()
+		.min(1, "Cloudflare access key id is required"),
+	CLOUDFLARE_SECRET_ACCESS_KEY: z
+		.string()
+		.min(1, "Cloudflare secret access key is required"),
+	CLOUDFLARE_BUCKET_NAME: z
+		.string()
+		.min(1, "Cloudflare bucket name is required")
 });
 
 export const env = envSchema.parse(process.env);

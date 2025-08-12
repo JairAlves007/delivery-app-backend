@@ -1,7 +1,7 @@
 import { UserUnauthenticated } from "@/errors/user/user-unauthenticated";
 import { UserUnauthorized } from "@/errors/user/user-unauthorized";
 import type { RoleType } from "@prisma/client";
-import type { FastifyRequest } from "fastify";
+import { FastifyRequest } from "fastify/types/request";
 
 export const ensureUserHasRoles = (roles: RoleType[]) => {
 	return async (request: FastifyRequest) => {

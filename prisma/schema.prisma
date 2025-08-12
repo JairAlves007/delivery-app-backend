@@ -163,7 +163,7 @@ model Establishment {
   id                  String            @id @default(uuid())
   name                String
   slug                String            @unique
-  logo_url            String
+  logo_image_key      String
   address             String
   phone               String
   description         String
@@ -232,7 +232,7 @@ model Product {
   name                String
   description         String
   price               Int
-  image_url           String
+  image_key           String
   slug                String          @unique
   discount_percentage Float?
   stock               Int?
@@ -326,7 +326,7 @@ model Favorite {
 model Banner {
   id               Int              @id @default(autoincrement())
   name             String
-  image_url        String
+  image_key        String
   establishment_id String
   linkType         BannerLinkType
   product_id       String?
