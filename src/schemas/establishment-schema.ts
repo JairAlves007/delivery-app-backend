@@ -10,6 +10,7 @@ export const listEstablishmentQueryParamsSchema = z.object({
 export const createEstablishmentBodySchema = z.object({
 	name: z.string().min(1, "O nome deve ser preenchido"),
 	address: z.string().min(1, "O endereço deve ser preenchido"),
+	logo_image_key: z.string().min(1, "Precisamos da chave da imagem"),
 	phone: z
 		.string()
 		.min(1, "O telefone deve ser preenchido")
@@ -39,6 +40,7 @@ export const updateEstablishmentBodySchema = z.object({
 	address: z.string().optional(),
 	description: z.string().optional(),
 	email: z.email("Endereço de e-mail inválido").optional(),
+	logo_image_key: z.string().optional(),
 	phone: z
 		.string()
 		.regex(Constants.PHONE_REGEX, "Telefone inválido")

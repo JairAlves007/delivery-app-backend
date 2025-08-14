@@ -16,7 +16,10 @@ const envSchema = z.object({
 		.min(1, "Cloudflare secret access key is required"),
 	CLOUDFLARE_BUCKET_NAME: z
 		.string()
-		.min(1, "Cloudflare bucket name is required")
+		.min(1, "Cloudflare bucket name is required"),
+	REDIS_HOST: z.string().default("127.0.0.1"),
+	REDIS_PORT: z.coerce.number().default(6379),
+	REDIS_PASSWORD: z.string().optional()
 });
 
 export const env = envSchema.parse(process.env);

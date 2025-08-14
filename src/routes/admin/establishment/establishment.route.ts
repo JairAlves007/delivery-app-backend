@@ -7,7 +7,7 @@ import {
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission";
 import { isAuthenticated } from "@/middlewares/is-auth";
 import { PermissionType } from "@prisma/client";
-import type { FastifyInstance, FastifyRequest } from "fastify";
+import type { FastifyInstance } from "fastify";
 
 const establishmentMiddlewares = {
 	onRequest: [

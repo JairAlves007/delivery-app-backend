@@ -1,4 +1,5 @@
 import { InvalidPage } from "@/errors/establishment/invalid-page";
+import { makeCache } from "@/factories/make-cache";
 import { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository";
 import { listEstablishmentQueryParamsSchema } from "@/schemas/establishment-schema";
 import { Establishment } from "@prisma/client";
@@ -23,15 +24,24 @@ export class ListEstablishmentService {
 		page,
 		perPage
 	}: ListEstablishmentServiceRequest): Promise<ListEstablishmentServiceResponse> {
+		const cache = makeCache();
+
 		const isPaging = !!page;
-		const total = await this.establishmentRepository.count();
+		const totalPromise = cache.rememberForever(
+			"total_establishments",
+			async () => await this.establishmentRepository.count()
+		);
 
 		if (isPaging) {
+			const [total, establishments] = await Promise.all([
+				totalPromise,
+				cache.rememberForever(
+					`establishments_page_${page}`,
+					async () => await this.establishmentRepository.paginate(page, perPage)
+				)
+			]);
+
 			const totalPages = Math.ceil(total / perPage);
-			const establishments = await this.establishmentRepository.paginate(
-				page,
-				perPage
-			);
 
 			if (page > totalPages) throw new InvalidPage();
 
@@ -44,7 +54,13 @@ export class ListEstablishmentService {
 			};
 		}
 
-		const establishments = await this.establishmentRepository.listAll();
+		const [total, establishments] = await Promise.all([
+			totalPromise,
+			cache.rememberForever(
+				"all_establishments",
+				async () => await this.establishmentRepository.listAll()
+			)
+		]);
 
 		return {
 			establishments,

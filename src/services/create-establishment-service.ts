@@ -1,12 +1,6 @@
 import { slugify } from "@/helpers/utils";
 import { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository";
-import { createEstablishmentBodySchema } from "@/schemas/establishment-schema";
 import { Prisma } from "@prisma/client";
-import z from "zod";
-
-type CreateEstablishmentServiceRequest = z.infer<
-	typeof createEstablishmentBodySchema
->;
 
 export class CreateEstablishmentService {
 	constructor(private establishmentRepository: IEstablishmentRepository) {}
@@ -15,16 +9,17 @@ export class CreateEstablishmentService {
 		name,
 		email,
 		address,
+		logo_image_key,
 		description,
 		phone,
 		cnpj,
 		accepts_credit_card,
 		only_delivery
-	}: CreateEstablishmentServiceRequest): Promise<void> {
-		const data: Prisma.EstablishmentCreateInput = {
+	}: Prisma.EstablishmentCreateInput): Promise<void> {
+		await this.establishmentRepository.create({
 			name,
 			slug: slugify(name),
-			logo_url: "https://avatar.iran.liara.run/public/17",
+			logo_image_key,
 			email,
 			address,
 			description,
@@ -32,8 +27,6 @@ export class CreateEstablishmentService {
 			cnpj,
 			accepts_credit_card,
 			only_delivery
-		};
-
-		await this.establishmentRepository.create(data);
+		});
 	}
 }
