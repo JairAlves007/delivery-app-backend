@@ -1,13 +1,12 @@
-import Constants from "@/helpers/constants";
-import { transformPriceToDatabase } from "@/helpers/price";
-import { slugify } from "@/helpers/utils";
+import { transformPriceToDatabase } from "@/helpers/price.ts";
+import { slugify } from "@/helpers/utils.ts";
 import {
 	PrismaClient,
 	PermissionType,
 	RoleType,
-	ProductCategory,
-	Product,
-	AddonCategory,
+	type ProductCategory,
+	type Product,
+	type AddonCategory,
 	AddonType,
 	CouponType,
 	DiscountType,
@@ -15,7 +14,7 @@ import {
 	SocialPlatform,
 	WeekDay
 } from "@prisma/client";
-import { hash } from "bcrypt-ts";
+import { hash } from "argon2";
 
 const prisma = new PrismaClient();
 
@@ -91,7 +90,7 @@ async function main() {
 		data: {
 			name: "Admin",
 			email: "admin@delivery.com",
-			password: await hash("admin123", Constants.HASH_SALT_LENGTH),
+			password: await hash("admin123"),
 			role_id: adminRole.id
 		}
 	});

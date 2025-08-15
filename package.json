@@ -4,21 +4,19 @@
 	"description": "Delivery Micro SAAS Backend",
 	"main": "index.js",
 	"scripts": {
-		"dev": "node --loader esm-module-alias/loader --no-warnings --watch --env-file .env src/http/server.ts"
+		"dev": "node --loader esm-module-alias/loader --no-warnings --watch --env-file .env src/http/server.ts",
+		"db:studio": "prisma studio"
 	},
 	"prisma": {
-		"seed": "ts-node -r tsconfig-paths/register prisma/seed.ts"
+		"seed": "node --loader esm-module-alias/loader --no-warnings prisma/seed.ts"
 	},
 	"keywords": [],
 	"author": "Jair Alves",
 	"license": "MIT",
 	"type": "module",
 	"devDependencies": {
-		"@types/module-alias": "2.0.4",
 		"@types/node": "24.2.0",
 		"prisma": "6.14.0",
-		"ts-node": "10.9.2",
-		"tsconfig-paths": "4.2.0",
 		"typescript": "5.9.2"
 	},
 	"dependencies": {
@@ -27,7 +25,7 @@
 		"@fastify/cors": "11.1.0",
 		"@fastify/jwt": "9.1.0",
 		"@prisma/client": "6.14.0",
-		"bcrypt-ts": "7.1.0",
+		"argon2": "0.44.0",
 		"esm-module-alias": "2.2.1",
 		"fastify": "5.4.0",
 		"ioredis": "5.7.0",

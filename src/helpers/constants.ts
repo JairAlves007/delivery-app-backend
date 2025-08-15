@@ -4,7 +4,6 @@ export default class Constants {
 
 	// Numbers
 	public static readonly PRICE_MULTIPLIER: number = 100;
-	public static readonly HASH_SALT_LENGTH: number = 6;
 	public static readonly SIGNED_URL_EXPIRES_IN_MINUTES: number = 60 * 4;
 
 	// Regex

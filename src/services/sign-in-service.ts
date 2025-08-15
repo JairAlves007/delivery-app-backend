@@ -3,7 +3,7 @@ import type { IUserRepository } from "@/interfaces/repositories/user-repository.
 import type { UserWithRole } from "@/interfaces/user.ts";
 import { signInBodySchema } from "@/schemas/auth-schema.ts";
 import type { RoleType } from "@prisma/client";
-import { compare } from "bcrypt-ts";
+import { verify } from "argon2";
 import z from "zod";
 
 type SignInServiceRequest = z.infer<typeof signInBodySchema> & {
@@ -29,12 +29,14 @@ export class SignInService {
 		try {
 			const user = await this.userRepository.findByEmail(email);
 
+			console.log(user);
+
 			if (!user) throw new InvalidCredentials();
 
 			if (!allowedRoles.includes(user.role.name))
 				throw new InvalidCredentials();
 
-			const doesPasswordMatches = await compare(password, user.password);
+			const doesPasswordMatches = await verify(user.password, password);
 
 			if (!doesPasswordMatches) throw new InvalidCredentials();
 
