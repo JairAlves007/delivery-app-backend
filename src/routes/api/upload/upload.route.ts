@@ -1,8 +1,8 @@
-import { FastifyInstance } from "fastify/types/instance";
-import { generateUploadSignedUrl } from "@/controllers/upload.controller";
-import { isAuthenticated } from "@/middlewares/is-auth";
-import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission";
+import { generateUploadSignedUrl } from "@/controllers/upload.controller.ts";
+import { isAuthenticated } from "@/middlewares/is-auth.ts";
+import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.ts";
 import { PermissionType } from "@prisma/client";
+import type { FastifyInstance } from "fastify";
 
 const uploadMiddlewares = {
 	onRequest: [

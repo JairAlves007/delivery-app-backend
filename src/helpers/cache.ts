@@ -1,5 +1,5 @@
-import { ICacheBase } from "@/interfaces/cache/cache-base";
-import { redis } from "@/lib/redis";
+import type { ICacheBase } from "@/interfaces/cache/cache-base.ts";
+import { redis } from "@/lib/redis.ts";
 
 export class Cache implements ICacheBase {
 	async set(key: string, value: any, duration?: number) {

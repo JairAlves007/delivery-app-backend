@@ -1,7 +1,7 @@
-import { InvalidCredentials } from "@/errors/user/invalid-credentials-error";
-import { IUserRepository } from "@/interfaces/repositories/user-repository";
-import type { UserWithRole } from "@/interfaces/user";
-import { signInBodySchema } from "@/schemas/auth-schema";
+import { InvalidCredentials } from "@/errors/user/invalid-credentials-error.ts";
+import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
+import type { UserWithRole } from "@/interfaces/user.ts";
+import { signInBodySchema } from "@/schemas/auth-schema.ts";
 import type { RoleType } from "@prisma/client";
 import { compare } from "bcrypt-ts";
 import z from "zod";
@@ -15,7 +15,11 @@ interface SignInServiceResponse {
 }
 
 export class SignInService {
-	constructor(private userRepository: IUserRepository) {}
+	private userRepository: IUserRepository;
+
+	constructor(userRepository: IUserRepository) {
+		this.userRepository = userRepository;
+	}
 
 	async handle({
 		email,

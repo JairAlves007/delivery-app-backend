@@ -1,8 +1,8 @@
-import { InvalidPage } from "@/errors/establishment/invalid-page";
-import { makeCache } from "@/factories/make-cache";
-import { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository";
-import { listEstablishmentQueryParamsSchema } from "@/schemas/establishment-schema";
-import { Establishment } from "@prisma/client";
+import { InvalidPage } from "@/errors/establishment/invalid-page.ts";
+import { makeCache } from "@/factories/make-cache.ts";
+import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
+import { listEstablishmentQueryParamsSchema } from "@/schemas/establishment-schema.ts";
+import type { Establishment } from "@prisma/client";
 import z from "zod";
 
 type ListEstablishmentServiceRequest = z.infer<
@@ -18,7 +18,11 @@ interface ListEstablishmentServiceResponse
 }
 
 export class ListEstablishmentService {
-	constructor(private establishmentRepository: IEstablishmentRepository) {}
+	private establishmentRepository: IEstablishmentRepository;
+
+	constructor(establishmentRepository: IEstablishmentRepository) {
+		this.establishmentRepository = establishmentRepository;
+	}
 
 	async handle({
 		page,

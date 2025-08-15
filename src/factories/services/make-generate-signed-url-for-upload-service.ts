@@ -1,4 +1,4 @@
-import { GenerateSignedUrlForUploadService } from "@/services/generate-signed-url-for-upload";
+import { GenerateSignedUrlForUploadService } from "@/services/generate-signed-url-for-upload.ts";
 
 export const makeGenerateSignedUrlForUploadService = () => {
 	return new GenerateSignedUrlForUploadService();

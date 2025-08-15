@@ -1,5 +1,5 @@
 import type { PermissionType, Prisma, User } from "@prisma/client";
-import { UserWithRole } from "../user";
+import type { UserWithRole } from "../user.ts";
 
 export interface IUserRepository {
 	findById(id: string): Promise<UserWithRole | null>;

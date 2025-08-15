@@ -1,6 +1,6 @@
-import { SignUpService } from "@/services/sign-up-service";
-import { makeUserRepository } from "../repositories/make-user-repository";
-import { makeRoleRepository } from "../repositories/make-role-repository";
+import { SignUpService } from "@/services/sign-up-service.ts";
+import { makeUserRepository } from "../repositories/make-user-repository.ts";
+import { makeRoleRepository } from "../repositories/make-role-repository.ts";
 
 export const makeSignUpService = () => {
 	const userRepository = makeUserRepository();

@@ -1,5 +1,5 @@
-import Constants from "@/helpers/constants";
-import { checkIfCNPJIsValid } from "@/helpers/utils";
+import Constants from "@/helpers/constants.ts";
+import { checkIfCNPJIsValid } from "@/helpers/utils.ts";
 import z from "zod";
 
 export const listEstablishmentQueryParamsSchema = z.object({

@@ -1,6 +1,6 @@
-import { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository";
-import { prisma } from "@/lib/prisma";
-import { Establishment, Prisma } from "@prisma/client";
+import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
+import type { Establishment, Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma.ts";
 
 export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	async listAll(): Promise<Establishment[]> {

@@ -1,6 +1,6 @@
-import { UserNotFound } from "@/errors/user/user-not-found";
-import { IUserRepository } from "@/interfaces/repositories/user-repository";
-import { Profile, UserWithRole } from "@/interfaces/user";
+import { UserNotFound } from "@/errors/user/user-not-found.ts";
+import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
+import type { Profile } from "@/interfaces/user.ts";
 
 interface GetProfileServiceRequest {
 	id: string;
@@ -11,7 +11,11 @@ interface GetProfileServiceResponse {
 }
 
 export class GetProfileService {
-	constructor(private userRepository: IUserRepository) {}
+	private userRepository: IUserRepository;
+
+	constructor(userRepository: IUserRepository) {
+		this.userRepository = userRepository;
+	}
 
 	async handle({
 		id

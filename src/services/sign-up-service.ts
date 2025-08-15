@@ -1,9 +1,9 @@
-import { UserUnauthorized } from "@/errors/user/user-unauthorized";
-import Constants from "@/helpers/constants";
-import { IRoleRepository } from "@/interfaces/repositories/role-repository";
-import { IUserRepository } from "@/interfaces/repositories/user-repository";
-import { signUpBodySchema } from "@/schemas/auth-schema";
-import { RoleType, User } from "@prisma/client";
+import { UserUnauthorized } from "@/errors/user/user-unauthorized.ts";
+import Constants from "@/helpers/constants.ts";
+import type { IRoleRepository } from "@/interfaces/repositories/role-repository.ts";
+import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
+import { signUpBodySchema } from "@/schemas/auth-schema.ts";
+import type { RoleType, User } from "@prisma/client";
 import { hash } from "bcrypt-ts";
 import z from "zod";
 
@@ -17,10 +17,16 @@ interface SignUpServiceResponse {
 }
 
 export class SignUpService {
+	private userRepository: IUserRepository;
+	private roleRepository: IRoleRepository;
+
 	constructor(
-		private userRepository: IUserRepository,
-		private roleRepository: IRoleRepository
-	) {}
+		userRepository: IUserRepository,
+		roleRepository: IRoleRepository
+	) {
+		this.userRepository = userRepository;
+		this.roleRepository = roleRepository;
+	}
 
 	async handle(data: SignUpServiceRequest): Promise<SignUpServiceResponse> {
 		const { name, email, password, role } = data;

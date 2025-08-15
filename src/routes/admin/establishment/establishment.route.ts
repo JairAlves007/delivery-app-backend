@@ -3,9 +3,9 @@ import {
 	index,
 	store,
 	update
-} from "@/controllers/establishment.controller";
-import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission";
-import { isAuthenticated } from "@/middlewares/is-auth";
+} from "@/controllers/establishment.controller.ts";
+import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.ts";
+import { isAuthenticated } from "@/middlewares/is-auth.ts";
 import { PermissionType } from "@prisma/client";
 import type { FastifyInstance } from "fastify";
 

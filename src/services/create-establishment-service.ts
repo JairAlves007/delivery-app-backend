@@ -1,9 +1,13 @@
-import { slugify } from "@/helpers/utils";
-import { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository";
+import { slugify } from "@/helpers/utils.ts";
+import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import { Prisma } from "@prisma/client";
 
 export class CreateEstablishmentService {
-	constructor(private establishmentRepository: IEstablishmentRepository) {}
+	private establishmentRepository: IEstablishmentRepository;
+
+	constructor(establishmentRepository: IEstablishmentRepository) {
+		this.establishmentRepository = establishmentRepository;
+	}
 
 	async handle({
 		name,

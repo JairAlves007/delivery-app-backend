@@ -1,7 +1,7 @@
-import { env } from "@/env";
-import Constants from "@/helpers/constants";
-import { r2 } from "@/lib/cloudflare";
-import { uploadSignedUrlBodySchema } from "@/schemas/upload-schema";
+import { env } from "@/env.ts";
+import Constants from "@/helpers/constants.ts";
+import { r2 } from "@/lib/cloudflare.ts";
+import { uploadSignedUrlBodySchema } from "@/schemas/upload-schema.ts";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import z from "zod";

@@ -1,8 +1,8 @@
-import { UserUnauthenticated } from "@/errors/user/user-unauthenticated";
-import { UserUnauthorized } from "@/errors/user/user-unauthorized";
-import { makeUserRepository } from "@/factories/repositories/make-user-repository";
+import { UserUnauthenticated } from "@/errors/user/user-unauthenticated.ts";
+import { UserUnauthorized } from "@/errors/user/user-unauthorized.ts";
+import { makeUserRepository } from "@/factories/repositories/make-user-repository.ts";
 import type { PermissionType } from "@prisma/client";
-import { FastifyRequest } from "fastify/types/request";
+import type { FastifyRequest } from "fastify";
 
 export const ensureUserHasPermission = (permissions: PermissionType[]) => {
 	return async (request: FastifyRequest) => {

@@ -1,5 +1,5 @@
-import { HTTPStatusCodes } from "@/helpers/http-request-codes";
-import { ErrorBase } from "../error-base";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import { ErrorBase } from "../error-base.ts";
 
 export class InvalidCredentials extends ErrorBase {
 	constructor() {

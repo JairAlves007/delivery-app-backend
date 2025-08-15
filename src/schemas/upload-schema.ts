@@ -1,4 +1,4 @@
-import Constants from "@/helpers/constants";
+import Constants from "@/helpers/constants.ts";
 import z from "zod";
 
 export const uploadSignedUrlBodySchema = z.object({

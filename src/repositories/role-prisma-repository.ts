@@ -1,7 +1,7 @@
-import { IRoleRepository } from "@/interfaces/repositories/role-repository";
-import { RoleWithPermissions } from "@/interfaces/role";
-import { prisma } from "@/lib/prisma";
-import { RoleType } from "@prisma/client";
+import type { IRoleRepository } from "@/interfaces/repositories/role-repository.ts";
+import type { RoleWithPermissions } from "@/interfaces/role.ts";
+import { prisma } from "@/lib/prisma.ts";
+import type { RoleType } from "@prisma/client";
 
 export class RolePrismaRepository implements IRoleRepository {
 	async findByName(name: RoleType): Promise<RoleWithPermissions | null> {

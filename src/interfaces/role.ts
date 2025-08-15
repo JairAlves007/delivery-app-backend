@@ -1,4 +1,4 @@
-import { PermissionType, Role } from "@prisma/client";
+import type { PermissionType, Role } from "@prisma/client";
 
 export interface RoleWithPermissions extends Role {
 	permissions: Array<{

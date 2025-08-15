@@ -1,13 +1,12 @@
-import Constants from "@/helpers/constants";
-import { makeSignInService } from "@/factories/services/make-sign-in-service";
-import { makeSignUpService } from "@/factories/services/make-sign-up-service";
-import { ApiResponse } from "@/helpers/api";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes";
-import { signInBodySchema, signUpBodySchema } from "@/schemas/auth-schema";
+import Constants from "@/helpers/constants.ts";
+import { makeSignInService } from "@/factories/services/make-sign-in-service.ts";
+import { makeSignUpService } from "@/factories/services/make-sign-up-service.ts";
+import { ApiResponse } from "@/helpers/api.ts";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import { signInBodySchema, signUpBodySchema } from "@/schemas/auth-schema.ts";
 import { RoleType } from "@prisma/client";
-import { makeProfileService } from "@/factories/services/make-get-profile-service";
-import { FastifyRequest } from "fastify/types/request";
-import { FastifyReply } from "fastify/types/reply";
+import { makeProfileService } from "@/factories/services/make-get-profile-service.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const signIn = (allowedRoles: RoleType[]) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {

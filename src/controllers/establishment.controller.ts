@@ -1,17 +1,16 @@
-import { makeCreateEstablishmentService } from "@/factories/services/make-create-establishment-service";
-import { makeDeleteEstablishmentService } from "@/factories/services/make-delete-establishment-service";
-import { makeListEstablishmentService } from "@/factories/services/make-list-establishment-service";
-import { makeUpdateEstablishmentService } from "@/factories/services/make-update-establishment-service";
-import { ApiResponse } from "@/helpers/api";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes";
+import { makeCreateEstablishmentService } from "@/factories/services/make-create-establishment-service.ts";
+import { makeDeleteEstablishmentService } from "@/factories/services/make-delete-establishment-service.ts";
+import { makeListEstablishmentService } from "@/factories/services/make-list-establishment-service.ts";
+import { makeUpdateEstablishmentService } from "@/factories/services/make-update-establishment-service.ts";
+import { ApiResponse } from "@/helpers/api.ts";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
 	createEstablishmentBodySchema,
 	establishmentParamsSchema,
 	listEstablishmentQueryParamsSchema,
 	updateEstablishmentBodySchema
-} from "@/schemas/establishment-schema";
-import { FastifyReply } from "fastify/types/reply";
-import { FastifyRequest } from "fastify/types/request";
+} from "@/schemas/establishment-schema.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const query = listEstablishmentQueryParamsSchema.parse(request.query);

@@ -1,6 +1,6 @@
-import type { FastifyInstance } from "fastify/types/instance";
-import { adminAuthRoutes } from "./auth/auth.route";
-import { establishmentRoutes } from "./establishment/establishment.route";
+import type { FastifyInstance } from "fastify";
+import { adminAuthRoutes } from "./auth/auth.route.ts";
+import { establishmentRoutes } from "./establishment/establishment.route.ts";
 
 export const adminRoutes = (app: FastifyInstance) => {
 	app.register(
