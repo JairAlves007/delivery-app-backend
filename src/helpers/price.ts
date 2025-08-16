@@ -5,3 +5,7 @@ export function transformPriceToDatabase(price: number): number {
 
 	return Math.round(price * Constants.PRICE_MULTIPLIER);
 }
+
+export function transformPriceFromDatabase(price: number): number {
+	return price / Constants.PRICE_MULTIPLIER;
+}

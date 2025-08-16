@@ -1,19 +1,19 @@
-import { makeCreateEstablishmentService } from "@/factories/services/make-create-establishment-service.ts";
-import { makeDeleteEstablishmentService } from "@/factories/services/make-delete-establishment-service.ts";
-import { makeListEstablishmentService } from "@/factories/services/make-list-establishment-service.ts";
-import { makeUpdateEstablishmentService } from "@/factories/services/make-update-establishment-service.ts";
+import { makeCreateEstablishmentService } from "@/factories/services/establishment/make-create-establishment-service.ts";
+import { makeDeleteEstablishmentService } from "@/factories/services/establishment/make-delete-establishment-service.ts";
+import { makeListEstablishmentService } from "@/factories/services/establishment/make-list-establishment-service.ts";
+import { makeUpdateEstablishmentService } from "@/factories/services/establishment/make-update-establishment-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
 	createEstablishmentBodySchema,
 	establishmentParamsSchema,
-	listEstablishmentQueryParamsSchema,
 	updateEstablishmentBodySchema
 } from "@/schemas/establishment-schema.ts";
+import { paginationQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
-	const query = listEstablishmentQueryParamsSchema.parse(request.query);
+	const query = paginationQueryParamsSchema.parse(request.query);
 
 	try {
 		const listEstablishmentService = makeListEstablishmentService();

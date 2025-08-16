@@ -1,4 +1,4 @@
-import { makeGenerateSignedUrlForUploadService } from "@/factories/services/make-generate-signed-url-for-upload-service.ts";
+import { makeGenerateSignedUrlForUploadService } from "@/factories/services/upload/make-generate-signed-url-for-upload-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import { uploadSignedUrlBodySchema } from "@/schemas/upload-schema.ts";

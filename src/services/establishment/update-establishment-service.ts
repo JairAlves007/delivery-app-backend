@@ -2,7 +2,7 @@ import type { IEstablishmentRepository } from "@/interfaces/repositories/establi
 import { updateEstablishmentBodySchema } from "@/schemas/establishment-schema.ts";
 import z from "zod";
 
-type DeleteEstablishmentRequest = z.infer<typeof updateEstablishmentBodySchema>;
+type UpdateEstablishmentRequest = z.infer<typeof updateEstablishmentBodySchema>;
 
 export class UpdateEstablishmentService {
 	private establishmentRepository: IEstablishmentRepository;
@@ -11,7 +11,7 @@ export class UpdateEstablishmentService {
 		this.establishmentRepository = establishmentRepository;
 	}
 
-	async handle(id: string, data: DeleteEstablishmentRequest) {
+	async handle(id: string, data: UpdateEstablishmentRequest) {
 		return await this.establishmentRepository.update(id, data);
 	}
 }

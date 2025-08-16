@@ -70,13 +70,6 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 			});
 		}
 
-		return await prisma.establishment.update({
-			where: {
-				id
-			},
-			data: {
-				deleted_at: new Date()
-			}
-		});
+		return await this.update(id, { deleted_at: new Date() });
 	}
 }

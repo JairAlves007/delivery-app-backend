@@ -1,12 +1,12 @@
-import { InvalidPage } from "@/errors/establishment/invalid-page.ts";
-import { makeCache } from "@/factories/make-cache.ts";
+import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import { listEstablishmentQueryParamsSchema } from "@/schemas/establishment-schema.ts";
+import { paginationQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { Establishment } from "@prisma/client";
 import z from "zod";
 
 type ListEstablishmentServiceRequest = z.infer<
-	typeof listEstablishmentQueryParamsSchema
+	typeof paginationQueryParamsSchema
 >;
 
 interface ListEstablishmentServiceResponse
@@ -40,7 +40,7 @@ export class ListEstablishmentService {
 			const [total, establishments] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`establishments_page_${page}`,
+					`establishments_page_${page}_per_page_${perPage}`,
 					async () => await this.establishmentRepository.paginate(page, perPage)
 				)
 			]);

@@ -1,6 +1,7 @@
 import { slugify } from "@/helpers/utils.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import { Prisma } from "@prisma/client";
+import { createEstablishmentBodySchema } from "@/schemas/establishment-schema.ts";
+import z from "zod";
 
 export class CreateEstablishmentService {
 	private establishmentRepository: IEstablishmentRepository;
@@ -19,7 +20,7 @@ export class CreateEstablishmentService {
 		cnpj,
 		accepts_credit_card,
 		only_delivery
-	}: Prisma.EstablishmentCreateInput): Promise<void> {
+	}: z.infer<typeof createEstablishmentBodySchema>): Promise<void> {
 		await this.establishmentRepository.create({
 			name,
 			slug: slugify(name),

@@ -1,0 +1,80 @@
+import { makeCreateProductService } from "@/factories/services/product/make-create-product-service.ts";
+import { makeDeleteProductService } from "@/factories/services/product/make-delete-product-service.ts";
+import { makeListProductService } from "@/factories/services/product/make-list-product-service.ts";
+import { makeUpdateProductService } from "@/factories/services/product/make-update-product-service.ts";
+import { ApiResponse } from "@/helpers/api.ts";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import { paginationQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import {
+	createProductBodySchema,
+	productParamsSchema,
+	updateProductBodySchema
+} from "@/schemas/product-schema.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
+
+export const index = async (request: FastifyRequest, reply: FastifyReply) => {
+	const query = paginationQueryParamsSchema.parse(request.query);
+
+	try {
+		const listProductService = makeListProductService();
+
+		const products = await listProductService.handle(query);
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(ApiResponse.success("Produtos listados com sucesso", products));
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const store = async (request: FastifyRequest, reply: FastifyReply) => {
+	const body = createProductBodySchema.parse(request.body);
+
+	try {
+		const createProductService = makeCreateProductService();
+
+		await createProductService.handle(body);
+
+		return reply
+			.status(HTTPStatusCodes.NO_CONTENT)
+			.send(ApiResponse.success("Produto criado com sucesso", {}));
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const update = async (request: FastifyRequest, reply: FastifyReply) => {
+	const { id } = productParamsSchema.parse(request.params);
+	const data = updateProductBodySchema.parse(request.body);
+
+	console.log(id, data);
+
+	try {
+		const updateProductService = makeUpdateProductService();
+
+		await updateProductService.handle(id, data);
+
+		return reply
+			.status(HTTPStatusCodes.NO_CONTENT)
+			.send(ApiResponse.success("Produto atualizado com sucesso", {}));
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const destroy = async (request: FastifyRequest, reply: FastifyReply) => {
+	const { id } = productParamsSchema.parse(request.params);
+
+	try {
+		const deleteProductService = makeDeleteProductService();
+
+		await deleteProductService.handle(id);
+
+		return reply
+			.status(HTTPStatusCodes.NO_CONTENT)
+			.send(ApiResponse.success("Produto deletado com sucesso", {}));
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
