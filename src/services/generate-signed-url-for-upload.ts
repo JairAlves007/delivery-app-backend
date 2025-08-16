@@ -1,9 +1,5 @@
-import { env } from "@/env.ts";
-import Constants from "@/helpers/constants.ts";
-import { r2 } from "@/lib/cloudflare.ts";
+import { SignedUrl } from "@/helpers/signed-url.ts";
 import { uploadSignedUrlBodySchema } from "@/schemas/upload-schema.ts";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import z from "zod";
 
 type GenerateSignedUrlForUploadServiceRequest = z.infer<
@@ -20,21 +16,9 @@ export class GenerateSignedUrlForUploadService {
 		contentType
 	}: GenerateSignedUrlForUploadServiceRequest): Promise<GenerateSignedUrlForUploadServiceResponse> {
 		try {
-			const extension = contentType.split("/")[1];
-			const uniqueString =
-				Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
-			const fileKey = `${uniqueString}.${extension}`;
-
-			const signedUrl = await getSignedUrl(
-				r2,
-				new PutObjectCommand({
-					Bucket: env.CLOUDFLARE_BUCKET_NAME,
-					Key: fileKey,
-					ContentType: contentType
-				}),
-				{
-					expiresIn: Constants.SIGNED_URL_EXPIRES_IN_MINUTES
-				}
+			const { signedUrl, fileKey } = await SignedUrl.createUploadSignedUrl(
+				"establishments/logos",
+				contentType
 			);
 
 			return {

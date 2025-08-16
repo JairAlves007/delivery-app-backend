@@ -38,7 +38,8 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	async findById(id: string): Promise<Establishment | null> {
 		return await prisma.establishment.findUnique({
 			where: {
-				id
+				id,
+				deleted_at: null
 			}
 		});
 	}
@@ -53,7 +54,8 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	): Promise<Establishment> {
 		return await prisma.establishment.update({
 			where: {
-				id
+				id,
+				deleted_at: null
 			},
 			data
 		});
