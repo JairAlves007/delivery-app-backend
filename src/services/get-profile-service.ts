@@ -1,3 +1,4 @@
+import { env } from "@/env.ts";
 import { UserNotFound } from "@/errors/user/user-not-found.ts";
 import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
 import type { Profile } from "@/interfaces/user.ts";
@@ -8,6 +9,7 @@ interface GetProfileServiceRequest {
 
 interface GetProfileServiceResponse {
 	profile: Profile | null;
+	bucketUrl: string;
 }
 
 export class GetProfileService {
@@ -33,7 +35,8 @@ export class GetProfileService {
 			};
 
 			return {
-				profile
+				profile,
+				bucketUrl: env.PUBLIC_BUCKET_URL
 			};
 		} catch (error) {
 			throw error;
