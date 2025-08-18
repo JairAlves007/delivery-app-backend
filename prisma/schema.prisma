@@ -214,7 +214,7 @@ model ProductCategory {
   id               String    @id @default(uuid())
   establishment_id String
   name             String
-  slug             String    @unique
+  slug             String
   order            Int?
   deleted_at       DateTime?
 
@@ -233,7 +233,7 @@ model Product {
   description         String
   price               Int
   image_key           String
-  slug                String          @unique
+  slug                String
   discount_percentage Float?
   stock               Int?
   valid_until         DateTime?
