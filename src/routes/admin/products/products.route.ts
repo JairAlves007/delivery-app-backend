@@ -4,11 +4,21 @@ import {
 	store,
 	update
 } from "@/controllers/product.controller.ts";
+import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.ts";
+import { isAuthenticated } from "@/middlewares/is-auth.ts";
+import { PermissionType } from "@prisma/client";
 import type { FastifyInstance } from "fastify";
 
+const productsMiddlewares = {
+	onRequest: [
+		isAuthenticated,
+		ensureUserHasPermission([PermissionType.MANAGE_PRODUCTS])
+	]
+};
+
 export const adminProductsRoutes = async (app: FastifyInstance) => {
-	app.get("/", index);
-	app.post("/", store);
-	app.patch("/:id", update);
-	app.delete("/:id", destroy);
+	app.get("/", productsMiddlewares, index);
+	app.post("/", productsMiddlewares, store);
+	app.patch("/:id", productsMiddlewares, update);
+	app.delete("/:id", productsMiddlewares, destroy);
 };
