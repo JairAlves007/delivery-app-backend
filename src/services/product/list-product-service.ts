@@ -1,5 +1,6 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { transformPriceFromDatabase } from "@/helpers/price.ts";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
 import { paginationQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { Product } from "@prisma/client";
@@ -20,6 +21,15 @@ export class ListProductService {
 
 	constructor(productRepository: IProductRepository) {
 		this.productRepository = productRepository;
+	}
+
+	private mapProducts(products: Product[]) {
+		return products.map(product => {
+			return {
+				...product,
+				price: transformPriceFromDatabase(product.price)
+			};
+		});
 	}
 
 	async handle({
@@ -48,7 +58,7 @@ export class ListProductService {
 			if (page > totalPages) throw new InvalidPage();
 
 			return {
-				products,
+				products: this.mapProducts(products),
 				page,
 				perPage,
 				total,
@@ -65,7 +75,7 @@ export class ListProductService {
 		]);
 
 		return {
-			products,
+			products: this.mapProducts(products),
 			page,
 			total
 		};
