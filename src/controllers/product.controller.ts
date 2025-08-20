@@ -48,8 +48,6 @@ export const update = async (request: FastifyRequest, reply: FastifyReply) => {
 	const { id } = productParamsSchema.parse(request.params);
 	const data = updateProductBodySchema.parse(request.body);
 
-	console.log(id, data);
-
 	try {
 		const updateProductService = makeUpdateProductService();
 

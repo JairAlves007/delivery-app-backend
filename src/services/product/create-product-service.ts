@@ -18,25 +18,14 @@ export class CreateProductService {
 	}
 
 	async handle({
-		name,
-		description,
-		price,
-		image_key,
-		discount_percentage,
-		stock,
-		valid_until,
 		establishmentId,
-		categoryId
+		categoryId,
+		...data
 	}: CreateProductServiceRequest): Promise<void> {
 		await this.productRepository.create({
-			name,
-			slug: slugify(name),
-			description,
-			price: transformPriceToDatabase(price),
-			image_key,
-			discount_percentage,
-			stock,
-			valid_until,
+			...data,
+			slug: slugify(data.name),
+			price: transformPriceToDatabase(data.price),
 			establishment: {
 				connect: {
 					id: establishmentId

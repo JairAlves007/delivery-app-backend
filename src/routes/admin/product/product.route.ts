@@ -16,7 +16,7 @@ const productsMiddlewares = {
 	]
 };
 
-export const adminProductsRoutes = async (app: FastifyInstance) => {
+export const adminProductRoutes = async (app: FastifyInstance) => {
 	app.get("/", productsMiddlewares, index);
 	app.post("/", productsMiddlewares, store);
 	app.patch("/:id", productsMiddlewares, update);
