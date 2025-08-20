@@ -222,6 +222,7 @@ model ProductCategory {
   products      Product[]
   banner        Banner[]
 
+  @@unique([slug, establishment_id])
   @@map("product_categories")
 }
 
@@ -246,6 +247,7 @@ model Product {
   orderItems          OrderItem[]
   banner              Banner[]
 
+  @@unique([slug, establishment_id])
   @@map("products")
 }
 
