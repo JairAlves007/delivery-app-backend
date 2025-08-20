@@ -122,18 +122,18 @@ model RolePermission {
 }
 
 model User {
-  id         String       @id @default(uuid())
-  name       String
-  email      String       @unique
-  password   String
-  role_id    Int
-  created_at DateTime     @default(now())
-  deleted_at DateTime?
-  role       Role         @relation(fields: [role_id], references: [id])
-  addresses  Address[]
-  orders     Order[]
-  favorites  Favorite[]
-  userCoupon UserCoupon[]
+  id          String       @id @default(uuid())
+  name        String
+  email       String       @unique
+  password    String
+  role_id     Int
+  created_at  DateTime     @default(now())
+  deleted_at  DateTime?
+  role        Role         @relation(fields: [role_id], references: [id])
+  addresses   Address[]
+  orders      Order[]
+  favorites   Favorite[]
+  userCoupons UserCoupon[]
 
   @@map("users")
 }
@@ -154,7 +154,7 @@ model Address {
   deleted_at      DateTime?
   user            User      @relation(fields: [user_id], references: [id])
   district        District  @relation(fields: [district_id], references: [id])
-  order           Order[]
+  orders          Order[]
 
   @@map("addresses")
 }
@@ -181,8 +181,8 @@ model Establishment {
   banners             Banner[]
   districts           District[]
   coupons             Coupon[]
-  addonCategory       AddonCategory[]
-  order               Order[]
+  addonCategories     AddonCategory[]
+  orders              Order[]
 
   @@map("establishments")
 }
@@ -220,7 +220,7 @@ model ProductCategory {
 
   establishment Establishment @relation(fields: [establishment_id], references: [id])
   products      Product[]
-  banner        Banner[]
+  banners       Banner[]
 
   @@unique([slug, establishment_id])
   @@map("product_categories")
@@ -245,7 +245,7 @@ model Product {
   category            ProductCategory @relation(fields: [category_id], references: [id])
   favorites           Favorite[]
   orderItems          OrderItem[]
-  banner              Banner[]
+  banners             Banner[]
 
   @@unique([slug, establishment_id])
   @@map("products")
@@ -266,12 +266,12 @@ model AddonCategory {
 }
 
 model Addon {
-  id             Int              @id @default(autoincrement())
-  category_id    Int
-  name           String
-  price          Int              @default(0)
-  category       AddonCategory    @relation(fields: [category_id], references: [id])
-  orderItemAddon OrderItemAddon[]
+  id              Int              @id @default(autoincrement())
+  category_id     Int
+  name            String
+  price           Int              @default(0)
+  category        AddonCategory    @relation(fields: [category_id], references: [id])
+  orderItemAddons OrderItemAddon[]
 
   @@map("addons")
 }
@@ -300,7 +300,7 @@ model Coupon {
   uses_per_user    Int?
   establishment    Establishment @relation(fields: [establishment_id], references: [id])
   orders           Order[]
-  userCoupon       UserCoupon[]
+  userCoupons      UserCoupon[]
 
   @@map("coupons")
 }
