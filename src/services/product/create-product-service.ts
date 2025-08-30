@@ -1,14 +1,9 @@
-import { transformPriceToDatabase } from "@/helpers/price.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
 import { createProductBodySchema } from "@/schemas/product-schema.ts";
 import z from "zod";
 
-interface CreateProductServiceRequest
-	extends z.infer<typeof createProductBodySchema> {
-	establishmentId: string;
-	categoryId: string;
-}
+type CreateProductServiceRequest = z.infer<typeof createProductBodySchema>;
 
 export class CreateProductService {
 	private productRepository: IProductRepository;
@@ -25,7 +20,6 @@ export class CreateProductService {
 		await this.productRepository.create({
 			...data,
 			slug: slugify(data.name),
-			price: transformPriceToDatabase(data.price),
 			establishment: {
 				connect: {
 					id: establishmentId

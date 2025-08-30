@@ -283,7 +283,9 @@ model District {
   shipping_cost    Int
   establishment    Establishment @relation(fields: [establishment_id], references: [id])
   addresses        Address[]
+  deleted_at       DateTime?
 
+  @@unique([name, establishment_id])
   @@map("districts")
 }
 

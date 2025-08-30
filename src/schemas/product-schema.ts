@@ -1,11 +1,13 @@
+import { transformPriceToDatabase } from "@/helpers/price.ts";
 import z from "zod";
 
 export const createProductBodySchema = z.object({
 	name: z.string().min(1, "O nome deve ser preenchido"),
 	description: z.string().min(1, "A descrição deve ser preenchida"),
-	price: z
+	price: z.coerce
 		.number("O preço deve ser preenchido")
-		.min(0, "O preço deve ser maior que zero"),
+		.min(0, "O preço deve ser maior que zero")
+		.transform(val => transformPriceToDatabase(val)),
 	image_key: z.string().min(1, "Precisamos da chave da imagem"),
 	discount_percentage: z
 		.number("O desconto deve ser preenchido")

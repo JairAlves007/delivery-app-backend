@@ -3,10 +3,9 @@ import type { IProductCategoryRepository } from "@/interfaces/repositories/produ
 import { createProductCategoryBodySchema } from "@/schemas/product-category-schema.ts";
 import z from "zod";
 
-interface CreateProductCategoryServiceRequest
-	extends z.infer<typeof createProductCategoryBodySchema> {
-	establishmentId: string;
-}
+type CreateProductCategoryServiceRequest = z.infer<
+	typeof createProductCategoryBodySchema
+>;
 
 export class CreateProductCategoryService {
 	private productCategoryRepository: IProductCategoryRepository;
