@@ -1,5 +1,6 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { transformPriceFromDatabase } from "@/helpers/price.ts";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
 import { paginationQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { District } from "@prisma/client";
@@ -20,6 +21,13 @@ export class ListDistrictService {
 
 	constructor(districtRepository: IDistrictRepository) {
 		this.districtRepository = districtRepository;
+	}
+
+	private mapDistricts(districts: District[]) {
+		return districts.map(district => ({
+			...district,
+			shipping_cost: transformPriceFromDatabase(district.shipping_cost)
+		}));
 	}
 
 	async handle({
@@ -48,7 +56,7 @@ export class ListDistrictService {
 			if (page > totalPages) throw new InvalidPage();
 
 			return {
-				districts,
+				districts: this.mapDistricts(districts),
 				page,
 				perPage,
 				total,
@@ -65,7 +73,7 @@ export class ListDistrictService {
 		]);
 
 		return {
-			districts,
+			districts: this.mapDistricts(districts),
 			page,
 			total
 		};

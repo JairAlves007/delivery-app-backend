@@ -271,9 +271,11 @@ model Addon {
   category_id     Int
   name            String
   price           Int              @default(0)
+  deleted_at      DateTime?
   category        AddonCategory    @relation(fields: [category_id], references: [id])
   orderItemAddons OrderItemAddon[]
 
+  @@unique([name, category_id])
   @@map("addons")
 }
 
