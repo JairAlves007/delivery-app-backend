@@ -247,7 +247,7 @@ async function main() {
 		data: {
 			name: "Promoção de Calabresa",
 			image_key: "https://placehold.co/600x300",
-			linkType: BannerLinkType.PRODUCT,
+			link_type: BannerLinkType.PRODUCT,
 			product_id: products[1].id,
 			establishment_id: establishment.id
 		}

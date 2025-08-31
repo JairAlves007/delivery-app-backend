@@ -332,7 +332,7 @@ model Banner {
   name             String
   image_key        String
   establishment_id String
-  linkType         BannerLinkType
+  link_type        BannerLinkType
   product_id       String?
   category_id      String?
   created_at       DateTime         @default(now())
