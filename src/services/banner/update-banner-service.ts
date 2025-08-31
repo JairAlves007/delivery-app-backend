@@ -3,7 +3,7 @@ import { updateBannerBodySchema } from "@/schemas/banner-schema.ts";
 import { BannerLinkType } from "@prisma/client";
 import z from "zod";
 
-type UpdateBannerRequest = z.infer<typeof updateBannerBodySchema>;
+type UpdateBannerServiceRequest = z.infer<typeof updateBannerBodySchema>;
 
 export class UpdateBannerService {
 	private bannerRepository: IBannerRepository;
@@ -20,7 +20,7 @@ export class UpdateBannerService {
 			productId,
 			linkType: link_type,
 			...data
-		}: UpdateBannerRequest
+		}: UpdateBannerServiceRequest
 	) {
 		return await this.bannerRepository.update(id, {
 			...data,

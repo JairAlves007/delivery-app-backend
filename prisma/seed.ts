@@ -171,12 +171,12 @@ async function main() {
 			data: [
 				{
 					name: "Bordas",
-					type: AddonType.Selection,
+					type: AddonType.MULTIPLE_CHOICE,
 					establishment_id: establishment.id
 				},
 				{
 					name: "Queijos",
-					type: AddonType.Quantity,
+					type: AddonType.QUANTITY,
 					establishment_id: establishment.id
 				}
 			]
@@ -227,15 +227,15 @@ async function main() {
 		data: [
 			{
 				code: "FRETEGRATIS",
-				type: CouponType.Shipping,
-				discount_type: DiscountType.Percentage,
+				type: CouponType.SHIPPING,
+				discount_type: DiscountType.PERCENTAGE,
 				value: transformPriceToDatabase(100),
 				establishment_id: establishment.id
 			},
 			{
 				code: "PIZZA10",
-				type: CouponType.Order,
-				discount_type: DiscountType.Fixed,
+				type: CouponType.ORDER,
+				discount_type: DiscountType.FIXED,
 				value: transformPriceToDatabase(10),
 				establishment_id: establishment.id
 			}
@@ -257,21 +257,21 @@ async function main() {
 	await prisma.openingHour.createMany({
 		data: [
 			{
-				day_of_week: WeekDay.Friday,
+				day_of_week: WeekDay.FRIDAY,
 				opens_at: "18:00",
 				closes_at: "23:00",
 				is_closed: false,
 				establishment_id: establishment.id
 			},
 			{
-				day_of_week: WeekDay.Saturday,
+				day_of_week: WeekDay.SATURDAY,
 				opens_at: "18:00",
 				closes_at: "23:00",
 				is_closed: false,
 				establishment_id: establishment.id
 			},
 			{
-				day_of_week: WeekDay.Sunday,
+				day_of_week: WeekDay.SUNDAY,
 				opens_at: "18:00",
 				closes_at: "23:00",
 				is_closed: false,
@@ -283,7 +283,7 @@ async function main() {
 	// ----- Social Links -----
 	await prisma.socialLink.create({
 		data: {
-			platform: SocialPlatform.Instagram,
+			platform: SocialPlatform.INSTAGRAM,
 			url: "https://instagram.com/pizzariadojair",
 			establishment_id: establishment.id
 		}

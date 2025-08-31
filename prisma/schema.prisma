@@ -8,21 +8,21 @@ datasource db {
 }
 
 enum OrderStatusType {
-  Preparing
-  Shipped
-  Delivered
-  Cancelled
+  PREPARING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
 
 enum PaymentMethodType {
-  Card
+  CARD
   PIX
-  Money
+  MONEY
 }
 
 enum DeliveryType {
-  Delivery
-  Pickup
+  DELIVERY
+  PICKUP
 }
 
 enum BannerLinkType {
@@ -32,36 +32,36 @@ enum BannerLinkType {
 }
 
 enum CouponType {
-  Shipping
-  Order
+  SHIPPING
+  ORDER
 }
 
 enum DiscountType {
-  Percentage
-  Fixed
+  PERCENTAGE
+  FIXED
 }
 
 enum AddonType {
-  Quantity
-  Selection
+  QUANTITY
+  MULTIPLE_CHOICE
 }
 
 enum SocialPlatform {
-  Facebook
-  Instagram
-  Twitter
-  WhatsApp
-  TikTok
+  FACEBOOK
+  INSTAGRAM
+  TWITTER
+  WHATSAPP
+  TIKTOK
 }
 
 enum WeekDay {
-  Monday
-  Tuesday
-  Wednesday
-  Thursday
-  Friday
-  Saturday
-  Sunday
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }
 
 enum RoleType {
@@ -262,6 +262,7 @@ model AddonCategory {
   establishment    Establishment @relation(fields: [establishment_id], references: [id])
   addons           Addon[]
 
+  @@unique([name, establishment_id])
   @@map("addon_categories")
 }
 

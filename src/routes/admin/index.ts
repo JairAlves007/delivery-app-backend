@@ -5,6 +5,7 @@ import { adminProductRoutes } from "./product/product.route.ts";
 import { adminProductCategoryRoutes } from "./product/category/category.route.ts";
 import { adminDistrictRoutes } from "./district/district.route.ts";
 import { adminBannerRoutes } from "./banner/banner.route.ts";
+import { adminAddonCategoryRoutes } from "./addon/category/addon-category.route.ts";
 
 export const adminRoutes = (app: FastifyInstance) => {
 	app.register(
@@ -15,6 +16,7 @@ export const adminRoutes = (app: FastifyInstance) => {
 			api.register(adminProductCategoryRoutes, { prefix: "/product/category" });
 			api.register(adminDistrictRoutes, { prefix: "/district" });
 			api.register(adminBannerRoutes, { prefix: "/banner" });
+			api.register(adminAddonCategoryRoutes, { prefix: "/addon/category" });
 		},
 		{ prefix: "/admin" }
 	);
