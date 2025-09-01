@@ -298,9 +298,10 @@ model Coupon {
   code             String        @unique
   type             CouponType
   discount_type    DiscountType
-  value            Int
+  value            Float
   starts_at        DateTime?
   ends_at          DateTime?
+  deleted_at       DateTime?
   max_uses         Int?
   uses_per_user    Int?
   establishment    Establishment @relation(fields: [establishment_id], references: [id])

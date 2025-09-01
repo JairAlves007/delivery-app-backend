@@ -5,12 +5,7 @@ export const createAddonCategoryBodySchema = z.object({
 	name: z.string().min(1, "O nome deve ser preenchido"),
 	type: z
 		.string()
-		.transform(val => {
-			return val.toUpperCase() as AddonType;
-		})
-		.refine(val => Object.values(AddonType).includes(val), {
-			message: "Tipo de categoria do adicional inválido"
-		}),
+		.enumCaseInsensitive(AddonType, "Tipo de categoria do adicional inválido"),
 	maxQuantity: z.coerce
 		.number()
 		.min(0, "A quantidade máxima deve ser maior que zero")

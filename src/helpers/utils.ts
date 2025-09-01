@@ -42,3 +42,7 @@ export function checkIfCNPJIsValid(cnpj: string): boolean {
 	result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
 	return result === parseInt(digits.charAt(1), 10);
 }
+
+export const transformValueToPercentage = (value: number): number => {
+	return value / 100;
+};

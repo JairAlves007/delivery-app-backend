@@ -1,3 +1,5 @@
+import "@/@types/zod.d.ts";
+
 import { env } from "@/env.ts";
 import { routes } from "@/routes/index.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";

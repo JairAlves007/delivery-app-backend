@@ -7,12 +7,7 @@ export const createBannerBodySchema = z
 		image_key: z.string().min(1, "Precisamos da chave da imagem"),
 		linkType: z
 			.string()
-			.transform(val => {
-				return val.toUpperCase() as BannerLinkType;
-			})
-			.refine(val => Object.values(BannerLinkType).includes(val), {
-				message: "Tipo de link inválido"
-			}),
+			.enumCaseInsensitive(BannerLinkType, "Tipo de link inválido"),
 		productId: z.string().nullable().optional(),
 		categoryId: z.string().nullable().optional(),
 		establishmentId: z

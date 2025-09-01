@@ -1,5 +1,5 @@
 import { transformPriceToDatabase } from "@/helpers/price.ts";
-import { slugify } from "@/helpers/utils.ts";
+import { slugify, transformValueToPercentage } from "@/helpers/utils.ts";
 import {
 	PrismaClient,
 	PermissionType,
@@ -229,7 +229,7 @@ async function main() {
 				code: "FRETEGRATIS",
 				type: CouponType.SHIPPING,
 				discount_type: DiscountType.PERCENTAGE,
-				value: transformPriceToDatabase(100),
+				value: transformValueToPercentage(100),
 				establishment_id: establishment.id
 			},
 			{
