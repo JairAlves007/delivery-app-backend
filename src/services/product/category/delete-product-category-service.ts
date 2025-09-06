@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
 
 export class DeleteProductCategoryService {
@@ -8,6 +9,10 @@ export class DeleteProductCategoryService {
 	}
 
 	async handle(id: string) {
-		return await this.productCategoryRepository.delete(id, false);
+		const cache = makeCache();
+
+		await this.productCategoryRepository.delete(id, false);
+
+		await cache.forgetKeysContaining(cache.keys.productCategories);
 	}
 }

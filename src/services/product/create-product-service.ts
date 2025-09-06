@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
 import { createProductBodySchema } from "@/schemas/product-schema.ts";
@@ -17,6 +18,8 @@ export class CreateProductService {
 		categoryId,
 		...data
 	}: CreateProductServiceRequest): Promise<void> {
+		const cache = makeCache();
+
 		await this.productRepository.create({
 			...data,
 			slug: slugify(data.name),
@@ -31,5 +34,7 @@ export class CreateProductService {
 				}
 			}
 		});
+
+		await cache.forgetKeysContaining(cache.keys.products);
 	}
 }

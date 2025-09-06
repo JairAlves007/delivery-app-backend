@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import { updateEstablishmentBodySchema } from "@/schemas/establishment-schema.ts";
 import z from "zod";
@@ -12,6 +13,10 @@ export class UpdateEstablishmentService {
 	}
 
 	async handle(id: string, data: UpdateEstablishmentRequest) {
-		return await this.establishmentRepository.update(id, data);
+		const cache = makeCache();
+
+		await this.establishmentRepository.update(id, data);
+
+		await cache.forgetKeysContaining(cache.keys.establishments);
 	}
 }

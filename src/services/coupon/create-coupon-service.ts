@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { transformPriceToDatabase } from "@/helpers/price.ts";
 import { transformValueToPercentage } from "@/helpers/utils.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
@@ -24,7 +25,9 @@ export class CreateCouponService {
 		usesPerUser: uses_per_user,
 		...data
 	}: CreateCouponServiceRequest) {
-		return await this.couponRepository.create({
+		const cache = makeCache();
+
+		await this.couponRepository.create({
 			...data,
 			value:
 				discount_type === DiscountType.PERCENTAGE
@@ -41,5 +44,7 @@ export class CreateCouponService {
 				}
 			}
 		});
+
+		await cache.forgetKeysContaining(cache.keys.coupons);
 	}
 }

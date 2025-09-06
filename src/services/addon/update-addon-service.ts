@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.ts";
 import { updateAddonBodySchema } from "@/schemas/addon-schema.ts";
 import z from "zod";
@@ -12,7 +13,9 @@ export class UpdateAddonService {
 	}
 
 	async handle(id: number, { categoryId, ...data }: UpdateAddonServiceRequest) {
-		return await this.addonRepository.update(id, {
+		const cache = makeCache();
+
+		await this.addonRepository.update(id, {
 			...data,
 			category: {
 				connect: {
@@ -20,5 +23,7 @@ export class UpdateAddonService {
 				}
 			}
 		});
+
+		await cache.forgetKeysContaining(cache.keys.addons);
 	}
 }

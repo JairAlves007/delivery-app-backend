@@ -32,7 +32,7 @@ export class ListProductCategoryService {
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
-			"total_product_categories",
+			`total_${cache.keys.productCategories}`,
 			async () => await this.productCategoryRepository.count()
 		);
 
@@ -40,7 +40,7 @@ export class ListProductCategoryService {
 			const [total, productCategories] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`product_categories_page_${page}_per_page_${perPage}`,
+					`${cache.keys.productCategories}_page_${page}_per_page_${perPage}`,
 					async () =>
 						await this.productCategoryRepository.paginate(page, perPage)
 				)
@@ -62,7 +62,7 @@ export class ListProductCategoryService {
 		const [total, productCategories] = await Promise.all([
 			totalPromise,
 			cache.rememberForever(
-				"all_product_categories",
+				`all_${cache.keys.productCategories}`,
 				async () => await this.productCategoryRepository.listAll()
 			)
 		]);

@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.ts";
 import { createAddonCategoryBodySchema } from "@/schemas/addon-category-schema.ts";
 import z from "zod";
@@ -18,7 +19,9 @@ export class CreateAddonCategoryService {
 		maxQuantity: max_quantity,
 		...data
 	}: CreateAddonCategoryServiceRequest) {
-		return await this.addonCategoryRepository.create({
+		const cache = makeCache();
+
+		await this.addonCategoryRepository.create({
 			...data,
 			max_quantity,
 			status: true,
@@ -28,5 +31,7 @@ export class CreateAddonCategoryService {
 				}
 			}
 		});
+
+		await cache.forgetKeysContaining(cache.keys.addonCategories);
 	}
 }

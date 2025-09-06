@@ -32,7 +32,7 @@ export class ListEstablishmentService {
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
-			"total_establishments",
+			`total_${cache.keys.establishments}`,
 			async () => await this.establishmentRepository.count()
 		);
 
@@ -40,7 +40,7 @@ export class ListEstablishmentService {
 			const [total, establishments] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`establishments_page_${page}_per_page_${perPage}`,
+					`${cache.keys.establishments}_page_${page}_per_page_${perPage}`,
 					async () => await this.establishmentRepository.paginate(page, perPage)
 				)
 			]);

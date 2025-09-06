@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
 
 export class DeleteBannerService {
@@ -8,6 +9,10 @@ export class DeleteBannerService {
 	}
 
 	async handle(id: number) {
-		return await this.bannerRepository.delete(id, false);
+		const cache = makeCache();
+
+		await this.bannerRepository.delete(id, false);
+
+		await cache.forgetKeysContaining(cache.keys.banners);
 	}
 }

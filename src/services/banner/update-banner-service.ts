@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
 import { updateBannerBodySchema } from "@/schemas/banner-schema.ts";
 import { BannerLinkType } from "@prisma/client";
@@ -22,7 +23,9 @@ export class UpdateBannerService {
 			...data
 		}: UpdateBannerServiceRequest
 	) {
-		return await this.bannerRepository.update(id, {
+		const cache = makeCache();
+
+		await this.bannerRepository.update(id, {
 			...data,
 			link_type,
 			establishment: {
@@ -43,5 +46,7 @@ export class UpdateBannerService {
 					}
 				})
 		});
+
+		await cache.forgetKeysContaining(cache.keys.banners);
 	}
 }

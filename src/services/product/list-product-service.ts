@@ -40,7 +40,7 @@ export class ListProductService {
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
-			"total_products",
+			`total_${cache.keys.products}`,
 			async () => await this.productRepository.count()
 		);
 
@@ -48,7 +48,7 @@ export class ListProductService {
 			const [total, products] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`products_page_${page}_per_page_${perPage}`,
+					`${cache.keys.products}_page_${page}_per_page_${perPage}`,
 					async () => await this.productRepository.paginate(page, perPage)
 				)
 			]);
@@ -69,7 +69,7 @@ export class ListProductService {
 		const [total, products] = await Promise.all([
 			totalPromise,
 			cache.rememberForever(
-				"all_products",
+				`all_${cache.keys.products}`,
 				async () => await this.productRepository.listAll()
 			)
 		]);

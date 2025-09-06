@@ -30,7 +30,7 @@ export class ListCouponService {
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
-			"total_coupons",
+			`total_${cache.keys.coupons}`,
 			async () => await this.couponRepository.count()
 		);
 
@@ -38,7 +38,7 @@ export class ListCouponService {
 			const [total, coupons] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`coupons_page_${page}_per_page_${perPage}`,
+					`${cache.keys.coupons}_page_${page}_per_page_${perPage}`,
 					async () => await this.couponRepository.paginate(page, perPage)
 				)
 			]);
@@ -59,7 +59,7 @@ export class ListCouponService {
 		const [total, coupons] = await Promise.all([
 			totalPromise,
 			cache.rememberForever(
-				"all_coupons",
+				`all_${cache.keys.coupons}`,
 				async () => await this.couponRepository.listAll()
 			)
 		]);

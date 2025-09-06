@@ -2,6 +2,24 @@ import type { ICacheBase } from "@/interfaces/cache/cache-base.ts";
 import { redis } from "@/lib/redis.ts";
 
 export class Cache implements ICacheBase {
+	private static instance: Cache | null = null;
+
+	readonly keys = {
+		products: "products",
+		productCategories: "product_categories",
+		establishments: "establishments",
+		districts: "districts",
+		coupons: "coupons",
+		banners: "banners",
+		addons: "addons",
+		addonCategories: "addon_categories"
+	};
+
+	static getInstance() {
+		if (!this.instance) this.instance = new Cache();
+		return this.instance;
+	}
+
 	async set(key: string, value: any, duration?: number) {
 		try {
 			if (duration) {

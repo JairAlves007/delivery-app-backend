@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { transformPriceToDatabase } from "@/helpers/price.ts";
 import { transformValueToPercentage } from "@/helpers/utils.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
@@ -27,7 +28,9 @@ export class UpdateCouponService {
 			...data
 		}: UpdateCouponServiceRequest
 	) {
-		return await this.couponRepository.update(id, {
+		const cache = makeCache();
+
+		await this.couponRepository.update(id, {
 			...data,
 			...(value && {
 				value:
@@ -46,5 +49,7 @@ export class UpdateCouponService {
 				}
 			}
 		});
+
+		await cache.forgetKeysContaining(cache.keys.coupons);
 	}
 }

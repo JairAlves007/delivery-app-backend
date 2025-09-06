@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
 import { createDistrictBodySchema } from "@/schemas/district-schema.ts";
 import z from "zod";
@@ -16,7 +17,9 @@ export class CreateDistrictService {
 		shippingCost: shipping_cost,
 		...data
 	}: CreateDistrictServiceRequest) {
-		return await this.districtRepository.create({
+		const cache = makeCache();
+
+		await this.districtRepository.create({
 			...data,
 			shipping_cost,
 			establishment: {
@@ -25,5 +28,7 @@ export class CreateDistrictService {
 				}
 			}
 		});
+
+		await cache.forgetKeysContaining(cache.keys.districts);
 	}
 }

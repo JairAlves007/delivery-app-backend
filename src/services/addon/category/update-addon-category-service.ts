@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.ts";
 import { updateAddonCategoryBodySchema } from "@/schemas/addon-category-schema.ts";
 import z from "zod";
@@ -22,6 +23,7 @@ export class UpdateAddonCategoryService {
 			...data
 		}: UpdateAddonCategoryServiceRequest
 	) {
+		const cache = makeCache();
 		const addons = !!addonIds
 			? {
 					set: addonIds.map(addonId => ({
@@ -30,7 +32,7 @@ export class UpdateAddonCategoryService {
 			  }
 			: undefined;
 
-		return await this.addonCategoryRepository.update(id, {
+		await this.addonCategoryRepository.update(id, {
 			...data,
 			max_quantity,
 			establishment: {
@@ -40,5 +42,7 @@ export class UpdateAddonCategoryService {
 			},
 			addons
 		});
+
+		await cache.forgetKeysContaining(cache.keys.addonCategories);
 	}
 }

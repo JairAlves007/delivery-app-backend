@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
 import { updateProductCategoryBodySchema } from "@/schemas/product-category-schema.ts";
 import z from "zod";
@@ -17,6 +18,7 @@ export class UpdateProductCategoryService {
 		id: string,
 		{ establishmentId, bannerIds, ...data }: UpdateProductCategoryRequest
 	) {
+		const cache = makeCache();
 		const banners = !!bannerIds
 			? {
 					set: bannerIds.map(bannerId => ({
@@ -25,7 +27,7 @@ export class UpdateProductCategoryService {
 			  }
 			: undefined;
 
-		return await this.productCategoryRepository.update(id, {
+		await this.productCategoryRepository.update(id, {
 			...data,
 			establishment: {
 				connect: {
@@ -34,5 +36,7 @@ export class UpdateProductCategoryService {
 			},
 			banners
 		});
+
+		await cache.forgetKeysContaining(cache.keys.productCategories);
 	}
 }

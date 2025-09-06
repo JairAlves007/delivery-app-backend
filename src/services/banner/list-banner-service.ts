@@ -30,7 +30,7 @@ export class ListBannerService {
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
-			"total_banners",
+			`total_${cache.keys.banners}`,
 			async () => await this.bannerRepository.count()
 		);
 
@@ -38,7 +38,7 @@ export class ListBannerService {
 			const [total, banners] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`banners_page_${page}_per_page_${perPage}`,
+					`${cache.keys.banners}_page_${page}_per_page_${perPage}`,
 					async () => await this.bannerRepository.paginate(page, perPage)
 				)
 			]);
@@ -59,7 +59,7 @@ export class ListBannerService {
 		const [total, banners] = await Promise.all([
 			totalPromise,
 			cache.rememberForever(
-				"all_banners",
+				`all_${cache.keys.banners}`,
 				async () => await this.bannerRepository.listAll()
 			)
 		]);

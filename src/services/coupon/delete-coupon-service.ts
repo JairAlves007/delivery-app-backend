@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
 
 export class DeleteCouponService {
@@ -8,6 +9,10 @@ export class DeleteCouponService {
 	}
 
 	async handle(id: number) {
+		const cache = makeCache();
+
 		await this.couponRepository.delete(id, false);
+
+		await cache.forgetKeysContaining(cache.keys.coupons);
 	}
 }

@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
 import { updateProductBodySchema } from "@/schemas/product-schema.ts";
 import z from "zod";
@@ -15,7 +16,9 @@ export class UpdateProductService {
 		id: string,
 		{ establishmentId, categoryId, ...data }: UpdateProductRequest
 	) {
-		return await this.productRepository.update(id, {
+		const cache = makeCache();
+
+		await this.productRepository.update(id, {
 			...data,
 			establishment: {
 				connect: {
@@ -28,5 +31,7 @@ export class UpdateProductService {
 				}
 			})
 		});
+
+		await cache.forgetKeysContaining(cache.keys.products);
 	}
 }

@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import { createEstablishmentBodySchema } from "@/schemas/establishment-schema.ts";
@@ -21,6 +22,8 @@ export class CreateEstablishmentService {
 		accepts_credit_card,
 		only_delivery
 	}: z.infer<typeof createEstablishmentBodySchema>): Promise<void> {
+		const cache = makeCache();
+
 		await this.establishmentRepository.create({
 			name,
 			slug: slugify(name),
@@ -33,5 +36,7 @@ export class CreateEstablishmentService {
 			accepts_credit_card,
 			only_delivery
 		});
+
+		await cache.forgetKeysContaining(cache.keys.establishments);
 	}
 }

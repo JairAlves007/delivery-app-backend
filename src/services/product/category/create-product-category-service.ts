@@ -1,3 +1,4 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
 import { createProductCategoryBodySchema } from "@/schemas/product-category-schema.ts";
@@ -18,7 +19,9 @@ export class CreateProductCategoryService {
 		establishmentId,
 		...data
 	}: CreateProductCategoryServiceRequest) {
-		return await this.productCategoryRepository.create({
+		const cache = makeCache();
+
+		await this.productCategoryRepository.create({
 			...data,
 			slug: slugify(data.name),
 			establishment: {
@@ -27,5 +30,7 @@ export class CreateProductCategoryService {
 				}
 			}
 		});
+
+		await cache.forgetKeysContaining(cache.keys.productCategories);
 	}
 }
