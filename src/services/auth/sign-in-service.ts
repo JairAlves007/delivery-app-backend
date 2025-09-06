@@ -29,8 +29,6 @@ export class SignInService {
 		try {
 			const user = await this.userRepository.findByEmail(email);
 
-			console.log(user);
-
 			if (!user) throw new InvalidCredentials();
 
 			if (!allowedRoles.includes(user.role.name))

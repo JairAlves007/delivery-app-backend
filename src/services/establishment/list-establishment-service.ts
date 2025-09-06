@@ -1,13 +1,11 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import { paginationQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { Establishment } from "@prisma/client";
 import z from "zod";
 
-type ListEstablishmentServiceRequest = z.infer<
-	typeof paginationQueryParamsSchema
->;
+type ListEstablishmentServiceRequest = z.infer<typeof listQueryParamsSchema>;
 
 interface ListEstablishmentServiceResponse
 	extends Pick<ListEstablishmentServiceRequest, "page"> {
@@ -26,22 +24,29 @@ export class ListEstablishmentService {
 
 	async handle({
 		page,
-		perPage
+		perPage,
+		establishmentId
 	}: ListEstablishmentServiceRequest): Promise<ListEstablishmentServiceResponse> {
 		const cache = makeCache();
+		const prefixKey = !!establishmentId ? `${establishmentId}_` : "";
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
-			`total_${cache.keys.establishments}`,
-			async () => await this.establishmentRepository.count()
+			`${prefixKey}total_${cache.keys.establishments}`,
+			async () => await this.establishmentRepository.count(establishmentId)
 		);
 
 		if (isPaging) {
 			const [total, establishments] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`${cache.keys.establishments}_page_${page}_per_page_${perPage}`,
-					async () => await this.establishmentRepository.paginate(page, perPage)
+					`${prefixKey}${cache.keys.establishments}_page_${page}_per_page_${perPage}`,
+					async () =>
+						await this.establishmentRepository.paginate(
+							page,
+							perPage,
+							establishmentId
+						)
 				)
 			]);
 
@@ -61,8 +66,8 @@ export class ListEstablishmentService {
 		const [total, establishments] = await Promise.all([
 			totalPromise,
 			cache.rememberForever(
-				"all_establishments",
-				async () => await this.establishmentRepository.listAll()
+				`${prefixKey}all_${cache.keys.establishments}`,
+				async () => await this.establishmentRepository.listAll(establishmentId)
 			)
 		]);
 

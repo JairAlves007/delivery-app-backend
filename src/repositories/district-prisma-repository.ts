@@ -3,10 +3,11 @@ import { prisma } from "@/lib/prisma.ts";
 import type { District, Prisma } from "@prisma/client";
 
 export class DistrictPrismaRepository implements IDistrictRepository {
-	async listAll(): Promise<District[]> {
+	async listAll(establishmentId?: string | null): Promise<District[]> {
 		return await prisma.district.findMany({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			},
 			orderBy: {
 				name: "asc"
@@ -14,16 +15,26 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 		});
 	}
 
-	async count(): Promise<number> {
-		return await prisma.district.count();
+	async count(establishmentId?: string | null): Promise<number> {
+		return await prisma.district.count({
+			where: {
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
+			}
+		});
 	}
 
-	async paginate(page: number, limit: number): Promise<District[]> {
+	async paginate(
+		page: number,
+		limit: number,
+		establishmentId?: string | null
+	): Promise<District[]> {
 		return await prisma.district.findMany({
 			skip: (page - 1) * limit,
 			take: limit,
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			},
 			orderBy: {
 				name: "asc"
@@ -31,11 +42,15 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 		});
 	}
 
-	async findById(id: number): Promise<District | null> {
+	async findById(
+		id: number,
+		establishmentId?: string | null
+	): Promise<District | null> {
 		return await prisma.district.findUnique({
 			where: {
 				id,
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}

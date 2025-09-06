@@ -2,7 +2,7 @@ import { UserUnauthorized } from "@/errors/user/user-unauthorized.ts";
 import type { IRoleRepository } from "@/interfaces/repositories/role-repository.ts";
 import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
 import { signUpBodySchema } from "@/schemas/auth-schema.ts";
-import type { RoleType, User } from "@prisma/client";
+import { RoleType, type User } from "@prisma/client";
 import { hash } from "argon2";
 import z from "zod";
 
@@ -28,7 +28,7 @@ export class SignUpService {
 	}
 
 	async handle(data: SignUpServiceRequest): Promise<SignUpServiceResponse> {
-		const { name, email, password, role } = data;
+		const { name, email, password, role, establishmentId } = data;
 
 		if (!role) throw new UserUnauthorized();
 
@@ -58,7 +58,15 @@ export class SignUpService {
 						}
 					}
 				}
-			}
+			},
+			...(!!establishmentId &&
+				role === RoleType.ESTABLISHMENT_OWNER && {
+					establishment: {
+						connect: {
+							id: establishmentId
+						}
+					}
+				})
 		});
 
 		return {

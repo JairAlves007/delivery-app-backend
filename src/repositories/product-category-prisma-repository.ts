@@ -5,10 +5,11 @@ import type { Prisma, ProductCategory } from "@prisma/client";
 export class ProductCategoryPrismaRepository
 	implements IProductCategoryRepository
 {
-	async listAll(): Promise<ProductCategory[]> {
+	async listAll(establishmentId?: string | null): Promise<ProductCategory[]> {
 		return await prisma.productCategory.findMany({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			},
 			orderBy: {
 				order: "asc"
@@ -16,20 +17,26 @@ export class ProductCategoryPrismaRepository
 		});
 	}
 
-	async count(): Promise<number> {
+	async count(establishmentId?: string | null): Promise<number> {
 		return await prisma.productCategory.count({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}
 
-	async paginate(page: number, limit: number): Promise<ProductCategory[]> {
+	async paginate(
+		page: number,
+		limit: number,
+		establishmentId?: string | null
+	): Promise<ProductCategory[]> {
 		return await prisma.productCategory.findMany({
 			skip: (page - 1) * limit,
 			take: limit,
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			},
 			orderBy: {
 				order: "asc"
@@ -37,11 +44,15 @@ export class ProductCategoryPrismaRepository
 		});
 	}
 
-	async findById(id: string): Promise<ProductCategory | null> {
+	async findById(
+		id: string,
+		establishmentId?: string | null
+	): Promise<ProductCategory | null> {
 		return await prisma.productCategory.findUnique({
 			where: {
 				id,
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}

@@ -3,10 +3,11 @@ import { prisma } from "@/lib/prisma.ts";
 import type { Addon, Prisma } from "@prisma/client";
 
 export class AddonPrismaRepository implements IAddonRepository {
-	async listAll(): Promise<Addon[]> {
+	async listAll(establishmentId?: string | null): Promise<Addon[]> {
 		return await prisma.addon.findMany({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			},
 			orderBy: {
 				name: "asc"
@@ -14,20 +15,26 @@ export class AddonPrismaRepository implements IAddonRepository {
 		});
 	}
 
-	async count(): Promise<number> {
+	async count(establishmentId?: string | null): Promise<number> {
 		return await prisma.addon.count({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}
 
-	async paginate(page: number, limit: number): Promise<Addon[]> {
+	async paginate(
+		page: number,
+		limit: number,
+		establishmentId?: string
+	): Promise<Addon[]> {
 		return await prisma.addon.findMany({
 			skip: (page - 1) * limit,
 			take: limit,
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			},
 			orderBy: {
 				name: "asc"
@@ -35,11 +42,15 @@ export class AddonPrismaRepository implements IAddonRepository {
 		});
 	}
 
-	async findById(id: number): Promise<Addon | null> {
+	async findById(
+		id: number,
+		establishmentId?: string | null
+	): Promise<Addon | null> {
 		return await prisma.addon.findUnique({
 			where: {
 				id,
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}

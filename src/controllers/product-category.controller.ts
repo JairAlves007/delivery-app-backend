@@ -4,7 +4,7 @@ import { makeListProductCategoryService } from "@/factories/services/product/cat
 import { makeUpdateProductCategoryService } from "@/factories/services/product/category/make-update-product-category-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
-import { paginationQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import {
 	createProductCategoryBodySchema,
 	productCategoryParamsSchema,
@@ -13,7 +13,7 @@ import {
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
-	const query = paginationQueryParamsSchema.parse(request.query);
+	const query = listQueryParamsSchema.parse(request.query);
 
 	try {
 		const listProductCategoryService = makeListProductCategoryService();

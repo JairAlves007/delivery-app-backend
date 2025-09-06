@@ -3,37 +3,48 @@ import { prisma } from "@/lib/prisma.ts";
 import type { Coupon, Prisma } from "@prisma/client";
 
 export class CouponPrismaRepository implements ICouponRepository {
-	async listAll(): Promise<Coupon[]> {
+	async listAll(establishmentId?: string | null): Promise<Coupon[]> {
 		return await prisma.coupon.findMany({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}
 
-	async count(): Promise<number> {
+	async count(establishmentId?: string | null): Promise<number> {
 		return await prisma.coupon.count({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}
 
-	async paginate(page: number, limit: number): Promise<Coupon[]> {
+	async paginate(
+		page: number,
+		limit: number,
+		establishmentId?: string | null
+	): Promise<Coupon[]> {
 		return await prisma.coupon.findMany({
 			skip: (page - 1) * limit,
 			take: limit,
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}
 
-	async findById(id: number): Promise<Coupon | null> {
+	async findById(
+		id: number,
+		establishmentId?: string | null
+	): Promise<Coupon | null> {
 		return await prisma.coupon.findUnique({
 			where: {
 				id,
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}

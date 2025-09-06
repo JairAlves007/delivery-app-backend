@@ -7,7 +7,7 @@ export class UserPrismaRepository implements IUserRepository {
 	async findById(id: string): Promise<UserWithRole | null> {
 		const user = await prisma.user.findUnique({
 			where: { id, deleted_at: null },
-			include: { role: true }
+			include: { role: true, establishment: true }
 		});
 
 		return user;
@@ -16,7 +16,7 @@ export class UserPrismaRepository implements IUserRepository {
 	async findByEmail(email: string): Promise<UserWithRole | null> {
 		const user = await prisma.user.findUnique({
 			where: { email, deleted_at: null },
-			include: { role: true }
+			include: { role: true, establishment: true }
 		});
 
 		return user;

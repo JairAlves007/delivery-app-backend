@@ -2,11 +2,11 @@ import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { transformPriceFromDatabase } from "@/helpers/price.ts";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
-import { paginationQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { Product } from "@prisma/client";
 import z from "zod";
 
-type ListProductServiceRequest = z.infer<typeof paginationQueryParamsSchema>;
+type ListProductServiceRequest = z.infer<typeof listQueryParamsSchema>;
 
 interface ListProductServiceResponse
 	extends Pick<ListProductServiceRequest, "page"> {
@@ -34,22 +34,29 @@ export class ListProductService {
 
 	async handle({
 		page,
-		perPage
+		perPage,
+		establishmentId
 	}: ListProductServiceRequest): Promise<ListProductServiceResponse> {
 		const cache = makeCache();
+		const prefixKey = !!establishmentId ? `${establishmentId}_` : "";
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
-			`total_${cache.keys.products}`,
-			async () => await this.productRepository.count()
+			`${prefixKey}total_${cache.keys.products}`,
+			async () => await this.productRepository.count(establishmentId)
 		);
 
 		if (isPaging) {
 			const [total, products] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`${cache.keys.products}_page_${page}_per_page_${perPage}`,
-					async () => await this.productRepository.paginate(page, perPage)
+					`${prefixKey}${cache.keys.products}_page_${page}_per_page_${perPage}`,
+					async () =>
+						await this.productRepository.paginate(
+							page,
+							perPage,
+							establishmentId
+						)
 				)
 			]);
 
@@ -69,8 +76,8 @@ export class ListProductService {
 		const [total, products] = await Promise.all([
 			totalPromise,
 			cache.rememberForever(
-				`all_${cache.keys.products}`,
-				async () => await this.productRepository.listAll()
+				`${prefixKey}all_${cache.keys.products}`,
+				async () => await this.productRepository.listAll(establishmentId)
 			)
 		]);
 

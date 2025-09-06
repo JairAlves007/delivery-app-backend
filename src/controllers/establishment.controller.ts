@@ -9,11 +9,11 @@ import {
 	establishmentParamsSchema,
 	updateEstablishmentBodySchema
 } from "@/schemas/establishment-schema.ts";
-import { paginationQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
-	const query = paginationQueryParamsSchema.parse(request.query);
+	const query = listQueryParamsSchema.parse(request.query);
 
 	try {
 		const listEstablishmentService = makeListEstablishmentService();

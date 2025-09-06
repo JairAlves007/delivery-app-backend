@@ -1,4 +1,4 @@
-import type { Role, RoleType, User } from "@prisma/client";
+import type { Establishment, Role, RoleType, User } from "@prisma/client";
 
 export interface Profile
 	extends Omit<User, "password" | "role_id" | "created_at" | "deleted_at"> {
@@ -7,4 +7,5 @@ export interface Profile
 
 export interface UserWithRole extends User {
 	role: Role;
+	establishment: Establishment | null;
 }

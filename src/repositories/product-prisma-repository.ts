@@ -3,10 +3,11 @@ import { prisma } from "@/lib/prisma.ts";
 import type { Prisma, Product } from "@prisma/client";
 
 export class ProductPrismaRepository implements IProductRepository {
-	async listAll(): Promise<Product[]> {
+	async listAll(establishmentId: string | null): Promise<Product[]> {
 		return await prisma.product.findMany({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			},
 			orderBy: {
 				created_at: "desc"
@@ -14,20 +15,26 @@ export class ProductPrismaRepository implements IProductRepository {
 		});
 	}
 
-	async count(): Promise<number> {
+	async count(establishmentId: string | null): Promise<number> {
 		return await prisma.product.count({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}
 
-	async paginate(page: number, limit: number): Promise<Product[]> {
+	async paginate(
+		page: number,
+		limit: number,
+		establishmentId: string | null
+	): Promise<Product[]> {
 		return await prisma.product.findMany({
 			skip: (page - 1) * limit,
 			take: limit,
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			},
 			orderBy: {
 				created_at: "desc"
@@ -35,11 +42,15 @@ export class ProductPrismaRepository implements IProductRepository {
 		});
 	}
 
-	async findById(id: string): Promise<Product | null> {
+	async findById(
+		id: string,
+		establishmentId?: string | null
+	): Promise<Product | null> {
 		return await prisma.product.findUnique({
 			where: {
 				id,
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}

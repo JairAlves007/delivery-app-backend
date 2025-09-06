@@ -1,13 +1,11 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
-import { paginationQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { ProductCategory } from "@prisma/client";
 import z from "zod";
 
-type ListProductCategoryServiceRequest = z.infer<
-	typeof paginationQueryParamsSchema
->;
+type ListProductCategoryServiceRequest = z.infer<typeof listQueryParamsSchema>;
 
 interface ListProductCategoryServiceResponse
 	extends Pick<ListProductCategoryServiceRequest, "page"> {
@@ -26,23 +24,29 @@ export class ListProductCategoryService {
 
 	async handle({
 		page,
-		perPage
+		perPage,
+		establishmentId
 	}: ListProductCategoryServiceRequest): Promise<ListProductCategoryServiceResponse> {
 		const cache = makeCache();
+		const prefixKey = !!establishmentId ? `${establishmentId}_` : "";
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
-			`total_${cache.keys.productCategories}`,
-			async () => await this.productCategoryRepository.count()
+			`${prefixKey}total_${cache.keys.productCategories}`,
+			async () => await this.productCategoryRepository.count(establishmentId)
 		);
 
 		if (isPaging) {
 			const [total, productCategories] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`${cache.keys.productCategories}_page_${page}_per_page_${perPage}`,
+					`${prefixKey}${cache.keys.productCategories}_page_${page}_per_page_${perPage}`,
 					async () =>
-						await this.productCategoryRepository.paginate(page, perPage)
+						await this.productCategoryRepository.paginate(
+							page,
+							perPage,
+							establishmentId
+						)
 				)
 			]);
 
@@ -62,8 +66,9 @@ export class ListProductCategoryService {
 		const [total, productCategories] = await Promise.all([
 			totalPromise,
 			cache.rememberForever(
-				`all_${cache.keys.productCategories}`,
-				async () => await this.productCategoryRepository.listAll()
+				`${prefixKey}all_${cache.keys.productCategories}`,
+				async () =>
+					await this.productCategoryRepository.listAll(establishmentId)
 			)
 		]);
 

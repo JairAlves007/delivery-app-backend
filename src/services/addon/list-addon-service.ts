@@ -2,11 +2,11 @@ import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { transformPriceFromDatabase } from "@/helpers/price.ts";
 import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.ts";
-import { paginationQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { Addon } from "@prisma/client";
 import z from "zod";
 
-type ListAddonServiceRequest = z.infer<typeof paginationQueryParamsSchema>;
+type ListAddonServiceRequest = z.infer<typeof listQueryParamsSchema>;
 
 interface ListAddonServiceResponse
 	extends Pick<ListAddonServiceRequest, "page"> {
@@ -32,22 +32,25 @@ export class ListAddonService {
 
 	async handle({
 		page,
-		perPage
+		perPage,
+		establishmentId
 	}: ListAddonServiceRequest): Promise<ListAddonServiceResponse> {
 		const cache = makeCache();
+		const prefixKey = !!establishmentId ? `${establishmentId}_` : "";
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
-			`total_${cache.keys.addons}`,
-			async () => await this.addonRepository.count()
+			`${prefixKey}total_${cache.keys.addons}`,
+			async () => await this.addonRepository.count(establishmentId)
 		);
 
 		if (isPaging) {
 			const [total, addons] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`${cache.keys.addons}_page_${page}_per_page_${perPage}`,
-					async () => await this.addonRepository.paginate(page, perPage)
+					`${prefixKey}${cache.keys.addons}_page_${page}_per_page_${perPage}`,
+					async () =>
+						await this.addonRepository.paginate(page, perPage, establishmentId)
 				)
 			]);
 
@@ -67,8 +70,8 @@ export class ListAddonService {
 		const [total, addons] = await Promise.all([
 			totalPromise,
 			cache.rememberForever(
-				`all_${cache.keys.addons}`,
-				async () => await this.addonRepository.listAll()
+				`${prefixKey}all_${cache.keys.addons}`,
+				async () => await this.addonRepository.listAll(establishmentId)
 			)
 		]);
 

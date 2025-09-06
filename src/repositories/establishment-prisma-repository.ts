@@ -3,10 +3,11 @@ import type { Establishment, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma.ts";
 
 export class EstablishmentPrismaRepository implements IEstablishmentRepository {
-	async listAll(): Promise<Establishment[]> {
+	async listAll(establishmentId?: string | null): Promise<Establishment[]> {
 		return await prisma.establishment.findMany({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			},
 			orderBy: {
 				created_at: "desc"
@@ -14,20 +15,26 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		});
 	}
 
-	async count(): Promise<number> {
+	async count(establishmentId?: string | null): Promise<number> {
 		return await prisma.establishment.count({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}
 
-	async paginate(page: number, limit: number): Promise<Establishment[]> {
+	async paginate(
+		page: number,
+		limit: number,
+		establishmentId?: string | null
+	): Promise<Establishment[]> {
 		return await prisma.establishment.findMany({
 			skip: (page - 1) * limit,
 			take: limit,
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			},
 			orderBy: {
 				created_at: "desc"
@@ -35,11 +42,15 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		});
 	}
 
-	async findById(id: string): Promise<Establishment | null> {
+	async findById(
+		id: string,
+		establishmentId?: string | null
+	): Promise<Establishment | null> {
 		return await prisma.establishment.findUnique({
 			where: {
 				id,
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}

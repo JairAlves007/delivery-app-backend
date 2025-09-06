@@ -1,11 +1,11 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
-import { paginationQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { Coupon } from "@prisma/client";
 import z from "zod";
 
-type ListCouponServiceRequest = z.infer<typeof paginationQueryParamsSchema>;
+type ListCouponServiceRequest = z.infer<typeof listQueryParamsSchema>;
 
 interface ListCouponServiceResponse
 	extends Pick<ListCouponServiceRequest, "page"> {
@@ -24,22 +24,25 @@ export class ListCouponService {
 
 	async handle({
 		page,
-		perPage
+		perPage,
+		establishmentId
 	}: ListCouponServiceRequest): Promise<ListCouponServiceResponse> {
 		const cache = makeCache();
+		const prefixKey = !!establishmentId ? `${establishmentId}_` : "";
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
-			`total_${cache.keys.coupons}`,
-			async () => await this.couponRepository.count()
+			`${prefixKey}total_${cache.keys.coupons}`,
+			async () => await this.couponRepository.count(establishmentId)
 		);
 
 		if (isPaging) {
 			const [total, coupons] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`${cache.keys.coupons}_page_${page}_per_page_${perPage}`,
-					async () => await this.couponRepository.paginate(page, perPage)
+					`${prefixKey}${cache.keys.coupons}_page_${page}_per_page_${perPage}`,
+					async () =>
+						await this.couponRepository.paginate(page, perPage, establishmentId)
 				)
 			]);
 
@@ -59,8 +62,8 @@ export class ListCouponService {
 		const [total, coupons] = await Promise.all([
 			totalPromise,
 			cache.rememberForever(
-				`all_${cache.keys.coupons}`,
-				async () => await this.couponRepository.listAll()
+				`${prefixKey}all_${cache.keys.coupons}`,
+				async () => await this.couponRepository.listAll(establishmentId)
 			)
 		]);
 

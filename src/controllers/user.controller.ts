@@ -22,7 +22,8 @@ export const signIn = (allowedRoles: RoleType[]) => {
 
 			const token = await reply.jwtSign(
 				{
-					role: user.role.name
+					role: user.role.name,
+					establishmentId: user.establishment?.id
 				},
 				{
 					sub: user.id

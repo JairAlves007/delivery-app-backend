@@ -2,11 +2,11 @@ import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { transformPriceFromDatabase } from "@/helpers/price.ts";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
-import { paginationQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { District } from "@prisma/client";
 import z from "zod";
 
-type ListDistrictServiceRequest = z.infer<typeof paginationQueryParamsSchema>;
+type ListDistrictServiceRequest = z.infer<typeof listQueryParamsSchema>;
 
 interface ListDistrictServiceResponse
 	extends Pick<ListDistrictServiceRequest, "page"> {
@@ -32,22 +32,29 @@ export class ListDistrictService {
 
 	async handle({
 		page,
-		perPage
+		perPage,
+		establishmentId
 	}: ListDistrictServiceRequest): Promise<ListDistrictServiceResponse> {
 		const cache = makeCache();
+		const prefixKey = !!establishmentId ? `${establishmentId}_` : "";
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
-			`total_${cache.keys.districts}`,
-			async () => await this.districtRepository.count()
+			`${prefixKey}total_${cache.keys.districts}`,
+			async () => await this.districtRepository.count(establishmentId)
 		);
 
 		if (isPaging) {
 			const [total, districts] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`${cache.keys.districts}_page_${page}_per_page_${perPage}`,
-					async () => await this.districtRepository.paginate(page, perPage)
+					`${prefixKey}${cache.keys.districts}_page_${page}_per_page_${perPage}`,
+					async () =>
+						await this.districtRepository.paginate(
+							page,
+							perPage,
+							establishmentId
+						)
 				)
 			]);
 
@@ -67,8 +74,8 @@ export class ListDistrictService {
 		const [total, districts] = await Promise.all([
 			totalPromise,
 			cache.rememberForever(
-				`all_${cache.keys.districts}`,
-				async () => await this.districtRepository.listAll()
+				`${prefixKey}all_${cache.keys.districts}`,
+				async () => await this.districtRepository.listAll(establishmentId)
 			)
 		]);
 

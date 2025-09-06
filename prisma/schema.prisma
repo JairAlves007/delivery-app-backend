@@ -122,18 +122,19 @@ model RolePermission {
 }
 
 model User {
-  id          String       @id @default(uuid())
-  name        String
-  email       String       @unique
-  password    String
-  role_id     Int
-  created_at  DateTime     @default(now())
-  deleted_at  DateTime?
-  role        Role         @relation(fields: [role_id], references: [id])
-  addresses   Address[]
-  orders      Order[]
-  favorites   Favorite[]
-  userCoupons UserCoupon[]
+  id            String         @id @default(uuid())
+  name          String
+  email         String         @unique
+  password      String
+  role_id       Int
+  created_at    DateTime       @default(now())
+  deleted_at    DateTime?
+  role          Role           @relation(fields: [role_id], references: [id])
+  addresses     Address[]
+  orders        Order[]
+  favorites     Favorite[]
+  userCoupons   UserCoupon[]
+  establishment Establishment?
 
   @@map("users")
 }
@@ -174,6 +175,8 @@ model Establishment {
   next_billing_date   DateTime?
   created_at          DateTime          @default(now())
   deleted_at          DateTime?
+  user_id             String?           @unique
+  user                User?             @relation(fields: [user_id], references: [id])
   openingHours        OpeningHour[]
   socialLinks         SocialLink[]
   products            Product[]

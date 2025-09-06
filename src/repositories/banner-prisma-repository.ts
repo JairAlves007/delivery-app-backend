@@ -3,10 +3,11 @@ import { prisma } from "@/lib/prisma.ts";
 import type { Banner, Prisma } from "@prisma/client";
 
 export class BannerPrismaRepository implements IBannerRepository {
-	async listAll(): Promise<Banner[]> {
+	async listAll(establishmentId?: string | null): Promise<Banner[]> {
 		return await prisma.banner.findMany({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			},
 			orderBy: {
 				created_at: "desc"
@@ -14,20 +15,26 @@ export class BannerPrismaRepository implements IBannerRepository {
 		});
 	}
 
-	async count(): Promise<number> {
+	async count(establishmentId?: string | null): Promise<number> {
 		return await prisma.banner.count({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}
 
-	async paginate(page: number, limit: number): Promise<Banner[]> {
+	async paginate(
+		page: number,
+		limit: number,
+		establishmentId?: string | null
+	): Promise<Banner[]> {
 		return await prisma.banner.findMany({
 			skip: (page - 1) * limit,
 			take: limit,
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			},
 			orderBy: {
 				created_at: "desc"
@@ -35,11 +42,15 @@ export class BannerPrismaRepository implements IBannerRepository {
 		});
 	}
 
-	async findById(id: number): Promise<Banner | null> {
+	async findById(
+		id: number,
+		establishmentId?: string | null
+	): Promise<Banner | null> {
 		return await prisma.banner.findUnique({
 			where: {
 				id,
-				deleted_at: null
+				deleted_at: null,
+				...(!!establishmentId && { establishment_id: establishmentId })
 			}
 		});
 	}
