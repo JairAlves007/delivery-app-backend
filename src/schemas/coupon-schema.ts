@@ -1,5 +1,6 @@
 import { CouponType, DiscountType } from "@prisma/client";
 import z from "zod";
+import { establishmentIdSchema } from "./generic-schema.ts";
 
 export const createCouponBodySchema = z
 	.object({
@@ -22,9 +23,7 @@ export const createCouponBodySchema = z
 			.number()
 			.min(1, "O uso por usuário deve ser maior que zero")
 			.nullable(),
-		establishmentId: z
-			.string()
-			.min(1, "O id do estabelecimento deve ser preenchido")
+		establishmentId: establishmentIdSchema
 	})
 	.superRefine((data, ctx) => {
 		if (data.discountType === DiscountType.PERCENTAGE && data.value > 100) {

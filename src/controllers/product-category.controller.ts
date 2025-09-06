@@ -10,10 +10,14 @@ import {
 	productCategoryParamsSchema,
 	updateProductCategoryBodySchema
 } from "@/schemas/product-category-schema.ts";
+import { RoleType } from "@prisma/client";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const query = listQueryParamsSchema.parse(request.query);
+
+	if (request.user.role === RoleType.ESTABLISHMENT_OWNER)
+		query.establishmentId = request.user.establishmentId;
 
 	try {
 		const listProductCategoryService = makeListProductCategoryService();

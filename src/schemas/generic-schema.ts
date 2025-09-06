@@ -9,3 +9,7 @@ export const listQueryParamsSchema = z.object({
 		.optional()
 		.nullable()
 });
+
+export const establishmentIdSchema = z
+	.string("O id do estabelecimento deve ser preenchido")
+	.min(1, "O id do estabelecimento deve ser preenchido");

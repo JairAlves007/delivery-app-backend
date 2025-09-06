@@ -1,5 +1,6 @@
 import { BannerLinkType } from "@prisma/client";
 import z from "zod";
+import { establishmentIdSchema } from "./generic-schema.ts";
 
 export const createBannerBodySchema = z
 	.object({
@@ -10,9 +11,7 @@ export const createBannerBodySchema = z
 			.enumCaseInsensitive(BannerLinkType, "Tipo de link inválido"),
 		productId: z.string().nullable().optional(),
 		categoryId: z.string().nullable().optional(),
-		establishmentId: z
-			.string()
-			.min(1, "O id do estabelecimento deve ser preenchido")
+		establishmentId: establishmentIdSchema
 	})
 	.superRefine((data, ctx) => {
 		if (data.linkType === BannerLinkType.PRODUCT && !data.productId) {

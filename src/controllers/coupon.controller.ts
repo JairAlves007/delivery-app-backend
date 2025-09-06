@@ -9,10 +9,14 @@ import {
 	createCouponBodySchema
 } from "@/schemas/coupon-schema.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import { RoleType } from "@prisma/client";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const query = listQueryParamsSchema.parse(request.query);
+
+	if (request.user.role === RoleType.ESTABLISHMENT_OWNER)
+		query.establishmentId = request.user.establishmentId;
 
 	try {
 		const listCouponService = makeListCouponService();

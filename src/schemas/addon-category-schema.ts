@@ -1,5 +1,6 @@
 import { AddonType } from "@prisma/client";
 import z from "zod";
+import { establishmentIdSchema } from "./generic-schema.ts";
 
 export const createAddonCategoryBodySchema = z.object({
 	name: z.string().min(1, "O nome deve ser preenchido"),
@@ -10,9 +11,7 @@ export const createAddonCategoryBodySchema = z.object({
 		.number()
 		.min(0, "A quantidade máxima deve ser maior que zero")
 		.nullable(),
-	establishmentId: z
-		.string()
-		.min(1, "O id do estabelecimento deve ser preenchido")
+	establishmentId: establishmentIdSchema
 });
 
 export const updateAddonCategoryBodySchema = createAddonCategoryBodySchema

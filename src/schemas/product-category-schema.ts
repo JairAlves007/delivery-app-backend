@@ -1,4 +1,5 @@
 import z from "zod";
+import { establishmentIdSchema } from "./generic-schema.ts";
 
 export const createProductCategoryBodySchema = z.object({
 	name: z.string().min(1, "O nome deve ser preenchido"),
@@ -7,9 +8,7 @@ export const createProductCategoryBodySchema = z.object({
 		.min(0, "A ordem deve ser maior que zero")
 		.optional()
 		.nullable(),
-	establishmentId: z
-		.string()
-		.min(1, "O id do estabelecimento deve ser preenchido")
+	establishmentId: establishmentIdSchema
 });
 
 export const updateProductCategoryBodySchema = createProductCategoryBodySchema

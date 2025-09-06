@@ -1,5 +1,6 @@
 import { transformPriceToDatabase } from "@/helpers/price.ts";
 import z from "zod";
+import { establishmentIdSchema } from "./generic-schema.ts";
 
 export const createProductBodySchema = z.object({
 	name: z.string().min(1, "O nome deve ser preenchido"),
@@ -18,9 +19,7 @@ export const createProductBodySchema = z.object({
 		.min(0, "O estoque deve ser maior que zero")
 		.optional(),
 	valid_until: z.date("A data de validade deve ser preenchida").optional(),
-	establishmentId: z
-		.string()
-		.min(1, "O id do estabelecimento deve ser preenchido"),
+	establishmentId: establishmentIdSchema,
 	categoryId: z.string().min(1, "O id da categoria deve ser preenchido")
 });
 

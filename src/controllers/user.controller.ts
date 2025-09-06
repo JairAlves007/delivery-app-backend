@@ -7,6 +7,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { makeSignInService } from "@/factories/services/auth/make-sign-in-service.ts";
 import { makeSignUpService } from "@/factories/services/auth/make-sign-up-service.ts";
 import { makeProfileService } from "@/factories/services/profile/make-get-profile-service.ts";
+import { establishmentIdSchema } from "@/schemas/generic-schema.ts";
 
 export const signIn = (allowedRoles: RoleType[]) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
@@ -44,7 +45,11 @@ export const signIn = (allowedRoles: RoleType[]) => {
 
 export const signUp = (roleType: RoleType) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
-		const body = signUpBodySchema.parse(request.body);
+		const schema = request.url.includes("/admin")
+			? signUpBodySchema.extend({ establishmentId: establishmentIdSchema })
+			: signUpBodySchema;
+
+		const body = schema.parse(request.body);
 
 		try {
 			const signUpService = makeSignUpService();
