@@ -43,6 +43,14 @@ export const updateCouponBodySchema = createCouponBodySchema.partial().extend({
 	establishmentId: createCouponBodySchema.shape.establishmentId
 });
 
+export const checkCouponBodySchema = z.object({
+	code: z
+		.string()
+		.min(1, "O código deve ser preenchido")
+		.transform(val => val.toUpperCase()),
+	establishmentId: establishmentIdSchema
+});
+
 export const couponParamsSchema = z.object({
 	id: z.coerce
 		.number("O id deve ser preenchido")

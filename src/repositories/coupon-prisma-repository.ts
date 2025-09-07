@@ -1,5 +1,6 @@
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
+import type { CouponWithUserCoupons } from "@/types/coupon.ts";
 import type { Coupon, Prisma } from "@prisma/client";
 
 export class CouponPrismaRepository implements ICouponRepository {
@@ -45,6 +46,27 @@ export class CouponPrismaRepository implements ICouponRepository {
 				id,
 				deleted_at: null,
 				...(!!establishmentId && { establishment_id: establishmentId })
+			}
+		});
+	}
+
+	async check(
+		code: string,
+		establishmentId: string,
+		userId: string
+	): Promise<CouponWithUserCoupons | null> {
+		return await prisma.coupon.findUnique({
+			where: {
+				code,
+				establishment_id: establishmentId,
+				deleted_at: null
+			},
+			include: {
+				userCoupons: {
+					where: {
+						user_id: userId
+					}
+				}
 			}
 		});
 	}

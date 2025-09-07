@@ -1,3 +1,5 @@
+import { CouponErrorBase } from "@/errors/coupon/error-base.ts";
+import { makeCheckCouponService } from "@/factories/services/coupon/make-check-coupon-service.ts";
 import { makeCreateCouponService } from "@/factories/services/coupon/make-create-coupon-service.ts";
 import { makeDeleteCouponService } from "@/factories/services/coupon/make-delete-coupon-service.ts";
 import { makeListCouponService } from "@/factories/services/coupon/make-list-coupon-service.ts";
@@ -5,6 +7,7 @@ import { makeUpdateCouponService } from "@/factories/services/coupon/make-update
 import { ApiResponse } from "@/helpers/api.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
+	checkCouponBodySchema,
 	couponParamsSchema,
 	createCouponBodySchema
 } from "@/schemas/coupon-schema.ts";
@@ -75,6 +78,28 @@ export const destroy = async (request: FastifyRequest, reply: FastifyReply) => {
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)
 			.send(ApiResponse.success("Cupom deletado com sucesso", {}));
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const check = async (request: FastifyRequest, reply: FastifyReply) => {
+	const body = checkCouponBodySchema.parse(request.body);
+	const data = {
+		...body,
+		userId: request.user.sub
+	};
+
+	try {
+		const checkCouponService = makeCheckCouponService();
+
+		const couponIsValid = await checkCouponService.handle(data);
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(
+				ApiResponse.success("Cupom foi checado com sucesso", couponIsValid)
+			);
 	} catch (error) {
 		return reply.sendError(error);
 	}

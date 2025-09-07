@@ -34,7 +34,7 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 		let errorCode: number = HTTPStatusCodes.INTERNAL_SERVER_ERROR;
 		const errorResponse: DefaultErrorResponse = {
 			success: false,
-			message: "UNKNOWN_ERROR",
+			code: "UNKNOWN_ERROR",
 			details: {
 				error: {
 					message: "A unexpected error has occurred"
@@ -43,7 +43,7 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 		};
 
 		if (error instanceof Prisma.PrismaClientKnownRequestError) {
-			errorResponse.message = "DATABASE_ERROR";
+			errorResponse.code = "DATABASE_ERROR";
 
 			switch (error.code) {
 				case "P2002":

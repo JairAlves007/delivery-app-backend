@@ -1,12 +1,12 @@
 export type SuccessResponse<T = any> = {
 	success: true;
-	message: string;
+	code: string;
 	details?: T;
 };
 
 export type ErrorResponse<T = any> = {
 	success: false;
-	message: string;
+	code: string;
 	details: T;
 };
 
