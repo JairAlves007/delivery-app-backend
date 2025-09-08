@@ -1,5 +1,5 @@
 import type { IRoleRepository } from "@/interfaces/repositories/role-repository.ts";
-import type { RoleWithPermissions } from "@/interfaces/role.ts";
+import type { RoleWithPermissions } from "@/types/role.ts";
 import { prisma } from "@/lib/prisma.ts";
 import type { RoleType } from "@prisma/client";
 

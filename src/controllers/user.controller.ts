@@ -6,8 +6,12 @@ import { RoleType } from "@prisma/client";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { makeSignInService } from "@/factories/services/auth/make-sign-in-service.ts";
 import { makeSignUpService } from "@/factories/services/auth/make-sign-up-service.ts";
-import { makeProfileService } from "@/factories/services/profile/make-get-profile-service.ts";
+import { makeProfileService } from "@/factories/services/main/make-get-profile-service.ts";
 import { establishmentIdSchema } from "@/schemas/generic-schema.ts";
+import { env } from "@/env.ts";
+import { makeGetMenuService } from "@/factories/services/main/make-get-menu-service.ts";
+import { makeFindEstablishmentBySlugService } from "@/factories/services/establishment/make-find-establishment-by-slug-service.ts";
+import { mainParamsSchema } from "@/schemas/main-schema.ts";
 
 export const signIn = (allowedRoles: RoleType[]) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
@@ -86,17 +90,31 @@ export const signUp = (roleType: RoleType) => {
 	};
 };
 
-export const me = async (request: FastifyRequest, reply: FastifyReply) => {
-	try {
-		const getProfileService = makeProfileService();
+export const main = async (request: FastifyRequest, reply: FastifyReply) => {
+	const { slug } = mainParamsSchema.parse(request.params);
 
+	try {
+		const getMenuService = makeGetMenuService();
+		const getProfileService = makeProfileService();
+		const findEstablishmentService = makeFindEstablishmentBySlugService();
+
+		const establishment = await findEstablishmentService.handle(slug);
+
+		const menu = await getMenuService.handle(
+			request.user.role,
+			establishment.id
+		);
 		const profile = await getProfileService.handle({
 			id: request.user.sub
 		});
 
-		return reply
-			.status(HTTPStatusCodes.OK)
-			.send(ApiResponse.success("Usuário listado com sucesso", profile));
+		return reply.status(HTTPStatusCodes.OK).send(
+			ApiResponse.success("Usuário listado com sucesso", {
+				menu,
+				profile,
+				bucketUrl: env.PUBLIC_BUCKET_URL
+			})
+		);
 	} catch (error) {
 		return reply.sendError(error);
 	}

@@ -12,7 +12,8 @@ import {
 	DiscountType,
 	BannerLinkType,
 	SocialPlatform,
-	WeekDay
+	WeekDay,
+	Prisma
 } from "@prisma/client";
 import { hash } from "argon2";
 
@@ -34,7 +35,7 @@ async function main() {
 		PermissionType.MANAGE_COUPONS,
 		PermissionType.VIEW_CUSTOMERS
 	];
-	const clientPermissions: PermissionType[] = [
+	const customerPermissions: PermissionType[] = [
 		PermissionType.VIEW_CATALOG,
 		PermissionType.ADD_TO_CART,
 		PermissionType.MANAGE_ADDRESSES,
@@ -73,10 +74,10 @@ async function main() {
 		}),
 		prisma.role.create({
 			data: {
-				name: RoleType.CLIENT,
+				name: RoleType.CUSTOMER,
 				permissions: {
 					create: allPermissions
-						.filter(p => clientPermissions.includes(p))
+						.filter(p => customerPermissions.includes(p))
 						.map(name => ({ permission: { connect: { name } } }))
 				}
 			}
@@ -287,6 +288,219 @@ async function main() {
 			url: "https://instagram.com/pizzariadojair",
 			establishment_id: establishment.id
 		}
+	});
+
+	const customerMenuItems: Prisma.MenuCreateManyInput[] = [
+		{
+			label: "Cardápio",
+			slug: "catalog",
+			establishment_id: establishment.id,
+			order: 1,
+			for_role: RoleType.CUSTOMER
+		},
+		{
+			label: "Sacola",
+			slug: "bag",
+			establishment_id: establishment.id,
+			order: 2,
+			for_role: RoleType.CUSTOMER
+		},
+		{
+			label: "Favoritos",
+			slug: "favorites",
+			establishment_id: establishment.id,
+			order: 3,
+			for_role: RoleType.CUSTOMER
+		},
+		{
+			label: "Meus Pedidos",
+			slug: "orders",
+			establishment_id: establishment.id,
+			order: 4,
+			for_role: RoleType.CUSTOMER
+		},
+		{
+			label: "Meus Endereços",
+			slug: "addresses",
+			establishment_id: establishment.id,
+			order: 5,
+			for_role: RoleType.CUSTOMER
+		}
+	];
+
+	const establishmentOwnerMenuItems: Prisma.MenuCreateManyInput[] = [
+		{
+			label: "Produtos",
+			slug: "products",
+			establishment_id: establishment.id,
+			order: 4,
+			for_role: RoleType.ESTABLISHMENT_OWNER
+		},
+		{
+			label: "Categorias dos Produtos",
+			slug: "product-categories",
+			establishment_id: establishment.id,
+			order: 5,
+			for_role: RoleType.ESTABLISHMENT_OWNER
+		},
+		{
+			label: "Pedidos",
+			slug: "orders",
+			establishment_id: establishment.id,
+			order: 6,
+			for_role: RoleType.ESTABLISHMENT_OWNER
+		},
+		{
+			label: "Cupons",
+			slug: "coupons",
+			establishment_id: establishment.id,
+			order: 7,
+			for_role: RoleType.ESTABLISHMENT_OWNER
+		}
+	];
+
+	const adminMenuItems: Prisma.MenuCreateManyInput[] = [
+		{
+			label: "Dashboard",
+			slug: "dashboard",
+			establishment_id: establishment.id,
+			order: 1,
+			for_role: RoleType.ADMIN
+		},
+		{
+			label: "Estabelecimentos",
+			slug: "establishments",
+			establishment_id: establishment.id,
+			order: 2,
+			for_role: RoleType.ADMIN
+		},
+		{
+			label: "Clientes",
+			slug: "customers",
+			establishment_id: establishment.id,
+			order: 3,
+			for_role: RoleType.ADMIN
+		},
+		...establishmentOwnerMenuItems.map(menu => ({
+			...menu,
+			for_role: RoleType.ADMIN
+		}))
+	];
+
+	await prisma.menu.createMany({
+		data: customerMenuItems
+	});
+
+	const establishmentOwnerMenus = await prisma.menu.createManyAndReturn({
+		data: establishmentOwnerMenuItems
+	});
+
+	const adminMenus = await prisma.menu.createManyAndReturn({
+		data: adminMenuItems
+	});
+
+	const establishmentOwnerSubmenuItems: Prisma.SubMenuCreateManyInput[] = [
+		{
+			label: "Ver produtos",
+			slug: "view-products",
+			order: 1,
+			menu_id: establishmentOwnerMenus[0].id
+		},
+		{
+			label: "Criar produto",
+			slug: "create-product",
+			order: 2,
+			menu_id: establishmentOwnerMenus[0].id
+		},
+		{
+			label: "Ver categorias dos produtos",
+			slug: "view-product-categories",
+			order: 1,
+			menu_id: establishmentOwnerMenus[1].id
+		},
+		{
+			label: "Criar categoria de produto",
+			slug: "create-product-category",
+			order: 2,
+			menu_id: establishmentOwnerMenus[1].id
+		},
+		{
+			label: "Ver cupons",
+			slug: "view-coupons",
+			order: 1,
+			menu_id: establishmentOwnerMenus[3].id
+		},
+		{
+			label: "Criar cupom",
+			slug: "create-coupon",
+			order: 2,
+			menu_id: establishmentOwnerMenus[3].id
+		}
+	];
+
+	const adminSubmenuItems: Prisma.SubMenuCreateManyInput[] = [
+		{
+			label: "Ver estabelecimentos",
+			slug: "view-establishments",
+			order: 1,
+			menu_id: adminMenus[1].id
+		},
+		{
+			label: "Criar estabelecimento",
+			slug: "create-establishment",
+			order: 2,
+			menu_id: adminMenus[1].id
+		},
+		{
+			label: "Ver clientes",
+			slug: "view-customers",
+			order: 1,
+			menu_id: adminMenus[2].id
+		},
+		{
+			label: "Ver produtos",
+			slug: "view-products",
+			order: 1,
+			menu_id: adminMenus[3].id
+		},
+		{
+			label: "Criar produto",
+			slug: "create-product",
+			order: 2,
+			menu_id: adminMenus[3].id
+		},
+		{
+			label: "Ver categorias dos produtos",
+			slug: "view-product-categories",
+			order: 1,
+			menu_id: adminMenus[4].id
+		},
+		{
+			label: "Criar categoria de produto",
+			slug: "create-product-category",
+			order: 2,
+			menu_id: adminMenus[4].id
+		},
+		{
+			label: "Ver cupons",
+			slug: "view-coupons",
+			order: 1,
+			menu_id: adminMenus[6].id
+		},
+		{
+			label: "Criar cupom",
+			slug: "create-coupon",
+			order: 2,
+			menu_id: adminMenus[6].id
+		}
+	];
+
+	await prisma.subMenu.createMany({
+		data: establishmentOwnerSubmenuItems
+	});
+
+	await prisma.subMenu.createMany({
+		data: adminSubmenuItems
 	});
 
 	console.log("✅ Seed finalizado com sucesso.");

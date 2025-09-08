@@ -3,6 +3,6 @@ import { RoleType } from "@prisma/client";
 import type { FastifyInstance } from "fastify";
 
 export const authRoutes = async (app: FastifyInstance) => {
-	app.post("/sign-in", signIn([RoleType.CLIENT]));
-	app.post("/sign-up", signUp(RoleType.CLIENT));
+	app.post("/sign-in", signIn([RoleType.CUSTOMER]));
+	app.post("/sign-up", signUp(RoleType.CUSTOMER));
 };

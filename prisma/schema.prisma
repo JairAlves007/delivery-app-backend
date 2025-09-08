@@ -65,13 +65,13 @@ enum WeekDay {
 }
 
 enum RoleType {
-  CLIENT
+  CUSTOMER
   ESTABLISHMENT_OWNER
   ADMIN
 }
 
 enum PermissionType {
-  // Client
+  // Customer
   VIEW_CATALOG
   ADD_TO_CART
   MANAGE_ADDRESSES
@@ -160,6 +160,34 @@ model Address {
   @@map("addresses")
 }
 
+model Menu {
+  id               Int           @id @default(autoincrement())
+  label            String
+  slug             String
+  order            Int
+  submenus         SubMenu[]
+  for_role         RoleType
+  establishment_id String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  establishment    Establishment @relation(fields: [establishment_id], references: [id])
+
+  @@unique([establishment_id, slug, for_role])
+  @@map("menus")
+}
+
+model SubMenu {
+  id      Int    @id @default(autoincrement())
+  label   String
+  slug    String
+  order   Int
+  menu_id Int
+  menu    Menu   @relation(fields: [menu_id], references: [id])
+
+  @@unique([menu_id, slug])
+  @@map("submenus")
+}
+
 model Establishment {
   id                  String            @id @default(uuid())
   name                String
@@ -186,6 +214,7 @@ model Establishment {
   coupons             Coupon[]
   addonCategories     AddonCategory[]
   orders              Order[]
+  menu                Menu[]
 
   @@map("establishments")
 }

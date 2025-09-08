@@ -5,7 +5,7 @@ import { RoleType } from "@prisma/client";
 import type { FastifyInstance } from "fastify";
 
 const couponMiddlewares = {
-	onRequest: [isAuthenticated, ensureUserHasRoles([RoleType.CLIENT])]
+	onRequest: [isAuthenticated, ensureUserHasRoles([RoleType.CUSTOMER])]
 };
 
 export const couponRoutes = (app: FastifyInstance) => {

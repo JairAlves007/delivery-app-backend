@@ -1,0 +1,46 @@
+import { UserNotFound } from "@/errors/user/user-not-found.ts";
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
+import type { Profile } from "@/types/user.ts";
+
+interface GetProfileServiceRequest {
+	id: string;
+}
+
+export class GetProfileService {
+	private userRepository: IUserRepository;
+
+	constructor(userRepository: IUserRepository) {
+		this.userRepository = userRepository;
+	}
+
+	async handle({ id }: GetProfileServiceRequest): Promise<Profile | null> {
+		try {
+			const cache = makeCache();
+			const key = `${cache.keys.users}_${id}`;
+
+			const user = await cache.rememberForever(
+				key,
+				async () => await this.userRepository.findById(id)
+			);
+
+			if (!user) {
+				await cache.forget(key);
+				throw new UserNotFound();
+			}
+
+			const profile: Profile = {
+				name: user.name,
+				email: user.email,
+				role: user.role.name,
+				establishment: user.establishment && {
+					slug: user.establishment?.slug
+				}
+			};
+
+			return profile;
+		} catch (error) {
+			throw error;
+		}
+	}
+}

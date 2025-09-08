@@ -3,11 +3,10 @@ import type { Establishment, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma.ts";
 
 export class EstablishmentPrismaRepository implements IEstablishmentRepository {
-	async listAll(establishmentId?: string | null): Promise<Establishment[]> {
+	async listAll(): Promise<Establishment[]> {
 		return await prisma.establishment.findMany({
 			where: {
-				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				deleted_at: null
 			},
 			orderBy: {
 				created_at: "desc"
@@ -15,26 +14,20 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		});
 	}
 
-	async count(establishmentId?: string | null): Promise<number> {
+	async count(): Promise<number> {
 		return await prisma.establishment.count({
 			where: {
-				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				deleted_at: null
 			}
 		});
 	}
 
-	async paginate(
-		page: number,
-		limit: number,
-		establishmentId?: string | null
-	): Promise<Establishment[]> {
+	async paginate(page: number, limit: number): Promise<Establishment[]> {
 		return await prisma.establishment.findMany({
 			skip: (page - 1) * limit,
 			take: limit,
 			where: {
-				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				deleted_at: null
 			},
 			orderBy: {
 				created_at: "desc"
@@ -42,15 +35,28 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		});
 	}
 
-	async findById(
-		id: string,
-		establishmentId?: string | null
-	): Promise<Establishment | null> {
+	async findById(id: string): Promise<Establishment | null> {
 		return await prisma.establishment.findUnique({
 			where: {
 				id,
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				OR: [
+					{ next_billing_date: null },
+					{ next_billing_date: { gt: new Date() } }
+				]
+			}
+		});
+	}
+
+	async findBySlug(slug: string): Promise<Establishment | null> {
+		return await prisma.establishment.findUnique({
+			where: {
+				slug,
+				deleted_at: null,
+				OR: [
+					{ next_billing_date: null },
+					{ next_billing_date: { gt: new Date() } }
+				]
 			}
 		});
 	}

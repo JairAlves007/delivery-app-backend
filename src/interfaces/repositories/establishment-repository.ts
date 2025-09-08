@@ -7,4 +7,6 @@ export interface IEstablishmentRepository
 		Prisma.EstablishmentCreateInput,
 		Prisma.EstablishmentUpdateInput,
 		string
-	> {}
+	> {
+	findBySlug(slug: string): Promise<Establishment | null>;
+}
