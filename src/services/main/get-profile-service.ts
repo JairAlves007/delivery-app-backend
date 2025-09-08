@@ -17,7 +17,7 @@ export class GetProfileService {
 	async handle({ id }: GetProfileServiceRequest): Promise<Profile | null> {
 		try {
 			const cache = makeCache();
-			const key = `${cache.keys.users}_${id}`;
+			const key = `${cache.keys.profile}_${id}`;
 
 			const user = await cache.rememberForever(
 				key,
@@ -29,7 +29,7 @@ export class GetProfileService {
 				throw new UserNotFound();
 			}
 
-			const profile: Profile = {
+			return {
 				name: user.name,
 				email: user.email,
 				role: user.role.name,
@@ -37,8 +37,6 @@ export class GetProfileService {
 					slug: user.establishment?.slug
 				}
 			};
-
-			return profile;
 		} catch (error) {
 			throw error;
 		}

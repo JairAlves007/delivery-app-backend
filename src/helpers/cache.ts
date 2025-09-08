@@ -13,7 +13,9 @@ export class Cache implements ICacheBase {
 		banners: "banners",
 		addons: "addons",
 		addonCategories: "addon_categories",
-		users: "users"
+		profile: "profile",
+		users: "users",
+		menus: "menus"
 	};
 
 	static getInstance() {

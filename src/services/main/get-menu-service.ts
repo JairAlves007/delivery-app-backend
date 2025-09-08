@@ -17,7 +17,7 @@ export class GetMenuService {
 		const cache = makeCache();
 
 		const menu = await cache.rememberForever(
-			`menus_${forRole.toLowerCase()}_${establishmentId}`,
+			`${cache.keys.menus}_${forRole.toLowerCase()}_${establishmentId}`,
 			async () => await this.menuRepository.get(forRole, establishmentId)
 		);
 
