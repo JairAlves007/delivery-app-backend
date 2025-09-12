@@ -17,3 +17,7 @@ export const signUpBodySchema = z.object({
 		.string("A senha deve ser preenchida")
 		.min(6, "A senha deve ter no mínimo 6 caracteres")
 });
+
+export const adminSignUpBodySchema = signUpBodySchema.extend({
+	establishmentId: establishmentIdSchema
+});

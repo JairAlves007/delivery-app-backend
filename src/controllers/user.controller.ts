@@ -1,13 +1,16 @@
 import Constants from "@/helpers/constants.ts";
 import { ApiResponse } from "@/helpers/api.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
-import { signInBodySchema, signUpBodySchema } from "@/schemas/auth-schema.ts";
+import {
+	adminSignUpBodySchema,
+	signInBodySchema,
+	signUpBodySchema
+} from "@/schemas/auth-schema.ts";
 import { RoleType } from "@prisma/client";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { makeSignInService } from "@/factories/services/auth/make-sign-in-service.ts";
 import { makeSignUpService } from "@/factories/services/auth/make-sign-up-service.ts";
 import { makeProfileService } from "@/factories/services/main/make-get-profile-service.ts";
-import { establishmentIdSchema } from "@/schemas/generic-schema.ts";
 import { env } from "@/env.ts";
 import { makeGetMenuService } from "@/factories/services/main/make-get-menu-service.ts";
 import { makeFindEstablishmentBySlugService } from "@/factories/services/establishment/make-find-establishment-by-slug-service.ts";
@@ -47,11 +50,9 @@ export const signIn = (allowedRoles: RoleType[]) => {
 	};
 };
 
-export const signUp = (roleType: RoleType) => {
+export const signUp = (roleType: RoleType, isAdmin: boolean = false) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
-		const schema = request.url.includes("/admin")
-			? signUpBodySchema.extend({ establishmentId: establishmentIdSchema })
-			: signUpBodySchema;
+		const schema = isAdmin ? adminSignUpBodySchema : signUpBodySchema;
 
 		const body = schema.parse(request.body);
 
