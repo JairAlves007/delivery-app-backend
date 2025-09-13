@@ -55,13 +55,13 @@ enum SocialPlatform {
 }
 
 enum WeekDay {
+  SUNDAY
   MONDAY
   TUESDAY
   WEDNESDAY
   THURSDAY
   FRIDAY
   SATURDAY
-  SUNDAY
 }
 
 enum RoleType {
@@ -200,7 +200,8 @@ model Establishment {
   cnpj                String?           @unique
   only_delivery       Boolean
   accepts_credit_card Boolean
-  next_billing_date   DateTime?
+  is_manually_closed  Boolean           @default(false)
+  next_billing_date   DateTime
   created_at          DateTime          @default(now())
   deleted_at          DateTime?
   user_id             String?           @unique
@@ -214,7 +215,8 @@ model Establishment {
   coupons             Coupon[]
   addonCategories     AddonCategory[]
   orders              Order[]
-  menu                Menu[]
+  menus               Menu[]
+  closures            Closure[]
 
   @@map("establishments")
 }
@@ -231,6 +233,17 @@ model OpeningHour {
   @@map("opening_hours")
 }
 
+model Closure {
+  id               Int           @id @default(autoincrement())
+  establishment_id String
+  starts_at        DateTime
+  ends_at          DateTime?
+  reason           String?
+  establishment    Establishment @relation(fields: [establishment_id], references: [id])
+
+  @@map("closures")
+}
+
 model SocialLink {
   id               Int            @id @default(autoincrement())
   establishment_id String
@@ -239,6 +252,7 @@ model SocialLink {
 
   establishment Establishment @relation(fields: [establishment_id], references: [id])
 
+  @@unique([platform, establishment_id])
   @@map("social_links")
 }
 

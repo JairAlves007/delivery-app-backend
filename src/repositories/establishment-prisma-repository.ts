@@ -1,6 +1,7 @@
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import type { Establishment, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma.ts";
+import type { EstablishmentWithInfo } from "@/types/establishment.ts";
 
 export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	async listAll(): Promise<Establishment[]> {
@@ -40,23 +41,22 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 			where: {
 				id,
 				deleted_at: null,
-				OR: [
-					{ next_billing_date: null },
-					{ next_billing_date: { gt: new Date() } }
-				]
+				OR: [{ next_billing_date: { gt: new Date() } }]
 			}
 		});
 	}
 
-	async findBySlug(slug: string): Promise<Establishment | null> {
+	async findBySlug(slug: string): Promise<EstablishmentWithInfo | null> {
 		return await prisma.establishment.findUnique({
 			where: {
 				slug,
 				deleted_at: null,
-				OR: [
-					{ next_billing_date: null },
-					{ next_billing_date: { gt: new Date() } }
-				]
+				OR: [{ next_billing_date: { gt: new Date() } }]
+			},
+			include: {
+				socialLinks: true,
+				openingHours: true,
+				closures: true
 			}
 		});
 	}

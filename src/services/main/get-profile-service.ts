@@ -32,10 +32,7 @@ export class GetProfileService {
 			return {
 				name: user.name,
 				email: user.email,
-				role: user.role.name,
-				establishment: user.establishment && {
-					slug: user.establishment?.slug
-				}
+				role: user.role.name
 			};
 		} catch (error) {
 			throw error;

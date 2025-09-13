@@ -107,7 +107,8 @@ async function main() {
 			description: "A melhor pizzaria da região!",
 			email: "contato@pizzariadojair.com",
 			accepts_credit_card: true,
-			only_delivery: false
+			only_delivery: false,
+			next_billing_date: new Date("2030-06-12T12:06:24")
 		}
 	});
 
@@ -258,6 +259,41 @@ async function main() {
 	await prisma.openingHour.createMany({
 		data: [
 			{
+				day_of_week: WeekDay.SUNDAY,
+				opens_at: "18:00",
+				closes_at: "23:00",
+				is_closed: false,
+				establishment_id: establishment.id
+			},
+			{
+				day_of_week: WeekDay.MONDAY,
+				opens_at: "18:00",
+				closes_at: "23:00",
+				is_closed: false,
+				establishment_id: establishment.id
+			},
+			{
+				day_of_week: WeekDay.TUESDAY,
+				opens_at: "18:00",
+				closes_at: "23:00",
+				is_closed: false,
+				establishment_id: establishment.id
+			},
+			{
+				day_of_week: WeekDay.WEDNESDAY,
+				opens_at: "18:00",
+				closes_at: "23:00",
+				is_closed: false,
+				establishment_id: establishment.id
+			},
+			{
+				day_of_week: WeekDay.THURSDAY,
+				opens_at: "18:00",
+				closes_at: "23:00",
+				is_closed: false,
+				establishment_id: establishment.id
+			},
+			{
 				day_of_week: WeekDay.FRIDAY,
 				opens_at: "18:00",
 				closes_at: "23:00",
@@ -268,14 +304,7 @@ async function main() {
 				day_of_week: WeekDay.SATURDAY,
 				opens_at: "18:00",
 				closes_at: "23:00",
-				is_closed: false,
-				establishment_id: establishment.id
-			},
-			{
-				day_of_week: WeekDay.SUNDAY,
-				opens_at: "18:00",
-				closes_at: "23:00",
-				is_closed: false,
+				is_closed: true,
 				establishment_id: establishment.id
 			}
 		]

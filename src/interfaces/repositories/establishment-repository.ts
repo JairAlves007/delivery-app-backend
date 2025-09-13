@@ -1,5 +1,6 @@
 import type { Establishment, Prisma } from "@prisma/client";
 import type { ICRUDBase } from "../crud-base.ts";
+import type { EstablishmentWithInfo } from "@/types/establishment.ts";
 
 export interface IEstablishmentRepository
 	extends ICRUDBase<
@@ -8,5 +9,5 @@ export interface IEstablishmentRepository
 		Prisma.EstablishmentUpdateInput,
 		string
 	> {
-	findBySlug(slug: string): Promise<Establishment | null>;
+	findBySlug(slug: string): Promise<EstablishmentWithInfo | null>;
 }

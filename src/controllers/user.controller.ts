@@ -15,6 +15,7 @@ import { env } from "@/env.ts";
 import { makeGetMenuService } from "@/factories/services/main/make-get-menu-service.ts";
 import { makeFindEstablishmentBySlugService } from "@/factories/services/establishment/make-find-establishment-by-slug-service.ts";
 import { mainParamsSchema } from "@/schemas/main-schema.ts";
+import { isEstablishmentOpen } from "@/helpers/establishment.ts";
 
 export const signIn = (allowedRoles: RoleType[]) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
@@ -113,6 +114,10 @@ export const main = async (request: FastifyRequest, reply: FastifyReply) => {
 			ApiResponse.success("Usuário listado com sucesso", {
 				menu,
 				profile,
+				establishment: {
+					...establishment,
+					isOpen: isEstablishmentOpen(establishment)
+				},
 				bucketUrl: env.PUBLIC_BUCKET_URL
 			})
 		);

@@ -1,0 +1,31 @@
+import type { EstablishmentWithInfo } from "@/types/establishment.ts";
+import { WeekDay } from "@prisma/client";
+import { parseHourToToday } from "./date.ts";
+
+export function isEstablishmentOpen(
+	establishment: EstablishmentWithInfo
+): boolean {
+	const now = new Date();
+
+	if (establishment.is_manually_closed) return false;
+
+	const activeClosure = establishment.closures.find(
+		c => c.starts_at <= now && (c.ends_at == null || c.ends_at >= now)
+	);
+
+	if (activeClosure) return false;
+
+	const today = now.getDay();
+	const weekDays = Object.values(WeekDay);
+
+	const schedule = establishment.openingHours.find(
+		h => h.day_of_week === weekDays[today]
+	);
+
+	if (!schedule || schedule.is_closed) return false;
+
+	const opensAt = parseHourToToday(schedule.opens_at);
+	const closesAt = parseHourToToday(schedule.closes_at);
+
+	return opensAt <= now && now <= closesAt;
+}

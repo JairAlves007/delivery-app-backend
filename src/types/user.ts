@@ -4,7 +4,6 @@ export type Profile = Prisma.UserGetPayload<{
 	select: {
 		name: true;
 		email: true;
-		establishment: { select: { slug: true } };
 	};
 }> & {
 	role: RoleType;
