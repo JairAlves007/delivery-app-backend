@@ -55,7 +55,7 @@ export class ProductPrismaRepository implements IProductRepository {
 			orderBy: {
 				created_at: "desc"
 			},
-			take: limit,
+			take: limit + 1,
 			skip: cursor ? 1 : 0,
 			cursor: !!cursor ? { id: cursor } : undefined
 		});

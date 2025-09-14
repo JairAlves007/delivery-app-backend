@@ -32,13 +32,17 @@ export class ListEstablishmentCatalogService {
 	}: ListEstablishmentCatalogServiceRequest): Promise<ListEstablishmentCatalogServiceResponse> {
 		const cache = makeCache();
 		const cursorSuffix = cursor ? `_cursor_${cursor}` : "";
+		const key = `${cache.keys.establishments}_${id}_limit_${limit}${cursorSuffix}`;
 
-		const catalog = await cache.rememberForever(
-			`${cache.keys.establishments}_${id}_limit_${limit}${cursorSuffix}`,
+		const raw = await cache.rememberForever(
+			key,
 			async () => await this.productRepository.getCatalog(id, limit, cursor)
 		);
-		const nextCursor =
-			catalog.length > 0 ? catalog[catalog.length - 1].id : null;
+		const hasNextPage = raw.length > limit;
+		const catalog = hasNextPage ? raw.slice(0, limit) : raw;
+		const nextCursor = hasNextPage ? catalog[catalog.length - 1].id : null;
+
+		if (catalog.length <= 0) await cache.forget(key);
 
 		return {
 			catalog,
