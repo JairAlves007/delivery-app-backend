@@ -13,3 +13,5 @@ export const listQueryParamsSchema = z.object({
 export const establishmentIdSchema = z
 	.string("O id do estabelecimento deve ser preenchido")
 	.min(1, "O id do estabelecimento deve ser preenchido");
+
+export const imageKey = z.string().min(1, "Precisamos da chave da imagem");

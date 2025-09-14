@@ -1,6 +1,6 @@
 import { transformPriceToDatabase } from "@/helpers/price.ts";
 import z from "zod";
-import { establishmentIdSchema } from "./generic-schema.ts";
+import { establishmentIdSchema, imageKey } from "./generic-schema.ts";
 
 export const createProductBodySchema = z.object({
 	name: z.string().min(1, "O nome deve ser preenchido"),
@@ -9,8 +9,8 @@ export const createProductBodySchema = z.object({
 		.number("O preço deve ser preenchido")
 		.min(0, "O preço deve ser maior que zero")
 		.transform(val => transformPriceToDatabase(val)),
-	image_key: z.string().min(1, "Precisamos da chave da imagem"),
-	discount_percentage: z
+	imageKey,
+	discountPercentage: z
 		.number("O desconto deve ser preenchido")
 		.min(0, "O desconto deve ser maior que zero")
 		.optional(),
@@ -18,7 +18,10 @@ export const createProductBodySchema = z.object({
 		.number("O estoque deve ser preenchido")
 		.min(0, "O estoque deve ser maior que zero")
 		.optional(),
-	valid_until: z.date("A data de validade deve ser preenchida").optional(),
+	validUntil: z.coerce
+		.date("A data de validade deve ser preenchida")
+		.refine(val => val >= new Date(), "A data de validade deve ser futura")
+		.optional(),
 	establishmentId: establishmentIdSchema,
 	categoryId: z.string().min(1, "O id da categoria deve ser preenchido")
 });

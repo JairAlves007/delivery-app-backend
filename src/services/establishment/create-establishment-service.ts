@@ -15,12 +15,13 @@ export class CreateEstablishmentService {
 		name,
 		email,
 		address,
-		logo_image_key,
+		logoImageKey: logo_image_key,
 		description,
 		phone,
 		cnpj,
-		accepts_credit_card,
-		only_delivery
+		acceptsCreditCard: accepts_credit_card,
+		onlyDelivery: only_delivery,
+		nextBillingDate: next_billing_date
 	}: z.infer<typeof createEstablishmentBodySchema>): Promise<void> {
 		const cache = makeCache();
 
@@ -34,7 +35,8 @@ export class CreateEstablishmentService {
 			phone,
 			cnpj,
 			accepts_credit_card,
-			only_delivery
+			only_delivery,
+			next_billing_date
 		});
 
 		await cache.forgetKeysContaining(cache.keys.establishments);

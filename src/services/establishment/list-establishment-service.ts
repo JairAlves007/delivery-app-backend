@@ -24,29 +24,22 @@ export class ListEstablishmentService {
 
 	async handle({
 		page,
-		perPage,
-		establishmentId
+		perPage
 	}: ListEstablishmentServiceRequest): Promise<ListEstablishmentServiceResponse> {
 		const cache = makeCache();
-		const prefixKey = !!establishmentId ? `${establishmentId}_` : "";
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
-			`${prefixKey}total_${cache.keys.establishments}`,
-			async () => await this.establishmentRepository.count(establishmentId)
+			`total_${cache.keys.establishments}`,
+			async () => await this.establishmentRepository.count()
 		);
 
 		if (isPaging) {
 			const [total, establishments] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`${prefixKey}${cache.keys.establishments}_page_${page}_per_page_${perPage}`,
-					async () =>
-						await this.establishmentRepository.paginate(
-							page,
-							perPage,
-							establishmentId
-						)
+					`${cache.keys.establishments}_page_${page}_per_page_${perPage}`,
+					async () => await this.establishmentRepository.paginate(page, perPage)
 				)
 			]);
 
@@ -66,8 +59,8 @@ export class ListEstablishmentService {
 		const [total, establishments] = await Promise.all([
 			totalPromise,
 			cache.rememberForever(
-				`${prefixKey}all_${cache.keys.establishments}`,
-				async () => await this.establishmentRepository.listAll(establishmentId)
+				`all_${cache.keys.establishments}`,
+				async () => await this.establishmentRepository.listAll()
 			)
 		]);
 

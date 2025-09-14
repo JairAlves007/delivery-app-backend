@@ -13,8 +13,14 @@ export const createCouponBodySchema = z
 		discountType: z
 			.string()
 			.enumCaseInsensitive(DiscountType, "Tipo de desconto inválido"),
-		startsAt: z.date("A data de inicio deve ser preenchida").nullable(),
-		endsAt: z.date("A data de fim deve ser preenchida").nullable(),
+		startsAt: z.coerce
+			.date("A data de inicio deve ser preenchida")
+			.refine(val => val >= new Date(), "A data de inicio deve ser futura")
+			.nullable(),
+		endsAt: z.coerce
+			.date("A data de fim deve ser preenchida")
+			.refine(val => val >= new Date(), "A data de fim deve ser futura")
+			.nullable(),
 		maxUses: z.coerce
 			.number()
 			.min(1, "O uso máximo deve ser maior que zero")
@@ -36,6 +42,24 @@ export const createCouponBodySchema = z
 				origin: "number",
 				message: "O valor percentual não pode ser maior que 100"
 			});
+		}
+
+		if (data.startsAt && data.endsAt) {
+			if (data.startsAt >= data.endsAt) {
+				ctx.addIssue({
+					path: ["startsAt"],
+					code: "custom",
+					message: "A data de início deve ser menor que a data de fim"
+				});
+			}
+
+			if (data.endsAt <= data.startsAt) {
+				ctx.addIssue({
+					path: ["endsAt"],
+					code: "custom",
+					message: "A data de fim deve ser maior que a data de início"
+				});
+			}
 		}
 	});
 
