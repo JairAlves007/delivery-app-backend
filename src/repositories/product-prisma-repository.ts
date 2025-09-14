@@ -42,6 +42,25 @@ export class ProductPrismaRepository implements IProductRepository {
 		});
 	}
 
+	async getCatalog(
+		establishmentId: string,
+		limit: number,
+		cursor?: string | null
+	): Promise<Product[]> {
+		return await prisma.product.findMany({
+			where: {
+				establishment_id: establishmentId,
+				deleted_at: null
+			},
+			orderBy: {
+				created_at: "desc"
+			},
+			take: limit,
+			skip: cursor ? 1 : 0,
+			cursor: !!cursor ? { id: cursor } : undefined
+		});
+	}
+
 	async findById(
 		id: string,
 		establishmentId?: string | null

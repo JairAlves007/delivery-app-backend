@@ -122,7 +122,7 @@ model RolePermission {
 }
 
 model User {
-  id            String         @id @default(uuid())
+  id            String         @id @default(ulid())
   name          String
   email         String         @unique
   password      String
@@ -189,7 +189,7 @@ model SubMenu {
 }
 
 model Establishment {
-  id                  String            @id @default(uuid())
+  id                  String            @id @default(ulid())
   name                String
   slug                String            @unique
   logo_image_key      String
@@ -257,7 +257,7 @@ model SocialLink {
 }
 
 model ProductCategory {
-  id               String    @id @default(uuid())
+  id               String    @id @default(ulid())
   establishment_id String
   name             String
   slug             String
@@ -273,7 +273,7 @@ model ProductCategory {
 }
 
 model Product {
-  id                  String          @id @default(uuid())
+  id                  String          @id @default(ulid())
   establishment_id    String
   category_id         String
   name                String

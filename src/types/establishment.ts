@@ -7,3 +7,5 @@ export type EstablishmentWithInfo = Prisma.EstablishmentGetPayload<{
 		closures: true;
 	};
 }>;
+
+export type EstablishmentCatalog = Prisma.ProductGetPayload<{}>;

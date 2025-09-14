@@ -7,4 +7,10 @@ export interface IProductRepository
 		Prisma.ProductCreateInput,
 		Prisma.ProductUpdateInput,
 		string
-	> {}
+	> {
+	getCatalog(
+		establishmentId: string,
+		limit: number,
+		cursor?: string | null
+	): Promise<Product[]>;
+}

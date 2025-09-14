@@ -19,5 +19,5 @@ export const updateProductCategoryBodySchema = createProductCategoryBodySchema
 	});
 
 export const productCategoryParamsSchema = z.object({
-	id: z.string().min(1, "O id do estabelecimento deve ser preenchido")
+	id: z.ulid().min(1, "O id do estabelecimento deve ser preenchido")
 });

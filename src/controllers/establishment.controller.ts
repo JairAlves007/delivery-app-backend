@@ -2,6 +2,7 @@ import { makeCreateEstablishmentService } from "@/factories/services/establishme
 import { makeDeleteEstablishmentService } from "@/factories/services/establishment/make-delete-establishment-service.ts";
 import { makeListEstablishmentService } from "@/factories/services/establishment/make-list-establishment-service.ts";
 import { makeUpdateEstablishmentService } from "@/factories/services/establishment/make-update-establishment-service.ts";
+import { makeListEstablishmentCatalogService } from "@/factories/services/product/make-list-establishment-catalog-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
@@ -9,7 +10,10 @@ import {
 	establishmentParamsSchema,
 	updateEstablishmentBodySchema
 } from "@/schemas/establishment-schema.ts";
-import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import {
+	listCursorQueryParamsSchema,
+	listQueryParamsSchema
+} from "@/schemas/generic-schema.ts";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
@@ -77,6 +81,32 @@ export const destroy = async (request: FastifyRequest, reply: FastifyReply) => {
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)
 			.send(ApiResponse.success("Estabelecimento deletado com sucesso", {}));
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const catalog = async (request: FastifyRequest, reply: FastifyReply) => {
+	const query = listCursorQueryParamsSchema.parse(request.query);
+	const { id } = establishmentParamsSchema.parse(request.params);
+
+	const serviceParams = {
+		id,
+		limit: query.limit,
+		cursor: query.cursor
+	};
+
+	try {
+		const listEstablishmentCatalogService =
+			makeListEstablishmentCatalogService();
+
+		const products = await listEstablishmentCatalogService.handle(
+			serviceParams
+		);
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(ApiResponse.success("Catálogo listado com sucesso", products));
 	} catch (error) {
 		return reply.sendError(error);
 	}
