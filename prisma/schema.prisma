@@ -196,7 +196,7 @@ model Establishment {
   address             String
   phone               String
   description         String
-  email               String
+  email               String            @unique
   cnpj                String?           @unique
   only_delivery       Boolean
   accepts_credit_card Boolean
