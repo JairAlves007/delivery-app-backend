@@ -41,7 +41,7 @@ app.setErrorHandler((error, _request, reply) => {
 app.setNotFoundHandler((request, reply) => {
 	const errorResponse: DefaultErrorResponse = {
 		success: false,
-		message: "ROUTE_NOT_FOUND_ERROR",
+		code: "ROUTE_NOT_FOUND_ERROR",
 		details: {
 			error: {
 				message: `A rota ${request.url} com o protocolo ${request.method} não foi encontrada`
