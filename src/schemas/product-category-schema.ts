@@ -8,14 +8,14 @@ export const createProductCategoryBodySchema = z.object({
 		.min(0, "A ordem deve ser maior que zero")
 		.optional()
 		.nullable(),
+	bannerIds: z.array(z.coerce.number()).optional(),
 	establishmentId: establishmentIdSchema
 });
 
 export const updateProductCategoryBodySchema = createProductCategoryBodySchema
 	.partial()
 	.extend({
-		establishmentId: createProductCategoryBodySchema.shape.establishmentId,
-		bannerIds: z.array(z.coerce.number()).optional()
+		establishmentId: createProductCategoryBodySchema.shape.establishmentId
 	});
 
 export const productCategoryParamsSchema = z.object({

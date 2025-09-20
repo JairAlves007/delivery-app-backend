@@ -99,4 +99,12 @@ export class ProductPrismaRepository implements IProductRepository {
 
 		return await this.update(id, { deleted_at: new Date() });
 	}
+
+	async deleteOldTags(id: string): Promise<void> {
+		await prisma.productTag.deleteMany({
+			where: {
+				product_id: id
+			}
+		});
+	}
 }

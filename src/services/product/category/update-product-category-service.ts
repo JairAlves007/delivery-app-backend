@@ -19,13 +19,6 @@ export class UpdateProductCategoryService {
 		{ establishmentId, bannerIds, ...data }: UpdateProductCategoryRequest
 	) {
 		const cache = makeCache();
-		const banners = !!bannerIds
-			? {
-					set: bannerIds.map(bannerId => ({
-						id: bannerId
-					}))
-			  }
-			: undefined;
 
 		await this.productCategoryRepository.update(id, {
 			...data,
@@ -34,7 +27,11 @@ export class UpdateProductCategoryService {
 					id: establishmentId
 				}
 			},
-			banners
+			banners: {
+				set: bannerIds?.map(bannerId => ({
+					id: bannerId
+				}))
+			}
 		});
 
 		await cache.forgetKeysContaining(cache.keys.productCategories);

@@ -17,6 +17,7 @@ export class CreateProductCategoryService {
 
 	async handle({
 		establishmentId,
+		bannerIds,
 		...data
 	}: CreateProductCategoryServiceRequest) {
 		const cache = makeCache();
@@ -28,6 +29,9 @@ export class CreateProductCategoryService {
 				connect: {
 					id: establishmentId
 				}
+			},
+			banners: {
+				connect: bannerIds?.map(bannerId => ({ id: bannerId }))
 			}
 		});
 

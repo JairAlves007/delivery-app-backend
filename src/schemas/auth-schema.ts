@@ -6,7 +6,7 @@ export const signInBodySchema = z.object({
 	password: z
 		.string("A senha deve ser preenchida")
 		.min(6, "A senha deve ter no mínimo 6 caracteres"),
-	origin: establishmentIdSchema
+	origin: z.string().min(1, "A origem deve ser preenchida")
 });
 
 export const signUpBodySchema = z.object({

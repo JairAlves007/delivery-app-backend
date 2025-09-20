@@ -20,10 +20,14 @@ export class UpdateProductService {
 			categoryId,
 			name,
 			imageKey: image_key,
+			bannerIds,
+			tagIds,
 			...data
 		}: UpdateProductRequest
 	) {
 		const cache = makeCache();
+
+		await this.productRepository.deleteOldTags(id);
 
 		await this.productRepository.update(id, {
 			...data,
@@ -39,7 +43,17 @@ export class UpdateProductService {
 				category: {
 					connect: { id: categoryId }
 				}
-			})
+			}),
+			banners: {
+				set: bannerIds?.map(bannerId => ({
+					id: bannerId
+				}))
+			},
+			tags: {
+				create: tagIds?.map(tagId => ({
+					tag: { connect: { id: tagId } }
+				}))
+			}
 		});
 
 		await cache.forgetKeysContaining(cache.keys.products);

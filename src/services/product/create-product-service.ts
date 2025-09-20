@@ -17,9 +17,16 @@ export class CreateProductService {
 		establishmentId,
 		categoryId,
 		imageKey: image_key,
+		bannerIds,
+		tagIds,
 		...data
 	}: CreateProductServiceRequest): Promise<void> {
 		const cache = makeCache();
+		const banners = !!bannerIds
+			? {
+					connect: bannerIds.map(bannerId => ({ id: bannerId }))
+			  }
+			: undefined;
 
 		await this.productRepository.create({
 			...data,
@@ -34,6 +41,12 @@ export class CreateProductService {
 				connect: {
 					id: categoryId
 				}
+			},
+			banners,
+			tags: {
+				create: tagIds.map(tagId => ({
+					tag: { connect: { id: tagId } }
+				}))
 			}
 		});
 

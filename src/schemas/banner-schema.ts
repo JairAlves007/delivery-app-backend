@@ -9,8 +9,8 @@ export const createBannerBodySchema = z
 		linkType: z
 			.string()
 			.enumCaseInsensitive(BannerLinkType, "Tipo de link inválido"),
-		productId: z.string().nullable().optional(),
-		categoryId: z.string().nullable().optional(),
+		productId: z.ulid("ID do produto inválido").nullable().optional(),
+		categoryId: z.ulid("ID da categoria inválido").nullable().optional(),
 		establishmentId: establishmentIdSchema
 	})
 	.superRefine((data, ctx) => {

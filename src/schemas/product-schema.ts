@@ -10,6 +10,8 @@ export const createProductBodySchema = z.object({
 		.min(0, "O preço deve ser maior que zero")
 		.transform(val => transformPriceToDatabase(val)),
 	imageKey,
+	tagIds: z.array(z.coerce.number()),
+	bannerIds: z.array(z.coerce.number()).optional(),
 	discountPercentage: z
 		.number("O desconto deve ser preenchido")
 		.min(0, "O desconto deve ser maior que zero")
@@ -23,7 +25,9 @@ export const createProductBodySchema = z.object({
 		.refine(val => val >= new Date(), "A data de validade deve ser futura")
 		.optional(),
 	establishmentId: establishmentIdSchema,
-	categoryId: z.string().min(1, "O id da categoria deve ser preenchido")
+	categoryId: z
+		.ulid("O id da categoria deve ser preenchido corretamente")
+		.min(1, "O id da categoria deve ser preenchido")
 });
 
 export const updateProductBodySchema = createProductBodySchema

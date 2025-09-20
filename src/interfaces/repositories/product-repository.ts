@@ -13,4 +13,6 @@ export interface IProductRepository
 		limit: number,
 		cursor?: string | null
 	): Promise<Product[]>;
+
+	deleteOldTags(id: string): Promise<void>;
 }

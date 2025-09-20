@@ -1,6 +1,7 @@
 import { UserUnauthorized } from "@/errors/user/user-unauthorized.ts";
 import type { IRoleRepository } from "@/interfaces/repositories/role-repository.ts";
 import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
+import type { RoleWithPermissions } from "@/types/role.ts";
 import { signUpBodySchema } from "@/schemas/auth-schema.ts";
 import { RoleType, type User } from "@prisma/client";
 import { hash } from "argon2";
@@ -32,10 +33,8 @@ export class SignUpService {
 
 		if (!role) throw new UserUnauthorized();
 
-		const [roleData, password_hash] = await Promise.all([
-			this.roleRepository.findByName(role),
-			hash(password)
-		]);
+		const [roleData, password_hash]: [RoleWithPermissions | null, string] =
+			await Promise.all([this.roleRepository.findByName(role), hash(password)]);
 
 		if (!roleData) throw new UserUnauthorized();
 
