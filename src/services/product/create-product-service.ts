@@ -16,12 +16,14 @@ export class CreateProductService {
 	async handle({
 		establishmentId,
 		categoryId,
+		imageKey: image_key,
 		...data
 	}: CreateProductServiceRequest): Promise<void> {
 		const cache = makeCache();
 
 		await this.productRepository.create({
 			...data,
+			image_key,
 			slug: slugify(data.name),
 			establishment: {
 				connect: {

@@ -13,7 +13,8 @@ import {
 	BannerLinkType,
 	SocialPlatform,
 	WeekDay,
-	Prisma
+	Prisma,
+	TagType
 } from "@prisma/client";
 import { hash } from "argon2";
 
@@ -213,6 +214,156 @@ async function main() {
 				category_id: addonCategories[1].id
 			}
 		]
+	});
+
+	// ----- Tags -----
+	const tagsData = Object.values(TagType).map(tag => ({
+		name: tag,
+		establishment_id: establishment.id
+	}));
+
+	const tags = await prisma.tag.createManyAndReturn({
+		data: tagsData
+	});
+
+	// ----- ProductTags -----
+	await prisma.productTag.createMany({
+		data: [
+			// Coca Cola 2L
+			{
+				product_id: products[0].id,
+				tag_id: tags.find(t => t.name === TagType.COLD_DRINK)!.id
+			},
+			{
+				product_id: products[0].id,
+				tag_id: tags.find(t => t.name === TagType.NON_ALCOHOLIC_DRINK)!.id
+			},
+			{
+				product_id: products[0].id,
+				tag_id: tags.find(t => t.name === TagType.DRINK)!.id
+			},
+
+			// Pizza Calabresa
+			{
+				product_id: products[1].id,
+				tag_id: tags.find(t => t.name === TagType.FOOD)!.id
+			},
+			{
+				product_id: products[1].id,
+				tag_id: tags.find(t => t.name === TagType.PIZZA)!.id
+			},
+			{
+				product_id: products[1].id,
+				tag_id: tags.find(t => t.name === TagType.LUNCH)!.id
+			},
+			{
+				product_id: products[1].id,
+				tag_id: tags.find(t => t.name === TagType.DINNER)!.id
+			},
+
+			// X-Tudo
+			{
+				product_id: products[2].id,
+				tag_id: tags.find(t => t.name === TagType.FOOD)!.id
+			},
+			{
+				product_id: products[2].id,
+				tag_id: tags.find(t => t.name === TagType.BURGER)!.id
+			},
+			{
+				product_id: products[2].id,
+				tag_id: tags.find(t => t.name === TagType.LUNCH)!.id
+			},
+			{
+				product_id: products[2].id,
+				tag_id: tags.find(t => t.name === TagType.DINNER)!.id
+			}
+		]
+	});
+
+	// Sugestões para produtos relacionados
+	// ----- Tag Combinations -----
+	const tagCombinationsData: { from: TagType; to: TagType }[] = [];
+
+	function addCombination(from: TagType, toTags: TagType[]) {
+		toTags.forEach(to => {
+			tagCombinationsData.push({ from, to });
+			tagCombinationsData.push({ from: to, to: from });
+		});
+	}
+
+	// ----- Definir combinações -----
+	// Café
+	addCombination(TagType.HOT_DRINK, [
+		TagType.PASTRY,
+		TagType.DESSERT,
+		TagType.MILK_SHAKE,
+		TagType.JUICE,
+		TagType.CAKE,
+		TagType.COFFEE,
+		TagType.TEA
+	]);
+
+	// Bebidas frias
+	addCombination(TagType.COLD_DRINK, [
+		TagType.SODA,
+		TagType.MILK_SHAKE,
+		TagType.JUICE,
+		TagType.SMOOTHIE,
+		TagType.ICE_CREAM
+	]);
+
+	// Sucos e Milkshakes
+	addCombination(TagType.JUICE, [TagType.FRUIT, TagType.SNACK]);
+	addCombination(TagType.MILK_SHAKE, [TagType.DESSERT, TagType.PASTRY]);
+
+	// Pizza
+	addCombination(TagType.PIZZA, [TagType.COLD_DRINK, TagType.SIDE]);
+
+	// Hambúrguer
+	addCombination(TagType.BURGER, [TagType.COLD_DRINK, TagType.SIDE]);
+
+	// Sanduíches
+	addCombination(TagType.SANDWICH, [TagType.COLD_DRINK, TagType.SIDE]);
+
+	// Sobremesas
+	addCombination(TagType.DESSERT, [
+		TagType.COFFEE,
+		TagType.TEA,
+		TagType.MILK_SHAKE
+	]);
+
+	// Saladas
+	addCombination(TagType.SALAD, [TagType.SIDE, TagType.DRINK]);
+
+	// Massas
+	addCombination(TagType.PASTA, [TagType.DRINK, TagType.SIDE]);
+
+	// Sushi e Grill
+	addCombination(TagType.SUSHI, [TagType.SIDE, TagType.DRINK]);
+	addCombination(TagType.GRILL, [TagType.SIDE, TagType.DRINK]);
+
+	// Proteínas
+	addCombination(TagType.MEAT, [TagType.SIDE, TagType.SALAD]);
+	addCombination(TagType.FISH, [TagType.SIDE, TagType.SALAD]);
+
+	// Dietas especiais
+	addCombination(TagType.VEGAN, [TagType.SIDE, TagType.SALAD]);
+	addCombination(TagType.VEGETARIAN, [TagType.SIDE, TagType.SALAD]);
+	addCombination(TagType.GLUTEN_FREE, [TagType.SIDE, TagType.SALAD]);
+
+	// Doces
+	addCombination(TagType.CAKE, [TagType.COFFEE, TagType.TEA]);
+	addCombination(TagType.COOKIE, [TagType.COFFEE, TagType.TEA]);
+	addCombination(TagType.PIE, [TagType.COFFEE, TagType.TEA]);
+
+	// Criar no banco
+	await prisma.tagCombination.createMany({
+		data: tagCombinationsData.map(tc => ({
+			from_tag_id: tags.find(t => t.name === tc.from)!.id,
+			to_tag_id: tags.find(t => t.name === tc.to)!.id
+		})),
+		skipDuplicates: true
 	});
 
 	// ----- District -----

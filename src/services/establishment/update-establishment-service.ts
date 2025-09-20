@@ -12,10 +12,16 @@ export class UpdateEstablishmentService {
 		this.establishmentRepository = establishmentRepository;
 	}
 
-	async handle(id: string, data: UpdateEstablishmentRequest) {
+	async handle(
+		id: string,
+		{ logoImageKey: logo_image_key, ...data }: UpdateEstablishmentRequest
+	) {
 		const cache = makeCache();
 
-		await this.establishmentRepository.update(id, data);
+		await this.establishmentRepository.update(id, {
+			...data,
+			logo_image_key
+		});
 
 		await cache.forgetKeysContaining(cache.keys.establishments);
 	}

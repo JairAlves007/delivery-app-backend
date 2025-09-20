@@ -1,4 +1,5 @@
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { slugify } from "@/helpers/utils.ts";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
 import { updateProductBodySchema } from "@/schemas/product-schema.ts";
 import z from "zod";
@@ -14,12 +15,21 @@ export class UpdateProductService {
 
 	async handle(
 		id: string,
-		{ establishmentId, categoryId, ...data }: UpdateProductRequest
+		{
+			establishmentId,
+			categoryId,
+			name,
+			imageKey: image_key,
+			...data
+		}: UpdateProductRequest
 	) {
 		const cache = makeCache();
 
 		await this.productRepository.update(id, {
 			...data,
+			name,
+			image_key,
+			...(!!name && { slug: slugify(name) }),
 			establishment: {
 				connect: {
 					id: establishmentId

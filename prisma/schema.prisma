@@ -94,6 +94,49 @@ enum PermissionType {
   MANAGE_USERS
 }
 
+enum TagType {
+  FOOD
+  DRINK
+  COMBO
+  DESSERT
+  SNACK
+  SIDE
+  ALCOHOLIC_DRINK
+  NON_ALCOHOLIC_DRINK
+  HOT_DRINK
+  COLD_DRINK
+  COFFEE
+  TEA
+  JUICE
+  SODA
+  MILK_SHAKE
+  SMOOTHIE
+  ICE_CREAM
+  BREAKFAST
+  LUNCH
+  DINNER
+  FRUIT
+  VEGETABLE
+  MEAT
+  FISH
+  APPETIZER
+  PASTRY
+  SALAD
+  SOUP
+  PIZZA
+  BURGER
+  SANDWICH
+  PASTA
+  GRILL
+  SUSHI
+  VEGAN
+  VEGETARIAN
+  GLUTEN_FREE
+  CAKE
+  COOKIE
+  PIE
+}
+
 model Role {
   id          Int              @id @default(autoincrement())
   name        RoleType         @unique
@@ -217,6 +260,7 @@ model Establishment {
   orders              Order[]
   menus               Menu[]
   closures            Closure[]
+  tags                Tag[]
 
   @@map("establishments")
 }
@@ -292,9 +336,42 @@ model Product {
   favorites           Favorite[]
   orderItems          OrderItem[]
   banners             Banner[]
+  tags                ProductTag[]
 
   @@unique([slug, establishment_id])
   @@map("products")
+}
+
+model Tag {
+  id               Int              @id @default(autoincrement())
+  establishment_id String
+  name             TagType
+  deleted_at       DateTime?
+  establishment    Establishment    @relation(fields: [establishment_id], references: [id])
+  productTags      ProductTag[]
+  fromTags         TagCombination[] @relation("FromTag")
+  toTags           TagCombination[] @relation("ToTag")
+
+  @@unique([name, establishment_id])
+}
+
+model TagCombination {
+  id          Int @id @default(autoincrement())
+  from_tag_id Int
+  to_tag_id   Int
+  from_tag    Tag @relation("FromTag", fields: [from_tag_id], references: [id])
+  to_tag      Tag @relation("ToTag", fields: [to_tag_id], references: [id])
+
+  @@unique([from_tag_id, to_tag_id])
+}
+
+model ProductTag {
+  product_id String
+  tag_id     Int
+  product    Product @relation(fields: [product_id], references: [id])
+  tag        Tag     @relation(fields: [tag_id], references: [id])
+
+  @@id([product_id, tag_id])
 }
 
 model AddonCategory {
