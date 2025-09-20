@@ -103,13 +103,25 @@ async function main() {
 			name: "Pizzaria do Jair",
 			slug: "pizzaria-do-jair",
 			logo_image_key: "",
-			address: "Rua Principal, 123",
 			phone: "11999999999",
 			description: "A melhor pizzaria da região!",
 			email: "contato@pizzariadojair.com",
 			accepts_credit_card: true,
 			only_delivery: false,
 			next_billing_date: new Date("2030-06-12T12:06:24")
+		}
+	});
+
+	await prisma.establishmentLocation.create({
+		data: {
+			establishment_id: establishment.id,
+			city: "Cidade",
+			state: "Estado",
+			neighborhood: "Bairro",
+			street: "Rua Principal",
+			country: "Pais",
+			number: "123",
+			postal_code: "12345678"
 		}
 	});
 

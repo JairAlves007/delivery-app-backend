@@ -3,10 +3,11 @@ import fp from "fastify-plugin";
 import { ApiResponse } from "@/helpers/api.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import { env } from "@/env.ts";
-import { flattenError, ZodError } from "zod";
+import { ZodError } from "zod";
 import type { DefaultErrorResponse } from "@/types/response.ts";
 import { ErrorBase } from "@/errors/error-base.ts";
 import { Prisma } from "@prisma/client";
+import { beautifyValidationErrors } from "@/helpers/validation-errors.ts";
 
 declare module "fastify" {
 	interface FastifyReply {
@@ -23,7 +24,7 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 			error.name = "VALIDATION_ERROR";
 
 			return this.status(HTTPStatusCodes.UNPROCESSABLE_ENTITY).send(
-				ApiResponse.error(error, flattenError(error).fieldErrors)
+				ApiResponse.error(error, beautifyValidationErrors(error))
 			);
 		}
 

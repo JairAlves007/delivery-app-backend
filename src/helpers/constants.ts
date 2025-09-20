@@ -8,5 +8,6 @@ export default class Constants {
 
 	// Regex
 	public static readonly PHONE_REGEX: RegExp = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
+	public static readonly POSTAL_CODE_REGEX: RegExp = /^\d{5}-?\d{3}$/;
 	public static readonly MIME_TYPE_REGEX: RegExp = /\w+\/[-+.\w]+/;
 }

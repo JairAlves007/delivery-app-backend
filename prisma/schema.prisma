@@ -232,23 +232,22 @@ model SubMenu {
 }
 
 model Establishment {
-  id                  String            @id @default(ulid())
+  id                  String                 @id @default(ulid())
   name                String
-  slug                String            @unique
+  slug                String                 @unique
   logo_image_key      String
-  address             String
   phone               String
   description         String
-  email               String            @unique
-  cnpj                String?           @unique
+  email               String                 @unique
+  cnpj                String?                @unique
   only_delivery       Boolean
   accepts_credit_card Boolean
-  is_manually_closed  Boolean           @default(false)
+  is_manually_closed  Boolean                @default(false)
   next_billing_date   DateTime
-  created_at          DateTime          @default(now())
+  created_at          DateTime               @default(now())
   deleted_at          DateTime?
-  user_id             String?           @unique
-  user                User?             @relation(fields: [user_id], references: [id])
+  user_id             String?                @unique
+  user                User?                  @relation(fields: [user_id], references: [id])
   openingHours        OpeningHour[]
   socialLinks         SocialLink[]
   products            Product[]
@@ -261,8 +260,26 @@ model Establishment {
   menus               Menu[]
   closures            Closure[]
   tags                Tag[]
+  location            EstablishmentLocation?
 
   @@map("establishments")
+}
+
+model EstablishmentLocation {
+  id               String        @id @default(ulid())
+  establishment_id String        @unique
+  street           String
+  number           String?
+  neighborhood     String?
+  city             String
+  state            String
+  postal_code      String
+  country          String
+  latitude         Float?
+  longitude        Float?
+  establishment    Establishment @relation(fields: [establishment_id], references: [id])
+
+  @@map("establishment_locations")
 }
 
 model OpeningHour {

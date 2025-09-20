@@ -13,30 +13,29 @@ export class CreateEstablishmentService {
 
 	async handle({
 		name,
-		email,
-		address,
+		address: { postalCode: postal_code, ...address },
 		logoImageKey: logo_image_key,
-		description,
-		phone,
-		cnpj,
 		acceptsCreditCard: accepts_credit_card,
 		onlyDelivery: only_delivery,
-		nextBillingDate: next_billing_date
+		nextBillingDate: next_billing_date,
+		...data
 	}: z.infer<typeof createEstablishmentBodySchema>): Promise<void> {
 		const cache = makeCache();
 
 		await this.establishmentRepository.create({
+			...data,
 			name,
 			slug: slugify(name),
 			logo_image_key,
-			email,
-			address,
-			description,
-			phone,
-			cnpj,
 			accepts_credit_card,
 			only_delivery,
-			next_billing_date
+			next_billing_date,
+			location: {
+				create: {
+					...address,
+					postal_code
+				}
+			}
 		});
 
 		await cache.forgetKeysContaining(cache.keys.establishments);
