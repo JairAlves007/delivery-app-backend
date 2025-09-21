@@ -41,7 +41,7 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 		await createDistrictService.handle(body);
 
 		return reply
-			.status(HTTPStatusCodes.NO_CONTENT)
+			.status(HTTPStatusCodes.CREATED)
 			.send(ApiResponse.success("Bairro criado com sucesso", {}));
 	} catch (error) {
 		return reply.sendError(error);

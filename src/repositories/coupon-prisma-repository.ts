@@ -4,20 +4,20 @@ import type { CouponWithUserCoupons } from "@/types/coupon.ts";
 import type { Coupon, Prisma } from "@prisma/client";
 
 export class CouponPrismaRepository implements ICouponRepository {
-	async listAll(establishmentId?: string | null): Promise<Coupon[]> {
+	async listAll(filterId?: string | null): Promise<Coupon[]> {
 		return await prisma.coupon.findMany({
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			}
 		});
 	}
 
-	async count(establishmentId?: string | null): Promise<number> {
+	async count(filterId?: string | null): Promise<number> {
 		return await prisma.coupon.count({
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			}
 		});
 	}
@@ -25,27 +25,24 @@ export class CouponPrismaRepository implements ICouponRepository {
 	async paginate(
 		page: number,
 		limit: number,
-		establishmentId?: string | null
+		filterId?: string | null
 	): Promise<Coupon[]> {
 		return await prisma.coupon.findMany({
 			skip: (page - 1) * limit,
 			take: limit,
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			}
 		});
 	}
 
-	async findById(
-		id: number,
-		establishmentId?: string | null
-	): Promise<Coupon | null> {
+	async findById(id: number, filterId?: string | null): Promise<Coupon | null> {
 		return await prisma.coupon.findUnique({
 			where: {
 				id,
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			}
 		});
 	}

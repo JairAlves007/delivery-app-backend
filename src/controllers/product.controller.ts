@@ -41,7 +41,7 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 		await createProductService.handle(body);
 
 		return reply
-			.status(HTTPStatusCodes.NO_CONTENT)
+			.status(HTTPStatusCodes.CREATED)
 			.send(ApiResponse.success("Produto criado com sucesso", {}));
 	} catch (error) {
 		return reply.sendError(error);

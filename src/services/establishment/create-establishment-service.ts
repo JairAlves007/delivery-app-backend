@@ -30,10 +30,14 @@ export class CreateEstablishmentService {
 			accepts_credit_card,
 			only_delivery,
 			next_billing_date,
-			location: {
+			address: {
 				create: {
-					...address,
-					postal_code
+					address: {
+						create: {
+							...address,
+							postal_code
+						}
+					}
 				}
 			}
 		});

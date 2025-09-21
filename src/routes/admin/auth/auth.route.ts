@@ -9,7 +9,10 @@ const authMiddlewares = {
 };
 
 export const adminAuthRoutes = async (app: FastifyInstance) => {
-	app.post("/sign-in", signIn([RoleType.ADMIN, RoleType.ESTABLISHMENT_OWNER]));
+	app.post(
+		"/sign-in",
+		signIn([RoleType.ADMIN, RoleType.ESTABLISHMENT_OWNER], true)
+	);
 	app.post(
 		"/sign-up",
 		authMiddlewares,

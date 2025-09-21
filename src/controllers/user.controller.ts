@@ -2,6 +2,7 @@ import Constants from "@/helpers/constants.ts";
 import { ApiResponse } from "@/helpers/api.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
+	adminSignInBodySchema,
 	adminSignUpBodySchema,
 	signInBodySchema,
 	signUpBodySchema
@@ -17,9 +18,10 @@ import { makeFindEstablishmentBySlugService } from "@/factories/services/establi
 import { mainParamsSchema } from "@/schemas/main-schema.ts";
 import { isEstablishmentOpen } from "@/helpers/establishment.ts";
 
-export const signIn = (allowedRoles: RoleType[]) => {
+export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
-		const body = signInBodySchema.parse(request.body);
+		const schema = isAdmin ? adminSignInBodySchema : signInBodySchema;
+		const body = schema.parse(request.body);
 
 		try {
 			const signInService = makeSignInService();

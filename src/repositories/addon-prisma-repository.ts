@@ -3,11 +3,11 @@ import { prisma } from "@/lib/prisma.ts";
 import type { Addon, Prisma } from "@prisma/client";
 
 export class AddonPrismaRepository implements IAddonRepository {
-	async listAll(establishmentId?: string | null): Promise<Addon[]> {
+	async listAll(filterId?: string | null): Promise<Addon[]> {
 		return await prisma.addon.findMany({
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			},
 			orderBy: {
 				name: "asc"
@@ -15,11 +15,11 @@ export class AddonPrismaRepository implements IAddonRepository {
 		});
 	}
 
-	async count(establishmentId?: string | null): Promise<number> {
+	async count(filterId?: string | null): Promise<number> {
 		return await prisma.addon.count({
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			}
 		});
 	}
@@ -27,14 +27,14 @@ export class AddonPrismaRepository implements IAddonRepository {
 	async paginate(
 		page: number,
 		limit: number,
-		establishmentId?: string
+		filterId?: string
 	): Promise<Addon[]> {
 		return await prisma.addon.findMany({
 			skip: (page - 1) * limit,
 			take: limit,
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			},
 			orderBy: {
 				name: "asc"
@@ -42,15 +42,12 @@ export class AddonPrismaRepository implements IAddonRepository {
 		});
 	}
 
-	async findById(
-		id: number,
-		establishmentId?: string | null
-	): Promise<Addon | null> {
+	async findById(id: number, filterId?: string | null): Promise<Addon | null> {
 		return await prisma.addon.findUnique({
 			where: {
 				id,
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			}
 		});
 	}

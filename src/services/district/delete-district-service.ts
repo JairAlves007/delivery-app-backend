@@ -8,7 +8,7 @@ export class DeleteDistrictService {
 		this.districtRepository = districtRepository;
 	}
 
-	async handle(id: number) {
+	async handle(id: string) {
 		const cache = makeCache();
 
 		await this.districtRepository.delete(id, true);

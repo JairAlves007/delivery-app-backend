@@ -34,10 +34,14 @@ export class UpdateEstablishmentService {
 		if (address) {
 			const { postalCode, ...rest } = address;
 
-			updateInput.location = {
+			updateInput.address = {
 				update: {
-					...rest,
-					postal_code: postalCode
+					address: {
+						update: {
+							...rest,
+							postal_code: postalCode
+						}
+					}
 				}
 			};
 		}

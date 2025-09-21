@@ -3,11 +3,11 @@ import { prisma } from "@/lib/prisma.ts";
 import type { Prisma, Product } from "@prisma/client";
 
 export class ProductPrismaRepository implements IProductRepository {
-	async listAll(establishmentId: string | null): Promise<Product[]> {
+	async listAll(filterId: string | null): Promise<Product[]> {
 		return await prisma.product.findMany({
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			},
 			orderBy: {
 				created_at: "desc"
@@ -15,11 +15,11 @@ export class ProductPrismaRepository implements IProductRepository {
 		});
 	}
 
-	async count(establishmentId: string | null): Promise<number> {
+	async count(filterId: string | null): Promise<number> {
 		return await prisma.product.count({
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			}
 		});
 	}
@@ -27,14 +27,14 @@ export class ProductPrismaRepository implements IProductRepository {
 	async paginate(
 		page: number,
 		limit: number,
-		establishmentId: string | null
+		filterId: string | null
 	): Promise<Product[]> {
 		return await prisma.product.findMany({
 			skip: (page - 1) * limit,
 			take: limit,
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			},
 			orderBy: {
 				created_at: "desc"
@@ -42,14 +42,14 @@ export class ProductPrismaRepository implements IProductRepository {
 		});
 	}
 
-	async getCatalog(
-		establishmentId: string,
+	async cursorPaginate(
 		limit: number,
-		cursor?: string | null
+		cursor?: string | null,
+		filterId?: string | null
 	): Promise<Product[]> {
 		return await prisma.product.findMany({
 			where: {
-				establishment_id: establishmentId,
+				...(!!filterId && { establishment_id: filterId }),
 				deleted_at: null
 			},
 			orderBy: {
@@ -61,15 +61,23 @@ export class ProductPrismaRepository implements IProductRepository {
 		});
 	}
 
+	async getCatalog(
+		establishmentId: string,
+		limit: number,
+		cursor?: string | null
+	): Promise<Product[]> {
+		return await this.cursorPaginate(limit, cursor, establishmentId);
+	}
+
 	async findById(
 		id: string,
-		establishmentId?: string | null
+		filterId?: string | null
 	): Promise<Product | null> {
 		return await prisma.product.findUnique({
 			where: {
 				id,
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			}
 		});
 	}

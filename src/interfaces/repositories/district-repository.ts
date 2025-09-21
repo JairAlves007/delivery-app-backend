@@ -6,5 +6,5 @@ export interface IDistrictRepository
 		District,
 		Prisma.DistrictCreateInput,
 		Prisma.DistrictUpdateInput,
-		number
+		string
 	> {}

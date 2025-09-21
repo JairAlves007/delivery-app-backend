@@ -46,7 +46,7 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 		await createAddonCategoryService.handle(body);
 
 		return reply
-			.status(HTTPStatusCodes.NO_CONTENT)
+			.status(HTTPStatusCodes.CREATED)
 			.send(
 				ApiResponse.success("Categoria de adicional criada com sucesso", {})
 			);

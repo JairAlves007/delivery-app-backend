@@ -17,6 +17,7 @@ import {
 	TagType
 } from "@prisma/client";
 import { hash } from "argon2";
+import { create } from "domain";
 
 const prisma = new PrismaClient();
 
@@ -39,7 +40,7 @@ async function main() {
 	const customerPermissions: PermissionType[] = [
 		PermissionType.VIEW_CATALOG,
 		PermissionType.ADD_TO_CART,
-		PermissionType.MANAGE_ADDRESSES,
+		PermissionType.MANAGE_OWN_ADDRESSES,
 		PermissionType.VIEW_OWN_ORDERS,
 		PermissionType.CANCEL_OWN_ORDER
 	];
@@ -103,7 +104,6 @@ async function main() {
 			name: "Pizzaria do Jair",
 			slug: "pizzaria-do-jair",
 			logo_image_key: "",
-			phone: "11999999999",
 			description: "A melhor pizzaria da região!",
 			email: "contato@pizzariadojair.com",
 			accepts_credit_card: true,
@@ -112,16 +112,22 @@ async function main() {
 		}
 	});
 
-	await prisma.establishmentLocation.create({
+	const address = await prisma.address.create({
 		data: {
-			establishment_id: establishment.id,
 			city: "Cidade",
+			phone: "11999999999",
 			state: "Estado",
 			neighborhood: "Bairro",
 			street: "Rua Principal",
-			country: "Pais",
 			number: "123",
 			postal_code: "12345678"
+		}
+	});
+
+	await prisma.establishmentAddress.create({
+		data: {
+			establishment_id: establishment.id,
+			address_id: address.id
 		}
 	});
 

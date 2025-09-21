@@ -5,11 +5,11 @@ import type { Prisma, ProductCategory } from "@prisma/client";
 export class ProductCategoryPrismaRepository
 	implements IProductCategoryRepository
 {
-	async listAll(establishmentId?: string | null): Promise<ProductCategory[]> {
+	async listAll(filterId?: string | null): Promise<ProductCategory[]> {
 		return await prisma.productCategory.findMany({
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			},
 			orderBy: {
 				order: "asc"
@@ -17,11 +17,11 @@ export class ProductCategoryPrismaRepository
 		});
 	}
 
-	async count(establishmentId?: string | null): Promise<number> {
+	async count(filterId?: string | null): Promise<number> {
 		return await prisma.productCategory.count({
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			}
 		});
 	}
@@ -29,14 +29,14 @@ export class ProductCategoryPrismaRepository
 	async paginate(
 		page: number,
 		limit: number,
-		establishmentId?: string | null
+		filterId?: string | null
 	): Promise<ProductCategory[]> {
 		return await prisma.productCategory.findMany({
 			skip: (page - 1) * limit,
 			take: limit,
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			},
 			orderBy: {
 				order: "asc"
@@ -46,13 +46,13 @@ export class ProductCategoryPrismaRepository
 
 	async findById(
 		id: string,
-		establishmentId?: string | null
+		filterId?: string | null
 	): Promise<ProductCategory | null> {
 		return await prisma.productCategory.findUnique({
 			where: {
 				id,
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			}
 		});
 	}

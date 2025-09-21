@@ -13,7 +13,7 @@ export class UpdateDistrictService {
 	}
 
 	async handle(
-		id: number,
+		id: string,
 		{
 			establishmentId,
 			shippingCost: shipping_cost,

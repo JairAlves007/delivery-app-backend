@@ -3,11 +3,11 @@ import { prisma } from "@/lib/prisma.ts";
 import type { Banner, Prisma } from "@prisma/client";
 
 export class BannerPrismaRepository implements IBannerRepository {
-	async listAll(establishmentId?: string | null): Promise<Banner[]> {
+	async listAll(filterId?: string | null): Promise<Banner[]> {
 		return await prisma.banner.findMany({
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			},
 			orderBy: {
 				created_at: "desc"
@@ -15,11 +15,11 @@ export class BannerPrismaRepository implements IBannerRepository {
 		});
 	}
 
-	async count(establishmentId?: string | null): Promise<number> {
+	async count(filterId?: string | null): Promise<number> {
 		return await prisma.banner.count({
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			}
 		});
 	}
@@ -27,14 +27,14 @@ export class BannerPrismaRepository implements IBannerRepository {
 	async paginate(
 		page: number,
 		limit: number,
-		establishmentId?: string | null
+		filterId?: string | null
 	): Promise<Banner[]> {
 		return await prisma.banner.findMany({
 			skip: (page - 1) * limit,
 			take: limit,
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			},
 			orderBy: {
 				created_at: "desc"
@@ -42,15 +42,12 @@ export class BannerPrismaRepository implements IBannerRepository {
 		});
 	}
 
-	async findById(
-		id: number,
-		establishmentId?: string | null
-	): Promise<Banner | null> {
+	async findById(id: number, filterId?: string | null): Promise<Banner | null> {
 		return await prisma.banner.findUnique({
 			where: {
 				id,
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			}
 		});
 	}

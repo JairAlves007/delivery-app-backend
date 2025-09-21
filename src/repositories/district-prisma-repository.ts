@@ -3,11 +3,11 @@ import { prisma } from "@/lib/prisma.ts";
 import type { District, Prisma } from "@prisma/client";
 
 export class DistrictPrismaRepository implements IDistrictRepository {
-	async listAll(establishmentId?: string | null): Promise<District[]> {
+	async listAll(filterId?: string | null): Promise<District[]> {
 		return await prisma.district.findMany({
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			},
 			orderBy: {
 				name: "asc"
@@ -15,11 +15,11 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 		});
 	}
 
-	async count(establishmentId?: string | null): Promise<number> {
+	async count(filterId?: string | null): Promise<number> {
 		return await prisma.district.count({
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			}
 		});
 	}
@@ -27,14 +27,14 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 	async paginate(
 		page: number,
 		limit: number,
-		establishmentId?: string | null
+		filterId?: string | null
 	): Promise<District[]> {
 		return await prisma.district.findMany({
 			skip: (page - 1) * limit,
 			take: limit,
 			where: {
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			},
 			orderBy: {
 				name: "asc"
@@ -43,14 +43,14 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 	}
 
 	async findById(
-		id: number,
-		establishmentId?: string | null
+		id: string,
+		filterId?: string | null
 	): Promise<District | null> {
 		return await prisma.district.findUnique({
 			where: {
 				id,
 				deleted_at: null,
-				...(!!establishmentId && { establishment_id: establishmentId })
+				...(!!filterId && { establishment_id: filterId })
 			}
 		});
 	}
@@ -60,7 +60,7 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 	}
 
 	async update(
-		id: number,
+		id: string,
 		data: Prisma.DistrictUpdateInput
 	): Promise<District> {
 		return await prisma.district.update({
@@ -72,7 +72,7 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 		});
 	}
 
-	async delete(id: number, force: boolean): Promise<District> {
+	async delete(id: string, force: boolean): Promise<District> {
 		if (force) {
 			return await prisma.district.delete({
 				where: {

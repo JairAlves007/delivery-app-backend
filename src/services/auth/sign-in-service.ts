@@ -35,7 +35,7 @@ export class SignInService {
 
 			if (
 				user.role.name === RoleType.ESTABLISHMENT_OWNER &&
-				(!user.establishment || user.establishment.slug !== origin)
+				(!user.establishment || !origin || user.establishment.slug !== origin)
 			)
 				throw new InvalidEstablishment();
 

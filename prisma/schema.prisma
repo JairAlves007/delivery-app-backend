@@ -74,7 +74,7 @@ enum PermissionType {
   // Customer
   VIEW_CATALOG
   ADD_TO_CART
-  MANAGE_ADDRESSES
+  MANAGE_OWN_ADDRESSES
   VIEW_OWN_ORDERS
   CANCEL_OWN_ORDER
 
@@ -161,6 +161,8 @@ model RolePermission {
   permission    Permission @relation(fields: [permission_id], references: [id])
 
   @@id([role_id, permission_id])
+  @@index([role_id], name: "idx_role_permissions_role_id")
+  @@index([permission_id], name: "idx_role_permissions_permission_id")
   @@map("role_permissions")
 }
 
@@ -173,34 +175,15 @@ model User {
   created_at    DateTime       @default(now())
   deleted_at    DateTime?
   role          Role           @relation(fields: [role_id], references: [id])
-  addresses     Address[]
+  addresses     UserAddress[]
   orders        Order[]
   favorites     Favorite[]
   userCoupons   UserCoupon[]
   establishment Establishment?
 
+  @@index([role_id], name: "idx_users_role_id")
+  @@index([deleted_at], name: "idx_users_deleted_at")
   @@map("users")
-}
-
-model Address {
-  id              Int       @id @default(autoincrement())
-  user_id         String
-  district_id     Int
-  reference_point String?
-  street          String
-  number          String
-  neighborhood    String
-  city            String
-  state           String
-  zip_code        String
-  phone           String
-  complement      String?
-  deleted_at      DateTime?
-  user            User      @relation(fields: [user_id], references: [id])
-  district        District  @relation(fields: [district_id], references: [id])
-  orders          Order[]
-
-  @@map("addresses")
 }
 
 model Menu {
@@ -211,8 +194,8 @@ model Menu {
   submenus         SubMenu[]
   for_role         RoleType
   establishment_id String
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
   establishment    Establishment @relation(fields: [establishment_id], references: [id])
 
   @@unique([establishment_id, slug, for_role])
@@ -232,22 +215,21 @@ model SubMenu {
 }
 
 model Establishment {
-  id                  String                 @id @default(ulid())
+  id                  String                @id @default(ulid())
   name                String
-  slug                String                 @unique
+  slug                String                @unique
   logo_image_key      String
-  phone               String
   description         String
-  email               String                 @unique
-  cnpj                String?                @unique
+  email               String                @unique
+  cnpj                String?               @unique
   only_delivery       Boolean
   accepts_credit_card Boolean
-  is_manually_closed  Boolean                @default(false)
+  is_manually_closed  Boolean               @default(false)
   next_billing_date   DateTime
-  created_at          DateTime               @default(now())
+  user_id             String?               @unique
+  created_at          DateTime              @default(now())
   deleted_at          DateTime?
-  user_id             String?                @unique
-  user                User?                  @relation(fields: [user_id], references: [id])
+  owner               User?                 @relation(fields: [user_id], references: [id])
   openingHours        OpeningHour[]
   socialLinks         SocialLink[]
   products            Product[]
@@ -260,26 +242,10 @@ model Establishment {
   menus               Menu[]
   closures            Closure[]
   tags                Tag[]
-  location            EstablishmentLocation?
+  address             EstablishmentAddress?
+  deliveryAddresses   DeliveryAddress[]
 
   @@map("establishments")
-}
-
-model EstablishmentLocation {
-  id               String        @id @default(ulid())
-  establishment_id String        @unique
-  street           String
-  number           String?
-  neighborhood     String?
-  city             String
-  state            String
-  postal_code      String
-  country          String
-  latitude         Float?
-  longitude        Float?
-  establishment    Establishment @relation(fields: [establishment_id], references: [id])
-
-  @@map("establishment_locations")
 }
 
 model OpeningHour {
@@ -310,24 +276,22 @@ model SocialLink {
   establishment_id String
   platform         SocialPlatform
   url              String
-
-  establishment Establishment @relation(fields: [establishment_id], references: [id])
+  establishment    Establishment  @relation(fields: [establishment_id], references: [id])
 
   @@unique([platform, establishment_id])
   @@map("social_links")
 }
 
 model ProductCategory {
-  id               String    @id @default(ulid())
+  id               String        @id @default(ulid())
   establishment_id String
   name             String
   slug             String
   order            Int?
   deleted_at       DateTime?
-
-  establishment Establishment @relation(fields: [establishment_id], references: [id])
-  products      Product[]
-  banners       Banner[]
+  establishment    Establishment @relation(fields: [establishment_id], references: [id])
+  products         Product[]
+  banners          Banner[]
 
   @@unique([slug, establishment_id])
   @@map("product_categories")
@@ -420,13 +384,14 @@ model Addon {
 }
 
 model District {
-  id               Int           @id @default(autoincrement())
-  establishment_id String
-  name             String
-  shipping_cost    Int
-  establishment    Establishment @relation(fields: [establishment_id], references: [id])
-  addresses        Address[]
-  deleted_at       DateTime?
+  id                     String                 @id @default(ulid())
+  establishment_id       String
+  name                   String
+  shipping_cost          Int
+  establishment          Establishment          @relation(fields: [establishment_id], references: [id])
+  deliveryLinks          DeliveryAddress[]
+  deleted_at             DateTime?
+  orderDeliveryAddresses OrderDeliveryAddress[]
 
   @@unique([name, establishment_id])
   @@map("districts")
@@ -448,6 +413,8 @@ model Coupon {
   orders           Order[]
   userCoupons      UserCoupon[]
 
+  @@index([establishment_id], name: "idx_coupons_establishment_id")
+  @@index([deleted_at], name: "idx_coupons_deleted_at")
   @@map("coupons")
 }
 
@@ -458,6 +425,8 @@ model UserCoupon {
   user      User   @relation(fields: [user_id], references: [id])
   coupon    Coupon @relation(fields: [coupon_id], references: [id])
 
+  @@index([user_id], name: "idx_user_coupons_user_id")
+  @@index([coupon_id], name: "idx_user_coupons_coupon_id")
   @@map("user_coupons")
 }
 
@@ -468,6 +437,8 @@ model Favorite {
   user       User    @relation(fields: [user_id], references: [id])
   product    Product @relation(fields: [product_id], references: [id])
 
+  @@index([user_id], name: "idx_favorites_user_id")
+  @@index([product_id], name: "idx_favorites_product_id")
   @@map("favorites")
 }
 
@@ -490,42 +461,57 @@ model Banner {
 }
 
 model Order {
-  id               Int               @id @default(autoincrement())
-  user_id          String
-  establishment_id String
-  addressId        Int?
-  couponId         Int?
-  comment          String?
-  change_amount    Int?
-  payment_method   PaymentMethodType
-  delivery_type    DeliveryType
-  shipping_fee     Int
-  subtotal         Int
-  created_at       DateTime          @default(now())
-  updated_at       DateTime          @updatedAt
-  deleted_at       DateTime?
-  user             User              @relation(fields: [user_id], references: [id])
-  establishment    Establishment     @relation(fields: [establishment_id], references: [id])
-  address          Address?          @relation(fields: [addressId], references: [id])
-  coupon           Coupon?           @relation(fields: [couponId], references: [id])
-  items            OrderItem[]
-  statuses         OrderStatus[]
+  id                   String                @id @default(ulid())
+  comment              String?
+  change_amount        Int?
+  payment_method       PaymentMethodType
+  delivery_type        DeliveryType
+  shipping_fee         Int
+  subtotal             Int
+  customer_name        String?
+  customer_phone       String?
+  user_id              String
+  establishment_id     String
+  coupon_id            Int?
+  created_at           DateTime              @default(now())
+  updated_at           DateTime              @updatedAt
+  deleted_at           DateTime?
+  user                 User                  @relation(fields: [user_id], references: [id])
+  establishment        Establishment         @relation(fields: [establishment_id], references: [id])
+  items                OrderItem[]
+  statuses             OrderStatus[]
+  coupon               Coupon?               @relation(fields: [coupon_id], references: [id])
+  orderCoupon          OrderCoupon?
+  orderDeliveryAddress OrderDeliveryAddress?
 
   @@map("orders")
 }
 
+model OrderCoupon {
+  id             Int          @id @default(autoincrement())
+  order_id       String       @unique
+  code           String
+  discount_type  DiscountType
+  discount_value Int
+  created_at     DateTime     @default(now())
+  order          Order        @relation(fields: [order_id], references: [id])
+
+  @@map("order_coupons")
+}
+
 model OrderItem {
-  id             Int              @id @default(autoincrement())
-  orderId        Int
-  product_id     String
-  product_name   String
-  product_price  Int
-  customer_name  String
-  customer_phone String
-  quantity       Int
-  order          Order            @relation(fields: [orderId], references: [id])
-  product        Product          @relation(fields: [product_id], references: [id])
-  addons         OrderItemAddon[]
+  id            Int      @id @default(autoincrement())
+  order_id      String
+  product_id    String
+  product_name  String
+  product_price Int
+  quantity      Int
+  observation   String?
+  created_at    DateTime @default(now())
+
+  order   Order            @relation(fields: [order_id], references: [id])
+  product Product          @relation(fields: [product_id], references: [id])
+  addons  OrderItemAddon[]
 
   @@map("order_items")
 }
@@ -533,23 +519,124 @@ model OrderItem {
 model OrderItemAddon {
   id            Int       @id @default(autoincrement())
   order_item_id Int
-  addonPrice    Int       @default(0)
-  addonName     String
+  addon_price   Int       @default(0)
+  addon_name    String
   addon_id      Int
   quantity      Int
   orderItem     OrderItem @relation(fields: [order_item_id], references: [id])
   addon         Addon     @relation(fields: [addon_id], references: [id])
 
+  @@index([order_item_id], name: "idx_order_item_addons_order_item_id")
+  @@index([addon_id], name: "idx_order_item_addons_addon_id")
   @@map("order_item_addons")
 }
 
 model OrderStatus {
   id         Int             @id @default(autoincrement())
-  order_id   Int
+  order_id   String
   label      String
-  value      OrderStatusType @unique
+  value      OrderStatusType
   created_at DateTime        @default(now())
   order      Order           @relation(fields: [order_id], references: [id])
 
+  @@unique([order_id, value])
   @@map("order_statuses")
+}
+
+model Address {
+  id                     String                 @id @default(ulid())
+  street                 String
+  number                 String?                @default("N/A")
+  neighborhood           String
+  city                   String
+  state                  String
+  postal_code            String
+  complement             String?
+  reference_point        String?
+  phone                  String
+  latitude               Float?
+  longitude              Float?
+  created_at             DateTime               @default(now())
+  updated_at             DateTime               @updatedAt
+  deleted_at             DateTime?
+  userAddresses          UserAddress[]
+  establishmentAddresses EstablishmentAddress[]
+  orderDeliveryAddresses OrderDeliveryAddress[]
+
+  @@index([deleted_at], name: "idx_addresses_deleted_at")
+  @@map("addresses")
+}
+
+model UserAddress {
+  id                Int               @id @default(autoincrement())
+  user_id           String
+  address_id        String
+  is_default        Boolean           @default(false)
+  created_at        DateTime          @default(now())
+  deleted_at        DateTime?
+  user              User              @relation(fields: [user_id], references: [id])
+  address           Address           @relation(fields: [address_id], references: [id])
+  deliveryAddresses DeliveryAddress[]
+
+  @@unique([user_id, address_id])
+  @@index([user_id], name: "idx_user_addresses_user_id")
+  @@index([address_id], name: "idx_user_addresses_address_id")
+  @@map("user_addresses")
+}
+
+model EstablishmentAddress {
+  id               String        @id @default(ulid())
+  establishment_id String        @unique
+  address_id       String
+  created_at       DateTime      @default(now())
+  deleted_at       DateTime?
+  address          Address       @relation(fields: [address_id], references: [id])
+  establishment    Establishment @relation(fields: [establishment_id], references: [id])
+
+  @@unique([establishment_id, address_id])
+  @@index([deleted_at], name: "idx_establishment_addresses_deleted_at")
+  @@index([establishment_id], name: "idx_establishment_addresses_establishment_id")
+  @@index([address_id], name: "idx_establishment_addresses_address_id")
+  @@map("establishment_addresses")
+}
+
+model DeliveryAddress {
+  id               Int           @id @default(autoincrement())
+  establishment_id String
+  district_id      String
+  user_address_id  Int
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
+  userAddress      UserAddress   @relation(fields: [user_address_id], references: [id])
+  establishment    Establishment @relation(fields: [establishment_id], references: [id])
+  district         District      @relation(fields: [district_id], references: [id])
+
+  @@unique([user_address_id, establishment_id])
+  @@index([user_address_id], name: "idx_delivery_addresses_user_address_id")
+  @@index([establishment_id], name: "idx_delivery_addresses_establishment_id")
+  @@index([district_id], name: "idx_delivery_addresses_district_id")
+  @@map("delivery_addresses")
+}
+
+model OrderDeliveryAddress {
+  id            Int       @id @default(autoincrement())
+  street        String
+  number        String
+  city          String
+  state         String
+  zip_code      String
+  shipping_cost Int
+  district_name String
+  order_id      String    @unique
+  address_id    String?
+  district_id   String?
+  created_at    DateTime  @default(now())
+  address       Address?  @relation(fields: [address_id], references: [id])
+  district      District? @relation(fields: [district_id], references: [id])
+  order         Order     @relation(fields: [order_id], references: [id])
+
+  @@index([order_id], name: "idx_order_delivery_addresses_order_id")
+  @@index([address_id], name: "idx_order_delivery_addresses_address_id")
+  @@index([district_id], name: "idx_order_delivery_addresses_district_id")
+  @@map("order_delivery_addresses")
 }

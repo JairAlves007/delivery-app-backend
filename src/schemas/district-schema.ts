@@ -18,7 +18,5 @@ export const updateDistrictBodySchema = createDistrictBodySchema
 	});
 
 export const districtParamsSchema = z.object({
-	id: z.coerce
-		.number("O id deve ser preenchido")
-		.min(1, "O id deve ser maior que zero")
+	id: z.ulid("O id deve ser preenchido").min(1, "O id deve ser maior que zero")
 });
