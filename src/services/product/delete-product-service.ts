@@ -11,7 +11,7 @@ export class DeleteProductService {
 	public async handle(id: string) {
 		const cache = makeCache();
 
-		await this.productRepository.delete(id, false);
+		await this.productRepository.delete({ id, force: false });
 
 		await cache.forgetKeysContaining(cache.keys.products);
 	}

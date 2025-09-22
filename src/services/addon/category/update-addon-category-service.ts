@@ -32,15 +32,18 @@ export class UpdateAddonCategoryService {
 			  }
 			: undefined;
 
-		await this.addonCategoryRepository.update(id, {
-			...data,
-			max_quantity,
-			establishment: {
-				connect: {
-					id: establishmentId
-				}
-			},
-			addons
+		await this.addonCategoryRepository.update({
+			id,
+			data: {
+				...data,
+				max_quantity,
+				establishment: {
+					connect: {
+						id: establishmentId
+					}
+				},
+				addons
+			}
 		});
 
 		await cache.forgetKeysContaining(cache.keys.addonCategories);

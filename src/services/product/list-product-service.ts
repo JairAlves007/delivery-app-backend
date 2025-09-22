@@ -43,7 +43,10 @@ export class ListProductService {
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
 			`${prefixKey}total_${cache.keys.products}`,
-			async () => await this.productRepository.count(establishmentId)
+			async () =>
+				await this.productRepository.count({
+					establishment_id: establishmentId
+				})
 		);
 
 		if (isPaging) {
@@ -52,11 +55,11 @@ export class ListProductService {
 				cache.rememberForever(
 					`${prefixKey}${cache.keys.products}_page_${page}_per_page_${perPage}`,
 					async () =>
-						await this.productRepository.paginate(
+						await this.productRepository.paginate({
 							page,
 							perPage,
-							establishmentId
-						)
+							filterParams: { establishment_id: establishmentId }
+						})
 				)
 			]);
 
@@ -77,7 +80,10 @@ export class ListProductService {
 			totalPromise,
 			cache.rememberForever(
 				`${prefixKey}all_${cache.keys.products}`,
-				async () => await this.productRepository.listAll(establishmentId)
+				async () =>
+					await this.productRepository.listAll({
+						establishment_id: establishmentId
+					})
 			)
 		]);
 

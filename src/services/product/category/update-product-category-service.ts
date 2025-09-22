@@ -21,18 +21,21 @@ export class UpdateProductCategoryService {
 	) {
 		const cache = makeCache();
 
-		await this.productCategoryRepository.update(id, {
-			...data,
-			...(!!name && { slug: slugify(name) }),
-			establishment: {
-				connect: {
-					id: establishmentId
+		await this.productCategoryRepository.update({
+			id,
+			data: {
+				...data,
+				...(!!name && { slug: slugify(name) }),
+				establishment: {
+					connect: {
+						id: establishmentId
+					}
+				},
+				banners: {
+					set: bannerIds?.map(bannerId => ({
+						id: bannerId
+					}))
 				}
-			},
-			banners: {
-				set: bannerIds?.map(bannerId => ({
-					id: bannerId
-				}))
 			}
 		});
 

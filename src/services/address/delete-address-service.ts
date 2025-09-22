@@ -11,7 +11,7 @@ export class DeleteAddressService {
 	async handle(id: string): Promise<void> {
 		const cache = makeCache();
 
-		await this.addressRepository.delete(id, false);
+		await this.addressRepository.delete({ id, force: false });
 
 		await cache.forgetKeysContaining(cache.keys.addresses);
 	}

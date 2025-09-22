@@ -1,12 +1,24 @@
+import { transformValidFilterParams } from "@/helpers/utils.ts";
 import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
+import {
+	CursorPaginationParams,
+	DeleteContentParams,
+	FilterParams,
+	FindByIdParams,
+	PaginationParams,
+	UpdateContentParams
+} from "@/types/crud.ts";
 import type { Address, Prisma } from "@prisma/client";
 
 export class AddressPrismaRepository implements IAddressRepository {
-	async listAll(): Promise<Address[]> {
+	async listAll(filterParams?: FilterParams): Promise<Address[]> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.address.findMany({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...params
 			},
 			orderBy: {
 				created_at: "desc"
@@ -14,20 +26,30 @@ export class AddressPrismaRepository implements IAddressRepository {
 		});
 	}
 
-	async count(): Promise<number> {
+	async count(filterParams?: FilterParams): Promise<number> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.address.count({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...params
 			}
 		});
 	}
 
-	async paginate(page: number, limit: number): Promise<Address[]> {
+	async paginate({
+		page,
+		perPage,
+		filterParams
+	}: PaginationParams): Promise<Address[]> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.address.findMany({
-			skip: (page - 1) * limit,
-			take: limit,
+			skip: (page - 1) * perPage,
+			take: perPage,
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...params
 			},
 			orderBy: {
 				created_at: "desc"
@@ -35,16 +57,18 @@ export class AddressPrismaRepository implements IAddressRepository {
 		});
 	}
 
-	async cursorPaginate(
-		limit: number,
-		cursor?: string | null,
-		filterId?: string | null
-	): Promise<Address[]> {
+	async cursorPaginate({
+		limit,
+		cursor,
+		filterParams
+	}: CursorPaginationParams<string>): Promise<Address[]> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.address.findMany({
 			where: {
 				userAddresses: {
 					some: {
-						...(!!filterId && { user_id: filterId }),
+						...params,
 						deleted_at: null
 					}
 				},
@@ -59,11 +83,17 @@ export class AddressPrismaRepository implements IAddressRepository {
 		});
 	}
 
-	async findById(id: string): Promise<Address | null> {
+	async findById({
+		id,
+		filterParams
+	}: FindByIdParams<string>): Promise<Address | null> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.address.findUnique({
 			where: {
 				id,
-				deleted_at: null
+				deleted_at: null,
+				...params
 			}
 		});
 	}
@@ -72,25 +102,43 @@ export class AddressPrismaRepository implements IAddressRepository {
 		return await prisma.address.create({ data });
 	}
 
-	async update(id: string, data: Prisma.AddressUpdateInput): Promise<Address> {
+	async update({
+		id,
+		data,
+		filterParams
+	}: UpdateContentParams<string, Prisma.AddressUpdateInput>): Promise<Address> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.address.update({
 			where: {
 				id,
-				deleted_at: null
+				deleted_at: null,
+				...params
 			},
 			data
 		});
 	}
 
-	async delete(id: string, force: boolean): Promise<Address> {
+	async delete({
+		id,
+		force,
+		filterParams
+	}: DeleteContentParams<string>): Promise<Address> {
+		const params = transformValidFilterParams(filterParams);
+
 		if (force) {
 			return await prisma.address.delete({
 				where: {
-					id
+					id,
+					...params
 				}
 			});
 		}
 
-		return await this.update(id, { deleted_at: new Date() });
+		return await this.update({
+			id,
+			filterParams,
+			data: { deleted_at: new Date() }
+		});
 	}
 }

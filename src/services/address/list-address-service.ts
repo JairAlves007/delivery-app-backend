@@ -38,7 +38,13 @@ export class ListAddressService {
 		const raw = await cache.rememberForever(
 			key,
 			async () =>
-				await this.addressRepository.cursorPaginate(limit, cursor, userId)
+				await this.addressRepository.cursorPaginate({
+					limit,
+					cursor,
+					filterParams: {
+						user_id: userId
+					}
+				})
 		);
 		const hasNextPage = raw.length > limit;
 		const addresses = hasNextPage ? raw.slice(0, limit) : raw;

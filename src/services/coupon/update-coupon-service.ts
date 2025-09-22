@@ -30,22 +30,25 @@ export class UpdateCouponService {
 	) {
 		const cache = makeCache();
 
-		await this.couponRepository.update(id, {
-			...data,
-			...(value && {
-				value:
-					discount_type === DiscountType.PERCENTAGE
-						? transformValueToPercentage(value)
-						: transformPriceToDatabase(value)
-			}),
-			discount_type,
-			starts_at,
-			ends_at,
-			max_uses,
-			uses_per_user,
-			establishment: {
-				connect: {
-					id: establishmentId
+		await this.couponRepository.update({
+			id,
+			data: {
+				...data,
+				...(value && {
+					value:
+						discount_type === DiscountType.PERCENTAGE
+							? transformValueToPercentage(value)
+							: transformPriceToDatabase(value)
+				}),
+				discount_type,
+				starts_at,
+				ends_at,
+				max_uses,
+				uses_per_user,
+				establishment: {
+					connect: {
+						id: establishmentId
+					}
 				}
 			}
 		});

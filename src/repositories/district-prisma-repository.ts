@@ -1,13 +1,23 @@
+import { transformValidFilterParams } from "@/helpers/utils.ts";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
+import {
+	DeleteContentParams,
+	FilterParams,
+	FindByIdParams,
+	PaginationParams,
+	UpdateContentParams
+} from "@/types/crud.ts";
 import type { District, Prisma } from "@prisma/client";
 
 export class DistrictPrismaRepository implements IDistrictRepository {
-	async listAll(filterId?: string | null): Promise<District[]> {
+	async listAll(filterParams?: FilterParams): Promise<District[]> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.district.findMany({
 			where: {
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			},
 			orderBy: {
 				name: "asc"
@@ -15,26 +25,30 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 		});
 	}
 
-	async count(filterId?: string | null): Promise<number> {
+	async count(filterParams?: FilterParams): Promise<number> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.district.count({
 			where: {
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			}
 		});
 	}
 
-	async paginate(
-		page: number,
-		limit: number,
-		filterId?: string | null
-	): Promise<District[]> {
+	async paginate({
+		page,
+		perPage,
+		filterParams
+	}: PaginationParams): Promise<District[]> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.district.findMany({
-			skip: (page - 1) * limit,
-			take: limit,
+			skip: (page - 1) * perPage,
+			take: perPage,
 			where: {
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			},
 			orderBy: {
 				name: "asc"
@@ -42,15 +56,17 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 		});
 	}
 
-	async findById(
-		id: string,
-		filterId?: string | null
-	): Promise<District | null> {
+	async findById({
+		id,
+		filterParams
+	}: FindByIdParams<string>): Promise<District | null> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.district.findUnique({
 			where: {
 				id,
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			}
 		});
 	}
@@ -59,28 +75,46 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 		return await prisma.district.create({ data });
 	}
 
-	async update(
-		id: string,
-		data: Prisma.DistrictUpdateInput
-	): Promise<District> {
+	async update({
+		id,
+		data,
+		filterParams
+	}: UpdateContentParams<
+		string,
+		Prisma.DistrictUpdateInput
+	>): Promise<District> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.district.update({
 			where: {
 				id,
-				deleted_at: null
+				deleted_at: null,
+				...params
 			},
 			data
 		});
 	}
 
-	async delete(id: string, force: boolean): Promise<District> {
+	async delete({
+		id,
+		force,
+		filterParams
+	}: DeleteContentParams<string>): Promise<District> {
+		const params = transformValidFilterParams(filterParams);
+
 		if (force) {
 			return await prisma.district.delete({
 				where: {
-					id
+					id,
+					...params
 				}
 			});
 		}
 
-		return await this.update(id, { deleted_at: new Date() });
+		return await this.update({
+			id,
+			filterParams,
+			data: { deleted_at: new Date() }
+		});
 	}
 }

@@ -46,7 +46,10 @@ export class UpdateEstablishmentService {
 			};
 		}
 
-		await this.establishmentRepository.update(id, updateInput);
+		await this.establishmentRepository.update({
+			id,
+			data: updateInput
+		});
 
 		await cache.forgetKeysContaining(cache.keys.establishments);
 	}

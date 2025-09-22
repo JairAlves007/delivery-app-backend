@@ -39,7 +39,8 @@ export class ListEstablishmentService {
 				totalPromise,
 				cache.rememberForever(
 					`${cache.keys.establishments}_page_${page}_per_page_${perPage}`,
-					async () => await this.establishmentRepository.paginate(page, perPage)
+					async () =>
+						await this.establishmentRepository.paginate({ page, perPage })
 				)
 			]);
 

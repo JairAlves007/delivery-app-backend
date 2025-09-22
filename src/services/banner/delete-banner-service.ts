@@ -11,7 +11,7 @@ export class DeleteBannerService {
 	async handle(id: number) {
 		const cache = makeCache();
 
-		await this.bannerRepository.delete(id, false);
+		await this.bannerRepository.delete({ id, force: false });
 
 		await cache.forgetKeysContaining(cache.keys.banners);
 	}

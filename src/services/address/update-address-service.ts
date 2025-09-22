@@ -26,22 +26,25 @@ export class UpdateAddressService {
 	): Promise<void> {
 		const cache = makeCache();
 
-		await this.addressRepository.update(id, {
-			...data,
-			reference_point,
-			postal_code,
-			userAddresses: {
-				update: {
-					where: {
-						user_id_address_id: {
-							address_id: id,
-							user_id: userId
-						}
-					},
-					data: {
-						user: {
-							connect: {
-								id: userId
+		await this.addressRepository.update({
+			id,
+			data: {
+				...data,
+				reference_point,
+				postal_code,
+				userAddresses: {
+					update: {
+						where: {
+							user_id_address_id: {
+								address_id: id,
+								user_id: userId
+							}
+						},
+						data: {
+							user: {
+								connect: {
+									id: userId
+								}
 							}
 						}
 					}

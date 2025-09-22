@@ -1,13 +1,24 @@
+import { transformValidFilterParams } from "@/helpers/utils.ts";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
+import {
+	CursorPaginationParams,
+	DeleteContentParams,
+	FilterParams,
+	FindByIdParams,
+	PaginationParams,
+	UpdateContentParams
+} from "@/types/crud.ts";
 import type { Prisma, Product } from "@prisma/client";
 
 export class ProductPrismaRepository implements IProductRepository {
-	async listAll(filterId: string | null): Promise<Product[]> {
+	async listAll(filterParams?: FilterParams): Promise<Product[]> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.product.findMany({
 			where: {
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			},
 			orderBy: {
 				created_at: "desc"
@@ -15,26 +26,30 @@ export class ProductPrismaRepository implements IProductRepository {
 		});
 	}
 
-	async count(filterId: string | null): Promise<number> {
+	async count(filterParams?: FilterParams): Promise<number> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.product.count({
 			where: {
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			}
 		});
 	}
 
-	async paginate(
-		page: number,
-		limit: number,
-		filterId: string | null
-	): Promise<Product[]> {
+	async paginate({
+		perPage,
+		page,
+		filterParams
+	}: PaginationParams): Promise<Product[]> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.product.findMany({
-			skip: (page - 1) * limit,
-			take: limit,
+			skip: (page - 1) * perPage,
+			take: perPage,
 			where: {
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			},
 			orderBy: {
 				created_at: "desc"
@@ -42,15 +57,17 @@ export class ProductPrismaRepository implements IProductRepository {
 		});
 	}
 
-	async cursorPaginate(
-		limit: number,
-		cursor?: string | null,
-		filterId?: string | null
-	): Promise<Product[]> {
+	async cursorPaginate({
+		limit,
+		cursor,
+		filterParams
+	}: CursorPaginationParams<string>): Promise<Product[]> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.product.findMany({
 			where: {
-				...(!!filterId && { establishment_id: filterId }),
-				deleted_at: null
+				deleted_at: null,
+				...params
 			},
 			orderBy: {
 				created_at: "desc"
@@ -66,18 +83,24 @@ export class ProductPrismaRepository implements IProductRepository {
 		limit: number,
 		cursor?: string | null
 	): Promise<Product[]> {
-		return await this.cursorPaginate(limit, cursor, establishmentId);
+		return await this.cursorPaginate({
+			limit,
+			cursor,
+			filterParams: { establishment_id: establishmentId }
+		});
 	}
 
-	async findById(
-		id: string,
-		filterId?: string | null
-	): Promise<Product | null> {
+	async findById({
+		id,
+		filterParams
+	}: FindByIdParams<string>): Promise<Product | null> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.product.findUnique({
 			where: {
 				id,
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			}
 		});
 	}
@@ -86,26 +109,44 @@ export class ProductPrismaRepository implements IProductRepository {
 		return await prisma.product.create({ data });
 	}
 
-	async update(id: string, data: Prisma.ProductUpdateInput): Promise<Product> {
+	async update({
+		id,
+		data,
+		filterParams
+	}: UpdateContentParams<string, Prisma.ProductUpdateInput>): Promise<Product> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.product.update({
 			where: {
 				id,
-				deleted_at: null
+				deleted_at: null,
+				...params
 			},
 			data
 		});
 	}
 
-	async delete(id: string, force: boolean): Promise<Product> {
+	async delete({
+		id,
+		force,
+		filterParams
+	}: DeleteContentParams<string>): Promise<Product> {
+		const params = transformValidFilterParams(filterParams);
+
 		if (force) {
 			return await prisma.product.delete({
 				where: {
-					id
+					id,
+					...params
 				}
 			});
 		}
 
-		return await this.update(id, { deleted_at: new Date() });
+		return await this.update({
+			id,
+			filterParams,
+			data: { deleted_at: new Date() }
+		});
 	}
 
 	async deleteOldTags(id: string): Promise<void> {

@@ -1,48 +1,67 @@
+import { transformValidFilterParams } from "@/helpers/utils.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
 import type { CouponWithUserCoupons } from "@/types/coupon.ts";
+import {
+	DeleteContentParams,
+	FilterParams,
+	FindByIdParams,
+	PaginationParams,
+	UpdateContentParams
+} from "@/types/crud.ts";
 import type { Coupon, Prisma } from "@prisma/client";
 
 export class CouponPrismaRepository implements ICouponRepository {
-	async listAll(filterId?: string | null): Promise<Coupon[]> {
+	async listAll(filterParams?: FilterParams): Promise<Coupon[]> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.coupon.findMany({
 			where: {
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			}
 		});
 	}
 
-	async count(filterId?: string | null): Promise<number> {
+	async count(filterParams?: FilterParams): Promise<number> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.coupon.count({
 			where: {
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			}
 		});
 	}
 
-	async paginate(
-		page: number,
-		limit: number,
-		filterId?: string | null
-	): Promise<Coupon[]> {
+	async paginate({
+		perPage,
+		page,
+		filterParams
+	}: PaginationParams): Promise<Coupon[]> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.coupon.findMany({
-			skip: (page - 1) * limit,
-			take: limit,
+			skip: (page - 1) * perPage,
+			take: perPage,
 			where: {
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			}
 		});
 	}
 
-	async findById(id: number, filterId?: string | null): Promise<Coupon | null> {
+	async findById({
+		id,
+		filterParams
+	}: FindByIdParams<number>): Promise<Coupon | null> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.coupon.findUnique({
 			where: {
 				id,
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			}
 		});
 	}
@@ -72,25 +91,43 @@ export class CouponPrismaRepository implements ICouponRepository {
 		return await prisma.coupon.create({ data });
 	}
 
-	async update(id: number, data: Prisma.CouponUpdateInput): Promise<Coupon> {
+	async update({
+		id,
+		data,
+		filterParams
+	}: UpdateContentParams<number, Prisma.CouponUpdateInput>): Promise<Coupon> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.coupon.update({
 			where: {
 				id,
-				deleted_at: null
+				deleted_at: null,
+				...params
 			},
 			data
 		});
 	}
 
-	async delete(id: number, force: boolean): Promise<Coupon> {
+	async delete({
+		id,
+		force,
+		filterParams
+	}: DeleteContentParams<number>): Promise<Coupon> {
+		const params = transformValidFilterParams(filterParams);
+
 		if (force) {
 			return await prisma.coupon.delete({
 				where: {
-					id
+					id,
+					...params
 				}
 			});
 		}
 
-		return await this.update(id, { deleted_at: new Date() });
+		return await this.update({
+			id,
+			filterParams,
+			data: { deleted_at: new Date() }
+		});
 	}
 }

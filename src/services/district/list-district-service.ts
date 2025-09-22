@@ -41,7 +41,10 @@ export class ListDistrictService {
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
 			`${prefixKey}total_${cache.keys.districts}`,
-			async () => await this.districtRepository.count(establishmentId)
+			async () =>
+				await this.districtRepository.count({
+					establishment_id: establishmentId
+				})
 		);
 
 		if (isPaging) {
@@ -50,11 +53,11 @@ export class ListDistrictService {
 				cache.rememberForever(
 					`${prefixKey}${cache.keys.districts}_page_${page}_per_page_${perPage}`,
 					async () =>
-						await this.districtRepository.paginate(
+						await this.districtRepository.paginate({
 							page,
 							perPage,
-							establishmentId
-						)
+							filterParams: { establishment_id: establishmentId }
+						})
 				)
 			]);
 
@@ -75,7 +78,10 @@ export class ListDistrictService {
 			totalPromise,
 			cache.rememberForever(
 				`${prefixKey}all_${cache.keys.districts}`,
-				async () => await this.districtRepository.listAll(establishmentId)
+				async () =>
+					await this.districtRepository.listAll({
+						establishment_id: establishmentId
+					})
 			)
 		]);
 

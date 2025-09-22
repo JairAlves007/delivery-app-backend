@@ -15,11 +15,14 @@ export class UpdateAddonService {
 	async handle(id: number, { categoryId, ...data }: UpdateAddonServiceRequest) {
 		const cache = makeCache();
 
-		await this.addonRepository.update(id, {
-			...data,
-			category: {
-				connect: {
-					id: categoryId
+		await this.addonRepository.update({
+			id,
+			data: {
+				...data,
+				category: {
+					connect: {
+						id: categoryId
+					}
 				}
 			}
 		});

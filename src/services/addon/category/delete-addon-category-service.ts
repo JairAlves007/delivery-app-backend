@@ -11,7 +11,10 @@ export class DeleteAddonCategoryService {
 	async handle(id: number) {
 		const cache = makeCache();
 
-		await this.addonCategoryRepository.delete(id, false);
+		await this.addonCategoryRepository.delete({
+			id,
+			force: false
+		});
 
 		await cache.forgetKeysContaining(cache.keys.addonCategories);
 	}

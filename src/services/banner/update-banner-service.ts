@@ -26,27 +26,30 @@ export class UpdateBannerService {
 	) {
 		const cache = makeCache();
 
-		await this.bannerRepository.update(id, {
-			...data,
-			link_type,
-			image_key,
-			establishment: {
-				connect: {
-					id: establishmentId
-				}
-			},
-			...(!!categoryId &&
-				link_type === BannerLinkType.CATEGORY && {
-					category: {
-						connect: { id: categoryId }
+		await this.bannerRepository.update({
+			id,
+			data: {
+				...data,
+				link_type,
+				image_key,
+				establishment: {
+					connect: {
+						id: establishmentId
 					}
-				}),
-			...(!!productId &&
-				link_type === BannerLinkType.PRODUCT && {
-					product: {
-						connect: { id: productId }
-					}
-				})
+				},
+				...(!!categoryId &&
+					link_type === BannerLinkType.CATEGORY && {
+						category: {
+							connect: { id: categoryId }
+						}
+					}),
+				...(!!productId &&
+					link_type === BannerLinkType.PRODUCT && {
+						product: {
+							connect: { id: productId }
+						}
+					})
+			}
 		});
 
 		await cache.forgetKeysContaining(cache.keys.banners);

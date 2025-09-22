@@ -41,7 +41,8 @@ export class ListAddonService {
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
 			`${prefixKey}total_${cache.keys.addons}`,
-			async () => await this.addonRepository.count(establishmentId)
+			async () =>
+				await this.addonRepository.count({ establishment_id: establishmentId })
 		);
 
 		if (isPaging) {
@@ -50,7 +51,11 @@ export class ListAddonService {
 				cache.rememberForever(
 					`${prefixKey}${cache.keys.addons}_page_${page}_per_page_${perPage}`,
 					async () =>
-						await this.addonRepository.paginate(page, perPage, establishmentId)
+						await this.addonRepository.paginate({
+							page,
+							limit: perPage,
+							filterParams: { establishment_id: establishmentId }
+						})
 				)
 			]);
 
@@ -71,7 +76,10 @@ export class ListAddonService {
 			totalPromise,
 			cache.rememberForever(
 				`${prefixKey}all_${cache.keys.addons}`,
-				async () => await this.addonRepository.listAll(establishmentId)
+				async () =>
+					await this.addonRepository.listAll({
+						establishment_id: establishmentId
+					})
 			)
 		]);
 

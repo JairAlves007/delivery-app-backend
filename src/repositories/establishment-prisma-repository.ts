@@ -2,6 +2,12 @@ import type { IEstablishmentRepository } from "@/interfaces/repositories/establi
 import type { Establishment, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma.ts";
 import type { EstablishmentWithInfo } from "@/types/establishment.ts";
+import {
+	DeleteContentParams,
+	FindByIdParams,
+	PaginationParams,
+	UpdateContentParams
+} from "@/types/crud.ts";
 
 export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	async listAll(): Promise<Establishment[]> {
@@ -23,10 +29,13 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		});
 	}
 
-	async paginate(page: number, limit: number): Promise<Establishment[]> {
+	async paginate({
+		perPage,
+		page
+	}: PaginationParams): Promise<Establishment[]> {
 		return await prisma.establishment.findMany({
-			skip: (page - 1) * limit,
-			take: limit,
+			skip: (page - 1) * perPage,
+			take: perPage,
 			where: {
 				deleted_at: null
 			},
@@ -36,7 +45,9 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		});
 	}
 
-	async findById(id: string): Promise<Establishment | null> {
+	async findById({
+		id
+	}: FindByIdParams<string>): Promise<Establishment | null> {
 		return await prisma.establishment.findUnique({
 			where: {
 				id,
@@ -65,10 +76,13 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		return await prisma.establishment.create({ data });
 	}
 
-	async update(
-		id: string,
-		data: Prisma.EstablishmentUpdateInput
-	): Promise<Establishment> {
+	async update({
+		id,
+		data
+	}: UpdateContentParams<
+		string,
+		Prisma.EstablishmentUpdateInput
+	>): Promise<Establishment> {
 		return await prisma.establishment.update({
 			where: {
 				id,
@@ -78,7 +92,10 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		});
 	}
 
-	async delete(id: string, force: boolean = false): Promise<Establishment> {
+	async delete({
+		id,
+		force
+	}: DeleteContentParams<string>): Promise<Establishment> {
 		if (force) {
 			return await prisma.establishment.delete({
 				where: {
@@ -87,6 +104,9 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 			});
 		}
 
-		return await this.update(id, { deleted_at: new Date() });
+		return await this.update({
+			id,
+			data: { deleted_at: new Date() }
+		});
 	}
 }

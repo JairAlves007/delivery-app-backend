@@ -1,13 +1,23 @@
+import { transformValidFilterParams } from "@/helpers/utils.ts";
 import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
+import {
+	DeleteContentParams,
+	FilterParams,
+	FindByIdParams,
+	PaginationParams,
+	UpdateContentParams
+} from "@/types/crud.ts";
 import type { Addon, Prisma } from "@prisma/client";
 
 export class AddonPrismaRepository implements IAddonRepository {
-	async listAll(filterId?: string | null): Promise<Addon[]> {
+	async listAll(filterParams?: FilterParams): Promise<Addon[]> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.addon.findMany({
 			where: {
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			},
 			orderBy: {
 				name: "asc"
@@ -15,26 +25,30 @@ export class AddonPrismaRepository implements IAddonRepository {
 		});
 	}
 
-	async count(filterId?: string | null): Promise<number> {
+	async count(filterParams?: FilterParams): Promise<number> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.addon.count({
 			where: {
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			}
 		});
 	}
 
-	async paginate(
-		page: number,
-		limit: number,
-		filterId?: string
-	): Promise<Addon[]> {
+	async paginate({
+		page,
+		perPage,
+		filterParams
+	}: PaginationParams): Promise<Addon[]> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.addon.findMany({
-			skip: (page - 1) * limit,
-			take: limit,
+			skip: (page - 1) * perPage,
+			take: perPage,
 			where: {
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			},
 			orderBy: {
 				name: "asc"
@@ -42,12 +56,17 @@ export class AddonPrismaRepository implements IAddonRepository {
 		});
 	}
 
-	async findById(id: number, filterId?: string | null): Promise<Addon | null> {
+	async findById({
+		id,
+		filterParams
+	}: FindByIdParams<number>): Promise<Addon | null> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.addon.findUnique({
 			where: {
 				id,
 				deleted_at: null,
-				...(!!filterId && { establishment_id: filterId })
+				...params
 			}
 		});
 	}
@@ -56,25 +75,43 @@ export class AddonPrismaRepository implements IAddonRepository {
 		return await prisma.addon.create({ data });
 	}
 
-	async update(id: number, data: Prisma.AddonUpdateInput): Promise<Addon> {
+	async update({
+		id,
+		filterParams,
+		data
+	}: UpdateContentParams<number, Prisma.AddonUpdateInput>): Promise<Addon> {
+		const params = transformValidFilterParams(filterParams);
+
 		return await prisma.addon.update({
 			where: {
 				id,
-				deleted_at: null
+				deleted_at: null,
+				...params
 			},
 			data
 		});
 	}
 
-	async delete(id: number, force: boolean): Promise<Addon> {
+	async delete({
+		id,
+		force,
+		filterParams
+	}: DeleteContentParams<number>): Promise<Addon> {
+		const params = transformValidFilterParams(filterParams);
+
 		if (force) {
 			return await prisma.addon.delete({
 				where: {
-					id
+					id,
+					...params
 				}
 			});
 		}
 
-		return await this.update(id, { deleted_at: new Date() });
+		return await this.update({
+			id,
+			filterParams,
+			data: { deleted_at: new Date() }
+		});
 	}
 }

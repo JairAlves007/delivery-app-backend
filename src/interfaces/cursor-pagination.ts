@@ -1,7 +1,7 @@
+import { CursorPaginationParams } from "@/types/crud.ts";
+
 export interface CursorPagination<Model, CursorType> {
 	cursorPaginate(
-		limit: number,
-		cursor?: CursorType | null,
-		filterId?: string | null
+		cursorPaginationParams: CursorPaginationParams<CursorType>
 	): Promise<Model[]>;
 }

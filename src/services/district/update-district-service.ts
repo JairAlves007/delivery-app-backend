@@ -22,12 +22,15 @@ export class UpdateDistrictService {
 	) {
 		const cache = makeCache();
 
-		await this.districtRepository.update(id, {
-			...data,
-			shipping_cost,
-			establishment: {
-				connect: {
-					id: establishmentId
+		await this.districtRepository.update({
+			id,
+			data: {
+				...data,
+				shipping_cost,
+				establishment: {
+					connect: {
+						id: establishmentId
+					}
 				}
 			}
 		});

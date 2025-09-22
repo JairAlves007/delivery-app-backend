@@ -11,7 +11,7 @@ export class DeleteDistrictService {
 	async handle(id: string) {
 		const cache = makeCache();
 
-		await this.districtRepository.delete(id, true);
+		await this.districtRepository.delete({ id, force: false });
 
 		await cache.forgetKeysContaining(cache.keys.districts);
 	}

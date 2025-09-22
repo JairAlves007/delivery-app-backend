@@ -11,7 +11,7 @@ export class DeleteCouponService {
 	async handle(id: number) {
 		const cache = makeCache();
 
-		await this.couponRepository.delete(id, false);
+		await this.couponRepository.delete({ id, force: false });
 
 		await cache.forgetKeysContaining(cache.keys.coupons);
 	}

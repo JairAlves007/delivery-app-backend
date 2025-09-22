@@ -29,30 +29,33 @@ export class UpdateProductService {
 
 		await this.productRepository.deleteOldTags(id);
 
-		await this.productRepository.update(id, {
-			...data,
-			name,
-			image_key,
-			...(!!name && { slug: slugify(name) }),
-			establishment: {
-				connect: {
-					id: establishmentId
+		await this.productRepository.update({
+			id,
+			data: {
+				...data,
+				name,
+				image_key,
+				...(!!name && { slug: slugify(name) }),
+				establishment: {
+					connect: {
+						id: establishmentId
+					}
+				},
+				...(categoryId && {
+					category: {
+						connect: { id: categoryId }
+					}
+				}),
+				banners: {
+					set: bannerIds?.map(bannerId => ({
+						id: bannerId
+					}))
+				},
+				tags: {
+					create: tagIds?.map(tagId => ({
+						tag: { connect: { id: tagId } }
+					}))
 				}
-			},
-			...(categoryId && {
-				category: {
-					connect: { id: categoryId }
-				}
-			}),
-			banners: {
-				set: bannerIds?.map(bannerId => ({
-					id: bannerId
-				}))
-			},
-			tags: {
-				create: tagIds?.map(tagId => ({
-					tag: { connect: { id: tagId } }
-				}))
 			}
 		});
 
