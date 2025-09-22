@@ -611,7 +611,7 @@ model DeliveryAddress {
   establishment    Establishment @relation(fields: [establishment_id], references: [id])
   district         District      @relation(fields: [district_id], references: [id])
 
-  @@unique([user_address_id, establishment_id])
+  @@unique([user_address_id, establishment_id, district_id])
   @@index([user_address_id], name: "idx_delivery_addresses_user_address_id")
   @@index([establishment_id], name: "idx_delivery_addresses_establishment_id")
   @@index([district_id], name: "idx_delivery_addresses_district_id")
