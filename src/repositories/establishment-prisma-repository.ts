@@ -2,7 +2,7 @@ import type { IEstablishmentRepository } from "@/interfaces/repositories/establi
 import type { Establishment, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma.ts";
 import type { EstablishmentWithInfo } from "@/types/establishment.ts";
-import {
+import type {
 	DeleteContentParams,
 	FindByIdParams,
 	PaginationParams,

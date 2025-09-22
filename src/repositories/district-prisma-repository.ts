@@ -1,7 +1,7 @@
 import { transformValidFilterParams } from "@/helpers/utils.ts";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
-import {
+import type {
 	DeleteContentParams,
 	FilterParams,
 	FindByIdParams,

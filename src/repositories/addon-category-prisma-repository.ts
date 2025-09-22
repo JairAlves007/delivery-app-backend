@@ -1,7 +1,7 @@
 import { transformValidFilterParams } from "@/helpers/utils.ts";
 import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
-import {
+import type {
 	DeleteContentParams,
 	FilterParams,
 	FindByIdParams,

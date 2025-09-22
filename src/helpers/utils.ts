@@ -1,4 +1,4 @@
-import { FilterParams, ValidFilterParams } from "@/types/crud.ts";
+import type { FilterParams, ValidFilterParams } from "@/types/crud.ts";
 
 export function slugify(text: string): string {
 	return text
