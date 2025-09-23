@@ -226,10 +226,10 @@ model Establishment {
   accepts_credit_card Boolean
   is_manually_closed  Boolean               @default(false)
   next_billing_date   DateTime
-  user_id             String?               @unique
+  owner_id            String?               @unique
   created_at          DateTime              @default(now())
   deleted_at          DateTime?
-  owner               User?                 @relation(fields: [user_id], references: [id])
+  owner               User?                 @relation(fields: [owner_id], references: [id])
   openingHours        OpeningHour[]
   socialLinks         SocialLink[]
   products            Product[]

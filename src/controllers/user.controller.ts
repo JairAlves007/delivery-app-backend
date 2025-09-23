@@ -34,7 +34,7 @@ export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
 			const token = await reply.jwtSign(
 				{
 					role: user.role.name,
-					establishmentId: user.establishment?.id
+					establishmentId: user.establishment?.owner_id
 				},
 				{
 					sub: user.id
