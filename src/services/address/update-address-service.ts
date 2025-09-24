@@ -1,11 +1,12 @@
+import { makeSetAllAddressesAsNotDefaultService } from "@/factories/services/address/user/make-set-all-addresses-as-not-default-service.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
 import { updateAddressBodySchema } from "@/schemas/address-schema.ts";
-import { userIdSchema } from "@/schemas/generic-schema.ts";
+import { UserID } from "@/types/user.ts";
 import z from "zod";
 
 type UpdateAddressServiceRequest = z.infer<typeof updateAddressBodySchema> & {
-	userId: z.infer<typeof userIdSchema>;
+	userId: UserID;
 };
 
 export class UpdateAddressService {
@@ -20,11 +21,19 @@ export class UpdateAddressService {
 		{
 			referencePoint: reference_point,
 			postalCode: postal_code,
+			isDefault: is_default,
 			userId,
 			...data
 		}: UpdateAddressServiceRequest
 	): Promise<void> {
 		const cache = makeCache();
+
+		if (is_default) {
+			const setAllAsNotDefaultService =
+				makeSetAllAddressesAsNotDefaultService();
+
+			await setAllAsNotDefaultService.handle(userId);
+		}
 
 		await this.addressRepository.update({
 			id,
@@ -41,6 +50,7 @@ export class UpdateAddressService {
 							}
 						},
 						data: {
+							is_default,
 							user: {
 								connect: {
 									id: userId

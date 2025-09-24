@@ -1,10 +1,12 @@
+import { UserID } from "./user.ts";
+
 export type ValidFilterParams = {
 	[K in keyof FilterParams]-?: Exclude<FilterParams[K], null | undefined>;
 };
 
 export type FilterParams = {
 	establishment_id?: string | null;
-	user_id?: string | null;
+	user_id?: UserID | null;
 };
 
 export type PaginationParams = {
