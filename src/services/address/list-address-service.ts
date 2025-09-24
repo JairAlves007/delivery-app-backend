@@ -3,7 +3,7 @@ import type { IAddressRepository } from "@/interfaces/repositories/address-repos
 import type { Address } from "@prisma/client";
 import { listCursorQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import z from "zod";
-import { UserID } from "@/types/user.ts";
+import type { UserID } from "@/types/user.ts";
 
 type ListAddressServiceRequest = z.infer<typeof listCursorQueryParamsSchema> & {
 	userId: UserID;

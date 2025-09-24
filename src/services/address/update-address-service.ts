@@ -2,7 +2,7 @@ import { makeSetAllAddressesAsNotDefaultService } from "@/factories/services/add
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
 import { updateAddressBodySchema } from "@/schemas/address-schema.ts";
-import { UserID } from "@/types/user.ts";
+import type { UserID } from "@/types/user.ts";
 import z from "zod";
 
 type UpdateAddressServiceRequest = z.infer<typeof updateAddressBodySchema> & {
