@@ -1,3 +1,4 @@
+import Constants from "@/helpers/constants.ts";
 import { transformPriceToDatabase } from "@/helpers/price.ts";
 import { slugify, transformValueToPercentage } from "@/helpers/utils.ts";
 import {
@@ -16,8 +17,7 @@ import {
 	Prisma,
 	TagType
 } from "@prisma/client";
-import { hash } from "argon2";
-import { create } from "domain";
+import { hash } from "bcrypt-ts";
 
 const prisma = new PrismaClient();
 
@@ -93,7 +93,7 @@ async function main() {
 		data: {
 			name: "Admin",
 			email: "admin@delivery.com",
-			password: await hash("admin123"),
+			password: await hash("admin123", Constants.HASH_SALT_LENGTH),
 			role_id: adminRole.id
 		}
 	});

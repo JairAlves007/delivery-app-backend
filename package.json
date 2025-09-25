@@ -25,7 +25,7 @@
 		"@fastify/cors": "11.1.0",
 		"@fastify/jwt": "9.1.0",
 		"@prisma/client": "6.16.2",
-		"argon2": "0.44.0",
+		"bcrypt-ts": "7.1.0",
 		"esm-module-alias": "2.2.1",
 		"fastify": "5.4.0",
 		"ioredis": "5.7.0",

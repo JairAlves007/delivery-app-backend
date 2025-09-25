@@ -4,8 +4,9 @@ import type { IUserRepository } from "@/interfaces/repositories/user-repository.
 import type { RoleWithPermissions } from "@/types/role.ts";
 import { signUpBodySchema } from "@/schemas/auth-schema.ts";
 import { RoleType, type User } from "@prisma/client";
-import { hash } from "argon2";
 import z from "zod";
+import Constants from "@/helpers/constants.ts";
+import { hash } from "bcrypt-ts";
 
 type SignUpServiceRequest = z.infer<typeof signUpBodySchema> & {
 	role: RoleType;
@@ -34,7 +35,10 @@ export class SignUpService {
 		if (!role) throw new UserUnauthorized();
 
 		const [roleData, password_hash]: [RoleWithPermissions | null, string] =
-			await Promise.all([this.roleRepository.findByName(role), hash(password)]);
+			await Promise.all([
+				this.roleRepository.findByName(role),
+				hash(password, Constants.HASH_SALT_LENGTH)
+			]);
 
 		if (!roleData) throw new UserUnauthorized();
 

@@ -1,4 +1,7 @@
 export default class Constants {
+	// Hash
+	public static readonly HASH_SALT_LENGTH: number = 6;
+
 	// Strings
 	public static readonly TOKEN_TYPE: string = "Bearer";
 

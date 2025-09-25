@@ -3,9 +3,9 @@ import type { IUserRepository } from "@/interfaces/repositories/user-repository.
 import type { UserWithRole } from "@/types/user.ts";
 import { signInBodySchema } from "@/schemas/auth-schema.ts";
 import { RoleType } from "@prisma/client";
-import { verify } from "argon2";
 import z from "zod";
 import { InvalidEstablishment } from "@/errors/user/invalid-establishment-error.ts";
+import { compare } from "bcrypt-ts";
 
 type SignInServiceRequest = z.infer<typeof signInBodySchema> & {
 	allowedRoles: RoleType[];
@@ -42,7 +42,7 @@ export class SignInService {
 			if (!allowedRoles.includes(user.role.name))
 				throw new InvalidCredentials();
 
-			const doesPasswordMatches = await verify(user.password, password);
+			const doesPasswordMatches = await compare(password, user.password);
 
 			if (!doesPasswordMatches) throw new InvalidCredentials();
 
