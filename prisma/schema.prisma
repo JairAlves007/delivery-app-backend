@@ -167,23 +167,38 @@ model RolePermission {
 }
 
 model User {
-  id            String         @id @default(ulid())
-  name          String
-  email         String         @unique
-  password      String
-  role_id       Int
-  created_at    DateTime       @default(now())
-  deleted_at    DateTime?
-  role          Role           @relation(fields: [role_id], references: [id])
-  addresses     UserAddress[]
-  orders        Order[]
-  favorites     Favorite[]
-  userCoupons   UserCoupon[]
-  establishment Establishment?
+  id                  String               @id @default(ulid())
+  name                String
+  email               String               @unique
+  password            String
+  role_id             Int
+  created_at          DateTime             @default(now())
+  deleted_at          DateTime?
+  role                Role                 @relation(fields: [role_id], references: [id])
+  addresses           UserAddress[]
+  orders              Order[]
+  favorites           Favorite[]
+  userCoupons         UserCoupon[]
+  establishment       Establishment?
+  passwordResetTokens PasswordResetToken[]
 
   @@index([role_id], name: "idx_users_role_id")
   @@index([deleted_at], name: "idx_users_deleted_at")
   @@map("users")
+}
+
+model PasswordResetToken {
+  id         Int       @id @default(autoincrement())
+  user_id    String
+  token_hash String
+  expires_at DateTime
+  used_at    DateTime?
+  created_at DateTime  @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@map("password_reset_tokens")
 }
 
 model Menu {

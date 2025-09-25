@@ -1,4 +1,4 @@
-import { UserWithRole } from "@/types/user.ts";
+import type { UserWithRole } from "@/types/user.ts";
 import type { PermissionType, Prisma, User } from "@prisma/client";
 
 export interface IUserRepository {

@@ -1,5 +1,5 @@
 import z from "zod";
-import { establishmentIdSchema } from "./generic-schema.ts";
+import { establishmentIdSchema, userIdSchema } from "./generic-schema.ts";
 
 export const signInBodySchema = z.object({
 	email: z.email("Endereço de e-mail inválido"),
@@ -26,4 +26,18 @@ export const adminSignInBodySchema = signInBodySchema.extend({
 
 export const adminSignUpBodySchema = signUpBodySchema.extend({
 	establishmentId: establishmentIdSchema
+});
+
+export const forgotPasswordBodySchema = z.object({
+	email: z
+		.email("Endereço de e-mail inválido")
+		.min(1, "O e-mail deve ser preenchido")
+});
+
+export const resetPasswordBodySchema = z.object({
+	newPassword: z
+		.string("A senha deve ser preenchida")
+		.min(6, "A senha deve ter no mínimo 6 caracteres"),
+	token: z.string("O token deve ser preenchido"),
+	userId: userIdSchema
 });

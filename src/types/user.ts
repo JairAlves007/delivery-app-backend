@@ -16,3 +16,14 @@ export type UserWithRole = Prisma.UserGetPayload<{
 }>;
 
 export type UserID = z.infer<typeof userIdSchema>;
+
+export type FindByPasswordTokenParams = {
+	token: string;
+	userId: UserID;
+};
+
+export type ResetPasswordParams = {
+	passwordResetTokenId: number;
+	newPassword: string;
+	userId: UserID;
+};

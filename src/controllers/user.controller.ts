@@ -4,6 +4,8 @@ import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
 	adminSignInBodySchema,
 	adminSignUpBodySchema,
+	forgotPasswordBodySchema,
+	resetPasswordBodySchema,
 	signInBodySchema,
 	signUpBodySchema
 } from "@/schemas/auth-schema.ts";
@@ -17,6 +19,8 @@ import { makeGetMenuService } from "@/factories/services/main/make-get-menu-serv
 import { makeFindEstablishmentBySlugService } from "@/factories/services/establishment/make-find-establishment-by-slug-service.ts";
 import { mainParamsSchema } from "@/schemas/main-schema.ts";
 import { isEstablishmentOpen } from "@/helpers/establishment.ts";
+import { makeForgotPasswordService } from "@/factories/services/auth/make-forgot-password-service.ts";
+import { makeResetPasswordService } from "@/factories/services/auth/make-reset-password-service.ts";
 
 export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
@@ -92,6 +96,44 @@ export const signUp = (roleType: RoleType, isAdmin: boolean = false) => {
 			return reply.sendError(error);
 		}
 	};
+};
+
+export const forgotPassword = async (
+	request: FastifyRequest,
+	reply: FastifyReply
+) => {
+	const { email } = forgotPasswordBodySchema.parse(request.body);
+
+	try {
+		const forgotPasswordService = makeForgotPasswordService();
+
+		await forgotPasswordService.handle(email);
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(ApiResponse.success("Email enviado com sucesso", {}));
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const resetPassword = async (
+	request: FastifyRequest,
+	reply: FastifyReply
+) => {
+	const body = resetPasswordBodySchema.parse(request.body);
+
+	try {
+		const resetPasswordService = makeResetPasswordService();
+
+		await resetPasswordService.handle(body);
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(ApiResponse.success("Senha alterada com sucesso", {}));
+	} catch (error) {
+		return reply.sendError(error);
+	}
 };
 
 export const main = async (request: FastifyRequest, reply: FastifyReply) => {
