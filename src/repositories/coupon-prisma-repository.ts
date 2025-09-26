@@ -1,4 +1,4 @@
-import { transformValidFilterParams } from "@/helpers/utils.ts";
+import { transformValidFilterParams } from "@/helpers/crud.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
 import type { CouponWithUserCoupons } from "@/types/coupon.ts";

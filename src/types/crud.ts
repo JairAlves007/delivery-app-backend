@@ -1,4 +1,4 @@
-import { UserID } from "./user.ts";
+import type { UserID } from "./user.ts";
 
 export type ValidFilterParams = {
 	[K in keyof FilterParams]-?: Exclude<FilterParams[K], null | undefined>;

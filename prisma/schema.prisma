@@ -583,7 +583,7 @@ model Address {
 }
 
 model UserAddress {
-  id                Int               @id @default(autoincrement())
+  id                String            @id @default(ulid())
   user_id           String
   address_id        String
   is_default        Boolean           @default(false)
@@ -616,10 +616,10 @@ model EstablishmentAddress {
 }
 
 model DeliveryAddress {
-  id               Int           @id @default(autoincrement())
+  id               String        @id @default(ulid())
   establishment_id String
   district_id      String
-  user_address_id  Int
+  user_address_id  String
   created_at       DateTime      @default(now())
   updated_at       DateTime      @updatedAt
   userAddress      UserAddress   @relation(fields: [user_address_id], references: [id])
@@ -634,7 +634,7 @@ model DeliveryAddress {
 }
 
 model OrderDeliveryAddress {
-  id            Int       @id @default(autoincrement())
+  id            String    @id @default(ulid())
   street        String
   number        String
   city          String

@@ -1,6 +1,7 @@
-import { transformValidFilterParams } from "@/helpers/utils.ts";
+import { transformValidFilterParams } from "@/helpers/crud.ts";
 import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
+import type { UserAddressWithDefault } from "@/types/address.ts";
 import type {
 	CursorPaginationParams,
 	DeleteContentParams,
@@ -9,31 +10,66 @@ import type {
 	PaginationParams,
 	UpdateContentParams
 } from "@/types/crud.ts";
-import type { Address, Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
+
+type UserAddressStructured = Prisma.UserAddressGetPayload<{
+	select: {
+		id: true;
+		is_default: true;
+		address: true;
+	};
+}>;
 
 export class AddressPrismaRepository implements IAddressRepository {
-	async listAll(filterParams?: FilterParams): Promise<Address[]> {
+	private getBaseWhere(
+		filterParams?: FilterParams
+	): Prisma.UserAddressWhereInput {
 		const params = transformValidFilterParams(filterParams);
 
-		return await prisma.address.findMany({
-			where: {
-				deleted_at: null,
-				...params
+		return {
+			address: {
+				deleted_at: null
 			},
+			deleted_at: null,
+			...params
+		};
+	}
+
+	private transformAddress(
+		address: UserAddressStructured
+	): UserAddressWithDefault {
+		return {
+			...address.address,
+			id: address.id,
+			is_default: address.is_default
+		};
+	}
+
+	async listAll(
+		filterParams?: FilterParams
+	): Promise<UserAddressWithDefault[]> {
+		const where = this.getBaseWhere(filterParams);
+
+		const addresses = await prisma.userAddress.findMany({
+			select: {
+				id: true,
+				is_default: true,
+				address: true
+			},
+			where,
 			orderBy: {
 				created_at: "desc"
 			}
 		});
+
+		return addresses.map(address => this.transformAddress(address));
 	}
 
 	async count(filterParams?: FilterParams): Promise<number> {
-		const params = transformValidFilterParams(filterParams);
+		const where = this.getBaseWhere(filterParams);
 
-		return await prisma.address.count({
-			where: {
-				deleted_at: null,
-				...params
-			}
+		return await prisma.userAddress.count({
+			where
 		});
 	}
 
@@ -41,39 +77,40 @@ export class AddressPrismaRepository implements IAddressRepository {
 		page,
 		perPage,
 		filterParams
-	}: PaginationParams): Promise<Address[]> {
-		const params = transformValidFilterParams(filterParams);
+	}: PaginationParams): Promise<UserAddressWithDefault[]> {
+		const where = this.getBaseWhere(filterParams);
 
-		return await prisma.address.findMany({
+		const addresses = await prisma.userAddress.findMany({
+			select: {
+				id: true,
+				is_default: true,
+				address: true
+			},
 			skip: (page - 1) * perPage,
 			take: perPage,
-			where: {
-				deleted_at: null,
-				...params
-			},
+			where,
 			orderBy: {
 				created_at: "desc"
 			}
 		});
+
+		return addresses.map(address => this.transformAddress(address));
 	}
 
 	async cursorPaginate({
 		limit,
 		cursor,
 		filterParams
-	}: CursorPaginationParams<string>): Promise<Address[]> {
-		const params = transformValidFilterParams(filterParams);
+	}: CursorPaginationParams<string>): Promise<UserAddressWithDefault[]> {
+		const where = this.getBaseWhere(filterParams);
 
-		return await prisma.address.findMany({
-			where: {
-				userAddresses: {
-					some: {
-						...params,
-						deleted_at: null
-					}
-				},
-				deleted_at: null
+		const addresses = await prisma.userAddress.findMany({
+			select: {
+				id: true,
+				is_default: true,
+				address: true
 			},
+			where,
 			orderBy: {
 				created_at: "desc"
 			},
@@ -81,58 +118,93 @@ export class AddressPrismaRepository implements IAddressRepository {
 			skip: cursor ? 1 : 0,
 			cursor: !!cursor ? { id: cursor } : undefined
 		});
+
+		return addresses.map(address => this.transformAddress(address));
 	}
 
 	async findById({
 		id,
 		filterParams
-	}: FindByIdParams<string>): Promise<Address | null> {
-		const params = transformValidFilterParams(filterParams);
+	}: FindByIdParams<string>): Promise<UserAddressWithDefault | null> {
+		const where = this.getBaseWhere(filterParams);
 
-		return await prisma.address.findUnique({
+		const address = await prisma.userAddress.findFirst({
+			select: {
+				id: true,
+				is_default: true,
+				address: true
+			},
 			where: {
 				id,
-				deleted_at: null,
-				...params
+				AND: [where]
 			}
 		});
+
+		return address ? this.transformAddress(address) : null;
 	}
 
-	async create(data: Prisma.AddressCreateInput): Promise<Address> {
-		return await prisma.address.create({ data });
+	async create(
+		data: Prisma.UserAddressCreateInput
+	): Promise<UserAddressWithDefault> {
+		const address = await prisma.userAddress.create({
+			select: {
+				id: true,
+				is_default: true,
+				address: true
+			},
+			data
+		});
+
+		return this.transformAddress(address);
 	}
 
 	async update({
 		id,
 		data,
 		filterParams
-	}: UpdateContentParams<string, Prisma.AddressUpdateInput>): Promise<Address> {
-		const params = transformValidFilterParams(filterParams);
+	}: UpdateContentParams<
+		string,
+		Prisma.UserAddressUpdateInput
+	>): Promise<UserAddressWithDefault> {
+		const where = this.getBaseWhere(filterParams);
 
-		return await prisma.address.update({
+		const address = await prisma.userAddress.update({
+			select: {
+				id: true,
+				is_default: true,
+				address: true
+			},
 			where: {
 				id,
-				deleted_at: null,
-				...params
+				AND: [where]
 			},
 			data
 		});
+
+		return this.transformAddress(address);
 	}
 
 	async delete({
 		id,
 		force,
 		filterParams
-	}: DeleteContentParams<string>): Promise<Address> {
-		const params = transformValidFilterParams(filterParams);
+	}: DeleteContentParams<string>): Promise<UserAddressWithDefault> {
+		const where = this.getBaseWhere(filterParams);
 
 		if (force) {
-			return await prisma.address.delete({
+			const address = await prisma.userAddress.delete({
+				select: {
+					id: true,
+					is_default: true,
+					address: true
+				},
 				where: {
 					id,
-					...params
+					AND: [where]
 				}
 			});
+
+			return this.transformAddress(address);
 		}
 
 		return await this.update({

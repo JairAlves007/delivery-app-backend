@@ -1,4 +1,4 @@
-import { transformValidFilterParams } from "@/helpers/utils.ts";
+import { transformValidFilterParams } from "@/helpers/crud.ts";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
 import type {

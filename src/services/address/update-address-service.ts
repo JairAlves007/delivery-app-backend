@@ -38,25 +38,12 @@ export class UpdateAddressService {
 		await this.addressRepository.update({
 			id,
 			data: {
-				...data,
-				reference_point,
-				postal_code,
-				userAddresses: {
+				is_default,
+				address: {
 					update: {
-						where: {
-							user_id_address_id: {
-								address_id: id,
-								user_id: userId
-							}
-						},
-						data: {
-							is_default,
-							user: {
-								connect: {
-									id: userId
-								}
-							}
-						}
+						...data,
+						reference_point,
+						postal_code
 					}
 				}
 			}

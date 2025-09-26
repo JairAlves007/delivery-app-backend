@@ -6,6 +6,7 @@ import { ApiResponse } from "@/helpers/api.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
 	addressParamsSchema,
+	createAddressBodySchema,
 	updateAddressBodySchema
 } from "@/schemas/address-schema.ts";
 import {
@@ -34,7 +35,7 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 
 export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 	const userId = userIdSchema.parse(request.user.sub);
-	const body = addressLocationSchema.parse(request.body);
+	const body = createAddressBodySchema.parse(request.body);
 
 	try {
 		const createAddressService = makeCreateAddressService();

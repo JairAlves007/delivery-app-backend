@@ -1,5 +1,3 @@
-import type { FilterParams, ValidFilterParams } from "@/types/crud.ts";
-
 export function slugify(text: string): string {
 	return text
 		.normalize("NFD")
@@ -47,14 +45,4 @@ export function checkIfCNPJIsValid(cnpj: string): boolean {
 
 export const transformValueToPercentage = (value: number): number => {
 	return value / 100;
-};
-
-export const transformValidFilterParams = (
-	filterParams?: FilterParams
-): Partial<ValidFilterParams> => {
-	return Object.fromEntries(
-		Object.entries(filterParams || {}).filter(
-			([_, v]) => v !== null && v !== undefined
-		)
-	);
 };

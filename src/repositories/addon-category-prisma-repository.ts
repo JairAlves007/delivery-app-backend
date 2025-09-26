@@ -1,4 +1,4 @@
-import { transformValidFilterParams } from "@/helpers/utils.ts";
+import { transformValidFilterParams } from "@/helpers/crud.ts";
 import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
 import type {

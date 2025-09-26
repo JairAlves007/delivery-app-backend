@@ -24,8 +24,18 @@ export class CreateAddressService {
 		...data
 	}: CreateAddressServiceRequest): Promise<void> {
 		const cache = makeCache();
+		const countKey = `${cache.keys.addresses}_user_id_${userId}`;
 
-		if (is_default) {
+		console.log({ is_default });
+
+		const count = await cache.rememberForever(
+			countKey,
+			async () => await this.addressRepository.count({ user_id: userId })
+		);
+
+		if (count <= 0) is_default = true;
+
+		if (is_default && count > 0) {
 			const setAllAsNotDefaultService =
 				makeSetAllAddressesAsNotDefaultService();
 
@@ -33,17 +43,17 @@ export class CreateAddressService {
 		}
 
 		await this.addressRepository.create({
-			...data,
-			reference_point,
-			postal_code,
-			userAddresses: {
+			is_default,
+			address: {
 				create: {
-					is_default,
-					user: {
-						connect: {
-							id: userId
-						}
-					}
+					...data,
+					reference_point,
+					postal_code
+				}
+			},
+			user: {
+				connect: {
+					id: userId
 				}
 			}
 		});
