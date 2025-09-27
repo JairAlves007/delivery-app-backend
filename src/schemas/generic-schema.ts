@@ -22,6 +22,10 @@ export const userIdSchema = z
 	.ulid("Usuário inválido")
 	.min(1, "Usuário inválido");
 
+export const userEmailSchema = z
+	.email("Endereço de e-mail inválido")
+	.min(1, "Endereço de e-mail inválido");
+
 export const addressLocationSchema = z.object({
 	city: z.string().min(1, "A cidade deve ser preenchida"),
 	state: z.string().min(1, "O estado deve ser preenchido"),

@@ -15,6 +15,7 @@
 	"license": "MIT",
 	"type": "module",
 	"devDependencies": {
+		"@types/ejs": "3.1.5",
 		"@types/node": "24.2.0",
 		"prisma": "6.16.2",
 		"typescript": "5.9.2"
@@ -26,6 +27,7 @@
 		"@fastify/jwt": "9.1.0",
 		"@prisma/client": "6.16.2",
 		"bcrypt-ts": "7.1.0",
+		"ejs": "3.1.10",
 		"esm-module-alias": "2.2.1",
 		"fastify": "5.4.0",
 		"ioredis": "5.7.0",

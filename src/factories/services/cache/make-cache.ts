@@ -1,4 +1,4 @@
-import { Cache } from "@/helpers/cache.ts";
+import { Cache } from "@/classes/cache.ts";
 
 export const makeCache = () => {
 	return Cache.getInstance();

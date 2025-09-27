@@ -8,6 +8,8 @@ export default class Constants {
 	// Numbers
 	public static readonly PRICE_MULTIPLIER: number = 100;
 	public static readonly SIGNED_URL_EXPIRES_IN_MINUTES: number = 60 * 4;
+	public static readonly PASSWORD_RESET_TOKEN_EXPIRES_IN_SECONDS: number =
+		60 * 60;
 
 	// Regex
 	public static readonly PHONE_REGEX: RegExp = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
