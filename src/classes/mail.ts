@@ -1,17 +1,15 @@
 import { FailedToSendMail } from "@/errors/mail/failed-to-send-mail-error.ts";
 import { mail } from "@/lib/mail.ts";
 import { renderFile } from "ejs";
-import { fileURLToPath } from "node:url";
-import { join, dirname } from "node:path";
+import { join, resolve } from "node:path";
 import type { IMail } from "@/interfaces/mail/mail-base.ts";
 import type { ResetPasswordMailData } from "@/types/mail.ts";
 
 export class Mail implements IMail {
 	private static instance: Mail | null = null;
-	private readonly MODULE_DIR: string = dirname(fileURLToPath(import.meta.url));
-	private readonly TEMPLATES_PATH: string = join(
-		this.MODULE_DIR,
-		"..",
+	private readonly TEMPLATES_PATH: string = resolve(
+		process.cwd(),
+		"src",
 		"mails"
 	);
 
@@ -41,10 +39,10 @@ export class Mail implements IMail {
 				html
 			});
 
-			if (error) {
-				console.error(error);
-				throw new FailedToSendMail("Reset Password");
-			}
+			if (!error) return;
+
+			console.error(error);
+			throw new FailedToSendMail("Reset Password");
 		} catch (error) {
 			throw error;
 		}

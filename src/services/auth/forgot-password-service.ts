@@ -1,10 +1,14 @@
 import { env } from "@/env.ts";
 import { InvalidCredentials } from "@/errors/user/invalid-credentials-error.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import { makeSendResetPasswordMailService } from "@/factories/services/mail/make-send-reset-password-mail-service.ts";
 import Constants from "@/helpers/constants.ts";
 import type { IPasswordResetTokenRepository } from "@/interfaces/repositories/password-reset-token-repository.ts";
 import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
+import {
+	sendResetPasswordMailTask,
+	sendResetPasswordMailTaskId
+} from "@/tasks/send-reset-password-mail-task.ts";
+import { tasks } from "@trigger.dev/sdk";
 import { hash } from "bcrypt-ts";
 import { randomBytes } from "node:crypto";
 
@@ -47,15 +51,16 @@ export class ForgotPasswordService {
 		const resetPasswordUrl = `${env.APP_URL}/reset-password?token=${rawToken}&email=${email}`;
 		const supportEmail = "onboarding@resend.dev";
 
-		const sendResetPasswordMailService = makeSendResetPasswordMailService();
-
-		await sendResetPasswordMailService.handle({
-			from: `Enterprise <${supportEmail}>`,
-			to: email,
-			resetPasswordUrl,
-			bucketUrl: env.PUBLIC_BUCKET_URL,
-			supportEmail,
-			expiresAt: Math.floor(expiresAtTimestamp / 3600)
-		});
+		await tasks.trigger<typeof sendResetPasswordMailTask>(
+			sendResetPasswordMailTaskId,
+			{
+				from: `Enterprise <${supportEmail}>`,
+				to: email,
+				resetPasswordUrl,
+				bucketUrl: env.PUBLIC_BUCKET_URL,
+				supportEmail,
+				expiresAt: Math.floor(expiresAtTimestamp / 3600)
+			}
+		);
 	}
 }

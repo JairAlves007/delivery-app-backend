@@ -1,11 +1,9 @@
-export type BaseMailData = {
-	from: string;
-	to: string | string[];
-};
+import {
+	baseMailSchema,
+	resetPasswordMailBodySchema
+} from "@/schemas/mail-schema.ts";
+import z from "zod";
 
-export type ResetPasswordMailData = BaseMailData & {
-	resetPasswordUrl: string;
-	bucketUrl: string;
-	supportEmail: string;
-	expiresAt: number;
-};
+export type BaseMailData = z.infer<typeof baseMailSchema>;
+
+export type ResetPasswordMailData = z.infer<typeof resetPasswordMailBodySchema>;

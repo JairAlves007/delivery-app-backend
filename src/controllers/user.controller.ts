@@ -111,7 +111,12 @@ export const forgotPassword = async (
 
 		return reply
 			.status(HTTPStatusCodes.OK)
-			.send(ApiResponse.success("Email enviado com sucesso", {}));
+			.send(
+				ApiResponse.success(
+					"E-mail de recuperação na área! Corre lá na sua caixa pra conferir!",
+					{}
+				)
+			);
 	} catch (error) {
 		return reply.sendError(error);
 	}

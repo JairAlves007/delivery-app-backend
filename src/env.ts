@@ -24,7 +24,9 @@ const envSchema = z.object({
 	REDIS_HOST: z.string().default("127.0.0.1"),
 	REDIS_PORT: z.coerce.number().default(6379),
 	REDIS_PASSWORD: z.string().optional(),
-	RESEND_API_KEY: z.string().min(1, "Resend api key is required")
+	RESEND_API_KEY: z.string().min(1, "Resend api key is required"),
+	TRIGGER_PROJECT_ID: z.string().min(1, "Trigger project id is required"),
+	TRIGGER_SECRET_KEY: z.string().min(1, "Trigger api key is required")
 });
 
 export const env = envSchema.parse(process.env);
