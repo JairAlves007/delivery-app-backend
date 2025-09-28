@@ -1,45 +1,22 @@
 import { InvalidToken } from "@/errors/user/password/invalid-token-error.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IPasswordResetTokenRepository } from "@/interfaces/repositories/password-reset-token-repository.ts";
-import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
-import type { FindByPasswordTokenParams } from "@/types/user.ts";
 import { compare } from "bcrypt-ts";
 
-type ResetPasswordServiceParams = Omit<FindByPasswordTokenParams, "userId"> & {
-	email: string;
+type ResetPasswordServiceParams = {
+	token: string;
 	newPassword: string;
 };
 
 export class ResetPasswordService {
-	private userRepository: IUserRepository;
 	private passwordResetTokenRepository: IPasswordResetTokenRepository;
 
-	constructor(
-		userRepository: IUserRepository,
-		passwordResetTokenRepository: IPasswordResetTokenRepository
-	) {
-		this.userRepository = userRepository;
+	constructor(passwordResetTokenRepository: IPasswordResetTokenRepository) {
 		this.passwordResetTokenRepository = passwordResetTokenRepository;
 	}
 
-	async handle({ token, newPassword, email }: ResetPasswordServiceParams) {
-		const cache = makeCache();
-		const key = `${cache.keys.users}_${email}`;
-
-		const user = await cache.rememberForever(
-			key,
-			async () => await this.userRepository.findByEmail(email)
-		);
-
-		if (!user) throw new InvalidToken();
-
-		const userId = user.id;
-
+	async handle({ token, newPassword }: ResetPasswordServiceParams) {
 		const passwordResetToken =
-			await this.passwordResetTokenRepository.findByToken({
-				token,
-				userId
-			});
+			await this.passwordResetTokenRepository.findByToken(token);
 
 		if (!passwordResetToken) throw new InvalidToken();
 
@@ -48,11 +25,8 @@ export class ResetPasswordService {
 		if (!tokenIsValid) throw new InvalidToken();
 
 		await this.passwordResetTokenRepository.resetPassword({
-			passwordResetTokenId: passwordResetToken.id,
-			newPassword,
-			userId
+			passwordResetToken,
+			newPassword
 		});
-
-		await cache.forget(key);
 	}
 }

@@ -25,11 +25,7 @@ export class ForgotPasswordService {
 	}
 
 	async handle(email: string): Promise<void> {
-		const cache = makeCache();
-		const user = await cache.rememberForever(
-			`${cache.keys.users}_${email}`,
-			async () => await this.userRepository.findByEmail(email)
-		);
+		const user = await this.userRepository.findByEmail(email);
 
 		if (!user) throw new InvalidCredentials();
 
@@ -48,7 +44,7 @@ export class ForgotPasswordService {
 			}
 		});
 
-		const resetPasswordUrl = `${env.APP_URL}/reset-password?token=${rawToken}&email=${email}`;
+		const resetPasswordUrl = `${env.APP_URL}/reset-password?token=${rawToken}`;
 		const supportEmail = "onboarding@resend.dev";
 
 		await tasks.trigger<typeof sendResetPasswordMailTask>(

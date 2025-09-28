@@ -36,6 +36,5 @@ export const resetPasswordBodySchema = z.object({
 	newPassword: z
 		.string("A senha deve ser preenchida")
 		.min(6, "A senha deve ter no mínimo 6 caracteres"),
-	token: z.string("O token deve ser preenchido"),
-	email: userEmailSchema
+	token: z.string("O token deve ser preenchido")
 });

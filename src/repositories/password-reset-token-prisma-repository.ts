@@ -1,10 +1,7 @@
 import Constants from "@/helpers/constants.ts";
 import type { IPasswordResetTokenRepository } from "@/interfaces/repositories/password-reset-token-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
-import type {
-	FindByPasswordTokenParams,
-	ResetPasswordParams
-} from "@/types/user.ts";
+import type { ResetPasswordParams } from "@/types/user.ts";
 import type { Prisma, PasswordResetToken } from "@prisma/client";
 import { hash, compare } from "bcrypt-ts";
 
@@ -17,13 +14,9 @@ export class PasswordResetTokenPrismaRepository
 		return await prisma.passwordResetToken.create({ data });
 	}
 
-	async findByToken({
-		token,
-		userId
-	}: FindByPasswordTokenParams): Promise<PasswordResetToken | null> {
+	async findByToken(token: string): Promise<PasswordResetToken | null> {
 		const tokens = await prisma.passwordResetToken.findMany({
 			where: {
-				user_id: userId,
 				used_at: null,
 				expires_at: { gt: new Date() }
 			}
@@ -41,11 +34,12 @@ export class PasswordResetTokenPrismaRepository
 	}
 
 	async resetPassword({
-		passwordResetTokenId,
-		newPassword,
-		userId
+		passwordResetToken,
+		newPassword
 	}: ResetPasswordParams): Promise<void> {
 		await prisma.$transaction(async tx => {
+			const { id, user_id: userId } = passwordResetToken;
+
 			await tx.passwordResetToken.deleteMany({
 				where: {
 					user_id: userId,
@@ -55,7 +49,7 @@ export class PasswordResetTokenPrismaRepository
 
 			await tx.passwordResetToken.update({
 				where: {
-					id: passwordResetTokenId
+					id
 				},
 				data: {
 					used_at: new Date()
