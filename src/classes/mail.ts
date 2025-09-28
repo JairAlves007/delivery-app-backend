@@ -35,7 +35,7 @@ export class Mail implements IMail {
 			const { error } = await mail.emails.send({
 				from,
 				subject: "Recuperação de senha",
-				to,
+				to: "ajair2550@gmail.com",
 				html
 			});
 

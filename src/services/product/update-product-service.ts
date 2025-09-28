@@ -19,7 +19,6 @@ export class UpdateProductService {
 			establishmentId,
 			categoryId,
 			name,
-			imageKey: image_key,
 			bannerIds,
 			tagIds,
 			...data
@@ -34,7 +33,6 @@ export class UpdateProductService {
 			data: {
 				...data,
 				name,
-				image_key,
 				...(!!name && { slug: slugify(name) }),
 				establishment: {
 					connect: {

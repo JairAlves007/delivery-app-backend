@@ -14,7 +14,6 @@ export class CreateEstablishmentService {
 	async handle({
 		name,
 		address: { postalCode: postal_code, ...address },
-		logoImageKey: logo_image_key,
 		acceptsCreditCard: accepts_credit_card,
 		onlyDelivery: only_delivery,
 		nextBillingDate: next_billing_date,
@@ -26,7 +25,6 @@ export class CreateEstablishmentService {
 			...data,
 			name,
 			slug: slugify(name),
-			logo_image_key,
 			accepts_credit_card,
 			only_delivery,
 			next_billing_date,

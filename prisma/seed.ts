@@ -15,7 +15,8 @@ import {
 	SocialPlatform,
 	WeekDay,
 	Prisma,
-	TagType
+	TagType,
+	FileFormatType
 } from "@prisma/client";
 import { hash } from "bcrypt-ts";
 
@@ -103,7 +104,6 @@ async function main() {
 		data: {
 			name: "Pizzaria do Jair",
 			slug: "pizzaria-do-jair",
-			logo_image_key: "",
 			description: "A melhor pizzaria da região!",
 			email: "contato@pizzariadojair.com",
 			accepts_credit_card: true,
@@ -161,7 +161,6 @@ async function main() {
 				slug: slugify("Coca Cola 2L"),
 				description: "Refrigerante Coca-cola de 2 litros tamanho família.",
 				price: transformPriceToDatabase(12),
-				image_key: "https://placehold.co/100x100",
 				establishment_id: establishment.id,
 				category_id: categories[1].id
 			},
@@ -170,7 +169,6 @@ async function main() {
 				slug: slugify("Pizza Calabresa"),
 				description: "Deliciosa pizza de calabresa com cebola.",
 				price: transformPriceToDatabase(24),
-				image_key: "https://placehold.co/100x100",
 				establishment_id: establishment.id,
 				category_id: categories[1].id
 			},
@@ -179,7 +177,6 @@ async function main() {
 				slug: slugify("X-Tudo"),
 				description: "Delicioso hambúrguer com tudo o que você tem direito!",
 				price: transformPriceToDatabase(17.5),
-				image_key: "https://placehold.co/100x100",
 				establishment_id: establishment.id,
 				category_id: categories[1].id
 			}
@@ -417,7 +414,6 @@ async function main() {
 	await prisma.banner.create({
 		data: {
 			name: "Promoção de Calabresa",
-			image_key: "https://placehold.co/600x300",
 			link_type: BannerLinkType.PRODUCT,
 			product_id: products[1].id,
 			establishment_id: establishment.id
@@ -699,6 +695,111 @@ async function main() {
 
 	await prisma.subMenu.createMany({
 		data: adminSubmenuItems
+	});
+
+	const resource = await prisma.resource.create({
+		data: {
+			establishment_id: establishment.id,
+			file_key: "file_key.jpg"
+		}
+	});
+
+	const resourceTypes = await prisma.resourceType.createManyAndReturn({
+		data: [
+			{
+				name: "BANNER",
+				for: "PRODUCT",
+				path: "products/banners",
+				width: 1920,
+				height: 1080,
+				resource_id: resource.id
+			},
+			{
+				name: "THUMBNAIL",
+				for: "PRODUCT",
+				path: "products/thumbnails",
+				width: 320,
+				height: 320,
+				resource_id: resource.id
+			},
+			{
+				name: "LOGO",
+				for: "ESTABLISHMENT",
+				path: "establishments/logos",
+				width: 200,
+				height: 200,
+				resource_id: resource.id
+			},
+			{
+				name: "BANNER",
+				for: "ESTABLISHMENT",
+				path: "establishments/banners",
+				width: 1920,
+				height: 1080,
+				resource_id: resource.id
+			},
+			{
+				name: "THUMBNAIL",
+				for: "CATEGORY",
+				path: "establishments/thumbnails",
+				width: 320,
+				height: 320,
+				resource_id: resource.id
+			}
+		]
+	});
+
+	await prisma.fileFormat.createMany({
+		data: [
+			{
+				type: FileFormatType.JPG,
+				resource_type_id: resourceTypes[0].id
+			},
+			{
+				type: FileFormatType.JPEG,
+				resource_type_id: resourceTypes[0].id
+			},
+			{
+				type: FileFormatType.PNG,
+				resource_type_id: resourceTypes[0].id
+			},
+			{
+				type: FileFormatType.JPG,
+				resource_type_id: resourceTypes[1].id
+			},
+			{
+				type: FileFormatType.JPEG,
+				resource_type_id: resourceTypes[1].id
+			},
+			{
+				type: FileFormatType.PNG,
+				resource_type_id: resourceTypes[1].id
+			},
+			{
+				type: FileFormatType.JPG,
+				resource_type_id: resourceTypes[2].id
+			},
+			{
+				type: FileFormatType.JPEG,
+				resource_type_id: resourceTypes[2].id
+			},
+			{
+				type: FileFormatType.PNG,
+				resource_type_id: resourceTypes[2].id
+			},
+			{
+				type: FileFormatType.JPG,
+				resource_type_id: resourceTypes[3].id
+			},
+			{
+				type: FileFormatType.JPEG,
+				resource_type_id: resourceTypes[3].id
+			},
+			{
+				type: FileFormatType.PNG,
+				resource_type_id: resourceTypes[3].id
+			}
+		]
 	});
 
 	console.log("✅ Seed finalizado com sucesso.");

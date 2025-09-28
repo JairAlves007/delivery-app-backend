@@ -1,11 +1,10 @@
 import { BannerLinkType } from "@prisma/client";
 import z from "zod";
-import { establishmentIdSchema, imageKey } from "./generic-schema.ts";
+import { establishmentIdSchema } from "./generic-schema.ts";
 
 export const createBannerBodySchema = z
 	.object({
 		name: z.string().min(1, "O nome deve ser preenchido"),
-		imageKey,
 		linkType: z
 			.string()
 			.enumCaseInsensitive(BannerLinkType, "Tipo de link inválido"),

@@ -16,19 +16,13 @@ export class UpdateEstablishmentService {
 
 	async handle(
 		id: string,
-		{
-			name,
-			logoImageKey: logo_image_key,
-			address,
-			...data
-		}: UpdateEstablishmentRequest
+		{ name, address, ...data }: UpdateEstablishmentRequest
 	) {
 		const cache = makeCache();
 
 		const updateInput: Prisma.EstablishmentUpdateInput = {
 			...data,
-			...(!!name && { slug: slugify(name) }),
-			logo_image_key
+			...(!!name && { slug: slugify(name) })
 		};
 
 		if (address) {

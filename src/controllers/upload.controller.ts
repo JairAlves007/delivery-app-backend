@@ -13,14 +13,11 @@ export const generateUploadSignedUrl = async (
 	try {
 		const uploadSignedUrlService = makeGenerateSignedUrlForUploadService();
 
-		const { signedUrl, fileKey } = await uploadSignedUrlService.handle(body);
+		const { uploads } = await uploadSignedUrlService.handle(body);
 
-		return reply.status(HTTPStatusCodes.OK).send(
-			ApiResponse.success("URL gerada com sucesso", {
-				signedUrl,
-				fileKey
-			})
-		);
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(ApiResponse.success("URL gerada com sucesso", { uploads }));
 	} catch (error) {
 		return reply.sendError(error);
 	}

@@ -18,7 +18,6 @@ export class CreateBannerService {
 		categoryId,
 		productId,
 		linkType: link_type,
-		imageKey: image_key,
 		...data
 	}: CreateBannerServiceRequest) {
 		const cache = makeCache();
@@ -26,7 +25,6 @@ export class CreateBannerService {
 		await this.bannerRepository.create({
 			...data,
 			link_type,
-			image_key,
 			establishment: {
 				connect: {
 					id: establishmentId

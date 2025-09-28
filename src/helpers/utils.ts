@@ -1,3 +1,6 @@
+import { type FileMimeType, fileMimeTypeValues } from "@/types/resource.ts";
+import { FileFormatType } from "@prisma/client";
+
 export function slugify(text: string): string {
 	return text
 		.normalize("NFD")
@@ -46,3 +49,19 @@ export function checkIfCNPJIsValid(cnpj: string): boolean {
 export const transformValueToPercentage = (value: number): number => {
 	return value / 100;
 };
+
+export function mapMimeTypeToFileFormat(
+	mimeType: FileMimeType
+): FileFormatType {
+	switch (mimeType) {
+		case fileMimeTypeValues.PNG:
+			return FileFormatType.PNG;
+		// case FileMimeType.JPG:
+		// 	return FileFormatType.JPG;
+		case fileMimeTypeValues.JPEG:
+			return FileFormatType.JPEG;
+
+		default:
+			throw new Error(`MIME Type '${mimeType}' não suportado para conversão.`);
+	}
+}

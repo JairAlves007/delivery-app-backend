@@ -16,7 +16,6 @@ export class CreateProductService {
 	async handle({
 		establishmentId,
 		categoryId,
-		imageKey: image_key,
 		bannerIds,
 		tagIds,
 		...data
@@ -30,7 +29,6 @@ export class CreateProductService {
 
 		await this.productRepository.create({
 			...data,
-			image_key,
 			slug: slugify(data.name),
 			establishment: {
 				connect: {

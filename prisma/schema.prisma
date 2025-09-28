@@ -137,6 +137,24 @@ enum TagType {
   PIE
 }
 
+enum ResourceFileType {
+  BANNER
+  LOGO
+  THUMBNAIL
+}
+
+enum ForObjectResourceType {
+  ESTABLISHMENT
+  PRODUCT
+  CATEGORY
+}
+
+enum FileFormatType {
+  PNG
+  JPG
+  JPEG
+}
+
 model Role {
   id          Int              @id @default(autoincrement())
   name        RoleType         @unique
@@ -230,35 +248,36 @@ model SubMenu {
 }
 
 model Establishment {
-  id                  String                @id @default(ulid())
-  name                String
-  slug                String                @unique
-  logo_image_key      String
-  description         String
-  email               String                @unique
-  cnpj                String?               @unique
-  only_delivery       Boolean
-  accepts_credit_card Boolean
-  is_manually_closed  Boolean               @default(false)
-  next_billing_date   DateTime
-  owner_id            String?               @unique
-  created_at          DateTime              @default(now())
-  deleted_at          DateTime?
-  owner               User?                 @relation(fields: [owner_id], references: [id])
-  openingHours        OpeningHour[]
-  socialLinks         SocialLink[]
-  products            Product[]
-  categories          ProductCategory[]
-  banners             Banner[]
-  districts           District[]
-  coupons             Coupon[]
-  addonCategories     AddonCategory[]
-  orders              Order[]
-  menus               Menu[]
-  closures            Closure[]
-  tags                Tag[]
-  address             EstablishmentAddress?
-  deliveryAddresses   DeliveryAddress[]
+  id                     String                  @id @default(ulid())
+  name                   String
+  slug                   String                  @unique
+  description            String
+  email                  String                  @unique
+  cnpj                   String?                 @unique
+  only_delivery          Boolean
+  accepts_credit_card    Boolean
+  is_manually_closed     Boolean                 @default(false)
+  next_billing_date      DateTime
+  owner_id               String?                 @unique
+  created_at             DateTime                @default(now())
+  deleted_at             DateTime?
+  owner                  User?                   @relation(fields: [owner_id], references: [id])
+  openingHours           OpeningHour[]
+  socialLinks            SocialLink[]
+  products               Product[]
+  categories             ProductCategory[]
+  banners                Banner[]
+  districts              District[]
+  coupons                Coupon[]
+  addonCategories        AddonCategory[]
+  orders                 Order[]
+  menus                  Menu[]
+  closures               Closure[]
+  tags                   Tag[]
+  address                EstablishmentAddress?
+  deliveryAddresses      DeliveryAddress[]
+  resources              Resource[]
+  establishmentResources EstablishmentResource[]
 
   @@map("establishments")
 }
@@ -298,41 +317,42 @@ model SocialLink {
 }
 
 model ProductCategory {
-  id               String        @id @default(ulid())
+  id               String                    @id @default(ulid())
   establishment_id String
   name             String
   slug             String
   order            Int?
   deleted_at       DateTime?
-  establishment    Establishment @relation(fields: [establishment_id], references: [id])
+  establishment    Establishment             @relation(fields: [establishment_id], references: [id])
   products         Product[]
   banners          Banner[]
+  resources        ProductCategoryResource[]
 
   @@unique([slug, establishment_id])
   @@map("product_categories")
 }
 
 model Product {
-  id                  String          @id @default(ulid())
+  id                  String            @id @default(ulid())
   establishment_id    String
   category_id         String
   name                String
   description         String
   price               Int
-  image_key           String
   slug                String
   discount_percentage Float?
   stock               Int?
   valid_until         DateTime?
-  created_at          DateTime        @default(now())
-  updated_at          DateTime        @updatedAt
+  created_at          DateTime          @default(now())
+  updated_at          DateTime          @updatedAt
   deleted_at          DateTime?
-  establishment       Establishment   @relation(fields: [establishment_id], references: [id])
-  category            ProductCategory @relation(fields: [category_id], references: [id])
+  establishment       Establishment     @relation(fields: [establishment_id], references: [id])
+  category            ProductCategory   @relation(fields: [category_id], references: [id])
   favorites           Favorite[]
   orderItems          OrderItem[]
   banners             Banner[]
   tags                ProductTag[]
+  resources           ProductResource[]
 
   @@unique([slug, establishment_id])
   @@map("products")
@@ -460,7 +480,6 @@ model Favorite {
 model Banner {
   id               Int              @id @default(autoincrement())
   name             String
-  image_key        String
   establishment_id String
   link_type        BannerLinkType
   product_id       String?
@@ -654,4 +673,93 @@ model OrderDeliveryAddress {
   @@index([address_id], name: "idx_order_delivery_addresses_address_id")
   @@index([district_id], name: "idx_order_delivery_addresses_district_id")
   @@map("order_delivery_addresses")
+}
+
+model FileFormat {
+  id               Int            @id @default(autoincrement())
+  type             FileFormatType
+  resource_type_id Int
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+  resourceType     ResourceType   @relation(fields: [resource_type_id], references: [id])
+
+  @@map("file_formats")
+}
+
+model ResourceType {
+  id               Int                   @id @default(autoincrement())
+  name             ResourceFileType
+  path             String
+  width            Int
+  height           Int
+  for              ForObjectResourceType
+  resource_id      String
+  resource         Resource              @relation(fields: [resource_id], references: [id])
+  availableFormats FileFormat[]
+
+  @@index([name], name: "idx_resource_types_name")
+  @@map("resource_types")
+}
+
+model Resource {
+  id                       String                    @id @default(ulid())
+  file_key                 String
+  establishment_id         String
+  created_at               DateTime                  @default(now())
+  updated_at               DateTime                  @updatedAt
+  resourceTypes            ResourceType[]
+  establishment            Establishment             @relation(fields: [establishment_id], references: [id])
+  productResources         ProductResource[]
+  establishmentResources   EstablishmentResource[]
+  productCategoryResources ProductCategoryResource[]
+
+  @@unique([establishment_id, file_key])
+  @@index([establishment_id], name: "idx_resources_establishment_id")
+  @@index([file_key], name: "idx_resources_file_key")
+  @@map("resources")
+}
+
+model ProductResource {
+  id          String   @id @default(ulid())
+  resource_id String
+  product_id  String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  resource    Resource @relation(fields: [resource_id], references: [id])
+  product     Product  @relation(fields: [product_id], references: [id])
+
+  @@unique([product_id, resource_id])
+  @@index([product_id], name: "idx_product_images_product_id")
+  @@index([resource_id], name: "idx_product_images_resource_id")
+  @@map("product_resources")
+}
+
+model EstablishmentResource {
+  id               String        @id @default(ulid())
+  resource_id      String
+  establishment_id String
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
+  resource         Resource      @relation(fields: [resource_id], references: [id])
+  establishment    Establishment @relation(fields: [establishment_id], references: [id])
+
+  @@unique([establishment_id, resource_id])
+  @@index([establishment_id], name: "idx_establishment_resources_establishment_id")
+  @@index([resource_id], name: "idx_establishment_resources_resource_id")
+  @@map("establishment_resources")
+}
+
+model ProductCategoryResource {
+  id          String          @id @default(ulid())
+  resource_id String
+  category_id String
+  created_at  DateTime        @default(now())
+  updated_at  DateTime        @updatedAt
+  resource    Resource        @relation(fields: [resource_id], references: [id])
+  category    ProductCategory @relation(fields: [category_id], references: [id])
+
+  @@unique([category_id, resource_id])
+  @@index([category_id], name: "idx_product_category_resources_category_id")
+  @@index([resource_id], name: "idx_product_category_resources_resource_id")
+  @@map("product_category_resources")
 }

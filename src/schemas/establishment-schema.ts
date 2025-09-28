@@ -1,11 +1,10 @@
 import { checkIfCNPJIsValid } from "@/helpers/utils.ts";
 import z from "zod";
-import { addressLocationSchema, imageKey } from "./generic-schema.ts";
+import { addressLocationSchema } from "./generic-schema.ts";
 
 export const createEstablishmentBodySchema = z.object({
 	name: z.string().min(1, "O nome deve ser preenchido"),
 	address: addressLocationSchema,
-	logoImageKey: imageKey,
 	description: z.string().min(1, "A descrição deve ser preenchida"),
 	email: z
 		.email("Endereço de e-mail inválido")

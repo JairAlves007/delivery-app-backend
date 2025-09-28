@@ -26,8 +26,6 @@ export class CreateAddressService {
 		const cache = makeCache();
 		const countKey = `${cache.keys.addresses}_user_id_${userId}`;
 
-		console.log({ is_default });
-
 		const count = await cache.rememberForever(
 			countKey,
 			async () => await this.addressRepository.count({ user_id: userId })

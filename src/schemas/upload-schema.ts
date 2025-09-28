@@ -1,9 +1,25 @@
-import Constants from "@/helpers/constants.ts";
+import { fileMimeTypeValues } from "@/types/resource.ts";
+import { ForObjectResourceType, ResourceFileType } from "@prisma/client";
 import z from "zod";
 
 export const uploadSignedUrlBodySchema = z.object({
-	contentType: z
-		.string()
-		.min(1, "O contentType deve ser preenchido")
-		.regex(Constants.MIME_TYPE_REGEX, "Formato de arquivo inválido")
+	resources: z.array(
+		z.object({
+			width: z.coerce.number("A largura deve ser preenchida"),
+			height: z.coerce.number("A altura deve ser preenchida"),
+			forResource: z
+				.string()
+				.enumCaseInsensitive(
+					ForObjectResourceType,
+					"Precisamos saber para qual recurso pertencem as imagens"
+				),
+			fileMimeType: z.enum(
+				Object.values(fileMimeTypeValues),
+				"Tipo de arquivo inválido"
+			),
+			resourceType: z
+				.string()
+				.enumCaseInsensitive(ResourceFileType, "Tipo de recurso inválido")
+		})
+	)
 });

@@ -20,7 +20,6 @@ export class UpdateBannerService {
 			categoryId,
 			productId,
 			linkType: link_type,
-			imageKey: image_key,
 			...data
 		}: UpdateBannerServiceRequest
 	) {
@@ -31,7 +30,6 @@ export class UpdateBannerService {
 			data: {
 				...data,
 				link_type,
-				image_key,
 				establishment: {
 					connect: {
 						id: establishmentId
