@@ -1,10 +1,9 @@
-import { env } from "@/env.ts";
 import { defineConfig } from "@trigger.dev/sdk/v3";
 
-const isProduction = env.NODE_ENV === "production";
+const isProduction = (process.env.NODE_ENV ?? "development") === "production";
 
 export default defineConfig({
-	project: env.TRIGGER_PROJECT_ID,
+	project: process.env.TRIGGER_PROJECT_ID ?? "",
 	runtime: "node",
 	logLevel: isProduction ? "info" : "debug",
 	// The max compute seconds a task is allowed to run. If the task run exceeds this duration, it will be stopped.
