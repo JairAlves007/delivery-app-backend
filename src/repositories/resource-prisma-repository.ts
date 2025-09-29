@@ -1,15 +1,13 @@
-import { mapMimeTypeToFileFormat } from "@/helpers/utils.ts";
+import { mapMimeTypeToFileFormat } from "@/helpers/resource.ts";
 import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.ts";
 import type { ResourceIntent } from "@/types/resource.ts";
 import { prisma } from "@/lib/prisma.ts";
 
 export class ResourcePrismaRepository implements IResourceRepository {
-	async validateResourceRule(
-		resourceIntent: ResourceIntent
-	): Promise<{ path: string }> {
-		const resourceTypeRule = await prisma.resourceType.findFirst({
+	async validateResourceRule(resourceIntent: ResourceIntent): Promise<boolean> {
+		const resourceRule = await prisma.resourceRule.findFirst({
 			where: {
-				name: resourceIntent.resourceType,
+				type: resourceIntent.resourceType,
 				for: resourceIntent.forResource,
 				width: resourceIntent.width,
 				height: resourceIntent.height,
@@ -18,18 +16,9 @@ export class ResourcePrismaRepository implements IResourceRepository {
 						type: mapMimeTypeToFileFormat(resourceIntent.fileMimeType)
 					}
 				}
-			},
-			select: {
-				path: true
 			}
 		});
 
-		if (!resourceTypeRule) {
-			throw new Error(
-				"Regra de recurso inválida ou não definida para o upload."
-			);
-		}
-
-		return resourceTypeRule;
+		return !!resourceRule;
 	}
 }

@@ -18,13 +18,13 @@ export class SignedUrl {
 		const extension = contentType.split("/")[1];
 		const uniqueString =
 			Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
-		const fileKey = `${finalPrefixPath}/${uniqueString}.${extension}`;
+		const fileKey = `${uniqueString}.${extension}`;
 
 		const signedUrl = await getSignedUrl(
 			r2,
 			new PutObjectCommand({
 				Bucket: env.CLOUDFLARE_BUCKET_NAME,
-				Key: fileKey,
+				Key: `${finalPrefixPath}/${fileKey}`,
 				ContentType: contentType
 			}),
 			{
@@ -37,6 +37,4 @@ export class SignedUrl {
 			fileKey
 		};
 	}
-
-	static async getSignedUrl() {}
 }

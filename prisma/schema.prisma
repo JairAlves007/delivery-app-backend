@@ -137,7 +137,7 @@ enum TagType {
   PIE
 }
 
-enum ResourceFileType {
+enum ResourceType {
   BANNER
   LOGO
   THUMBNAIL
@@ -675,39 +675,13 @@ model OrderDeliveryAddress {
   @@map("order_delivery_addresses")
 }
 
-model FileFormat {
-  id               Int            @id @default(autoincrement())
-  type             FileFormatType
-  resource_type_id Int
-  created_at       DateTime       @default(now())
-  updated_at       DateTime       @updatedAt
-  resourceType     ResourceType   @relation(fields: [resource_type_id], references: [id])
-
-  @@map("file_formats")
-}
-
-model ResourceType {
-  id               Int                   @id @default(autoincrement())
-  name             ResourceFileType
-  path             String
-  width            Int
-  height           Int
-  for              ForObjectResourceType
-  resource_id      String
-  resource         Resource              @relation(fields: [resource_id], references: [id])
-  availableFormats FileFormat[]
-
-  @@index([name], name: "idx_resource_types_name")
-  @@map("resource_types")
-}
-
 model Resource {
   id                       String                    @id @default(ulid())
+  path                     String
   file_key                 String
   establishment_id         String
   created_at               DateTime                  @default(now())
   updated_at               DateTime                  @updatedAt
-  resourceTypes            ResourceType[]
   establishment            Establishment             @relation(fields: [establishment_id], references: [id])
   productResources         ProductResource[]
   establishmentResources   EstablishmentResource[]
@@ -717,6 +691,31 @@ model Resource {
   @@index([establishment_id], name: "idx_resources_establishment_id")
   @@index([file_key], name: "idx_resources_file_key")
   @@map("resources")
+}
+
+model FileFormat {
+  id               Int            @id @default(autoincrement())
+  type             FileFormatType
+  resource_rule_id Int
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+  resourceType     ResourceRule   @relation(fields: [resource_rule_id], references: [id])
+
+  @@index([resource_rule_id], name: "idx_file_formats_resource_rule_id")
+  @@map("file_formats")
+}
+
+model ResourceRule {
+  id               Int                   @id @default(autoincrement())
+  type             ResourceType
+  width            Int
+  height           Int
+  for              ForObjectResourceType
+  availableFormats FileFormat[]
+
+  @@index([type], name: "idx_resource_rules_type")
+  @@index([for], name: "idx_resource_rules_for")
+  @@map("resource_rules")
 }
 
 model ProductResource {

@@ -1,6 +1,7 @@
 import { fileMimeTypeValues } from "@/types/resource.ts";
-import { ForObjectResourceType, ResourceFileType } from "@prisma/client";
+import { ForObjectResourceType, ResourceType } from "@prisma/client";
 import z from "zod";
+import { establishmentIdSchema } from "./generic-schema.ts";
 
 export const uploadSignedUrlBodySchema = z.object({
 	resources: z.array(
@@ -19,7 +20,8 @@ export const uploadSignedUrlBodySchema = z.object({
 			),
 			resourceType: z
 				.string()
-				.enumCaseInsensitive(ResourceFileType, "Tipo de recurso inválido")
+				.enumCaseInsensitive(ResourceType, "Tipo de recurso inválido")
 		})
-	)
+	),
+	establishmentId: establishmentIdSchema
 });

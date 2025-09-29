@@ -1,6 +1,10 @@
+import { InvalidResource } from "@/errors/resource/invalid-resource-error.ts";
+import { getResourcePath } from "@/helpers/resource.ts";
 import { SignedUrl } from "@/helpers/signed-url.ts";
 import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.ts";
+import { prisma } from "@/lib/prisma.ts";
 import { uploadSignedUrlBodySchema } from "@/schemas/upload-schema.ts";
+import type { ResourceIntent } from "@/types/resource.ts";
 import z from "zod";
 
 type GenerateSignedUrlForUploadServiceRequest = z.infer<
@@ -23,23 +27,56 @@ export class GenerateSignedUrlForUploadService {
 	}
 
 	async handle({
+		establishmentId,
 		resources
 	}: GenerateSignedUrlForUploadServiceRequest): Promise<GenerateSignedUrlForUploadServiceResponse> {
+		// TODO: In future, add wrangler-queues for r2-upload-events to validate signed urls and fire events when my file was uploaded
+		// TODO: In future, add wrangler-queues for r2-delete-events to validate signed urls and fire events when my file was deleted
+		// TODO: In future, improve store db logic
+
+		const resourcesNonDuplicate: ResourceIntent[] = Array.from(
+			new Set(
+				resources.map(resource => {
+					return JSON.stringify(resource);
+				})
+			)
+		).map(jsonString => JSON.parse(jsonString));
+
 		try {
 			const uploadDetails: SignedUrlDetail[] = [];
+			const resourcesPromise = [];
 
-			for (const resourceIntent of resources) {
+			for (const resourceIntent of resourcesNonDuplicate) {
 				const resourceRule = await this.resourceRepository.validateResourceRule(
 					resourceIntent
 				);
 
+				if (!resourceRule) throw new InvalidResource();
+
+				const path = getResourcePath(
+					resourceIntent.forResource,
+					resourceIntent.resourceType
+				);
+
 				const { signedUrl, fileKey } = await SignedUrl.createUploadSignedUrl(
-					resourceRule.path,
+					path,
 					resourceIntent.fileMimeType
+				);
+
+				resourcesPromise.push(
+					prisma.resource.create({
+						data: {
+							file_key: fileKey,
+							path,
+							establishment_id: establishmentId
+						}
+					})
 				);
 
 				uploadDetails.push({ signedUrl, fileKey });
 			}
+
+			await Promise.all(resourcesPromise);
 
 			return {
 				uploads: uploadDetails

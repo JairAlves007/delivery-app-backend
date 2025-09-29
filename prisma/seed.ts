@@ -697,54 +697,37 @@ async function main() {
 		data: adminSubmenuItems
 	});
 
-	const resource = await prisma.resource.create({
-		data: {
-			establishment_id: establishment.id,
-			file_key: "file_key.jpg"
-		}
-	});
-
-	const resourceTypes = await prisma.resourceType.createManyAndReturn({
+	const resourceRules = await prisma.resourceRule.createManyAndReturn({
 		data: [
 			{
-				name: "BANNER",
+				type: "BANNER",
 				for: "PRODUCT",
-				path: "products/banners",
 				width: 1920,
-				height: 1080,
-				resource_id: resource.id
+				height: 1080
 			},
 			{
-				name: "THUMBNAIL",
+				type: "THUMBNAIL",
 				for: "PRODUCT",
-				path: "products/thumbnails",
 				width: 320,
-				height: 320,
-				resource_id: resource.id
+				height: 320
 			},
 			{
-				name: "LOGO",
+				type: "LOGO",
 				for: "ESTABLISHMENT",
-				path: "establishments/logos",
 				width: 200,
-				height: 200,
-				resource_id: resource.id
+				height: 200
 			},
 			{
-				name: "BANNER",
+				type: "BANNER",
 				for: "ESTABLISHMENT",
-				path: "establishments/banners",
 				width: 1920,
-				height: 1080,
-				resource_id: resource.id
+				height: 1080
 			},
 			{
-				name: "THUMBNAIL",
+				type: "THUMBNAIL",
 				for: "CATEGORY",
-				path: "establishments/thumbnails",
 				width: 320,
-				height: 320,
-				resource_id: resource.id
+				height: 320
 			}
 		]
 	});
@@ -753,51 +736,51 @@ async function main() {
 		data: [
 			{
 				type: FileFormatType.JPG,
-				resource_type_id: resourceTypes[0].id
+				resource_rule_id: resourceRules[0].id
 			},
 			{
 				type: FileFormatType.JPEG,
-				resource_type_id: resourceTypes[0].id
+				resource_rule_id: resourceRules[0].id
 			},
 			{
 				type: FileFormatType.PNG,
-				resource_type_id: resourceTypes[0].id
+				resource_rule_id: resourceRules[0].id
 			},
 			{
 				type: FileFormatType.JPG,
-				resource_type_id: resourceTypes[1].id
+				resource_rule_id: resourceRules[1].id
 			},
 			{
 				type: FileFormatType.JPEG,
-				resource_type_id: resourceTypes[1].id
+				resource_rule_id: resourceRules[1].id
 			},
 			{
 				type: FileFormatType.PNG,
-				resource_type_id: resourceTypes[1].id
+				resource_rule_id: resourceRules[1].id
 			},
 			{
 				type: FileFormatType.JPG,
-				resource_type_id: resourceTypes[2].id
+				resource_rule_id: resourceRules[2].id
 			},
 			{
 				type: FileFormatType.JPEG,
-				resource_type_id: resourceTypes[2].id
+				resource_rule_id: resourceRules[2].id
 			},
 			{
 				type: FileFormatType.PNG,
-				resource_type_id: resourceTypes[2].id
+				resource_rule_id: resourceRules[2].id
 			},
 			{
 				type: FileFormatType.JPG,
-				resource_type_id: resourceTypes[3].id
+				resource_rule_id: resourceRules[3].id
 			},
 			{
 				type: FileFormatType.JPEG,
-				resource_type_id: resourceTypes[3].id
+				resource_rule_id: resourceRules[3].id
 			},
 			{
 				type: FileFormatType.PNG,
-				resource_type_id: resourceTypes[3].id
+				resource_rule_id: resourceRules[3].id
 			}
 		]
 	});
