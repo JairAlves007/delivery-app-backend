@@ -64,11 +64,13 @@ export class GenerateSignedUrlForUploadService {
 				);
 
 				resourcesPromise.push(
-					prisma.resource.create({
-						data: {
-							file_key: fileKey,
-							path,
-							establishment_id: establishmentId
+					this.resourceRepository.storeResource({
+						file_key: fileKey,
+						path,
+						establishment: {
+							connect: {
+								id: establishmentId
+							}
 						}
 					})
 				);
