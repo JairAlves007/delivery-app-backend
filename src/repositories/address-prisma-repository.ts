@@ -143,10 +143,8 @@ export class AddressPrismaRepository implements IAddressRepository {
 		return address ? this.transformAddress(address) : null;
 	}
 
-	async create(
-		data: Prisma.UserAddressCreateInput
-	): Promise<UserAddressWithDefault> {
-		const address = await prisma.userAddress.create({
+	async create(data: Prisma.UserAddressCreateInput): Promise<void> {
+		await prisma.userAddress.create({
 			select: {
 				id: true,
 				is_default: true,
@@ -154,8 +152,6 @@ export class AddressPrismaRepository implements IAddressRepository {
 			},
 			data
 		});
-
-		return this.transformAddress(address);
 	}
 
 	async update({
@@ -165,10 +161,10 @@ export class AddressPrismaRepository implements IAddressRepository {
 	}: UpdateContentParams<
 		string,
 		Prisma.UserAddressUpdateInput
-	>): Promise<UserAddressWithDefault> {
+	>): Promise<void> {
 		const where = this.getBaseWhere(filterParams);
 
-		const address = await prisma.userAddress.update({
+		await prisma.userAddress.update({
 			select: {
 				id: true,
 				is_default: true,
@@ -180,19 +176,17 @@ export class AddressPrismaRepository implements IAddressRepository {
 			},
 			data
 		});
-
-		return this.transformAddress(address);
 	}
 
 	async delete({
 		id,
 		force,
 		filterParams
-	}: DeleteContentParams<string>): Promise<UserAddressWithDefault> {
+	}: DeleteContentParams<string>): Promise<void> {
 		const where = this.getBaseWhere(filterParams);
 
 		if (force) {
-			const address = await prisma.userAddress.delete({
+			await prisma.userAddress.delete({
 				select: {
 					id: true,
 					is_default: true,
@@ -203,11 +197,9 @@ export class AddressPrismaRepository implements IAddressRepository {
 					AND: [where]
 				}
 			});
-
-			return this.transformAddress(address);
 		}
 
-		return await this.update({
+		await this.update({
 			id,
 			filterParams,
 			data: { deleted_at: new Date() }

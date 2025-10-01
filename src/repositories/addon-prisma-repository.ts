@@ -71,18 +71,18 @@ export class AddonPrismaRepository implements IAddonRepository {
 		});
 	}
 
-	async create(data: Prisma.AddonCreateInput): Promise<Addon> {
-		return await prisma.addon.create({ data });
+	async create(data: Prisma.AddonCreateInput): Promise<void> {
+		await prisma.addon.create({ data });
 	}
 
 	async update({
 		id,
 		filterParams,
 		data
-	}: UpdateContentParams<number, Prisma.AddonUpdateInput>): Promise<Addon> {
+	}: UpdateContentParams<number, Prisma.AddonUpdateInput>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
-		return await prisma.addon.update({
+		await prisma.addon.update({
 			where: {
 				id,
 				deleted_at: null,
@@ -96,11 +96,11 @@ export class AddonPrismaRepository implements IAddonRepository {
 		id,
 		force,
 		filterParams
-	}: DeleteContentParams<number>): Promise<Addon> {
+	}: DeleteContentParams<number>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
 		if (force) {
-			return await prisma.addon.delete({
+			await prisma.addon.delete({
 				where: {
 					id,
 					...params
@@ -108,7 +108,7 @@ export class AddonPrismaRepository implements IAddonRepository {
 			});
 		}
 
-		return await this.update({
+		await this.update({
 			id,
 			filterParams,
 			data: { deleted_at: new Date() }

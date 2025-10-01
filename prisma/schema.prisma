@@ -276,8 +276,8 @@ model Establishment {
   tags                   Tag[]
   address                EstablishmentAddress?
   deliveryAddresses      DeliveryAddress[]
-  resources              Resource[]
-  establishmentResources EstablishmentResource[]
+  establishmentResources Resource[]
+  resources              EstablishmentResource[]
 
   @@map("establishments")
 }
@@ -677,6 +677,7 @@ model OrderDeliveryAddress {
 
 model Resource {
   id                       String                    @id @default(ulid())
+  type                     ResourceType
   path                     String
   file_key                 String
   establishment_id         String

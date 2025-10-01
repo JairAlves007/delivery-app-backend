@@ -11,7 +11,7 @@ export interface ICRUDBase<Model, CreateData, UpdateData, Id> {
 	count(filterParams?: FilterParams): Promise<number>;
 	paginate(paginationParams: PaginationParams): Promise<Model[]>;
 	findById(findByIdParams: FindByIdParams<Id>): Promise<Model | null>;
-	create(data: CreateData): Promise<Model>;
-	update(updateParams: UpdateContentParams<Id, UpdateData>): Promise<Model>;
-	delete(deleteParams: DeleteContentParams<Id>): Promise<Model>;
+	create(data: CreateData): Promise<void>;
+	update(updateParams: UpdateContentParams<Id, UpdateData>): Promise<void>;
+	delete(deleteParams: DeleteContentParams<Id>): Promise<void>;
 }

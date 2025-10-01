@@ -1,4 +1,4 @@
-import type { ForObjectResourceType, ResourceType } from "@prisma/client";
+import type { Resource, ResourceType } from "@prisma/client";
 
 export const fileMimeTypeValues = {
 	PNG: "image/png",
@@ -12,7 +12,6 @@ export type FileMimeType =
 export type ResourceIntent = {
 	width: number;
 	height: number;
-	forResource: ForObjectResourceType;
-	fileMimeType: FileMimeType;
-	resourceType: ResourceType;
+	type: ResourceType;
+	mimeType: FileMimeType;
 };

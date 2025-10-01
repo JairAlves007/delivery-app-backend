@@ -73,10 +73,8 @@ export class ProductCategoryPrismaRepository
 		});
 	}
 
-	async create(
-		data: Prisma.ProductCategoryCreateInput
-	): Promise<ProductCategory> {
-		return await prisma.productCategory.create({ data });
+	async create(data: Prisma.ProductCategoryCreateInput): Promise<void> {
+		await prisma.productCategory.create({ data });
 	}
 
 	async update({
@@ -86,10 +84,10 @@ export class ProductCategoryPrismaRepository
 	}: UpdateContentParams<
 		string,
 		Prisma.ProductCategoryUpdateInput
-	>): Promise<ProductCategory> {
+	>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
-		return await prisma.productCategory.update({
+		await prisma.productCategory.update({
 			where: {
 				id,
 				deleted_at: null,
@@ -103,18 +101,19 @@ export class ProductCategoryPrismaRepository
 		id,
 		force,
 		filterParams
-	}: DeleteContentParams<string>): Promise<ProductCategory> {
+	}: DeleteContentParams<string>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
 		if (force) {
-			return await prisma.productCategory.delete({
+			await prisma.productCategory.delete({
 				where: {
-					id
+					id,
+					...params
 				}
 			});
 		}
 
-		return await this.update({
+		await this.update({
 			id,
 			filterParams,
 			data: { deleted_at: new Date() }

@@ -87,18 +87,18 @@ export class CouponPrismaRepository implements ICouponRepository {
 		});
 	}
 
-	async create(data: Prisma.CouponCreateInput): Promise<Coupon> {
-		return await prisma.coupon.create({ data });
+	async create(data: Prisma.CouponCreateInput): Promise<void> {
+		await prisma.coupon.create({ data });
 	}
 
 	async update({
 		id,
 		data,
 		filterParams
-	}: UpdateContentParams<number, Prisma.CouponUpdateInput>): Promise<Coupon> {
+	}: UpdateContentParams<number, Prisma.CouponUpdateInput>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
-		return await prisma.coupon.update({
+		await prisma.coupon.update({
 			where: {
 				id,
 				deleted_at: null,
@@ -112,11 +112,11 @@ export class CouponPrismaRepository implements ICouponRepository {
 		id,
 		force,
 		filterParams
-	}: DeleteContentParams<number>): Promise<Coupon> {
+	}: DeleteContentParams<number>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
 		if (force) {
-			return await prisma.coupon.delete({
+			await prisma.coupon.delete({
 				where: {
 					id,
 					...params
@@ -124,7 +124,7 @@ export class CouponPrismaRepository implements ICouponRepository {
 			});
 		}
 
-		return await this.update({
+		await this.update({
 			id,
 			filterParams,
 			data: { deleted_at: new Date() }

@@ -10,10 +10,20 @@ import type {
 } from "@/types/crud.ts";
 
 export class EstablishmentPrismaRepository implements IEstablishmentRepository {
-	async listAll(): Promise<Establishment[]> {
+	async listAll(): Promise<EstablishmentWithInfo[]> {
 		return await prisma.establishment.findMany({
 			where: {
 				deleted_at: null
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				},
+				socialLinks: true,
+				openingHours: true,
+				closures: true
 			},
 			orderBy: {
 				created_at: "desc"
@@ -32,12 +42,22 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	async paginate({
 		perPage,
 		page
-	}: PaginationParams): Promise<Establishment[]> {
+	}: PaginationParams): Promise<EstablishmentWithInfo[]> {
 		return await prisma.establishment.findMany({
 			skip: (page - 1) * perPage,
 			take: perPage,
 			where: {
 				deleted_at: null
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				},
+				socialLinks: true,
+				openingHours: true,
+				closures: true
 			},
 			orderBy: {
 				created_at: "desc"
@@ -47,12 +67,22 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 
 	async findById({
 		id
-	}: FindByIdParams<string>): Promise<Establishment | null> {
+	}: FindByIdParams<string>): Promise<EstablishmentWithInfo | null> {
 		return await prisma.establishment.findUnique({
 			where: {
 				id,
 				deleted_at: null,
 				OR: [{ next_billing_date: { gt: new Date() } }]
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				},
+				socialLinks: true,
+				openingHours: true,
+				closures: true
 			}
 		});
 	}
@@ -65,6 +95,11 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 				OR: [{ next_billing_date: { gt: new Date() } }]
 			},
 			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				},
 				socialLinks: true,
 				openingHours: true,
 				closures: true
@@ -72,8 +107,8 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		});
 	}
 
-	async create(data: Prisma.EstablishmentCreateInput): Promise<Establishment> {
-		return await prisma.establishment.create({ data });
+	async create(data: Prisma.EstablishmentCreateInput): Promise<void> {
+		await prisma.establishment.create({ data });
 	}
 
 	async update({
@@ -82,8 +117,8 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	}: UpdateContentParams<
 		string,
 		Prisma.EstablishmentUpdateInput
-	>): Promise<Establishment> {
-		return await prisma.establishment.update({
+	>): Promise<void> {
+		await prisma.establishment.update({
 			where: {
 				id,
 				deleted_at: null
@@ -92,19 +127,16 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		});
 	}
 
-	async delete({
-		id,
-		force
-	}: DeleteContentParams<string>): Promise<Establishment> {
+	async delete({ id, force }: DeleteContentParams<string>): Promise<void> {
 		if (force) {
-			return await prisma.establishment.delete({
+			await prisma.establishment.delete({
 				where: {
 					id
 				}
 			});
 		}
 
-		return await this.update({
+		await this.update({
 			id,
 			data: { deleted_at: new Date() }
 		});

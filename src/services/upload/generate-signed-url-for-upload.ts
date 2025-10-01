@@ -1,5 +1,5 @@
 import { InvalidResource } from "@/errors/resource/invalid-resource-error.ts";
-import { getResourcePath } from "@/helpers/resource.ts";
+import { attachObjectResource, getResourcePath } from "@/helpers/resource.ts";
 import { SignedUrl } from "@/helpers/signed-url.ts";
 import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
@@ -28,6 +28,8 @@ export class GenerateSignedUrlForUploadService {
 
 	async handle({
 		establishmentId,
+		objectId,
+		forResource,
 		resources
 	}: GenerateSignedUrlForUploadServiceRequest): Promise<GenerateSignedUrlForUploadServiceResponse> {
 		// TODO: In future, add wrangler-queues for r2-upload-events to validate signed urls and fire events when my file was uploaded
@@ -48,30 +50,32 @@ export class GenerateSignedUrlForUploadService {
 
 			for (const resourceIntent of resourcesNonDuplicate) {
 				const resourceRule = await this.resourceRepository.validateResourceRule(
+					forResource,
 					resourceIntent
 				);
 
 				if (!resourceRule) throw new InvalidResource();
 
-				const path = getResourcePath(
-					resourceIntent.forResource,
-					resourceIntent.resourceType
-				);
+				const path = getResourcePath(forResource, resourceIntent.type);
+
+				const objectIdResource = attachObjectResource(forResource, objectId);
 
 				const { signedUrl, fileKey } = await SignedUrl.createUploadSignedUrl(
 					path,
-					resourceIntent.fileMimeType
+					resourceIntent.mimeType
 				);
 
 				resourcesPromise.push(
 					this.resourceRepository.storeResource({
-						file_key: fileKey,
+						type: resourceIntent.type,
 						path,
+						file_key: fileKey,
 						establishment: {
 							connect: {
 								id: establishmentId
 							}
-						}
+						},
+						...objectIdResource
 					})
 				);
 

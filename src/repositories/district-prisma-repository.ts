@@ -71,21 +71,18 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 		});
 	}
 
-	async create(data: Prisma.DistrictCreateInput): Promise<District> {
-		return await prisma.district.create({ data });
+	async create(data: Prisma.DistrictCreateInput): Promise<void> {
+		await prisma.district.create({ data });
 	}
 
 	async update({
 		id,
 		data,
 		filterParams
-	}: UpdateContentParams<
-		string,
-		Prisma.DistrictUpdateInput
-	>): Promise<District> {
+	}: UpdateContentParams<string, Prisma.DistrictUpdateInput>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
-		return await prisma.district.update({
+		await prisma.district.update({
 			where: {
 				id,
 				deleted_at: null,
@@ -99,11 +96,11 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 		id,
 		force,
 		filterParams
-	}: DeleteContentParams<string>): Promise<District> {
+	}: DeleteContentParams<string>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
 		if (force) {
-			return await prisma.district.delete({
+			await prisma.district.delete({
 				where: {
 					id,
 					...params
@@ -111,7 +108,7 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 			});
 		}
 
-		return await this.update({
+		await this.update({
 			id,
 			filterParams,
 			data: { deleted_at: new Date() }

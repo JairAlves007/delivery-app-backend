@@ -71,18 +71,18 @@ export class BannerPrismaRepository implements IBannerRepository {
 		});
 	}
 
-	async create(data: Prisma.BannerCreateInput): Promise<Banner> {
-		return await prisma.banner.create({ data });
+	async create(data: Prisma.BannerCreateInput): Promise<void> {
+		await prisma.banner.create({ data });
 	}
 
 	async update({
 		id,
 		data,
 		filterParams
-	}: UpdateContentParams<number, Prisma.BannerUpdateInput>): Promise<Banner> {
+	}: UpdateContentParams<number, Prisma.BannerUpdateInput>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
-		return await prisma.banner.update({
+		await prisma.banner.update({
 			where: {
 				id,
 				deleted_at: null,
@@ -96,11 +96,11 @@ export class BannerPrismaRepository implements IBannerRepository {
 		id,
 		force,
 		filterParams
-	}: DeleteContentParams<number>): Promise<Banner> {
+	}: DeleteContentParams<number>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
 		if (force) {
-			return await prisma.banner.delete({
+			await prisma.banner.delete({
 				where: {
 					id,
 					...params
@@ -108,7 +108,7 @@ export class BannerPrismaRepository implements IBannerRepository {
 			});
 		}
 
-		return await this.update({
+		await this.update({
 			id,
 			filterParams,
 			data: { deleted_at: new Date() }

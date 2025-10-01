@@ -105,18 +105,18 @@ export class ProductPrismaRepository implements IProductRepository {
 		});
 	}
 
-	async create(data: Prisma.ProductCreateInput): Promise<Product> {
-		return await prisma.product.create({ data });
+	async create(data: Prisma.ProductCreateInput): Promise<void> {
+		await prisma.product.create({ data });
 	}
 
 	async update({
 		id,
 		data,
 		filterParams
-	}: UpdateContentParams<string, Prisma.ProductUpdateInput>): Promise<Product> {
+	}: UpdateContentParams<string, Prisma.ProductUpdateInput>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
-		return await prisma.product.update({
+		await prisma.product.update({
 			where: {
 				id,
 				deleted_at: null,
@@ -130,11 +130,11 @@ export class ProductPrismaRepository implements IProductRepository {
 		id,
 		force,
 		filterParams
-	}: DeleteContentParams<string>): Promise<Product> {
+	}: DeleteContentParams<string>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
 		if (force) {
-			return await prisma.product.delete({
+			await prisma.product.delete({
 				where: {
 					id,
 					...params
@@ -142,7 +142,7 @@ export class ProductPrismaRepository implements IProductRepository {
 			});
 		}
 
-		return await this.update({
+		await this.update({
 			id,
 			filterParams,
 			data: { deleted_at: new Date() }

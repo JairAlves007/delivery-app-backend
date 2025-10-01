@@ -2,19 +2,20 @@ import { fileMimeTypeValues, type FileMimeType } from "@/types/resource.ts";
 import {
 	FileFormatType,
 	ForObjectResourceType,
+	Prisma,
 	ResourceType
 } from "@prisma/client";
 
-export function getResourcePath(
+export const getResourcePath = (
 	forResource: ForObjectResourceType,
 	resourceType: ResourceType
-): string {
+): string => {
 	return `${forResource.toLowerCase()}/${resourceType.toLowerCase()}`;
-}
+};
 
-export function mapMimeTypeToFileFormat(
+export const mapMimeTypeToFileFormat = (
 	mimeType: FileMimeType
-): FileFormatType {
+): FileFormatType => {
 	switch (mimeType) {
 		case fileMimeTypeValues.PNG:
 			return FileFormatType.PNG;
@@ -25,4 +26,38 @@ export function mapMimeTypeToFileFormat(
 		default:
 			throw new Error(`MIME Type '${mimeType}' não suportado para conversão.`);
 	}
-}
+};
+
+export const attachObjectResource = (
+	forResource: ForObjectResourceType,
+	objectId: string
+): Partial<Prisma.ResourceCreateInput> => {
+	switch (forResource) {
+		case ForObjectResourceType.ESTABLISHMENT:
+			return {
+				establishmentResources: {
+					create: {
+						establishment_id: objectId
+					}
+				}
+			};
+		case ForObjectResourceType.PRODUCT:
+			return {
+				productResources: {
+					create: {
+						product_id: objectId
+					}
+				}
+			};
+		case ForObjectResourceType.CATEGORY:
+			return {
+				productCategoryResources: {
+					create: {
+						category_id: objectId
+					}
+				}
+			};
+		default:
+			return {};
+	}
+};

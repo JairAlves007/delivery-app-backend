@@ -1,7 +1,10 @@
 import type { ResourceIntent } from "@/types/resource.ts";
-import type { Prisma, Resource } from "@prisma/client";
+import type { ForObjectResourceType, Prisma, Resource } from "@prisma/client";
 
 export interface IResourceRepository {
-	validateResourceRule(resourceIntent: ResourceIntent): Promise<boolean>;
+	validateResourceRule(
+		forResource: ForObjectResourceType,
+		resourceIntent: ResourceIntent
+	): Promise<boolean>;
 	storeResource(data: Prisma.ResourceCreateInput): Promise<Resource>;
 }

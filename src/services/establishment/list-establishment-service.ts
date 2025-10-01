@@ -2,14 +2,14 @@ import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import type { Establishment } from "@prisma/client";
+import { EstablishmentWithInfo } from "@/types/establishment.ts";
 import z from "zod";
 
 type ListEstablishmentServiceRequest = z.infer<typeof listQueryParamsSchema>;
 
 interface ListEstablishmentServiceResponse
 	extends Pick<ListEstablishmentServiceRequest, "page"> {
-	establishments: Establishment[];
+	establishments: EstablishmentWithInfo[];
 	total: number;
 	perPage?: number;
 	totalPages?: number;

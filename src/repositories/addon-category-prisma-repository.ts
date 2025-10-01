@@ -71,8 +71,8 @@ export class AddonCategoryPrismaRepository implements IAddonCategoryRepository {
 		});
 	}
 
-	async create(data: Prisma.AddonCategoryCreateInput): Promise<AddonCategory> {
-		return await prisma.addonCategory.create({ data });
+	async create(data: Prisma.AddonCategoryCreateInput): Promise<void> {
+		await prisma.addonCategory.create({ data });
 	}
 
 	async update({
@@ -82,10 +82,10 @@ export class AddonCategoryPrismaRepository implements IAddonCategoryRepository {
 	}: UpdateContentParams<
 		number,
 		Prisma.AddonCategoryUpdateInput
-	>): Promise<AddonCategory> {
+	>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
-		return await prisma.addonCategory.update({
+		await prisma.addonCategory.update({
 			where: {
 				id,
 				deleted_at: null,
@@ -99,11 +99,11 @@ export class AddonCategoryPrismaRepository implements IAddonCategoryRepository {
 		id,
 		force,
 		filterParams
-	}: DeleteContentParams<number>): Promise<AddonCategory> {
+	}: DeleteContentParams<number>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
 		if (force) {
-			return await prisma.addonCategory.delete({
+			await prisma.addonCategory.delete({
 				where: {
 					id,
 					...params
@@ -111,7 +111,7 @@ export class AddonCategoryPrismaRepository implements IAddonCategoryRepository {
 			});
 		}
 
-		return await this.update({
+		await this.update({
 			id,
 			filterParams,
 			data: { deleted_at: new Date() }
