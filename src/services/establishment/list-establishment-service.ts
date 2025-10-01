@@ -2,7 +2,7 @@ import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import { EstablishmentWithInfo } from "@/types/establishment.ts";
+import type { EstablishmentWithInfo } from "@/types/establishment.ts";
 import z from "zod";
 
 type ListEstablishmentServiceRequest = z.infer<typeof listQueryParamsSchema>;
