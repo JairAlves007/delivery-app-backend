@@ -9,16 +9,24 @@ import type {
 	PaginationParams,
 	UpdateContentParams
 } from "@/types/crud.ts";
-import type { Prisma, Product } from "@prisma/client";
+import type { ProductFromRepository } from "@/types/product.ts";
+import type { Prisma } from "@prisma/client";
 
 export class ProductPrismaRepository implements IProductRepository {
-	async listAll(filterParams?: FilterParams): Promise<Product[]> {
+	async listAll(filterParams?: FilterParams): Promise<ProductFromRepository[]> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.product.findMany({
 			where: {
 				deleted_at: null,
 				...params
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				}
 			},
 			orderBy: {
 				created_at: "desc"
@@ -41,7 +49,7 @@ export class ProductPrismaRepository implements IProductRepository {
 		perPage,
 		page,
 		filterParams
-	}: PaginationParams): Promise<Product[]> {
+	}: PaginationParams): Promise<ProductFromRepository[]> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.product.findMany({
@@ -50,6 +58,13 @@ export class ProductPrismaRepository implements IProductRepository {
 			where: {
 				deleted_at: null,
 				...params
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				}
 			},
 			orderBy: {
 				created_at: "desc"
@@ -61,13 +76,20 @@ export class ProductPrismaRepository implements IProductRepository {
 		limit,
 		cursor,
 		filterParams
-	}: CursorPaginationParams<string>): Promise<Product[]> {
+	}: CursorPaginationParams<string>): Promise<ProductFromRepository[]> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.product.findMany({
 			where: {
 				deleted_at: null,
 				...params
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				}
 			},
 			orderBy: {
 				created_at: "desc"
@@ -82,7 +104,7 @@ export class ProductPrismaRepository implements IProductRepository {
 		establishmentId: string,
 		limit: number,
 		cursor?: string | null
-	): Promise<Product[]> {
+	): Promise<ProductFromRepository[]> {
 		return await this.cursorPaginate({
 			limit,
 			cursor,
@@ -93,7 +115,7 @@ export class ProductPrismaRepository implements IProductRepository {
 	async findById({
 		id,
 		filterParams
-	}: FindByIdParams<string>): Promise<Product | null> {
+	}: FindByIdParams<string>): Promise<ProductFromRepository | null> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.product.findUnique({
@@ -101,6 +123,13 @@ export class ProductPrismaRepository implements IProductRepository {
 				id,
 				deleted_at: null,
 				...params
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				}
 			}
 		});
 	}

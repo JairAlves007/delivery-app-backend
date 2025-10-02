@@ -8,18 +8,28 @@ import type {
 	PaginationParams,
 	UpdateContentParams
 } from "@/types/crud.ts";
-import type { Prisma, ProductCategory } from "@prisma/client";
+import type { ProductCategoryFromRepository } from "@/types/product-category.ts";
+import type { Prisma } from "@prisma/client";
 
 export class ProductCategoryPrismaRepository
 	implements IProductCategoryRepository
 {
-	async listAll(filterParams?: FilterParams): Promise<ProductCategory[]> {
+	async listAll(
+		filterParams?: FilterParams
+	): Promise<ProductCategoryFromRepository[]> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.productCategory.findMany({
 			where: {
 				deleted_at: null,
 				...params
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				}
 			},
 			orderBy: {
 				order: "asc"
@@ -42,7 +52,7 @@ export class ProductCategoryPrismaRepository
 		page,
 		perPage,
 		filterParams
-	}: PaginationParams): Promise<ProductCategory[]> {
+	}: PaginationParams): Promise<ProductCategoryFromRepository[]> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.productCategory.findMany({
@@ -51,6 +61,13 @@ export class ProductCategoryPrismaRepository
 			where: {
 				deleted_at: null,
 				...params
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				}
 			},
 			orderBy: {
 				order: "asc"
@@ -61,7 +78,7 @@ export class ProductCategoryPrismaRepository
 	async findById({
 		id,
 		filterParams
-	}: FindByIdParams<string>): Promise<ProductCategory | null> {
+	}: FindByIdParams<string>): Promise<ProductCategoryFromRepository | null> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.productCategory.findUnique({
@@ -69,6 +86,13 @@ export class ProductCategoryPrismaRepository
 				id,
 				deleted_at: null,
 				...params
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				}
 			}
 		});
 	}

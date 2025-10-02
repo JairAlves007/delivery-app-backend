@@ -1,15 +1,19 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { mapObjectResourcesList } from "@/helpers/resource.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import type { ProductCategory } from "@prisma/client";
+import {
+	ProductCategoryFromRepository,
+	ProductCategoryList
+} from "@/types/product-category.ts";
 import z from "zod";
 
 type ListProductCategoryServiceRequest = z.infer<typeof listQueryParamsSchema>;
 
 interface ListProductCategoryServiceResponse
 	extends Pick<ListProductCategoryServiceRequest, "page"> {
-	productCategories: ProductCategory[];
+	productCategories: ProductCategoryList[];
 	total: number;
 	perPage?: number;
 	totalPages?: number;
@@ -20,6 +24,17 @@ export class ListProductCategoryService {
 
 	constructor(productCategoryRepository: IProductCategoryRepository) {
 		this.productCategoryRepository = productCategoryRepository;
+	}
+
+	private mapProductCategories(
+		productCategories: ProductCategoryFromRepository[]
+	): ProductCategoryList[] {
+		return productCategories.map(productCategory => {
+			return {
+				...productCategory,
+				resources: mapObjectResourcesList(productCategory.resources)
+			};
+		});
 	}
 
 	async handle({
@@ -58,7 +73,7 @@ export class ListProductCategoryService {
 			if (page > totalPages) throw new InvalidPage();
 
 			return {
-				productCategories,
+				productCategories: this.mapProductCategories(productCategories),
 				page,
 				perPage,
 				total,
@@ -78,7 +93,7 @@ export class ListProductCategoryService {
 		]);
 
 		return {
-			productCategories,
+			productCategories: this.mapProductCategories(productCategories),
 			page,
 			total
 		};

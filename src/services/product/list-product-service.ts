@@ -1,16 +1,17 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { transformPriceFromDatabase } from "@/helpers/price.ts";
+import { mapObjectResourcesList } from "@/helpers/resource.ts";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import type { Product } from "@prisma/client";
+import type { ProductFromRepository, ProductList } from "@/types/product.ts";
 import z from "zod";
 
 type ListProductServiceRequest = z.infer<typeof listQueryParamsSchema>;
 
 interface ListProductServiceResponse
 	extends Pick<ListProductServiceRequest, "page"> {
-	products: Product[];
+	products: ProductList[];
 	total: number;
 	perPage?: number;
 	totalPages?: number;
@@ -23,11 +24,12 @@ export class ListProductService {
 		this.productRepository = productRepository;
 	}
 
-	private mapProducts(products: Product[]) {
+	private mapProducts(products: ProductFromRepository[]): ProductList[] {
 		return products.map(product => {
 			return {
 				...product,
-				price: transformPriceFromDatabase(product.price)
+				price: transformPriceFromDatabase(product.price),
+				resources: mapObjectResourcesList(product.resources)
 			};
 		});
 	}
