@@ -1,6 +1,7 @@
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
+import type { ResourceItem } from "./resource.ts";
 
-export type EstablishmentWithInfo = Prisma.EstablishmentGetPayload<{
+export type EstablishmentFromRepository = Prisma.EstablishmentGetPayload<{
 	include: {
 		resources: {
 			select: {
@@ -14,3 +15,10 @@ export type EstablishmentWithInfo = Prisma.EstablishmentGetPayload<{
 }>;
 
 export type EstablishmentCatalog = Prisma.ProductGetPayload<{}>;
+
+export type EstablishmentsList = Omit<
+	EstablishmentFromRepository,
+	"resources"
+> & {
+	resources: ResourceItem;
+};

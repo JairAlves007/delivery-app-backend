@@ -1,4 +1,9 @@
-import type { Resource, ResourceType } from "@prisma/client";
+import type {
+	ForObjectResourceType,
+	Prisma,
+	Resource,
+	ResourceType
+} from "@prisma/client";
 
 export const fileMimeTypeValues = {
 	PNG: "image/png",
@@ -12,6 +17,20 @@ export type FileMimeType =
 export type ResourceIntent = {
 	width: number;
 	height: number;
+	for: ForObjectResourceType;
 	type: ResourceType;
 	mimeType: FileMimeType;
+};
+
+export type ResourceInfo = {
+	path: string;
+	attachData: Partial<Prisma.ResourceCreateInput>;
+};
+
+export type ResourceItem = Partial<
+	Record<string, { id: string; path: string }>
+>;
+
+export type ObjectResources = {
+	resource: Resource;
 };

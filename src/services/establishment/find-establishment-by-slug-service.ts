@@ -1,7 +1,7 @@
 import { EstablishmentNotFound } from "@/errors/establishment/not-found-error.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import type { EstablishmentWithInfo } from "@/types/establishment.ts";
+import type { EstablishmentFromRepository } from "@/types/establishment.ts";
 
 export class FindEstablishmentBySlugService {
 	private establishmentRepository: IEstablishmentRepository;
@@ -10,7 +10,7 @@ export class FindEstablishmentBySlugService {
 		this.establishmentRepository = establishmentRepository;
 	}
 
-	async handle(slug: string): Promise<EstablishmentWithInfo> {
+	async handle(slug: string): Promise<EstablishmentFromRepository> {
 		const cache = makeCache();
 		const key = `${cache.keys.establishments}_${slug}`;
 

@@ -1,7 +1,7 @@
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import type { Establishment, Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma.ts";
-import type { EstablishmentWithInfo } from "@/types/establishment.ts";
+import type { EstablishmentFromRepository } from "@/types/establishment.ts";
 import type {
 	DeleteContentParams,
 	FindByIdParams,
@@ -10,7 +10,7 @@ import type {
 } from "@/types/crud.ts";
 
 export class EstablishmentPrismaRepository implements IEstablishmentRepository {
-	async listAll(): Promise<EstablishmentWithInfo[]> {
+	async listAll(): Promise<EstablishmentFromRepository[]> {
 		return await prisma.establishment.findMany({
 			where: {
 				deleted_at: null
@@ -42,7 +42,7 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	async paginate({
 		perPage,
 		page
-	}: PaginationParams): Promise<EstablishmentWithInfo[]> {
+	}: PaginationParams): Promise<EstablishmentFromRepository[]> {
 		return await prisma.establishment.findMany({
 			skip: (page - 1) * perPage,
 			take: perPage,
@@ -67,7 +67,7 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 
 	async findById({
 		id
-	}: FindByIdParams<string>): Promise<EstablishmentWithInfo | null> {
+	}: FindByIdParams<string>): Promise<EstablishmentFromRepository | null> {
 		return await prisma.establishment.findUnique({
 			where: {
 				id,
@@ -87,7 +87,7 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		});
 	}
 
-	async findBySlug(slug: string): Promise<EstablishmentWithInfo | null> {
+	async findBySlug(slug: string): Promise<EstablishmentFromRepository | null> {
 		return await prisma.establishment.findUnique({
 			where: {
 				slug,

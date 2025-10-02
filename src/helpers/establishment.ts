@@ -1,9 +1,9 @@
-import type { EstablishmentWithInfo } from "@/types/establishment.ts";
+import type { EstablishmentFromRepository } from "@/types/establishment.ts";
 import { WeekDay } from "@prisma/client";
 import { parseHourToToday } from "./date.ts";
 
 export function isEstablishmentOpen(
-	establishment: EstablishmentWithInfo
+	establishment: EstablishmentFromRepository
 ): boolean {
 	const now = new Date();
 

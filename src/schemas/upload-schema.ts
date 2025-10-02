@@ -7,24 +7,27 @@ export const uploadSignedUrlBodySchema = z.object({
 	objectId: z
 		.ulid("O id do recurso deve ser preenchido corretamente")
 		.min(1, "O id do recurso deve ser preenchido"),
-	forResource: z
-		.string()
-		.enumCaseInsensitive(
-			ForObjectResourceType,
-			"Precisamos saber para qual recurso pertencem as imagens"
-		),
+	resourceId: z
+		.ulid("O id do recurso deve ser preenchido corretamente")
+		.min(1, "O id do recurso deve ser preenchido")
+		.optional()
+		.nullable(),
 	establishmentId: establishmentIdSchema,
-	resources: z.array(
-		z.object({
-			width: z.coerce.number("A largura deve ser preenchida"),
-			height: z.coerce.number("A altura deve ser preenchida"),
-			mimeType: z.enum(
-				Object.values(fileMimeTypeValues),
-				"Tipo de arquivo inválido"
+	resource: z.object({
+		width: z.coerce.number("A largura deve ser preenchida"),
+		height: z.coerce.number("A altura deve ser preenchida"),
+		for: z
+			.string()
+			.enumCaseInsensitive(
+				ForObjectResourceType,
+				"Precisamos saber para qual recurso pertencem as imagens"
 			),
-			type: z
-				.string()
-				.enumCaseInsensitive(ResourceType, "Tipo de recurso inválido")
-		})
-	)
+		mimeType: z.enum(
+			Object.values(fileMimeTypeValues),
+			"Tipo de arquivo inválido"
+		),
+		type: z
+			.string()
+			.enumCaseInsensitive(ResourceType, "Tipo de recurso inválido")
+	})
 });

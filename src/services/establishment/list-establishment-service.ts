@@ -1,15 +1,19 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { mapObjectResourcesList } from "@/helpers/resource.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import type { EstablishmentWithInfo } from "@/types/establishment.ts";
+import type {
+	EstablishmentFromRepository,
+	EstablishmentsList
+} from "@/types/establishment.ts";
 import z from "zod";
 
 type ListEstablishmentServiceRequest = z.infer<typeof listQueryParamsSchema>;
 
 interface ListEstablishmentServiceResponse
 	extends Pick<ListEstablishmentServiceRequest, "page"> {
-	establishments: EstablishmentWithInfo[];
+	establishments: EstablishmentsList[];
 	total: number;
 	perPage?: number;
 	totalPages?: number;
@@ -20,6 +24,17 @@ export class ListEstablishmentService {
 
 	constructor(establishmentRepository: IEstablishmentRepository) {
 		this.establishmentRepository = establishmentRepository;
+	}
+
+	private mapEstablishments(
+		establishments: EstablishmentFromRepository[]
+	): EstablishmentsList[] {
+		return establishments.map(establishment => {
+			return {
+				...establishment,
+				resources: mapObjectResourcesList(establishment.resources)
+			};
+		});
 	}
 
 	async handle({
@@ -49,7 +64,7 @@ export class ListEstablishmentService {
 			if (page > totalPages) throw new InvalidPage();
 
 			return {
-				establishments,
+				establishments: this.mapEstablishments(establishments),
 				page,
 				perPage,
 				total,
@@ -66,7 +81,7 @@ export class ListEstablishmentService {
 		]);
 
 		return {
-			establishments,
+			establishments: this.mapEstablishments(establishments),
 			page,
 			total
 		};
