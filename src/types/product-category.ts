@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import { ResourceItem } from "./resource.ts";
+import type { ResourceItem } from "./resource.ts";
 
 export type ProductCategoryFromRepository = Prisma.ProductCategoryGetPayload<{
 	include: {

@@ -3,7 +3,7 @@ import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { mapObjectResourcesList } from "@/helpers/resource.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import {
+import type {
 	ProductCategoryFromRepository,
 	ProductCategoryList
 } from "@/types/product-category.ts";
