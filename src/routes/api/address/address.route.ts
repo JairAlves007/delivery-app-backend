@@ -1,5 +1,6 @@
 import {
 	destroy,
+	find,
 	index,
 	store,
 	update

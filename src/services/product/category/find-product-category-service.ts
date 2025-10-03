@@ -2,7 +2,7 @@ import { ProductCategoryNotFound } from "@/errors/product/category/not-found-err
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
 import { productCategoryParamsSchema } from "@/schemas/product-category-schema.ts";
-import { ProductCategory } from "@prisma/client";
+import type { ProductCategory } from "@prisma/client";
 import z from "zod";
 
 type FindProductCategoryServiceRequest = z.infer<
