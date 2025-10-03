@@ -9,6 +9,7 @@ import type {
 	PaginationParams,
 	UpdateContentParams
 } from "@/types/crud.ts";
+import type { EstablishmentID } from "@/types/establishment.ts";
 import type { Coupon, Prisma } from "@prisma/client";
 
 export class CouponPrismaRepository implements ICouponRepository {
@@ -68,7 +69,7 @@ export class CouponPrismaRepository implements ICouponRepository {
 
 	async check(
 		code: string,
-		establishmentId: string,
+		establishmentId: EstablishmentID,
 		userId: string
 	): Promise<CouponWithUserCoupons | null> {
 		return await prisma.coupon.findUnique({

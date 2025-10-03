@@ -1,32 +1,28 @@
-import { mapMimeTypeToFileFormat } from "@/helpers/resource.ts";
 import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.ts";
-import type { ResourceIntent } from "@/types/resource.ts";
+import type {
+	ResourceRuleFromRepository,
+	ValidateResourceRuleParams
+} from "@/types/resource-rule.ts";
 import type { Prisma, Resource } from "@prisma/client";
 import { prisma } from "@/lib/prisma.ts";
 
 export class ResourcePrismaRepository implements IResourceRepository {
 	async validateResourceRule({
-		type,
-		for: forResource,
-		width,
-		height,
-		mimeType
-	}: ResourceIntent): Promise<boolean> {
-		const resourceRule = await prisma.resourceRule.findFirst({
+		establishmentId,
+		resourceIntent: { type, for: forResource }
+	}: ValidateResourceRuleParams): Promise<ResourceRuleFromRepository | null> {
+		return await prisma.resourceRule.findUnique({
 			where: {
-				type: type,
-				for: forResource,
-				width: width,
-				height: height,
-				availableFormats: {
-					some: {
-						type: mapMimeTypeToFileFormat(mimeType)
-					}
+				establishment_id_type_for: {
+					establishment_id: establishmentId,
+					type,
+					for: forResource
 				}
+			},
+			include: {
+				availableFormats: true
 			}
 		});
-
-		return !!resourceRule;
 	}
 
 	async storeResource(data: Prisma.ResourceUpsertArgs): Promise<Resource> {

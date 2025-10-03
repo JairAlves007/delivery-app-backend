@@ -703,31 +703,36 @@ async function main() {
 				type: "BANNER",
 				for: "PRODUCT",
 				width: 1920,
-				height: 1080
+				height: 1080,
+				establishment_id: establishment.id
 			},
 			{
 				type: "THUMBNAIL",
 				for: "PRODUCT",
 				width: 320,
-				height: 320
+				height: 320,
+				establishment_id: establishment.id
 			},
 			{
 				type: "LOGO",
 				for: "ESTABLISHMENT",
 				width: 200,
-				height: 200
+				height: 200,
+				establishment_id: establishment.id
 			},
 			{
 				type: "BANNER",
 				for: "ESTABLISHMENT",
 				width: 1920,
-				height: 1080
+				height: 1080,
+				establishment_id: establishment.id
 			},
 			{
 				type: "THUMBNAIL",
 				for: "CATEGORY",
 				width: 320,
-				height: 320
+				height: 320,
+				establishment_id: establishment.id
 			}
 		]
 	});

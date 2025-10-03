@@ -9,6 +9,7 @@ import type {
 	PaginationParams,
 	UpdateContentParams
 } from "@/types/crud.ts";
+import type { EstablishmentID } from "@/types/establishment.ts";
 import type { ProductFromRepository } from "@/types/product.ts";
 import type { Prisma } from "@prisma/client";
 
@@ -101,7 +102,7 @@ export class ProductPrismaRepository implements IProductRepository {
 	}
 
 	async getCatalog(
-		establishmentId: string,
+		establishmentId: EstablishmentID,
 		limit: number,
 		cursor?: string | null
 	): Promise<ProductFromRepository[]> {

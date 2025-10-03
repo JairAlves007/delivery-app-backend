@@ -1,5 +1,6 @@
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IMenuRepository } from "@/interfaces/repositories/menu-repository.ts";
+import type { EstablishmentID } from "@/types/establishment.ts";
 import type { MenuWithSubmenus } from "@/types/menu.ts";
 import type { RoleType } from "@prisma/client";
 
@@ -12,7 +13,7 @@ export class GetMenuService {
 
 	async handle(
 		forRole: RoleType,
-		establishmentId: string
+		establishmentId: EstablishmentID
 	): Promise<MenuWithSubmenus[] | null> {
 		const cache = makeCache();
 

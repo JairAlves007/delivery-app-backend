@@ -1,5 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import type { ResourceItem } from "./resource.ts";
+import z from "zod";
+import { establishmentIdSchema } from "@/schemas/generic-schema.ts";
 
 export type EstablishmentFromRepository = Prisma.EstablishmentGetPayload<{
 	include: {
@@ -22,3 +24,5 @@ export type EstablishmentsList = Omit<
 > & {
 	resources: ResourceItem;
 };
+
+export type EstablishmentID = z.infer<typeof establishmentIdSchema>;
