@@ -1,5 +1,6 @@
 import {
 	destroy,
+	find,
 	index,
 	store,
 	update
@@ -18,6 +19,7 @@ const bannerMiddlewares = {
 
 export const adminBannerRoutes = async (app: FastifyInstance) => {
 	app.get("/", bannerMiddlewares, index);
+	app.get("/:id", bannerMiddlewares, find);
 	app.post("/", bannerMiddlewares, store);
 	app.patch("/:id", bannerMiddlewares, update);
 	app.delete("/:id", bannerMiddlewares, destroy);

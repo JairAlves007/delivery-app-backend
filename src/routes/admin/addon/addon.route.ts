@@ -1,5 +1,6 @@
 import {
 	destroy,
+	find,
 	index,
 	store,
 	update
@@ -18,6 +19,7 @@ const addonMiddlewares = {
 
 export const adminAddonRoutes = async (app: FastifyInstance) => {
 	app.get("/", addonMiddlewares, index);
+	app.get("/:id", addonMiddlewares, find);
 	app.post("/", addonMiddlewares, store);
 	app.patch("/:id", addonMiddlewares, update);
 	app.delete("/:id", addonMiddlewares, destroy);

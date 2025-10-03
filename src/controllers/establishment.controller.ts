@@ -1,5 +1,6 @@
 import { makeCreateEstablishmentService } from "@/factories/services/establishment/make-create-establishment-service.ts";
 import { makeDeleteEstablishmentService } from "@/factories/services/establishment/make-delete-establishment-service.ts";
+import { makeFindEstablishmentByIdService } from "@/factories/services/establishment/make-find-establishment-by-id-service.ts";
 import { makeListEstablishmentService } from "@/factories/services/establishment/make-list-establishment-service.ts";
 import { makeUpdateEstablishmentService } from "@/factories/services/establishment/make-update-establishment-service.ts";
 import { makeListEstablishmentCatalogService } from "@/factories/services/product/make-list-establishment-catalog-service.ts";
@@ -30,6 +31,27 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 				ApiResponse.success(
 					"Estabelecimentos listados com sucesso",
 					establishments
+				)
+			);
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const find = async (request: FastifyRequest, reply: FastifyReply) => {
+	const { id } = establishmentParamsSchema.parse(request.params);
+
+	try {
+		const findEstablishmentService = makeFindEstablishmentByIdService();
+
+		const establishment = await findEstablishmentService.handle({ id });
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(
+				ApiResponse.success(
+					"Estabelecimento encontrado com sucesso",
+					establishment
 				)
 			);
 	} catch (error) {

@@ -1,5 +1,6 @@
 import { makeCreateDistrictService } from "@/factories/services/district/make-create-district-service.ts";
 import { makeDeleteDistrictService } from "@/factories/services/district/make-delete-district-service.ts";
+import { makeFindDistrictService } from "@/factories/services/district/make-find-district-service.ts";
 import { makeListDistrictService } from "@/factories/services/district/make-list-district-service.ts";
 import { makeUpdateDistrictService } from "@/factories/services/district/make-update-district-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
@@ -27,6 +28,22 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 		return reply
 			.status(HTTPStatusCodes.OK)
 			.send(ApiResponse.success("Bairros listados com sucesso", districts));
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const find = async (request: FastifyRequest, reply: FastifyReply) => {
+	const { id } = districtParamsSchema.parse(request.params);
+
+	try {
+		const findDistrictService = makeFindDistrictService();
+
+		const district = await findDistrictService.handle({ id });
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(ApiResponse.success("Bairro encontrado com sucesso", district));
 	} catch (error) {
 		return reply.sendError(error);
 	}

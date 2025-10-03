@@ -1,5 +1,6 @@
 import { makeCreateAddonService } from "@/factories/services/addon/make-create-addon-service.ts";
 import { makeDeleteAddonService } from "@/factories/services/addon/make-delete-addon-service.ts";
+import { makeFindAddonService } from "@/factories/services/addon/make-find-addon-service.ts";
 import { makeListAddonService } from "@/factories/services/addon/make-list-addon-service.ts";
 import { makeUpdateAddonService } from "@/factories/services/addon/make-update-addon-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
@@ -32,6 +33,22 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 					addonCategories
 				)
 			);
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const find = async (request: FastifyRequest, reply: FastifyReply) => {
+	const { id } = addonParamsSchema.parse(request.params);
+
+	try {
+		const findAddonService = makeFindAddonService();
+
+		const addon = await findAddonService.handle({ id });
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(ApiResponse.success("Adicional encontrado com sucesso", addon));
 	} catch (error) {
 		return reply.sendError(error);
 	}

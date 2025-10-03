@@ -1,5 +1,6 @@
 import {
 	destroy,
+	find,
 	index,
 	store,
 	update
@@ -18,6 +19,7 @@ const districtMiddlewares = {
 
 export const adminDistrictRoutes = async (app: FastifyInstance) => {
 	app.get("/", districtMiddlewares, index);
+	app.get("/:id", districtMiddlewares, find);
 	app.post("/", districtMiddlewares, store);
 	app.patch("/:id", districtMiddlewares, update);
 	app.delete("/:id", districtMiddlewares, destroy);

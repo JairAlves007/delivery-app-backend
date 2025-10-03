@@ -1,5 +1,6 @@
 import { makeCreateBannerService } from "@/factories/services/banner/make-create-banner-service.ts";
 import { makeDeleteBannerService } from "@/factories/services/banner/make-delete-banner-service.ts";
+import { makeFindBannerService } from "@/factories/services/banner/make-find-banner-service.ts";
 import { makeListBannerService } from "@/factories/services/banner/make-list-banner-service.ts";
 import { makeUpdateBannerService } from "@/factories/services/banner/make-update-banner-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
@@ -26,6 +27,22 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 		return reply
 			.status(HTTPStatusCodes.OK)
 			.send(ApiResponse.success("Banners listados com sucesso", banners));
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const find = async (request: FastifyRequest, reply: FastifyReply) => {
+	const { id } = bannerParamsSchema.parse(request.params);
+
+	try {
+		const findBannerService = makeFindBannerService();
+
+		const banner = await findBannerService.handle({ id });
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(ApiResponse.success("Banner encontrado com sucesso", banner));
 	} catch (error) {
 		return reply.sendError(error);
 	}

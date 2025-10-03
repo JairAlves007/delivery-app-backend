@@ -1,7 +1,7 @@
-import { CouponErrorBase } from "@/errors/coupon/error-base.ts";
 import { makeCheckCouponService } from "@/factories/services/coupon/make-check-coupon-service.ts";
 import { makeCreateCouponService } from "@/factories/services/coupon/make-create-coupon-service.ts";
 import { makeDeleteCouponService } from "@/factories/services/coupon/make-delete-coupon-service.ts";
+import { makeFindCouponService } from "@/factories/services/coupon/make-find-coupon-service.ts";
 import { makeListCouponService } from "@/factories/services/coupon/make-list-coupon-service.ts";
 import { makeUpdateCouponService } from "@/factories/services/coupon/make-update-coupon-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
@@ -29,6 +29,22 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 		return reply
 			.status(HTTPStatusCodes.OK)
 			.send(ApiResponse.success("Cupons listados com sucesso", coupons));
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const find = async (request: FastifyRequest, reply: FastifyReply) => {
+	const { id } = couponParamsSchema.parse(request.params);
+
+	try {
+		const findCouponService = makeFindCouponService();
+
+		const coupon = await findCouponService.handle({ id });
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(ApiResponse.success("Cupom encontrado com sucesso", coupon));
 	} catch (error) {
 		return reply.sendError(error);
 	}

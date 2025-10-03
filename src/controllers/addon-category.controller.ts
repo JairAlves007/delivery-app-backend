@@ -1,5 +1,6 @@
 import { makeCreateAddonCategoryService } from "@/factories/services/addon/category/make-create-addon-category-service.ts";
 import { makeDeleteAddonCategoryService } from "@/factories/services/addon/category/make-delete-addon-category-service.ts";
+import { makeFindAddonCategoryService } from "@/factories/services/addon/category/make-find-addon-category-service.ts";
 import { makeListAddonCategoryService } from "@/factories/services/addon/category/make-list-addon-category-service.ts";
 import { makeUpdateAddonCategoryService } from "@/factories/services/addon/category/make-update-addon-category-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
@@ -30,6 +31,27 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 				ApiResponse.success(
 					"Categorias de adicionais listadas com sucesso",
 					addonCategories
+				)
+			);
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const find = async (request: FastifyRequest, reply: FastifyReply) => {
+	const { id } = addonCategoryParamsSchema.parse(request.params);
+
+	try {
+		const findAddonCategoryService = makeFindAddonCategoryService();
+
+		const addonCategory = await findAddonCategoryService.handle({ id });
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(
+				ApiResponse.success(
+					"Categoria de adicional encontrada com sucesso",
+					addonCategory
 				)
 			);
 	} catch (error) {

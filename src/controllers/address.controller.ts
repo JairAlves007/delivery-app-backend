@@ -1,5 +1,6 @@
 import { makeCreateAddressService } from "@/factories/services/address/make-create-address-service.ts";
 import { makeDeleteAddressService } from "@/factories/services/address/make-delete-address-service.ts";
+import { makeFindAddressService } from "@/factories/services/address/make-find-address-service.ts";
 import { makeListAddressService } from "@/factories/services/address/make-list-address-service.ts";
 import { makeUpdateAddressService } from "@/factories/services/address/make-update-address-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
@@ -10,7 +11,6 @@ import {
 	updateAddressBodySchema
 } from "@/schemas/address-schema.ts";
 import {
-	addressLocationSchema,
 	listCursorQueryParamsSchema,
 	userIdSchema
 } from "@/schemas/generic-schema.ts";
@@ -28,6 +28,22 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 		return reply
 			.status(HTTPStatusCodes.OK)
 			.send(ApiResponse.success("Endereços listados com sucesso", addresses));
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const find = async (request: FastifyRequest, reply: FastifyReply) => {
+	const { id } = addressParamsSchema.parse(request.params);
+
+	try {
+		const findAddressService = makeFindAddressService();
+
+		const address = await findAddressService.handle({ id });
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(ApiResponse.success("Endereço encontrado com sucesso", address));
 	} catch (error) {
 		return reply.sendError(error);
 	}

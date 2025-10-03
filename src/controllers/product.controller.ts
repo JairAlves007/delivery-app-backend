@@ -1,5 +1,6 @@
 import { makeCreateProductService } from "@/factories/services/product/make-create-product-service.ts";
 import { makeDeleteProductService } from "@/factories/services/product/make-delete-product-service.ts";
+import { makeFindProductService } from "@/factories/services/product/make-find-product-service.ts";
 import { makeListProductService } from "@/factories/services/product/make-list-product-service.ts";
 import { makeUpdateProductService } from "@/factories/services/product/make-update-product-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
@@ -27,6 +28,22 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 		return reply
 			.status(HTTPStatusCodes.OK)
 			.send(ApiResponse.success("Produtos listados com sucesso", products));
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const find = async (request: FastifyRequest, reply: FastifyReply) => {
+	const { id } = productParamsSchema.parse(request.params);
+
+	try {
+		const findProductService = makeFindProductService();
+
+		const product = await findProductService.handle({ id });
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(ApiResponse.success("Produto encontrado com sucesso", product));
 	} catch (error) {
 		return reply.sendError(error);
 	}

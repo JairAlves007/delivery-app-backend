@@ -18,6 +18,7 @@ const addressMiddlewares = {
 
 export const addressRoutes = (app: FastifyInstance) => {
 	app.get("/", addressMiddlewares, index);
+	app.get("/:id", addressMiddlewares, find);
 	app.post("/", addressMiddlewares, store);
 	app.patch("/:id", addressMiddlewares, update);
 	app.delete("/:id", addressMiddlewares, destroy);

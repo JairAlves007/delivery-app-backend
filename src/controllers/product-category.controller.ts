@@ -1,5 +1,6 @@
 import { makeCreateProductCategoryService } from "@/factories/services/product/category/make-create-product-category-service.ts";
 import { makeDeleteProductCategoryService } from "@/factories/services/product/category/make-delete-product-category-service.ts";
+import { makeFindProductCategoryService } from "@/factories/services/product/category/make-find-product-category-service.ts";
 import { makeListProductCategoryService } from "@/factories/services/product/category/make-list-product-category-service.ts";
 import { makeUpdateProductCategoryService } from "@/factories/services/product/category/make-update-product-category-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
@@ -30,6 +31,27 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 				ApiResponse.success(
 					"Categorias de produtos listadas com sucesso",
 					productCategories
+				)
+			);
+	} catch (error) {
+		return reply.sendError(error);
+	}
+};
+
+export const find = async (request: FastifyRequest, reply: FastifyReply) => {
+	const { id } = productCategoryParamsSchema.parse(request.params);
+
+	try {
+		const findProductCategoryService = makeFindProductCategoryService();
+
+		const productCategory = await findProductCategoryService.handle({ id });
+
+		return reply
+			.status(HTTPStatusCodes.OK)
+			.send(
+				ApiResponse.success(
+					"Categoria de produto encontrado com sucesso",
+					productCategory
 				)
 			);
 	} catch (error) {

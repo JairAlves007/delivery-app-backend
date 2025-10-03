@@ -1,5 +1,6 @@
 import {
 	destroy,
+	find,
 	index,
 	store,
 	update
@@ -18,6 +19,7 @@ const categoriesMiddlewares = {
 
 export const adminProductCategoryRoutes = async (app: FastifyInstance) => {
 	app.get("/", categoriesMiddlewares, index);
+	app.get("/:id", categoriesMiddlewares, find);
 	app.post("/", categoriesMiddlewares, store);
 	app.patch("/:id", categoriesMiddlewares, update);
 	app.delete("/:id", categoriesMiddlewares, destroy);

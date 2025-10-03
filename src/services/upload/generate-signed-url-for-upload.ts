@@ -35,9 +35,10 @@ export class GenerateSignedUrlForUploadService {
 	}: ValidateResourceRuleParams) {
 		try {
 			const cache = makeCache();
+			const key = `${cache.keys.resourceRules}_${resourceIntent.type}_${resourceIntent.for}_${resourceIntent.width}_${resourceIntent.height}_${resourceIntent.mimeType}`;
 
 			const resourceRule = await cache.rememberForever(
-				`${cache.keys.resourceRules}_${establishmentId}_${resourceIntent.type}_${resourceIntent.for}`,
+				key,
 				async () =>
 					await this.resourceRepository.validateResourceRule({
 						establishmentId,
@@ -45,7 +46,10 @@ export class GenerateSignedUrlForUploadService {
 					})
 			);
 
-			if (!resourceRule) throw new InvalidResource();
+			if (!resourceRule) {
+				await cache.forget(key);
+				throw new InvalidResource();
+			}
 
 			if (resourceRule.width !== resourceIntent.width)
 				throw new IncorrectResourceSize("width");
