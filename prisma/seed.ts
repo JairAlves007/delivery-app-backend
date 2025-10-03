@@ -733,6 +733,13 @@ async function main() {
 				width: 320,
 				height: 320,
 				establishment_id: establishment.id
+			},
+			{
+				type: "BANNER",
+				for: "BANNER",
+				width: 1920,
+				height: 1080,
+				establishment_id: establishment.id
 			}
 		]
 	});
@@ -786,6 +793,18 @@ async function main() {
 			{
 				type: FileFormatType.PNG,
 				resource_rule_id: resourceRules[3].id
+			},
+			{
+				type: FileFormatType.JPG,
+				resource_rule_id: resourceRules[4].id
+			},
+			{
+				type: FileFormatType.JPEG,
+				resource_rule_id: resourceRules[4].id
+			},
+			{
+				type: FileFormatType.PNG,
+				resource_rule_id: resourceRules[4].id
 			}
 		]
 	});

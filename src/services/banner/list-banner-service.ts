@@ -1,15 +1,16 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { mapObjectResourcesList } from "@/helpers/resource.ts";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import type { Banner } from "@prisma/client";
+import type { BannerFromRepository, BannerList } from "@/types/banner.ts";
 import z from "zod";
 
 type ListBannerServiceRequest = z.infer<typeof listQueryParamsSchema>;
 
 interface ListBannerServiceResponse
 	extends Pick<ListBannerServiceRequest, "page"> {
-	banners: Banner[];
+	banners: BannerList[];
 	total: number;
 	perPage?: number;
 	totalPages?: number;
@@ -20,6 +21,15 @@ export class ListBannerService {
 
 	constructor(bannerRepository: IBannerRepository) {
 		this.bannerRepository = bannerRepository;
+	}
+
+	private mapBanners(banners: BannerFromRepository[]): BannerList[] {
+		return banners.map(banner => {
+			return {
+				...banner,
+				resources: mapObjectResourcesList(banner.resources)
+			};
+		});
 	}
 
 	async handle({
@@ -56,7 +66,7 @@ export class ListBannerService {
 			if (page > totalPages) throw new InvalidPage();
 
 			return {
-				banners,
+				banners: this.mapBanners(banners),
 				page,
 				perPage,
 				total,
@@ -76,7 +86,7 @@ export class ListBannerService {
 		]);
 
 		return {
-			banners,
+			banners: this.mapBanners(banners),
 			page,
 			total
 		};

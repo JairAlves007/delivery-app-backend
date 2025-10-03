@@ -147,6 +147,7 @@ enum ForObjectResourceType {
   ESTABLISHMENT
   PRODUCT
   CATEGORY
+  BANNER
 }
 
 enum FileFormatType {
@@ -491,6 +492,7 @@ model Banner {
   product          Product?         @relation(fields: [product_id], references: [id])
   category         ProductCategory? @relation(fields: [category_id], references: [id])
   establishment    Establishment    @relation(fields: [establishment_id], references: [id])
+  resources        BannerResource[]
 
   @@map("banners")
 }
@@ -688,6 +690,7 @@ model Resource {
   productResources         ProductResource[]
   establishmentResources   EstablishmentResource[]
   productCategoryResources ProductCategoryResource[]
+  bannerResources          BannerResource[]
 
   @@unique([establishment_id, file_key])
   @@index([establishment_id], name: "idx_resources_establishment_id")
@@ -721,6 +724,21 @@ model ResourceRule {
   @@index([type], name: "idx_resource_rules_type")
   @@index([for], name: "idx_resource_rules_for")
   @@map("resource_rules")
+}
+
+model BannerResource {
+  id          String   @id @default(ulid())
+  resource_id String
+  banner_id   Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  resource    Resource @relation(fields: [resource_id], references: [id])
+  banner      Banner   @relation(fields: [banner_id], references: [id])
+
+  @@unique([banner_id, resource_id])
+  @@index([banner_id], name: "idx_banner_resources_banner_id")
+  @@index([resource_id], name: "idx_banner_resources_resource_id")
+  @@map("banner_resources")
 }
 
 model ProductResource {

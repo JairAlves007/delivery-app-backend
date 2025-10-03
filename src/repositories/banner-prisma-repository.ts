@@ -1,6 +1,7 @@
 import { transformValidFilterParams } from "@/helpers/crud.ts";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
+import type { BannerFromRepository } from "@/types/banner.ts";
 import type {
 	DeleteContentParams,
 	FilterParams,
@@ -8,16 +9,23 @@ import type {
 	PaginationParams,
 	UpdateContentParams
 } from "@/types/crud.ts";
-import type { Banner, Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 export class BannerPrismaRepository implements IBannerRepository {
-	async listAll(filterParams?: FilterParams): Promise<Banner[]> {
+	async listAll(filterParams?: FilterParams): Promise<BannerFromRepository[]> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.banner.findMany({
 			where: {
 				deleted_at: null,
 				...params
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				}
 			},
 			orderBy: {
 				created_at: "desc"
@@ -40,7 +48,7 @@ export class BannerPrismaRepository implements IBannerRepository {
 		perPage,
 		page,
 		filterParams
-	}: PaginationParams): Promise<Banner[]> {
+	}: PaginationParams): Promise<BannerFromRepository[]> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.banner.findMany({
@@ -49,6 +57,13 @@ export class BannerPrismaRepository implements IBannerRepository {
 			where: {
 				deleted_at: null,
 				...params
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				}
 			},
 			orderBy: {
 				created_at: "desc"
@@ -59,7 +74,7 @@ export class BannerPrismaRepository implements IBannerRepository {
 	async findById({
 		id,
 		filterParams
-	}: FindByIdParams<number>): Promise<Banner | null> {
+	}: FindByIdParams<number>): Promise<BannerFromRepository | null> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.banner.findUnique({
@@ -67,6 +82,13 @@ export class BannerPrismaRepository implements IBannerRepository {
 				id,
 				deleted_at: null,
 				...params
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				}
 			}
 		});
 	}
