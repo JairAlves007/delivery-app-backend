@@ -1,12 +1,15 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import { mapObjectResourcesList } from "@/helpers/resource.ts";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { BannerFromRepository, BannerList } from "@/types/banner.ts";
+import type { FilterField } from "@/types/crud.ts";
 import z from "zod";
 
-type ListBannerServiceRequest = z.infer<typeof listQueryParamsSchema>;
+type ListBannerServiceRequest = z.infer<typeof listQueryParamsSchema> &
+	FilterField;
 
 interface ListBannerServiceResponse
 	extends Pick<ListBannerServiceRequest, "page"> {
@@ -35,35 +38,39 @@ export class ListBannerService {
 	async handle({
 		page,
 		perPage,
-		establishmentId
+		filterParams
 	}: ListBannerServiceRequest): Promise<ListBannerServiceResponse> {
 		const cache = makeCache();
-		const prefixKey = !!establishmentId ? `${establishmentId}_` : "";
+		const prefixKey = getFilterParamsCacheKey(filterParams);
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
 			`${prefixKey}total_${cache.keys.banners}`,
-			async () =>
-				await this.bannerRepository.count({ establishment_id: establishmentId })
+			async () => await this.bannerRepository.count(filterParams)
 		);
 
 		if (isPaging) {
+			const key = `${prefixKey}${cache.keys.banners}_page_${page}_per_page_${perPage}`;
+
 			const [total, banners] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`${prefixKey}${cache.keys.banners}_page_${page}_per_page_${perPage}`,
+					key,
 					async () =>
 						await this.bannerRepository.paginate({
 							page,
 							perPage,
-							filterParams: { establishment_id: establishmentId }
+							filterParams
 						})
 				)
 			]);
 
 			const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages) throw new InvalidPage();
+			if (page > totalPages) {
+				await cache.forget(key);
+				throw new InvalidPage();
+			}
 
 			return {
 				banners: this.mapBanners(banners),
@@ -78,10 +85,7 @@ export class ListBannerService {
 			totalPromise,
 			cache.rememberForever(
 				`${prefixKey}all_${cache.keys.banners}`,
-				async () =>
-					await this.bannerRepository.listAll({
-						establishment_id: establishmentId
-					})
+				async () => await this.bannerRepository.listAll()
 			)
 		]);
 

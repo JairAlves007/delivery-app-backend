@@ -10,19 +10,18 @@ import {
 	createBannerBodySchema
 } from "@/schemas/banner-schema.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import { RoleType } from "@prisma/client";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const query = listQueryParamsSchema.parse(request.query);
 
-	if (request.user.role === RoleType.ESTABLISHMENT_OWNER)
-		query.establishmentId = request.user.establishmentId;
-
 	try {
 		const listBannerService = makeListBannerService();
 
-		const banners = await listBannerService.handle(query);
+		const banners = await listBannerService.handle({
+			...query,
+			filterParams: { establishment_id: request.user.establishmentId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.OK)
@@ -38,7 +37,10 @@ export const find = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const findBannerService = makeFindBannerService();
 
-		const banner = await findBannerService.handle({ id });
+		const banner = await findBannerService.handle({
+			id,
+			filterParams: { establishment_id: request.user.establishmentId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.OK)

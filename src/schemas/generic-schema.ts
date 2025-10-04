@@ -7,8 +7,7 @@ export const establishmentIdSchema = z
 
 export const listQueryParamsSchema = z.object({
 	page: z.coerce.number().min(1, "Pagina inválida").optional(),
-	perPage: z.coerce.number().min(1, "Limite inválido").default(12),
-	establishmentId: establishmentIdSchema.optional().nullable()
+	perPage: z.coerce.number().min(1, "Limite inválido").default(12)
 });
 
 export const listCursorQueryParamsSchema = z.object({

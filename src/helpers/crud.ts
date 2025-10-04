@@ -9,3 +9,16 @@ export const transformValidFilterParams = (
 		)
 	);
 };
+
+export const getFilterParamsCacheKey = (
+	filterParams?: FilterParams
+): string => {
+	const params = transformValidFilterParams(filterParams);
+	const cacheKey: string[] = [];
+
+	Object.entries(params).forEach(([key, value]) => {
+		cacheKey.push(key, value);
+	});
+
+	return cacheKey.join("_");
+};

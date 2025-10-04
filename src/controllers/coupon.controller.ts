@@ -12,19 +12,18 @@ import {
 	createCouponBodySchema
 } from "@/schemas/coupon-schema.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import { RoleType } from "@prisma/client";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const query = listQueryParamsSchema.parse(request.query);
 
-	if (request.user.role === RoleType.ESTABLISHMENT_OWNER)
-		query.establishmentId = request.user.establishmentId;
-
 	try {
 		const listCouponService = makeListCouponService();
 
-		const coupons = await listCouponService.handle(query);
+		const coupons = await listCouponService.handle({
+			...query,
+			filterParams: { establishment_id: request.user.establishmentId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.OK)
@@ -40,7 +39,10 @@ export const find = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const findCouponService = makeFindCouponService();
 
-		const coupon = await findCouponService.handle({ id });
+		const coupon = await findCouponService.handle({
+			id,
+			filterParams: { establishment_id: request.user.establishmentId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.OK)

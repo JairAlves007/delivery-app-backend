@@ -1,11 +1,14 @@
 import { CouponNotFound } from "@/errors/coupon/not-found.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
 import { couponParamsSchema } from "@/schemas/coupon-schema.ts";
+import type { FilterField } from "@/types/crud.ts";
 import type { Coupon } from "@prisma/client";
 import z from "zod";
 
-type FindCouponServiceRequest = z.infer<typeof couponParamsSchema>;
+type FindCouponServiceRequest = z.infer<typeof couponParamsSchema> &
+	FilterField;
 
 export class FindCouponService {
 	private couponRepository: ICouponRepository;
@@ -14,9 +17,13 @@ export class FindCouponService {
 		this.couponRepository = couponRepository;
 	}
 
-	async handle({ id }: FindCouponServiceRequest): Promise<Coupon> {
+	async handle({
+		id,
+		filterParams
+	}: FindCouponServiceRequest): Promise<Coupon> {
 		const cache = makeCache();
-		const key = `${cache.keys.coupons}_${id}`;
+		const filterPrefixKey = getFilterParamsCacheKey(filterParams);
+		const key = `${filterPrefixKey}${cache.keys.coupons}_${id}`;
 
 		const coupon = await cache.rememberForever(
 			key,

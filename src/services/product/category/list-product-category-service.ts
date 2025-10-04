@@ -1,15 +1,18 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import { mapObjectResourcesList } from "@/helpers/resource.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import type { FilterField } from "@/types/crud.ts";
 import type {
 	ProductCategoryFromRepository,
 	ProductCategoryList
 } from "@/types/product-category.ts";
 import z from "zod";
 
-type ListProductCategoryServiceRequest = z.infer<typeof listQueryParamsSchema>;
+type ListProductCategoryServiceRequest = z.infer<typeof listQueryParamsSchema> &
+	FilterField;
 
 interface ListProductCategoryServiceResponse
 	extends Pick<ListProductCategoryServiceRequest, "page"> {
@@ -40,37 +43,38 @@ export class ListProductCategoryService {
 	async handle({
 		page,
 		perPage,
-		establishmentId
+		filterParams
 	}: ListProductCategoryServiceRequest): Promise<ListProductCategoryServiceResponse> {
 		const cache = makeCache();
-		const prefixKey = !!establishmentId ? `${establishmentId}_` : "";
+		const prefixKey = getFilterParamsCacheKey(filterParams);
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
 			`${prefixKey}total_${cache.keys.productCategories}`,
-			async () =>
-				await this.productCategoryRepository.count({
-					establishment_id: establishmentId
-				})
+			async () => await this.productCategoryRepository.count(filterParams)
 		);
 
 		if (isPaging) {
+			const key = `${prefixKey}${cache.keys.productCategories}_page_${page}_per_page_${perPage}`;
 			const [total, productCategories] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`${prefixKey}${cache.keys.productCategories}_page_${page}_per_page_${perPage}`,
+					key,
 					async () =>
 						await this.productCategoryRepository.paginate({
 							page,
 							perPage,
-							filterParams: { establishment_id: establishmentId }
+							filterParams
 						})
 				)
 			]);
 
 			const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages) throw new InvalidPage();
+			if (page > totalPages) {
+				await cache.forget(key);
+				throw new InvalidPage();
+			}
 
 			return {
 				productCategories: this.mapProductCategories(productCategories),
@@ -85,10 +89,7 @@ export class ListProductCategoryService {
 			totalPromise,
 			cache.rememberForever(
 				`${prefixKey}all_${cache.keys.productCategories}`,
-				async () =>
-					await this.productCategoryRepository.listAll({
-						establishment_id: establishmentId
-					})
+				async () => await this.productCategoryRepository.listAll(filterParams)
 			)
 		]);
 

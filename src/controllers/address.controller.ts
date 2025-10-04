@@ -23,7 +23,10 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const listAddressService = makeListAddressService();
 
-		const addresses = await listAddressService.handle({ userId, ...query });
+		const addresses = await listAddressService.handle({
+			...query,
+			filterParams: { user_id: userId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.OK)
@@ -39,7 +42,10 @@ export const find = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const findAddressService = makeFindAddressService();
 
-		const address = await findAddressService.handle({ id });
+		const address = await findAddressService.handle({
+			id,
+			filterParams: { establishment_id: request.user.establishmentId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.OK)

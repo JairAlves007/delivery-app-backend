@@ -11,19 +11,18 @@ import {
 	updateDistrictBodySchema
 } from "@/schemas/district-schema.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import { RoleType } from "@prisma/client";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const query = listQueryParamsSchema.parse(request.query);
 
-	if (request.user.role === RoleType.ESTABLISHMENT_OWNER)
-		query.establishmentId = request.user.establishmentId;
-
 	try {
 		const listDistrictService = makeListDistrictService();
 
-		const districts = await listDistrictService.handle(query);
+		const districts = await listDistrictService.handle({
+			...query,
+			filterParams: { establishment_id: request.user.establishmentId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.OK)
@@ -39,7 +38,10 @@ export const find = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const findDistrictService = makeFindDistrictService();
 
-		const district = await findDistrictService.handle({ id });
+		const district = await findDistrictService.handle({
+			id,
+			filterParams: { establishment_id: request.user.establishmentId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.OK)

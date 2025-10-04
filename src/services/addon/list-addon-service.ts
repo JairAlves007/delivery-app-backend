@@ -1,12 +1,15 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import { transformPriceFromDatabase } from "@/helpers/price.ts";
 import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import type { FilterField } from "@/types/crud.ts";
 import type { Addon } from "@prisma/client";
 import z from "zod";
 
-type ListAddonServiceRequest = z.infer<typeof listQueryParamsSchema>;
+type ListAddonServiceRequest = z.infer<typeof listQueryParamsSchema> &
+	FilterField;
 
 interface ListAddonServiceResponse
 	extends Pick<ListAddonServiceRequest, "page"> {
@@ -33,35 +36,38 @@ export class ListAddonService {
 	async handle({
 		page,
 		perPage,
-		establishmentId
+		filterParams
 	}: ListAddonServiceRequest): Promise<ListAddonServiceResponse> {
 		const cache = makeCache();
-		const prefixKey = !!establishmentId ? `${establishmentId}_` : "";
+		const prefixKey = getFilterParamsCacheKey(filterParams);
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
 			`${prefixKey}total_${cache.keys.addons}`,
-			async () =>
-				await this.addonRepository.count({ establishment_id: establishmentId })
+			async () => await this.addonRepository.count(filterParams)
 		);
 
 		if (isPaging) {
+			const key = `${prefixKey}${cache.keys.addons}_page_${page}_per_page_${perPage}`;
 			const [total, addons] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`${prefixKey}${cache.keys.addons}_page_${page}_per_page_${perPage}`,
+					key,
 					async () =>
 						await this.addonRepository.paginate({
 							page,
-							limit: perPage,
-							filterParams: { establishment_id: establishmentId }
+							perPage,
+							filterParams
 						})
 				)
 			]);
 
 			const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages) throw new InvalidPage();
+			if (page > totalPages) {
+				await cache.forget(key);
+				throw new InvalidPage();
+			}
 
 			return {
 				addons: this.mapAddons(addons),
@@ -76,10 +82,7 @@ export class ListAddonService {
 			totalPromise,
 			cache.rememberForever(
 				`${prefixKey}all_${cache.keys.addons}`,
-				async () =>
-					await this.addonRepository.listAll({
-						establishment_id: establishmentId
-					})
+				async () => await this.addonRepository.listAll(filterParams)
 			)
 		]);
 

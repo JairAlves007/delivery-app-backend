@@ -11,19 +11,18 @@ import {
 	updateAddonCategoryBodySchema
 } from "@/schemas/addon-category-schema.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import { RoleType } from "@prisma/client";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const query = listQueryParamsSchema.parse(request.query);
 
-	if (request.user.role === RoleType.ESTABLISHMENT_OWNER)
-		query.establishmentId = request.user.establishmentId;
-
 	try {
 		const listAddonCategoryService = makeListAddonCategoryService();
 
-		const addonCategories = await listAddonCategoryService.handle(query);
+		const addonCategories = await listAddonCategoryService.handle({
+			...query,
+			filterParams: { establishment_id: request.user.establishmentId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.OK)
@@ -44,7 +43,10 @@ export const find = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const findAddonCategoryService = makeFindAddonCategoryService();
 
-		const addonCategory = await findAddonCategoryService.handle({ id });
+		const addonCategory = await findAddonCategoryService.handle({
+			id,
+			filterParams: { establishment_id: request.user.establishmentId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.OK)

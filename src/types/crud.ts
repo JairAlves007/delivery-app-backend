@@ -4,20 +4,22 @@ export type ValidFilterParams = {
 	[K in keyof FilterParams]-?: Exclude<FilterParams[K], null | undefined>;
 };
 
+export type FilterField = {
+	filterParams?: FilterParams;
+};
+
 export type FilterParams = {
 	establishment_id?: string | null;
 	user_id?: UserID | null;
 };
 
-export type PaginationParams = {
+export type PaginationParams = FilterField & {
 	page: number;
 	perPage: number;
-	filterParams?: FilterParams;
 };
 
-export type FindByIdParams<Id> = {
+export type FindByIdParams<Id> = FilterField & {
 	id: Id;
-	filterParams?: FilterParams;
 };
 
 export type UpdateContentParams<Id, UpdateData> = FindByIdParams<Id> & {
@@ -28,8 +30,7 @@ export type DeleteContentParams<Id> = FindByIdParams<Id> & {
 	force: boolean;
 };
 
-export type CursorPaginationParams<CursorType> = {
+export type CursorPaginationParams<CursorType> = FilterField & {
 	limit: number;
 	cursor?: CursorType | null;
-	filterParams?: FilterParams;
 };

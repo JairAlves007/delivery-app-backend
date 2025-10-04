@@ -4,8 +4,11 @@ import { addressParamsSchema } from "@/schemas/address-schema.ts";
 import z from "zod";
 import { AddressNotFound } from "@/errors/address/not-found-error.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import type { FilterField } from "@/types/crud.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 
-type FindAddressServiceRequest = z.infer<typeof addressParamsSchema>;
+type FindAddressServiceRequest = z.infer<typeof addressParamsSchema> &
+	FilterField;
 
 export class FindAddressService {
 	private addressRepository: IAddressRepository;
@@ -15,10 +18,12 @@ export class FindAddressService {
 	}
 
 	async handle({
-		id
+		id,
+		filterParams
 	}: FindAddressServiceRequest): Promise<UserAddressWithDefault> {
 		const cache = makeCache();
-		const key = `${cache.keys.addresses}_${id}`;
+		const filterPrefixKey = getFilterParamsCacheKey(filterParams);
+		const key = `${filterPrefixKey}${cache.keys.addresses}_${id}`;
 
 		const address = await cache.rememberForever(
 			key,

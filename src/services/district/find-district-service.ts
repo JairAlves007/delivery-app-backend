@@ -1,11 +1,14 @@
 import { DistrictNotFound } from "@/errors/district/not-found-error.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
 import { districtParamsSchema } from "@/schemas/district-schema.ts";
+import type { FilterField } from "@/types/crud.ts";
 import type { District } from "@prisma/client";
 import z from "zod";
 
-type FindDistrictServiceRequest = z.infer<typeof districtParamsSchema>;
+type FindDistrictServiceRequest = z.infer<typeof districtParamsSchema> &
+	FilterField;
 
 export class FindDistrictService {
 	private districtRepository: IDistrictRepository;
@@ -14,9 +17,13 @@ export class FindDistrictService {
 		this.districtRepository = districtRepository;
 	}
 
-	async handle({ id }: FindDistrictServiceRequest): Promise<District> {
+	async handle({
+		id,
+		filterParams
+	}: FindDistrictServiceRequest): Promise<District> {
 		const cache = makeCache();
-		const key = `${cache.keys.districts}_${id}`;
+		const filterPrefixKey = getFilterParamsCacheKey(filterParams);
+		const key = `${filterPrefixKey}${cache.keys.districts}_${id}`;
 
 		const district = await cache.rememberForever(
 			key,

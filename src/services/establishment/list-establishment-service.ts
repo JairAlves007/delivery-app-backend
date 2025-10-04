@@ -50,10 +50,11 @@ export class ListEstablishmentService {
 		);
 
 		if (isPaging) {
+			const key = `${cache.keys.establishments}_page_${page}_per_page_${perPage}`;
 			const [total, establishments] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
-					`${cache.keys.establishments}_page_${page}_per_page_${perPage}`,
+					key,
 					async () =>
 						await this.establishmentRepository.paginate({ page, perPage })
 				)
@@ -61,7 +62,10 @@ export class ListEstablishmentService {
 
 			const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages) throw new InvalidPage();
+			if (page > totalPages) {
+				await cache.forget(key);
+				throw new InvalidPage();
+			}
 
 			return {
 				establishments: this.mapEstablishments(establishments),

@@ -4,10 +4,11 @@ import type { Address } from "@prisma/client";
 import { listCursorQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import z from "zod";
 import type { UserID } from "@/types/user.ts";
+import type { FilterField } from "@/types/crud.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 
-type ListAddressServiceRequest = z.infer<typeof listCursorQueryParamsSchema> & {
-	userId: UserID;
-};
+type ListAddressServiceRequest = z.infer<typeof listCursorQueryParamsSchema> &
+	FilterField;
 
 interface ListAddressServiceResponse {
 	addresses: Address[];
@@ -25,13 +26,14 @@ export class ListAddressService {
 	}
 
 	async handle({
-		userId,
 		limit,
-		cursor
+		cursor,
+		filterParams
 	}: ListAddressServiceRequest): Promise<ListAddressServiceResponse> {
 		const cache = makeCache();
 		const cursorSuffix = cursor ? `_cursor_${cursor}` : "";
-		const key = `${cache.keys.addresses}_user_id_${userId}_limit_${limit}${cursorSuffix}`;
+		const prefixKey = getFilterParamsCacheKey(filterParams);
+		const key = `${prefixKey}${cache.keys.addresses}_limit_${limit}${cursorSuffix}`;
 
 		const raw = await cache.rememberForever(
 			key,
@@ -39,9 +41,7 @@ export class ListAddressService {
 				await this.addressRepository.cursorPaginate({
 					limit,
 					cursor,
-					filterParams: {
-						user_id: userId
-					}
+					filterParams
 				})
 		);
 		const hasNextPage = raw.length > limit;
