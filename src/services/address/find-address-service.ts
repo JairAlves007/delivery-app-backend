@@ -27,13 +27,10 @@ export class FindAddressService {
 
 		const address = await cache.rememberForever(
 			key,
-			async () => await this.addressRepository.findById({ id })
+			async () => await this.addressRepository.findById({ id, filterParams })
 		);
 
-		if (!address) {
-			await cache.forget(key);
-			throw new AddressNotFound();
-		}
+		if (!address) throw new AddressNotFound();
 
 		return address;
 	}

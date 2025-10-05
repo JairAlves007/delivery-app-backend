@@ -46,10 +46,7 @@ export class GenerateSignedUrlForUploadService {
 					})
 			);
 
-			if (!resourceRule) {
-				await cache.forget(key);
-				throw new InvalidResource();
-			}
+			if (!resourceRule) throw new InvalidResource();
 
 			if (resourceRule.width !== resourceIntent.width)
 				throw new IncorrectResourceSize("width");

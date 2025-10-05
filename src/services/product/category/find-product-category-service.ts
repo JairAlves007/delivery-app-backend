@@ -29,13 +29,11 @@ export class FindProductCategoryService {
 
 		const productCategory = await cache.rememberForever(
 			key,
-			async () => await this.productCategoryRepository.findById({ id })
+			async () =>
+				await this.productCategoryRepository.findById({ id, filterParams })
 		);
 
-		if (!productCategory) {
-			await cache.forget(key);
-			throw new ProductCategoryNotFound();
-		}
+		if (!productCategory) throw new ProductCategoryNotFound();
 
 		return productCategory;
 	}

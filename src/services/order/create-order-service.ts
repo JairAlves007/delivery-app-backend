@@ -1,35 +1,106 @@
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
 import type {
+	OrderAddonsToProcess,
+	OrderInfo,
 	OrderIntent,
 	OrderItems,
 	OrderItemsToProcess
 } from "@/types/order.ts";
-import type { AddonFromRepository } from "@/types/addon.ts";
-import { DeliveryType, PaymentMethodType } from "@prisma/client";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import { isEstablishmentOpen } from "@/helpers/establishment.ts";
-import { EstablishmentNotFound } from "@/errors/establishment/not-found-error.ts";
-import { EstablishmentIsClosed } from "@/errors/establishment/is-closed-error.ts";
-import { EstablishmentDoesNotAcceptCardError } from "@/errors/establishment/does-not-accept-card-error.ts";
-import { EstablishmentIsOnlyDeliveryError } from "@/errors/establishment/only-delivery-error.ts";
-import { CouponNotFound } from "@/errors/coupon/not-found.ts";
-import { makeCheckCouponService } from "@/factories/services/coupon/make-check-coupon-service.ts";
-import { makeFindEstablishmentByIdService } from "@/factories/services/establishment/make-find-establishment-by-id-service.ts";
-import { makeFindCouponService } from "@/factories/services/coupon/make-find-coupon-service.ts";
-import { makeFindProductService } from "@/factories/services/product/make-find-product-service.ts";
-import { ProductNotFound } from "@/errors/product/not-found-error.ts";
-import { ProductOutOfStockError } from "@/errors/product/out-of-stock-error.ts";
+import {
+	AddonType,
+	CouponType,
+	DeliveryType,
+	OrderStatusType,
+	type Coupon,
+	type District,
+	type Prisma
+} from "@prisma/client";
+import type { UserAddressWithDefault } from "@/types/address.ts";
 import { makeFindAddonService } from "@/factories/services/addon/make-find-addon-service.ts";
 import { AddonNotFound } from "@/errors/addon/not-found-error.ts";
-import { AddonQuantityExceeded } from "@/errors/addon/quantity-exceeded-error.ts";
-import { makeFindAddonCategoryService } from "@/factories/services/addon/category/make-find-addon-category-service.ts";
-import { AddonCategoryNotFound } from "@/errors/addon/category/not-found-error.ts";
+import { makeValidateEstablishmentFromOrderService } from "@/factories/services/order/validations/make-validate-establishment-from-order-service.ts";
+import { makeValidateCouponFromOrderService } from "@/factories/services/order/validations/make-validate-coupon-from-order-service.ts";
+import { removeDuplicateItems } from "@/helpers/utils.ts";
+import { makeValidateProductFromOrderService } from "@/factories/services/order/validations/make-validate-product-from-order-service.ts";
+import { makeValidateAddonCategoriesFromOrderService } from "@/factories/services/order/validations/make-validate-addon-categories-from-order-service.ts";
+import {
+	getValueDiscountedByCoupon,
+	transformPriceFromDatabase,
+	transformValueToPercentageFromDatabase
+} from "@/helpers/price.ts";
+import { makeFindUserService } from "@/factories/services/user/make-find-user-service.ts";
+import { UserNotFound } from "@/errors/user/user-not-found.ts";
+import { makeFindAddressService } from "@/factories/services/address/make-find-address-service.ts";
+import { makeFindDistrictService } from "@/factories/services/district/make-find-district-service.ts";
+import { getStatusLabel } from "@/helpers/order.ts";
 
 export class CreateOrderService {
 	private orderRepository: IOrderRepository;
 
 	constructor(orderRepository: IOrderRepository) {
 		this.orderRepository = orderRepository;
+	}
+
+	private getOrderCouponInputData(
+		coupon: Coupon | null
+	): Partial<Prisma.OrderCreateInput> | undefined {
+		if (!!!coupon) return undefined;
+
+		return {
+			coupon: {
+				connect: {
+					id: coupon.id
+				}
+			},
+			orderCoupon: {
+				create: {
+					code: coupon.code,
+					discount_type: coupon.discount_type,
+					discount_value: coupon.value
+				}
+			}
+		};
+	}
+
+	private getOrderAddressDistrictInputData(
+		address: UserAddressWithDefault | null,
+		district: District | null
+	): Partial<Prisma.OrderCreateInput> | undefined {
+		if (!!!address || !!!district) return undefined;
+
+		const {
+			id: address_id,
+			city,
+			street,
+			number,
+			postal_code,
+			state
+		} = address;
+		const { id: district_id, name: district_name, shipping_cost } = district;
+
+		return {
+			orderDeliveryAddress: {
+				create: {
+					city,
+					number,
+					postal_code,
+					state,
+					street,
+					district_name,
+					shipping_cost,
+					address: {
+						connect: {
+							id: address_id
+						}
+					},
+					district: {
+						connect: {
+							id: district_id
+						}
+					}
+				}
+			}
+		};
 	}
 
 	async handle({
@@ -43,105 +114,93 @@ export class CreateOrderService {
 		userId: user_id,
 		...data
 	}: OrderIntent) {
-		const cache = makeCache();
-		const cacheKeys = {
-			establishment: `${cache.keys.establishments}_${establishment_id}`,
-			coupon: `${cache.keys.coupons}_${coupon_id}`
+		const findUserService = makeFindUserService();
+
+		const user = await findUserService.handle(user_id);
+
+		if (!user) throw new UserNotFound();
+
+		const validateEstablishment = makeValidateEstablishmentFromOrderService();
+
+		await validateEstablishment.handle({
+			establishmentId: establishment_id,
+			deliveryType: delivery_type,
+			paymentMethod: payment_method
+		});
+
+		const orderInfos: OrderInfo = {
+			coupon: null,
+			address: null,
+			district: null
 		};
 
-		const findEstablishmentByIdService = makeFindEstablishmentByIdService();
-		const establishment = await cache.rememberForever(
-			cacheKeys.establishment,
-			async () =>
-				await findEstablishmentByIdService.handle({
-					id: establishment_id
-				})
-		);
-
-		if (!establishment) throw new EstablishmentNotFound();
-
-		if (
-			!establishment.accepts_credit_card &&
-			payment_method === PaymentMethodType.CARD
-		)
-			throw new EstablishmentDoesNotAcceptCardError();
-
-		if (establishment.only_delivery && delivery_type !== DeliveryType.DELIVERY)
-			throw new EstablishmentIsOnlyDeliveryError();
-
-		// if (!isEstablishmentOpen(establishment)) throw new EstablishmentIsClosed();
-
 		if (!!coupon_id) {
-			const findCouponService = makeFindCouponService();
-			const coupon = await cache.rememberForever(
-				cacheKeys.coupon,
-				async () => await findCouponService.handle({ id: coupon_id })
-			);
+			const validateCoupon = makeValidateCouponFromOrderService();
 
-			if (!coupon) throw new CouponNotFound();
-
-			const checkCoupon = makeCheckCouponService();
-
-			await checkCoupon.handle({
-				code: coupon.code,
+			orderInfos.coupon = await validateCoupon.handle({
+				couponId: coupon_id,
 				establishmentId: establishment_id,
 				userId: user_id
 			});
 		}
 
-		const itemsNonDuplicated: OrderItems[] = [
-			...new Map(data.items.map(item => [item.id, item])).values()
-		];
+		if (delivery_type == DeliveryType.DELIVERY) {
+			const findAddressService = makeFindAddressService();
+			const findDistrictService = makeFindDistrictService();
+
+			const [address, district] = await Promise.all([
+				address_id
+					? findAddressService.handle({
+							id: address_id,
+							filterParams: { user_id }
+					  })
+					: null,
+				district_id
+					? findDistrictService.handle({
+							id: district_id,
+							filterParams: { establishment_id }
+					  })
+					: null
+			]);
+
+			if (!!address) orderInfos.address = address;
+
+			if (!!district) orderInfos.district = district;
+		}
+
+		const { address, coupon, district } = orderInfos;
+
+		const itemsNonDuplicated: OrderItems[] = removeDuplicateItems(data.items);
 		const orderItemsToProcess: OrderItemsToProcess[] = [];
 
-		const findProductService = makeFindProductService();
-		const findAddonCategory = makeFindAddonCategoryService();
+		const validateProductService = makeValidateProductFromOrderService();
+		const validateAddonCategoriesService =
+			makeValidateAddonCategoriesFromOrderService();
 		const findAddonService = makeFindAddonService();
 
 		for (const item of itemsNonDuplicated) {
-			const productKey = `${cache.keys.products}_${item.id}`;
-			const product = await cache.rememberForever(
-				productKey,
-				async () => await findProductService.handle({ id: item.id })
-			);
+			const product = await validateProductService.handle({
+				establishmentId: establishment_id,
+				productId: item.id,
+				productQuantity: item.quantity
+			});
 
-			if (!product) throw new ProductNotFound();
-
-			if (product.stock && product.stock < item.quantity)
-				throw new ProductOutOfStockError();
-
-			const addons: AddonFromRepository[] = [];
+			const addons: OrderAddonsToProcess[] = [];
 
 			if (!!item.addonCategories && item.addonCategories.length > 0) {
-				const categoryAddonsNonDuplicated = [
-					...new Map(
-						item.addonCategories.map(category => [category.id, category])
-					).values()
-				];
+				const categoryAddonsNonDuplicated = removeDuplicateItems(
+					item.addonCategories
+				);
 
 				for (const category of categoryAddonsNonDuplicated) {
-					const addonCategoryKey = `${cache.keys.addonCategories}_${category.id}`;
-					const addonCategory = await cache.rememberForever(
-						addonCategoryKey,
-						async () => await findAddonCategory.handle({ id: category.id })
-					);
+					const { addonCategory, orderAddonsNonDuplicated } =
+						await validateAddonCategoriesService.handle({
+							establishmentId: establishment_id,
+							categoryId: category.id,
+							orderAddons: category.addons
+						});
 
-					if (!addonCategory) throw new AddonCategoryNotFound();
-
-					const addonsNonDuplicated = [
-						...new Map(category.addons.map(addon => [addon.id, addon])).values()
-					];
-
-					if (!!addonCategory.max_quantity) {
-						const quantity = addonsNonDuplicated.reduce((acc, addon) => {
-							return (acc += addon.quantity);
-						}, 0);
-
-						if (quantity > addonCategory.max_quantity)
-							throw new AddonQuantityExceeded();
-					}
-
-					for (const addon of addonsNonDuplicated) {
+					for (const addon of orderAddonsNonDuplicated) {
 						if (
 							!addonCategory.addons.some(
 								addonFromCategory => addonFromCategory.id === addon.id
@@ -149,26 +208,110 @@ export class CreateOrderService {
 						)
 							throw new AddonNotFound();
 
-						const addonKey = `${cache.keys.addons}_${addon.id}`;
-						const addonItem = await cache.rememberForever(
-							addonKey,
-							async () => await findAddonService.handle({ id: addon.id })
-						);
+						const addonItem = await findAddonService.handle({ id: addon.id });
 
-						addons.push(addonItem);
+						addons.push({
+							...addonItem,
+							quantity:
+								addonCategory.type === AddonType.MULTIPLE_CHOICE
+									? 1
+									: addon.quantity,
+							price: transformPriceFromDatabase(addonItem.price)
+						});
 					}
 				}
 			}
 
+			const discount = transformValueToPercentageFromDatabase(
+				product?.discount_percentage ?? 0
+			);
+			const price = product.price * (1 - discount);
+
 			orderItemsToProcess.push({
-				product,
-				quantity: item.quantity,
+				product: {
+					...product,
+					quantity: item.quantity,
+					price
+				},
 				addons
 			});
 		}
 
-		console.log(orderItemsToProcess);
+		const couponData = this.getOrderCouponInputData(coupon);
 
-		// await this.orderRepository.create({});
+		const orderAddress = this.getOrderAddressDistrictInputData(
+			address,
+			district
+		);
+
+		let shippingCost = transformPriceFromDatabase(district?.shipping_cost ?? 0);
+		let subtotal = orderItemsToProcess.reduce((acc, item) => {
+			const addonsTotal = item.addons.reduce((acc, addon) => {
+				return (acc += addon.price * addon.quantity);
+			}, 0);
+
+			return (acc += item.product.price * item.product.quantity + addonsTotal);
+		}, 0);
+
+		if (!!coupon && !!district) {
+			const valueByType = {
+				[CouponType.ORDER]: subtotal,
+				[CouponType.SHIPPING]: shippingCost
+			};
+
+			const couponDiscount = getValueDiscountedByCoupon(
+				coupon,
+				valueByType[coupon.type]
+			);
+
+			switch (coupon.type) {
+				case CouponType.ORDER:
+					subtotal = couponDiscount;
+					break;
+				case CouponType.SHIPPING:
+					shippingCost = couponDiscount;
+					break;
+			}
+		}
+
+		await this.orderRepository.create({
+			...data,
+			customer_name: user.name,
+			delivery_type,
+			payment_method,
+			shipping_fee: shippingCost,
+			subtotal,
+			change_amount,
+			establishment: {
+				connect: {
+					id: establishment_id
+				}
+			},
+			user: {
+				connect: {
+					id: user_id
+				}
+			},
+			items: {
+				createMany: {
+					data: [
+						{
+							product_id: orderItemsToProcess[0].product.id,
+							quantity: orderItemsToProcess[0].product.quantity,
+							product_name: orderItemsToProcess[0].product.name,
+							product_price: orderItemsToProcess[0].product.price
+						}
+					]
+				}
+			},
+			statuses: {
+				create: {
+					label: getStatusLabel(OrderStatusType.SHIPPED),
+					value: OrderStatusType.SHIPPED
+				}
+			},
+			...orderAddress,
+			...couponData
+		});
 	}
 }

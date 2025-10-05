@@ -1,6 +1,5 @@
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { transformPriceToDatabase } from "@/helpers/price.ts";
-import { transformValueToPercentage } from "@/helpers/utils.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
 import { updateCouponBodySchema } from "@/schemas/coupon-schema.ts";
 import { DiscountType } from "@prisma/client";
@@ -37,7 +36,7 @@ export class UpdateCouponService {
 				...(value && {
 					value:
 						discount_type === DiscountType.PERCENTAGE
-							? transformValueToPercentage(value)
+							? value
 							: transformPriceToDatabase(value)
 				}),
 				discount_type,

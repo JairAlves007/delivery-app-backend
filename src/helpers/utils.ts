@@ -1,6 +1,3 @@
-import { type FileMimeType, fileMimeTypeValues } from "@/types/resource.ts";
-import { FileFormatType } from "@prisma/client";
-
 export function slugify(text: string): string {
 	return text
 		.normalize("NFD")
@@ -46,6 +43,8 @@ export function checkIfCNPJIsValid(cnpj: string): boolean {
 	return result === parseInt(digits.charAt(1), 10);
 }
 
-export const transformValueToPercentage = (value: number): number => {
-	return value / 100;
+export const removeDuplicateItems = <T extends { id: string | number }>(
+	items: T[]
+): T[] => {
+	return [...new Map(items.map(item => [item.id, item])).values()];
 };

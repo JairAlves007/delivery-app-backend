@@ -27,13 +27,10 @@ export class FindCouponService {
 
 		const coupon = await cache.rememberForever(
 			key,
-			async () => await this.couponRepository.findById({ id })
+			async () => await this.couponRepository.findById({ id, filterParams })
 		);
 
-		if (!coupon) {
-			await cache.forget(key);
-			throw new CouponNotFound();
-		}
+		if (!coupon) throw new CouponNotFound();
 
 		return coupon;
 	}

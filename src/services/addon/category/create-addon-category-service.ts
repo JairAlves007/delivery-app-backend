@@ -24,7 +24,6 @@ export class CreateAddonCategoryService {
 		await this.addonCategoryRepository.create({
 			...data,
 			max_quantity,
-			status: true,
 			establishment: {
 				connect: {
 					id: establishmentId

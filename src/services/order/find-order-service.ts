@@ -22,13 +22,10 @@ export class FindOrderService {
 		const key = `${prefixKey}${cache.keys.orders}_${id}`;
 		const order = await cache.rememberForever(
 			key,
-			async () => await this.orderRepository.findById({ id })
+			async () => await this.orderRepository.findById({ id, filterParams })
 		);
 
-		if (!order) {
-			await cache.forget(key);
-			throw new OrderNotFound();
-		}
+		if (!order) throw new OrderNotFound();
 
 		return order;
 	}

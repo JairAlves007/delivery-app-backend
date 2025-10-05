@@ -27,13 +27,10 @@ export class FindDistrictService {
 
 		const district = await cache.rememberForever(
 			key,
-			async () => await this.districtRepository.findById({ id })
+			async () => await this.districtRepository.findById({ id, filterParams })
 		);
 
-		if (!district) {
-			await cache.forget(key);
-			throw new DistrictNotFound();
-		}
+		if (!district) throw new DistrictNotFound();
 
 		return district;
 	}

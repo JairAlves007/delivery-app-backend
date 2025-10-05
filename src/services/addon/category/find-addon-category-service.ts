@@ -28,13 +28,11 @@ export class FindAddonCategoryService {
 
 		const addonCategory = await cache.rememberForever(
 			key,
-			async () => await this.addonCategoryRepository.findById({ id })
+			async () =>
+				await this.addonCategoryRepository.findById({ id, filterParams })
 		);
 
-		if (!addonCategory) {
-			await cache.forget(key);
-			throw new AddonCategoryNotFound();
-		}
+		if (!addonCategory) throw new AddonCategoryNotFound();
 
 		return addonCategory;
 	}

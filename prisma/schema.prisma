@@ -505,7 +505,6 @@ model Order {
   shipping_fee         Int
   subtotal             Int
   customer_name        String
-  customer_phone       String
   user_id              String
   establishment_id     String
   coupon_id            Int?
@@ -656,10 +655,10 @@ model DeliveryAddress {
 model OrderDeliveryAddress {
   id            String   @id @default(ulid())
   street        String
-  number        String
+  number        String?  @default("N/A")
   city          String
   state         String
-  zip_code      String
+  postal_code   String
   shipping_cost Int
   district_name String
   order_id      String   @unique

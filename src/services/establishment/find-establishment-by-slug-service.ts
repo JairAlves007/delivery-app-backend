@@ -19,10 +19,7 @@ export class FindEstablishmentBySlugService {
 			async () => await this.establishmentRepository.findBySlug(slug)
 		);
 
-		if (!establishment) {
-			await cache.forget(key);
-			throw new EstablishmentNotFound();
-		}
+		if (!establishment) throw new EstablishmentNotFound();
 
 		return establishment;
 	}

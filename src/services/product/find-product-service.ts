@@ -27,13 +27,10 @@ export class FindProductService {
 
 		const product = await cache.rememberForever(
 			key,
-			async () => await this.productRepository.findById({ id })
+			async () => await this.productRepository.findById({ id, filterParams })
 		);
 
-		if (!product) {
-			await cache.forget(key);
-			throw new ProductNotFound();
-		}
+		if (!product) throw new ProductNotFound();
 
 		return product;
 	}

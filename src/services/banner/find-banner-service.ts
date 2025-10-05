@@ -27,13 +27,10 @@ export class FindBannerService {
 
 		const banner = await cache.rememberForever(
 			key,
-			async () => await this.bannerRepository.findById({ id })
+			async () => await this.bannerRepository.findById({ id, filterParams })
 		);
 
-		if (!banner) {
-			await cache.forget(key);
-			throw new BannerNotFound();
-		}
+		if (!banner) throw new BannerNotFound();
 
 		return banner;
 	}

@@ -27,13 +27,10 @@ export class FindAddonService {
 
 		const addon = await cache.rememberForever(
 			key,
-			async () => await this.addonRepository.findById({ id })
+			async () => await this.addonRepository.findById({ id, filterParams })
 		);
 
-		if (!addon) {
-			await cache.forget(key);
-			throw new AddonNotFound();
-		}
+		if (!addon) throw new AddonNotFound();
 
 		return addon;
 	}

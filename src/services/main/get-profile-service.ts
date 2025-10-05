@@ -24,10 +24,7 @@ export class GetProfileService {
 				async () => await this.userRepository.findById(id)
 			);
 
-			if (!user) {
-				await cache.forget(key);
-				throw new UserNotFound();
-			}
+			if (!user) throw new UserNotFound();
 
 			return {
 				name: user.name,

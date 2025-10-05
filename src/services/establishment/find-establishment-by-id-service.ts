@@ -27,10 +27,7 @@ export class FindEstablishmentByIdService {
 			async () => await this.establishmentRepository.findById({ id })
 		);
 
-		if (!establishment) {
-			await cache.forget(key);
-			throw new EstablishmentNotFound();
-		}
+		if (!establishment) throw new EstablishmentNotFound();
 
 		return establishment;
 	}

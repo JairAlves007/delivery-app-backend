@@ -1,8 +1,15 @@
-import type { DeliveryType, PaymentMethodType, Prisma } from "@prisma/client";
+import type {
+	Coupon,
+	DeliveryType,
+	District,
+	PaymentMethodType,
+	Prisma
+} from "@prisma/client";
 import type { EstablishmentID } from "./establishment.ts";
 import type { UserID } from "./user.ts";
-import { ProductFromRepository } from "./product.ts";
-import { AddonFromRepository } from "./addon.ts";
+import type { ProductFromRepository } from "./product.ts";
+import type { AddonFromRepository } from "./addon.ts";
+import type { UserAddressWithDefault } from "./address.ts";
 
 export type OrderFromRepository = Prisma.OrderGetPayload<{
 	include: {
@@ -11,15 +18,27 @@ export type OrderFromRepository = Prisma.OrderGetPayload<{
 	};
 }>;
 
+export type OrderInfo = {
+	coupon: Coupon | null;
+	address: UserAddressWithDefault | null;
+	district: District | null;
+};
+
+export interface OrderAddonsToProcess extends AddonFromRepository {
+	quantity: number;
+}
+
 export type OrderItems = {
 	id: string;
 	quantity: number;
 	addonCategories?: OrderCategoryAddons[] | null;
 };
 
-export type OrderItemsToProcess = Omit<OrderItems, "id" | "addons"> & {
-	product: ProductFromRepository;
-	addons: AddonFromRepository[];
+export type OrderItemsToProcess = {
+	product: ProductFromRepository & {
+		quantity: number;
+	};
+	addons: OrderAddonsToProcess[];
 };
 
 type OrderCategoryAddons = {
@@ -27,7 +46,7 @@ type OrderCategoryAddons = {
 	addons: OrderAddons[];
 };
 
-type OrderAddons = {
+export type OrderAddons = {
 	id: number;
 	quantity: number;
 };
