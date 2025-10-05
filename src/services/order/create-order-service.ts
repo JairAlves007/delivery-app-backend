@@ -11,11 +11,14 @@ import {
 	CouponType,
 	DeliveryType,
 	OrderStatusType,
+	PaymentMethodType,
 	type Coupon,
 	type District,
 	type Prisma
 } from "@prisma/client";
 import type { UserAddressWithDefault } from "@/types/address.ts";
+import type { EstablishmentID } from "@/types/establishment.ts";
+import type { UserID, UserWithRole } from "@/types/user.ts";
 import { makeFindAddonService } from "@/factories/services/addon/make-find-addon-service.ts";
 import { AddonNotFound } from "@/errors/addon/not-found-error.ts";
 import { makeValidateEstablishmentFromOrderService } from "@/factories/services/order/validations/make-validate-establishment-from-order-service.ts";
@@ -33,6 +36,36 @@ import { UserNotFound } from "@/errors/user/user-not-found.ts";
 import { makeFindAddressService } from "@/factories/services/address/make-find-address-service.ts";
 import { makeFindDistrictService } from "@/factories/services/district/make-find-district-service.ts";
 import { getStatusLabel } from "@/helpers/order.ts";
+
+type ValidateOrderInfoParams = {
+	establishmentId: EstablishmentID;
+	userId: UserID;
+	deliveryType: DeliveryType;
+	couponId?: number | null;
+	addressId?: string | null;
+	districtId?: string | null;
+};
+
+type CalculateDiscountsParams = {
+	coupon: Coupon | null;
+	district: District | null;
+	orderItemsToProcess: OrderItemsToProcess[];
+};
+
+type BuildOrderItemsParams = {
+	user: UserWithRole;
+	comment?: string | null;
+	deliveryType: DeliveryType;
+	paymentMethod: PaymentMethodType;
+	establishmentId: EstablishmentID;
+	changeAmount?: number | null;
+	coupon: Coupon | null;
+	address: UserAddressWithDefault | null;
+	district: District | null;
+	shippingCost: number;
+	subtotal: number;
+	orderItemsToProcess: OrderItemsToProcess[];
+};
 
 export class CreateOrderService {
 	private orderRepository: IOrderRepository;
@@ -103,62 +136,45 @@ export class CreateOrderService {
 		};
 	}
 
-	async handle({
-		deliveryType: delivery_type,
-		paymentMethod: payment_method,
-		changeAmount: change_amount,
-		couponId: coupon_id,
-		addressId: address_id,
-		establishmentId: establishment_id,
-		districtId: district_id,
-		userId: user_id,
-		...data
-	}: OrderIntent) {
-		const findUserService = makeFindUserService();
-
-		const user = await findUserService.handle(user_id);
-
-		if (!user) throw new UserNotFound();
-
-		const validateEstablishment = makeValidateEstablishmentFromOrderService();
-
-		await validateEstablishment.handle({
-			establishmentId: establishment_id,
-			deliveryType: delivery_type,
-			paymentMethod: payment_method
-		});
-
+	private async validateOrderInfos({
+		deliveryType,
+		establishmentId,
+		userId,
+		couponId,
+		addressId,
+		districtId
+	}: ValidateOrderInfoParams): Promise<OrderInfo> {
 		const orderInfos: OrderInfo = {
 			coupon: null,
 			address: null,
 			district: null
 		};
 
-		if (!!coupon_id) {
+		if (!!couponId) {
 			const validateCoupon = makeValidateCouponFromOrderService();
 
 			orderInfos.coupon = await validateCoupon.handle({
-				couponId: coupon_id,
-				establishmentId: establishment_id,
-				userId: user_id
+				couponId: couponId,
+				establishmentId,
+				userId
 			});
 		}
 
-		if (delivery_type == DeliveryType.DELIVERY) {
+		if (deliveryType == DeliveryType.DELIVERY) {
 			const findAddressService = makeFindAddressService();
 			const findDistrictService = makeFindDistrictService();
 
 			const [address, district] = await Promise.all([
-				address_id
+				addressId
 					? findAddressService.handle({
-							id: address_id,
-							filterParams: { user_id }
+							id: addressId,
+							filterParams: { user_id: userId }
 					  })
 					: null,
-				district_id
+				districtId
 					? findDistrictService.handle({
-							id: district_id,
-							filterParams: { establishment_id }
+							id: districtId,
+							filterParams: { establishment_id: establishmentId }
 					  })
 					: null
 			]);
@@ -168,9 +184,146 @@ export class CreateOrderService {
 			if (!!district) orderInfos.district = district;
 		}
 
-		const { address, coupon, district } = orderInfos;
+		return orderInfos;
+	}
 
-		const itemsNonDuplicated: OrderItems[] = removeDuplicateItems(data.items);
+	private calculateDiscounts({
+		coupon,
+		district,
+		orderItemsToProcess
+	}: CalculateDiscountsParams) {
+		let shippingCost = transformPriceFromDatabase(district?.shipping_cost ?? 0);
+		let subtotal = orderItemsToProcess.reduce((acc, item) => {
+			const addonsTotal = item.addons.reduce((acc, addon) => {
+				return (acc += addon.price * addon.quantity);
+			}, 0);
+
+			return (acc += item.product.price * item.product.quantity + addonsTotal);
+		}, 0);
+
+		if (!!coupon && !!district) {
+			const valueByType = {
+				[CouponType.ORDER]: subtotal,
+				[CouponType.SHIPPING]: shippingCost
+			};
+
+			const couponDiscount = getValueDiscountedByCoupon(
+				coupon,
+				valueByType[coupon.type]
+			);
+
+			switch (coupon.type) {
+				case CouponType.ORDER:
+					subtotal = couponDiscount;
+					break;
+				case CouponType.SHIPPING:
+					shippingCost = couponDiscount;
+					break;
+			}
+		}
+
+		return {
+			subtotal,
+			shippingCost
+		};
+	}
+
+	private buildOrderItems({
+		user,
+		deliveryType,
+		paymentMethod,
+		changeAmount,
+		establishmentId,
+		comment,
+		address,
+		coupon,
+		district,
+		shippingCost,
+		subtotal,
+		orderItemsToProcess
+	}: BuildOrderItemsParams): Prisma.OrderCreateInput {
+		const couponData = this.getOrderCouponInputData(coupon);
+
+		const orderAddress = this.getOrderAddressDistrictInputData(
+			address,
+			district
+		);
+
+		return {
+			comment,
+			customer_name: user.name,
+			delivery_type: deliveryType,
+			payment_method: paymentMethod,
+			shipping_fee: shippingCost,
+			subtotal,
+			change_amount: changeAmount,
+			establishment: {
+				connect: {
+					id: establishmentId
+				}
+			},
+			user: {
+				connect: {
+					id: user.id
+				}
+			},
+			items: {
+				createMany: {
+					data: orderItemsToProcess.map(item => ({
+						product_id: item.product.id,
+						product_name: item.product.name,
+						product_price: item.product.price,
+						quantity: item.product.quantity
+					}))
+				}
+			},
+			statuses: {
+				create: {
+					label: getStatusLabel(OrderStatusType.PREPARING),
+					value: OrderStatusType.PREPARING
+				}
+			},
+			...orderAddress,
+			...couponData
+		};
+	}
+
+	async handle({
+		deliveryType,
+		paymentMethod,
+		changeAmount,
+		couponId,
+		addressId,
+		establishmentId,
+		districtId,
+		userId,
+		comment,
+		items
+	}: OrderIntent) {
+		const findUserService = makeFindUserService();
+
+		const user = await findUserService.handle(userId);
+
+		if (!user) throw new UserNotFound();
+
+		const validateEstablishment = makeValidateEstablishmentFromOrderService();
+
+		await validateEstablishment.handle({
+			establishmentId,
+			deliveryType,
+			paymentMethod
+		});
+
+		const { address, coupon, district } = await this.validateOrderInfos({
+			deliveryType,
+			establishmentId,
+			userId,
+			couponId,
+			addressId,
+			districtId
+		});
+
+		const itemsNonDuplicated: OrderItems[] = removeDuplicateItems(items);
 		const orderItemsToProcess: OrderItemsToProcess[] = [];
 
 		const validateProductService = makeValidateProductFromOrderService();
@@ -180,7 +333,7 @@ export class CreateOrderService {
 
 		for (const item of itemsNonDuplicated) {
 			const product = await validateProductService.handle({
-				establishmentId: establishment_id,
+				establishmentId,
 				productId: item.id,
 				productQuantity: item.quantity
 			});
@@ -195,7 +348,7 @@ export class CreateOrderService {
 				for (const category of categoryAddonsNonDuplicated) {
 					const { addonCategory, orderAddonsNonDuplicated } =
 						await validateAddonCategoriesService.handle({
-							establishmentId: establishment_id,
+							establishmentId,
 							categoryId: category.id,
 							orderAddons: category.addons
 						});
@@ -237,79 +390,27 @@ export class CreateOrderService {
 			});
 		}
 
-		const couponData = this.getOrderCouponInputData(coupon);
-
-		const orderAddress = this.getOrderAddressDistrictInputData(
-			address,
-			district
-		);
-
-		let shippingCost = transformPriceFromDatabase(district?.shipping_cost ?? 0);
-		let subtotal = orderItemsToProcess.reduce((acc, item) => {
-			const addonsTotal = item.addons.reduce((acc, addon) => {
-				return (acc += addon.price * addon.quantity);
-			}, 0);
-
-			return (acc += item.product.price * item.product.quantity + addonsTotal);
-		}, 0);
-
-		if (!!coupon && !!district) {
-			const valueByType = {
-				[CouponType.ORDER]: subtotal,
-				[CouponType.SHIPPING]: shippingCost
-			};
-
-			const couponDiscount = getValueDiscountedByCoupon(
-				coupon,
-				valueByType[coupon.type]
-			);
-
-			switch (coupon.type) {
-				case CouponType.ORDER:
-					subtotal = couponDiscount;
-					break;
-				case CouponType.SHIPPING:
-					shippingCost = couponDiscount;
-					break;
-			}
-		}
-
-		await this.orderRepository.create({
-			...data,
-			customer_name: user.name,
-			delivery_type,
-			payment_method,
-			shipping_fee: shippingCost,
-			subtotal,
-			change_amount,
-			establishment: {
-				connect: {
-					id: establishment_id
-				}
-			},
-			user: {
-				connect: {
-					id: user_id
-				}
-			},
-			items: {
-				createMany: {
-					data: orderItemsToProcess.map(item => ({
-						product_id: item.product.id,
-						product_name: item.product.name,
-						product_price: item.product.price,
-						quantity: item.product.quantity
-					}))
-				}
-			},
-			statuses: {
-				create: {
-					label: getStatusLabel(OrderStatusType.SHIPPED),
-					value: OrderStatusType.SHIPPED
-				}
-			},
-			...orderAddress,
-			...couponData
+		const { shippingCost, subtotal } = this.calculateDiscounts({
+			coupon,
+			district,
+			orderItemsToProcess
 		});
+
+		await this.orderRepository.create(
+			this.buildOrderItems({
+				address,
+				coupon,
+				deliveryType,
+				district,
+				establishmentId,
+				paymentMethod,
+				shippingCost,
+				subtotal,
+				user,
+				changeAmount,
+				comment,
+				orderItemsToProcess
+			})
+		);
 	}
 }
