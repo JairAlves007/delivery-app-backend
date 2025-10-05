@@ -195,7 +195,8 @@ async function main() {
 				{
 					name: "Queijos",
 					type: AddonType.QUANTITY,
-					establishment_id: establishment.id
+					establishment_id: establishment.id,
+					max_quantity: 3
 				}
 			]
 		});

@@ -1,7 +1,7 @@
 import { makeOrderRepository } from "@/factories/repositories/make-order-repository.ts";
-import { CreateOrderService } from "@/services/order/create-order-service.ts";
+import { ListOrderService } from "@/services/order/list-order-service.ts";
 
-export const makeCreateOrderService = () => {
+export const makeListOrderService = () => {
 	const orderRepository = makeOrderRepository();
-	return new CreateOrderService(orderRepository);
+	return new ListOrderService(orderRepository);
 };

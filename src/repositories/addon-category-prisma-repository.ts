@@ -1,6 +1,7 @@
 import { transformValidFilterParams } from "@/helpers/crud.ts";
 import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
+import type { AddonCategoryFromRepository } from "@/types/addon-category.ts";
 import type {
 	DeleteContentParams,
 	FilterParams,
@@ -8,16 +9,21 @@ import type {
 	PaginationParams,
 	UpdateContentParams
 } from "@/types/crud.ts";
-import type { AddonCategory, Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 export class AddonCategoryPrismaRepository implements IAddonCategoryRepository {
-	async listAll(filterParams?: FilterParams): Promise<AddonCategory[]> {
+	async listAll(
+		filterParams?: FilterParams
+	): Promise<AddonCategoryFromRepository[]> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.addonCategory.findMany({
 			where: {
 				deleted_at: null,
 				...params
+			},
+			include: {
+				addons: true
 			},
 			orderBy: {
 				name: "asc"
@@ -40,7 +46,7 @@ export class AddonCategoryPrismaRepository implements IAddonCategoryRepository {
 		page,
 		perPage,
 		filterParams
-	}: PaginationParams): Promise<AddonCategory[]> {
+	}: PaginationParams): Promise<AddonCategoryFromRepository[]> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.addonCategory.findMany({
@@ -49,6 +55,9 @@ export class AddonCategoryPrismaRepository implements IAddonCategoryRepository {
 			where: {
 				deleted_at: null,
 				...params
+			},
+			include: {
+				addons: true
 			},
 			orderBy: {
 				name: "asc"
@@ -59,7 +68,7 @@ export class AddonCategoryPrismaRepository implements IAddonCategoryRepository {
 	async findById({
 		id,
 		filterParams
-	}: FindByIdParams<number>): Promise<AddonCategory | null> {
+	}: FindByIdParams<number>): Promise<AddonCategoryFromRepository | null> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.addonCategory.findUnique({
@@ -67,6 +76,9 @@ export class AddonCategoryPrismaRepository implements IAddonCategoryRepository {
 				id,
 				deleted_at: null,
 				...params
+			},
+			include: {
+				addons: true
 			}
 		});
 	}

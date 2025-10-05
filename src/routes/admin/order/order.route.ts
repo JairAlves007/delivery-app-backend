@@ -12,7 +12,7 @@ import type { FastifyInstance } from "fastify";
 
 const orderMiddlewares = {
 	onRequest: [
-		//isAuthenticated,
+		isAuthenticated
 		//ensureUserHasPermission([PermissionType.MANAGE_ORDERS])
 	]
 };

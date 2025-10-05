@@ -542,7 +542,6 @@ model OrderItem {
   product_name  String
   product_price Int
   quantity      Int
-  observation   String?
   created_at    DateTime @default(now())
 
   order   Order            @relation(fields: [order_id], references: [id])

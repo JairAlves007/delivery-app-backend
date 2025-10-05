@@ -44,33 +44,29 @@ export const createOrderBodySchema = z.object({
 		.nullable(),
 	items: z.array(
 		z.object({
-			id: z.coerce
-				.number("O id deve ser preenchido")
+			id: z
+				.string("O id deve ser preenchido")
 				.min(1, "O id deve ser maior que zero"),
-			// price: z.coerce
-			// 	.number("O preço deve ser preenchido")
-			// 	.min(0, "O preço deve ser maior que zero"),
 			quantity: z
 				.number("A quantidade deve ser preenchida")
 				.min(1, "A quantidade deve ser maior que zero"),
-			observations: z
-				.string("As observações devem ser preenchidas")
-				.min(1, "As observações devem ser preenchidas")
-				.optional()
-				.nullable(),
-			addons: z
+			addonCategories: z
 				.array(
 					z.object({
 						id: z.coerce
 							.number("O id deve ser preenchido")
 							.min(1, "O id deve ser maior que zero"),
-						// price: z.coerce
-						// 	.number("O preço deve ser preenchido")
-						// 	.min(0, "O preço deve ser maior que zero"),
-						quantity: z
-							.number("A quantidade deve ser preenchida")
-							.min(1, "A quantidade deve ser maior que zero")
-							.nullable()
+						addons: z.array(
+							z.object({
+								id: z.coerce
+									.number("O id deve ser preenchido")
+									.min(1, "O id deve ser maior que zero"),
+								quantity: z
+									.number("A quantidade deve ser preenchida")
+									.min(1, "A quantidade deve ser maior que zero")
+									.default(1)
+							})
+						)
 					})
 				)
 				.optional()

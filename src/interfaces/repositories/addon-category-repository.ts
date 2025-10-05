@@ -1,9 +1,10 @@
-import type { AddonCategory, Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import type { ICRUDBase } from "../crud-base.ts";
+import type { AddonCategoryFromRepository } from "@/types/addon-category.ts";
 
 export interface IAddonCategoryRepository
 	extends ICRUDBase<
-		AddonCategory,
+		AddonCategoryFromRepository,
 		Prisma.AddonCategoryCreateInput,
 		Prisma.AddonCategoryUpdateInput,
 		number

@@ -3,8 +3,8 @@ import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.ts";
 import { addonParamsSchema } from "@/schemas/addon-schema.ts";
+import type { AddonCategoryFromRepository } from "@/types/addon-category.ts";
 import type { FilterField } from "@/types/crud.ts";
-import type { AddonCategory } from "@prisma/client";
 import z from "zod";
 
 type FindAddonCategoryServiceRequest = z.infer<typeof addonParamsSchema> &
@@ -20,7 +20,7 @@ export class FindAddonCategoryService {
 	async handle({
 		id,
 		filterParams
-	}: FindAddonCategoryServiceRequest): Promise<AddonCategory> {
+	}: FindAddonCategoryServiceRequest): Promise<AddonCategoryFromRepository> {
 		const cache = makeCache();
 		const filterPrefixKey = getFilterParamsCacheKey(filterParams);
 

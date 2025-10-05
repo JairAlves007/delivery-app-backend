@@ -14,8 +14,7 @@ export type OrderFromRepository = Prisma.OrderGetPayload<{
 export type OrderItems = {
 	id: string;
 	quantity: number;
-	observations?: string | null;
-	addons?: OrderAddons[] | null;
+	addonCategories?: OrderCategoryAddons[] | null;
 };
 
 export type OrderItemsToProcess = Omit<OrderItems, "id" | "addons"> & {
@@ -23,9 +22,14 @@ export type OrderItemsToProcess = Omit<OrderItems, "id" | "addons"> & {
 	addons: AddonFromRepository[];
 };
 
+type OrderCategoryAddons = {
+	id: number;
+	addons: OrderAddons[];
+};
+
 type OrderAddons = {
 	id: number;
-	quantity: number | null;
+	quantity: number;
 };
 
 export type OrderIntent = {

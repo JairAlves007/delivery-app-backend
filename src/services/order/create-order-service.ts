@@ -4,6 +4,7 @@ import type {
 	OrderItems,
 	OrderItemsToProcess
 } from "@/types/order.ts";
+import type { AddonFromRepository } from "@/types/addon.ts";
 import { DeliveryType, PaymentMethodType } from "@prisma/client";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { isEstablishmentOpen } from "@/helpers/establishment.ts";
@@ -20,8 +21,9 @@ import { ProductNotFound } from "@/errors/product/not-found-error.ts";
 import { ProductOutOfStockError } from "@/errors/product/out-of-stock-error.ts";
 import { makeFindAddonService } from "@/factories/services/addon/make-find-addon-service.ts";
 import { AddonNotFound } from "@/errors/addon/not-found-error.ts";
-import { AddonFromRepository } from "@/types/addon.ts";
 import { AddonQuantityExceeded } from "@/errors/addon/quantity-exceeded-error.ts";
+import { makeFindAddonCategoryService } from "@/factories/services/addon/category/make-find-addon-category-service.ts";
+import { AddonCategoryNotFound } from "@/errors/addon/category/not-found-error.ts";
 
 export class CreateOrderService {
 	private orderRepository: IOrderRepository;
@@ -46,6 +48,7 @@ export class CreateOrderService {
 			establishment: `${cache.keys.establishments}_${establishment_id}`,
 			coupon: `${cache.keys.coupons}_${coupon_id}`
 		};
+
 		const findEstablishmentByIdService = makeFindEstablishmentByIdService();
 		const establishment = await cache.rememberForever(
 			cacheKeys.establishment,
@@ -55,10 +58,7 @@ export class CreateOrderService {
 				})
 		);
 
-		if (!establishment) {
-			await cache.forget(cacheKeys.establishment);
-			throw new EstablishmentNotFound();
-		}
+		if (!establishment) throw new EstablishmentNotFound();
 
 		if (
 			!establishment.accepts_credit_card &&
@@ -69,7 +69,7 @@ export class CreateOrderService {
 		if (establishment.only_delivery && delivery_type !== DeliveryType.DELIVERY)
 			throw new EstablishmentIsOnlyDeliveryError();
 
-		if (!isEstablishmentOpen(establishment)) throw new EstablishmentIsClosed();
+		// if (!isEstablishmentOpen(establishment)) throw new EstablishmentIsClosed();
 
 		if (!!coupon_id) {
 			const findCouponService = makeFindCouponService();
@@ -78,10 +78,7 @@ export class CreateOrderService {
 				async () => await findCouponService.handle({ id: coupon_id })
 			);
 
-			if (!coupon) {
-				await cache.forget(cacheKeys.coupon);
-				throw new CouponNotFound();
-			}
+			if (!coupon) throw new CouponNotFound();
 
 			const checkCoupon = makeCheckCouponService();
 
@@ -98,6 +95,7 @@ export class CreateOrderService {
 		const orderItemsToProcess: OrderItemsToProcess[] = [];
 
 		const findProductService = makeFindProductService();
+		const findAddonCategory = makeFindAddonCategoryService();
 		const findAddonService = makeFindAddonService();
 
 		for (const item of itemsNonDuplicated) {
@@ -107,51 +105,69 @@ export class CreateOrderService {
 				async () => await findProductService.handle({ id: item.id })
 			);
 
-			if (!product) {
-				await cache.forget(productKey);
-				throw new ProductNotFound();
-			}
+			if (!product) throw new ProductNotFound();
 
 			if (product.stock && product.stock < item.quantity)
 				throw new ProductOutOfStockError();
 
 			const addons: AddonFromRepository[] = [];
 
-			if (!!item.addons && item.addons.length > 0) {
-				const itemAddonsNonDuplicated = [
-					...new Map(item.addons.map(addon => [addon.id, addon])).values()
+			if (!!item.addonCategories && item.addonCategories.length > 0) {
+				const categoryAddonsNonDuplicated = [
+					...new Map(
+						item.addonCategories.map(category => [category.id, category])
+					).values()
 				];
 
-				for (const addon of itemAddonsNonDuplicated) {
-					const addonKey = `${cache.keys.addons}_${addon.id}`;
-					const addonItem = await cache.rememberForever(
-						addonKey,
-						async () => await findAddonService.handle({ id: addon.id })
+				for (const category of categoryAddonsNonDuplicated) {
+					const addonCategoryKey = `${cache.keys.addonCategories}_${category.id}`;
+					const addonCategory = await cache.rememberForever(
+						addonCategoryKey,
+						async () => await findAddonCategory.handle({ id: category.id })
 					);
 
-					if (!addonItem) {
-						await cache.forget(addonKey);
-						throw new AddonNotFound();
+					if (!addonCategory) throw new AddonCategoryNotFound();
+
+					const addonsNonDuplicated = [
+						...new Map(category.addons.map(addon => [addon.id, addon])).values()
+					];
+
+					if (!!addonCategory.max_quantity) {
+						const quantity = addonsNonDuplicated.reduce((acc, addon) => {
+							return (acc += addon.quantity);
+						}, 0);
+
+						if (quantity > addonCategory.max_quantity)
+							throw new AddonQuantityExceeded();
 					}
 
-					if (
-						!!addonItem.category.max_quantity &&
-						addon.quantity &&
-						addon.quantity > addonItem.category.max_quantity
-					)
-						throw new AddonQuantityExceeded();
+					for (const addon of addonsNonDuplicated) {
+						if (
+							!addonCategory.addons.some(
+								addonFromCategory => addonFromCategory.id === addon.id
+							)
+						)
+							throw new AddonNotFound();
 
-					addons.push(addonItem);
+						const addonKey = `${cache.keys.addons}_${addon.id}`;
+						const addonItem = await cache.rememberForever(
+							addonKey,
+							async () => await findAddonService.handle({ id: addon.id })
+						);
+
+						addons.push(addonItem);
+					}
 				}
 			}
 
 			orderItemsToProcess.push({
 				product,
 				quantity: item.quantity,
-				observations: item.observations,
 				addons
 			});
 		}
+
+		console.log(orderItemsToProcess);
 
 		// await this.orderRepository.create({});
 	}
