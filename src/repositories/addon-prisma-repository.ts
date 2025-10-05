@@ -1,6 +1,7 @@
 import { transformValidFilterParams } from "@/helpers/crud.ts";
 import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
+import type { AddonFromRepository } from "@/types/addon.ts";
 import type {
 	DeleteContentParams,
 	FilterParams,
@@ -8,16 +9,22 @@ import type {
 	PaginationParams,
 	UpdateContentParams
 } from "@/types/crud.ts";
-import type { Addon, Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 export class AddonPrismaRepository implements IAddonRepository {
-	async listAll(filterParams?: FilterParams): Promise<Addon[]> {
+	async listAll(filterParams?: FilterParams): Promise<AddonFromRepository[]> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.addon.findMany({
 			where: {
 				deleted_at: null,
+				category: {
+					deleted_at: null
+				},
 				...params
+			},
+			include: {
+				category: true
 			},
 			orderBy: {
 				name: "asc"
@@ -31,6 +38,9 @@ export class AddonPrismaRepository implements IAddonRepository {
 		return await prisma.addon.count({
 			where: {
 				deleted_at: null,
+				category: {
+					deleted_at: null
+				},
 				...params
 			}
 		});
@@ -40,7 +50,7 @@ export class AddonPrismaRepository implements IAddonRepository {
 		page,
 		perPage,
 		filterParams
-	}: PaginationParams): Promise<Addon[]> {
+	}: PaginationParams): Promise<AddonFromRepository[]> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.addon.findMany({
@@ -48,7 +58,13 @@ export class AddonPrismaRepository implements IAddonRepository {
 			take: perPage,
 			where: {
 				deleted_at: null,
+				category: {
+					deleted_at: null
+				},
 				...params
+			},
+			include: {
+				category: true
 			},
 			orderBy: {
 				name: "asc"
@@ -59,14 +75,20 @@ export class AddonPrismaRepository implements IAddonRepository {
 	async findById({
 		id,
 		filterParams
-	}: FindByIdParams<number>): Promise<Addon | null> {
+	}: FindByIdParams<number>): Promise<AddonFromRepository | null> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.addon.findUnique({
 			where: {
 				id,
 				deleted_at: null,
+				category: {
+					deleted_at: null
+				},
 				...params
+			},
+			include: {
+				category: true
 			}
 		});
 	}

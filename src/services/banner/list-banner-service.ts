@@ -91,7 +91,6 @@ export class ListBannerService {
 
 		return {
 			banners: this.mapBanners(banners),
-			page,
 			total
 		};
 	}

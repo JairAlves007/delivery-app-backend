@@ -1,53 +1,52 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
+import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { FilterField } from "@/types/crud.ts";
-import type { Coupon } from "@prisma/client";
+import { OrderFromRepository } from "@/types/order.ts";
 import z from "zod";
 
-type ListCouponServiceRequest = z.infer<typeof listQueryParamsSchema> &
+type ListOrderServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;
 
-interface ListCouponServiceResponse
-	extends Pick<ListCouponServiceRequest, "page"> {
-	coupons: Coupon[];
+interface ListOrderServiceResponse
+	extends Pick<ListOrderServiceRequest, "page"> {
+	orders: OrderFromRepository[];
 	total: number;
 	perPage?: number;
 	totalPages?: number;
 }
 
-export class ListCouponService {
-	private couponRepository: ICouponRepository;
+export class ListOrderService {
+	private orderRepository: IOrderRepository;
 
-	constructor(couponRepository: ICouponRepository) {
-		this.couponRepository = couponRepository;
+	constructor(orderRepository: IOrderRepository) {
+		this.orderRepository = orderRepository;
 	}
 
 	async handle({
 		page,
 		perPage,
 		filterParams
-	}: ListCouponServiceRequest): Promise<ListCouponServiceResponse> {
+	}: ListOrderServiceRequest): Promise<ListOrderServiceResponse> {
 		const cache = makeCache();
 		const prefixKey = getFilterParamsCacheKey(filterParams);
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
-			`${prefixKey}total_${cache.keys.coupons}`,
-			async () => await this.couponRepository.count(filterParams)
+			`${prefixKey}total_${cache.keys.orders}`,
+			async () => await this.orderRepository.count(filterParams)
 		);
 
 		if (isPaging) {
-			const key = `${prefixKey}${cache.keys.coupons}_page_${page}_per_page_${perPage}`;
-
-			const [total, coupons] = await Promise.all([
+			const key = `${prefixKey}${cache.keys.orders}_page_${page}_per_page_${perPage}`;
+			const [total, orders] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
 					key,
 					async () =>
-						await this.couponRepository.paginate({
+						await this.orderRepository.paginate({
 							page,
 							perPage,
 							filterParams
@@ -63,24 +62,24 @@ export class ListCouponService {
 			}
 
 			return {
-				coupons,
+				orders,
+				total,
 				page,
 				perPage,
-				total,
 				totalPages
 			};
 		}
 
-		const [total, coupons] = await Promise.all([
+		const [total, orders] = await Promise.all([
 			totalPromise,
 			cache.rememberForever(
-				`${prefixKey}all_${cache.keys.coupons}`,
-				async () => await this.couponRepository.listAll(filterParams)
+				`${prefixKey}${cache.keys.orders}`,
+				async () => await this.orderRepository.listAll(filterParams)
 			)
 		]);
 
 		return {
-			coupons,
+			orders,
 			total
 		};
 	}

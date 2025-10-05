@@ -92,7 +92,6 @@ export class ListProductService {
 
 		return {
 			products: this.mapProducts(products),
-			page,
 			total
 		};
 	}

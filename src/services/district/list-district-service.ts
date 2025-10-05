@@ -89,7 +89,6 @@ export class ListDistrictService {
 
 		return {
 			districts: this.mapDistricts(districts),
-			page,
 			total
 		};
 	}

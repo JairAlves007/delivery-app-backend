@@ -396,7 +396,6 @@ model AddonCategory {
   id               Int           @id @default(autoincrement())
   establishment_id String
   name             String
-  status           Boolean       @default(true)
   type             AddonType
   max_quantity     Int?
   deleted_at       DateTime?
@@ -505,8 +504,8 @@ model Order {
   delivery_type        DeliveryType
   shipping_fee         Int
   subtotal             Int
-  customer_name        String?
-  customer_phone       String?
+  customer_name        String
+  customer_phone       String
   user_id              String
   establishment_id     String
   coupon_id            Int?
@@ -656,7 +655,7 @@ model DeliveryAddress {
 }
 
 model OrderDeliveryAddress {
-  id            String    @id @default(ulid())
+  id            String   @id @default(ulid())
   street        String
   number        String
   city          String
@@ -664,13 +663,13 @@ model OrderDeliveryAddress {
   zip_code      String
   shipping_cost Int
   district_name String
-  order_id      String    @unique
-  address_id    String?
-  district_id   String?
-  created_at    DateTime  @default(now())
-  address       Address?  @relation(fields: [address_id], references: [id])
-  district      District? @relation(fields: [district_id], references: [id])
-  order         Order     @relation(fields: [order_id], references: [id])
+  order_id      String   @unique
+  address_id    String
+  district_id   String
+  created_at    DateTime @default(now())
+  address       Address  @relation(fields: [address_id], references: [id])
+  district      District @relation(fields: [district_id], references: [id])
+  order         Order    @relation(fields: [order_id], references: [id])
 
   @@index([order_id], name: "idx_order_delivery_addresses_order_id")
   @@index([address_id], name: "idx_order_delivery_addresses_address_id")

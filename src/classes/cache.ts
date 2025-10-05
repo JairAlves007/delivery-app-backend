@@ -17,7 +17,8 @@ export class Cache implements ICacheBase {
 		users: "users",
 		menus: "menus",
 		addresses: "addresses",
-		resourceRules: "resource_rules"
+		resourceRules: "resource_rules",
+		orders: "orders"
 	};
 
 	static getInstance() {

@@ -88,7 +88,6 @@ export class ListAddonService {
 
 		return {
 			addons: this.mapAddons(addons),
-			page,
 			total
 		};
 	}

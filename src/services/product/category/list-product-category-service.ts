@@ -95,7 +95,6 @@ export class ListProductCategoryService {
 
 		return {
 			productCategories: this.mapProductCategories(productCategories),
-			page,
 			total
 		};
 	}

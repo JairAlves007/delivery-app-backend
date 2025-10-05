@@ -123,6 +123,7 @@ export class ProductPrismaRepository implements IProductRepository {
 			where: {
 				id,
 				deleted_at: null,
+				OR: [{ valid_until: null }, { valid_until: { gt: new Date() } }],
 				...params
 			},
 			include: {

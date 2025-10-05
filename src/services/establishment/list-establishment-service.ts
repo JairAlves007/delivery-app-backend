@@ -86,7 +86,6 @@ export class ListEstablishmentService {
 
 		return {
 			establishments: this.mapEstablishments(establishments),
-			page,
 			total
 		};
 	}
