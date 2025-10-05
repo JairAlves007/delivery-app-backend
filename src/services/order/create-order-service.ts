@@ -294,14 +294,12 @@ export class CreateOrderService {
 			},
 			items: {
 				createMany: {
-					data: [
-						{
-							product_id: orderItemsToProcess[0].product.id,
-							quantity: orderItemsToProcess[0].product.quantity,
-							product_name: orderItemsToProcess[0].product.name,
-							product_price: orderItemsToProcess[0].product.price
-						}
-					]
+					data: orderItemsToProcess.map(item => ({
+						product_id: item.product.id,
+						product_name: item.product.name,
+						product_price: item.product.price,
+						quantity: item.product.quantity
+					}))
 				}
 			},
 			statuses: {
