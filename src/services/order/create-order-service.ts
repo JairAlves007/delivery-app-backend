@@ -27,6 +27,7 @@ import { getStatusLabel } from "@/helpers/order.ts";
 import { makeValidateDeliveryFromOrderService } from "@/factories/services/order/validations/make-validate-delivery-from-order-service.ts";
 import { makeValidateAddonsFromOrderService } from "@/factories/services/order/validations/make-validate-addons-from-order-service.ts";
 import { makeCalculateCouponDiscountFromOrderService } from "@/factories/services/order/validations/make-calculate-coupon-discount-from-order-service.ts";
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 
 type BuildOrderItemsParams = {
 	user: UserWithRole;
@@ -269,5 +270,9 @@ export class CreateOrderService {
 				orderItemsToProcess
 			})
 		);
+
+		const cache = makeCache();
+
+		await cache.forgetKeysContaining(cache.keys.orders);
 	}
 }

@@ -32,7 +32,7 @@ async function main() {
 		PermissionType.MANAGE_CATEGORIES,
 		PermissionType.MANAGE_PRODUCT_OPTIONS,
 		PermissionType.MANAGE_DISTRICTS,
-		PermissionType.MANAGE_ORDERS,
+		PermissionType.CANCEL_ORDERS,
 		PermissionType.MANAGE_OWN_ESTABLISHMENT,
 		PermissionType.MANAGE_BANNERS,
 		PermissionType.MANAGE_COUPONS,
@@ -42,8 +42,7 @@ async function main() {
 		PermissionType.VIEW_CATALOG,
 		PermissionType.ADD_TO_CART,
 		PermissionType.MANAGE_OWN_ADDRESSES,
-		PermissionType.VIEW_OWN_ORDERS,
-		PermissionType.CANCEL_OWN_ORDER
+		PermissionType.MANAGE_OWN_ORDERS
 	];
 
 	await prisma.permission.createMany({

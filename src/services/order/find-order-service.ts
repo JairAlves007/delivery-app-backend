@@ -1,6 +1,7 @@
 import { OrderNotFound } from "@/errors/order/not-found-error.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
+import { transformOrderByStatus } from "@/helpers/order.ts";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
 import { orderParamsSchema } from "@/schemas/order-schema.ts";
 import type { FilterField } from "@/types/crud.ts";
@@ -27,6 +28,6 @@ export class FindOrderService {
 
 		if (!order) throw new OrderNotFound();
 
-		return order;
+		return transformOrderByStatus(order);
 	}
 }

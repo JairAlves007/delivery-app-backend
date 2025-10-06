@@ -1,10 +1,11 @@
+import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
+import type { FilterField } from "@/types/crud.ts";
+import type { OrderFromRepository, OrderPayload } from "@/types/order.ts";
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
+import { transformOrderByStatus } from "@/helpers/order.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import type { FilterField } from "@/types/crud.ts";
-import { OrderFromRepository } from "@/types/order.ts";
 import z from "zod";
 
 type ListOrderServiceRequest = z.infer<typeof listQueryParamsSchema> &
@@ -12,7 +13,7 @@ type ListOrderServiceRequest = z.infer<typeof listQueryParamsSchema> &
 
 interface ListOrderServiceResponse
 	extends Pick<ListOrderServiceRequest, "page"> {
-	orders: OrderFromRepository[];
+	orders: OrderPayload[];
 	total: number;
 	perPage?: number;
 	totalPages?: number;
@@ -23,6 +24,12 @@ export class ListOrderService {
 
 	constructor(orderRepository: IOrderRepository) {
 		this.orderRepository = orderRepository;
+	}
+
+	private mapOrders(orders: OrderFromRepository[]): OrderPayload[] {
+		return orders.map(order => {
+			return transformOrderByStatus(order);
+		});
 	}
 
 	async handle({
@@ -62,7 +69,7 @@ export class ListOrderService {
 			}
 
 			return {
-				orders,
+				orders: this.mapOrders(orders),
 				total,
 				page,
 				perPage,
@@ -79,7 +86,7 @@ export class ListOrderService {
 		]);
 
 		return {
-			orders,
+			orders: this.mapOrders(orders),
 			total
 		};
 	}

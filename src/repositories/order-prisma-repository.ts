@@ -3,10 +3,11 @@ import type {
 	PaginationParams,
 	FindByIdParams,
 	UpdateContentParams,
-	DeleteContentParams
+	DeleteContentParams,
+	CursorPaginationParams
 } from "@/types/crud.ts";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
-import type { OrderFromRepository } from "@/types/order.ts";
+import type { OrderFromRepository, OrderPayload } from "@/types/order.ts";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma.ts";
 import { transformValidFilterParams } from "@/helpers/crud.ts";
@@ -22,7 +23,17 @@ export class OrderPrismaRepository implements IOrderRepository {
 			},
 			include: {
 				coupon: true,
-				items: true
+				items: true,
+				statuses: {
+					select: {
+						label: true,
+						value: true
+					},
+					orderBy: {
+						created_at: "desc"
+					},
+					take: 1
+				}
 			},
 			orderBy: {
 				created_at: "desc"
@@ -57,11 +68,56 @@ export class OrderPrismaRepository implements IOrderRepository {
 			},
 			include: {
 				coupon: true,
-				items: true
+				items: true,
+				statuses: {
+					select: {
+						label: true,
+						value: true
+					},
+					orderBy: {
+						created_at: "desc"
+					},
+					take: 1
+				}
 			},
 			orderBy: {
 				created_at: "desc"
 			}
+		});
+	}
+
+	async cursorPaginate({
+		limit,
+		cursor,
+		filterParams
+	}: CursorPaginationParams<string>): Promise<OrderFromRepository[]> {
+		const params = transformValidFilterParams(filterParams);
+
+		return await prisma.order.findMany({
+			where: {
+				deleted_at: null,
+				...params
+			},
+			include: {
+				coupon: true,
+				items: true,
+				statuses: {
+					select: {
+						label: true,
+						value: true
+					},
+					orderBy: {
+						created_at: "desc"
+					},
+					take: 1
+				}
+			},
+			orderBy: {
+				created_at: "desc"
+			},
+			take: limit + 1,
+			skip: cursor ? 1 : 0,
+			cursor: !!cursor ? { id: cursor } : undefined
 		});
 	}
 
@@ -79,7 +135,17 @@ export class OrderPrismaRepository implements IOrderRepository {
 			},
 			include: {
 				coupon: true,
-				items: true
+				items: true,
+				statuses: {
+					select: {
+						label: true,
+						value: true
+					},
+					orderBy: {
+						created_at: "desc"
+					},
+					take: 1
+				}
 			}
 		});
 	}

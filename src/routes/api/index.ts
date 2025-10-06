@@ -5,6 +5,7 @@ import { uploadRoutes } from "./upload/upload.route.ts";
 import { couponRoutes } from "./coupon/coupon.route.ts";
 import { establishmentRoutes } from "./establishment/establishment.route.ts";
 import { addressRoutes } from "./address/address.route.ts";
+import { orderRoutes } from "./order/order.route.ts";
 
 export const apiRoutes = (app: FastifyInstance) => {
 	app.register(async api => {
@@ -14,5 +15,6 @@ export const apiRoutes = (app: FastifyInstance) => {
 		api.register(couponRoutes, { prefix: "/coupon" });
 		api.register(establishmentRoutes, { prefix: "/establishment" });
 		api.register(addressRoutes, { prefix: "/address" });
+		api.register(orderRoutes, { prefix: "/order" });
 	});
 };

@@ -11,7 +11,10 @@ import {
 	couponParamsSchema,
 	createCouponBodySchema
 } from "@/schemas/coupon-schema.ts";
-import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import {
+	listQueryParamsSchema,
+	userIdSchema
+} from "@/schemas/generic-schema.ts";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
@@ -103,9 +106,10 @@ export const destroy = async (request: FastifyRequest, reply: FastifyReply) => {
 
 export const check = async (request: FastifyRequest, reply: FastifyReply) => {
 	const body = checkCouponBodySchema.parse(request.body);
+	const userId = userIdSchema.parse(request.user.sub);
 	const data = {
 		...body,
-		userId: request.user.sub
+		userId
 	};
 
 	try {

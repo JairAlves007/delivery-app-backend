@@ -111,7 +111,11 @@ export const createOrderBodySchema = z
 		}
 	});
 
-export const updateOrderBodySchema = z.object({
+export const cancelOrderBodySchema = z.object({
+	establishmentId: establishmentIdSchema
+});
+
+export const updateOrderStatusBodySchema = cancelOrderBodySchema.extend({
 	status: z
 		.string()
 		.enumCaseInsensitive(

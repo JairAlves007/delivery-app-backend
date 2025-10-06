@@ -2,6 +2,7 @@ import type {
 	Coupon,
 	DeliveryType,
 	District,
+	OrderStatusType,
 	PaymentMethodType,
 	Prisma
 } from "@prisma/client";
@@ -15,8 +16,25 @@ export type OrderFromRepository = Prisma.OrderGetPayload<{
 	include: {
 		coupon: true;
 		items: true;
+		statuses: {
+			select: {
+				label: true;
+				value: true;
+			};
+			orderBy: {
+				created_at: "desc";
+			};
+			take: 1;
+		};
 	};
 }>;
+
+export interface OrderPayload extends Omit<OrderFromRepository, "statuses"> {
+	status: {
+		label: string;
+		value: OrderStatusType;
+	};
+}
 
 export type OrderInfo = {
 	coupon: Coupon | null;

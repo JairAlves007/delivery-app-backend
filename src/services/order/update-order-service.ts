@@ -1,9 +1,10 @@
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { getStatusLabel } from "@/helpers/order.ts";
-import { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
-import { updateOrderBodySchema } from "@/schemas/order-schema.ts";
+import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
+import { updateOrderStatusBodySchema } from "@/schemas/order-schema.ts";
 import z from "zod";
 
-type UpdateOrderRequest = z.infer<typeof updateOrderBodySchema>;
+type UpdateOrderRequest = z.infer<typeof updateOrderStatusBodySchema>;
 
 export class UpdateOrderService {
 	private orderRepository: IOrderRepository;
@@ -12,9 +13,12 @@ export class UpdateOrderService {
 		this.orderRepository = orderRepository;
 	}
 
-	async handle(id: string, { status }: UpdateOrderRequest) {
-		return await this.orderRepository.update({
+	async handle(id: string, { status, establishmentId }: UpdateOrderRequest) {
+		const cache = makeCache();
+
+		await this.orderRepository.update({
 			id,
+			filterParams: { establishment_id: establishmentId },
 			data: {
 				statuses: {
 					create: {
@@ -24,5 +28,7 @@ export class UpdateOrderService {
 				}
 			}
 		});
+
+		await cache.forgetKeysContaining(cache.keys.orders);
 	}
 }

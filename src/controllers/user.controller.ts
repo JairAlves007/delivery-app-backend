@@ -21,6 +21,7 @@ import { mainParamsSchema } from "@/schemas/main-schema.ts";
 import { isEstablishmentOpen } from "@/helpers/establishment.ts";
 import { makeForgotPasswordService } from "@/factories/services/auth/make-forgot-password-service.ts";
 import { makeResetPasswordService } from "@/factories/services/auth/make-reset-password-service.ts";
+import { userIdSchema } from "@/schemas/generic-schema.ts";
 
 export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
@@ -143,6 +144,7 @@ export const resetPassword = async (
 
 export const main = async (request: FastifyRequest, reply: FastifyReply) => {
 	const { slug } = mainParamsSchema.parse(request.params);
+	const userId = userIdSchema.parse(request.user.sub);
 
 	try {
 		const getMenuService = makeGetMenuService();
@@ -156,7 +158,7 @@ export const main = async (request: FastifyRequest, reply: FastifyReply) => {
 			establishment.id
 		);
 		const profile = await getProfileService.handle({
-			id: request.user.sub
+			id: userId
 		});
 
 		return reply.status(HTTPStatusCodes.OK).send(
