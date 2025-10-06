@@ -6,6 +6,7 @@ export type UserAddressStructured = Prisma.UserAddressGetPayload<{
 		is_default: true;
 		address: {
 			select: {
+				id: true;
 				city: true;
 				complement: true;
 				district: true;
@@ -24,6 +25,6 @@ export type UserAddressStructured = Prisma.UserAddressGetPayload<{
 }>;
 
 export type UserAddressWithDefault = Address & {
-	id: string;
+	address_id: string;
 	is_default: boolean;
 };

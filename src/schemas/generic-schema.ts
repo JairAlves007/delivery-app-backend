@@ -5,6 +5,10 @@ export const establishmentIdSchema = z
 	.ulid("O id do estabelecimento deve ser preenchido")
 	.min(1, "O id do estabelecimento deve ser preenchido");
 
+export const establishmentParamsSchema = z.object({
+	establishmentId: establishmentIdSchema
+});
+
 export const listQueryParamsSchema = z.object({
 	page: z.coerce.number().min(1, "Pagina inválida").optional(),
 	perPage: z.coerce.number().min(1, "Limite inválido").default(12)

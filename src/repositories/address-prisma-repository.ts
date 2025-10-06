@@ -41,6 +41,7 @@ export class AddressPrismaRepository implements IAddressRepository {
 		return {
 			...address.address,
 			id: address.id,
+			address_id: address.address.id,
 			is_default: address.is_default
 		};
 	}

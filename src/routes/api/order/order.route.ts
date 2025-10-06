@@ -17,7 +17,7 @@ const orderMiddlewares = {
 };
 
 export const orderRoutes = async (app: FastifyInstance) => {
-	app.get("/my", orderMiddlewares, myOrders);
+	app.get("/:establishmentId/my", orderMiddlewares, myOrders);
 	app.get("/:id", orderMiddlewares, find(false));
 	app.post("/", orderMiddlewares, store);
 	app.put("/cancel/:id", orderMiddlewares, cancel);

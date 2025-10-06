@@ -78,14 +78,7 @@ export class CreateOrderService {
 	): Partial<Prisma.OrderCreateInput> | undefined {
 		if (!!!address || !!!district) return undefined;
 
-		const {
-			id: address_id,
-			city,
-			street,
-			number,
-			postal_code,
-			state
-		} = address;
+		const { address_id, city, street, number, postal_code, state } = address;
 		const { id: district_id, name: district_name, shipping_cost } = district;
 
 		return {

@@ -12,6 +12,7 @@ import { ApiResponse } from "@/helpers/api.ts";
 import { makeFindOrderService } from "@/factories/services/order/make-find-order-service.ts";
 import {
 	establishmentIdSchema,
+	establishmentParamsSchema,
 	listCursorQueryParamsSchema,
 	listQueryParamsSchema,
 	userIdSchema
@@ -45,9 +46,8 @@ export const myOrders = async (
 	reply: FastifyReply
 ) => {
 	const query = listCursorQueryParamsSchema.parse(request.query);
-	const establishmentId = establishmentIdSchema.parse(
-		request.user.establishmentId
-	);
+	const { establishmentId } = establishmentParamsSchema.parse(request.params);
+
 	const userId = userIdSchema.parse(request.user.sub);
 
 	try {
