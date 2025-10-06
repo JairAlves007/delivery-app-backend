@@ -17,14 +17,18 @@ export const transformValueToPercentageFromDatabase = (
 	return value / 100;
 };
 
-export const getValueDiscountedByCoupon = (
-	coupon: Coupon,
-	value: number
+export const getValueDiscounted = (
+	discountType: DiscountType,
+	discountValue: number,
+	valueToBeDiscounted: number
 ): number => {
-	switch (coupon.discount_type) {
+	switch (discountType) {
 		case DiscountType.PERCENTAGE:
-			return value * (1 - transformValueToPercentageFromDatabase(coupon.value));
+			return (
+				valueToBeDiscounted *
+				transformValueToPercentageFromDatabase(discountValue)
+			);
 		case DiscountType.FIXED:
-			return value - transformPriceFromDatabase(coupon.value);
+			return transformPriceFromDatabase(discountValue);
 	}
 };

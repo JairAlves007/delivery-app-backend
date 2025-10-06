@@ -16,7 +16,7 @@ type ValidateAddonCategoriesFromOrderServiceRequest = {
 
 type ValidateAddonCategoriesFromOrderServiceResponse = {
 	addonCategory: AddonCategoryFromRepository;
-	orderAddonsNonDuplicated: OrderAddons[];
+	orderAddonsValidated: OrderAddons[];
 };
 
 export class ValidateAddonCategoriesFromOrderService {
@@ -39,10 +39,10 @@ export class ValidateAddonCategoriesFromOrderService {
 
 		if (!addonCategory) throw new AddonCategoryNotFound();
 
-		const orderAddonsNonDuplicated = removeDuplicateItems(orderAddons);
+		const orderAddonsValidated = removeDuplicateItems(orderAddons);
 
 		if (!!addonCategory.max_quantity) {
-			const quantity = orderAddonsNonDuplicated.reduce((acc, addon) => {
+			const quantity = orderAddonsValidated.reduce((acc, addon) => {
 				return (acc += addon.quantity);
 			}, 0);
 
@@ -50,6 +50,6 @@ export class ValidateAddonCategoriesFromOrderService {
 				throw new AddonQuantityExceeded();
 		}
 
-		return { addonCategory, orderAddonsNonDuplicated };
+		return { addonCategory, orderAddonsValidated };
 	}
 }

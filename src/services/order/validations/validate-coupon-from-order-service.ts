@@ -1,8 +1,6 @@
 import { CouponNotFound } from "@/errors/coupon/not-found.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { makeCheckCouponService } from "@/factories/services/coupon/make-check-coupon-service.ts";
 import { makeFindCouponService } from "@/factories/services/coupon/make-find-coupon-service.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import type { EstablishmentID } from "@/types/establishment.ts";
 import type { UserID } from "@/types/user.ts";
 import type { Coupon } from "@prisma/client";

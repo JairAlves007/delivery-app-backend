@@ -41,7 +41,7 @@ export type OrderItemsToProcess = {
 	addons: OrderAddonsToProcess[];
 };
 
-type OrderCategoryAddons = {
+export type OrderCategoryAddons = {
 	id: number;
 	addons: OrderAddons[];
 };
