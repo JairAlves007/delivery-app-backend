@@ -14,6 +14,7 @@ type CalculateCouponDiscountsRequest = {
 type CalculateCouponDiscountsResponse = {
 	subtotal: number;
 	shippingCost: number;
+	couponDiscount: number;
 };
 
 export class CalculateCouponDiscountFromOrderService {
@@ -30,6 +31,7 @@ export class CalculateCouponDiscountFromOrderService {
 
 			return (acc += item.product.price * item.product.quantity + addonsTotal);
 		}, 0);
+		let couponDiscount = 0;
 
 		if (!!coupon && !!district) {
 			const valueByType = {
@@ -37,11 +39,13 @@ export class CalculateCouponDiscountFromOrderService {
 				[CouponType.SHIPPING]: shippingCost
 			};
 
-			const couponDiscount = getValueDiscounted(
+			couponDiscount = getValueDiscounted(
 				coupon.discount_type,
 				coupon.value,
 				valueByType[coupon.type]
 			);
+
+			console.log("couponDiscount", couponDiscount);
 
 			switch (coupon.type) {
 				case CouponType.ORDER:
@@ -55,7 +59,8 @@ export class CalculateCouponDiscountFromOrderService {
 
 		return {
 			subtotal,
-			shippingCost
+			shippingCost,
+			couponDiscount
 		};
 	}
 }

@@ -81,3 +81,14 @@ export type OrderIntent = {
 	changeAmount?: number | null;
 	items: OrderItems[];
 };
+
+export type OrderSubSectionMessage = {
+	address: string;
+	referencePoint: string;
+	product: string;
+	addon: string;
+	coupon: string;
+	changeAmount: string;
+	comment: string;
+	discount: string;
+};

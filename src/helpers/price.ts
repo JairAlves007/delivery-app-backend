@@ -1,15 +1,24 @@
-import { DiscountType, type Coupon } from "@prisma/client";
+import { DiscountType } from "@prisma/client";
 import Constants from "./constants.ts";
 
-export function transformPriceToDatabase(price: number): number {
+export const transformPriceToHumanReadable = (price: number): string => {
+	if (price <= 0) return "GRÁTIS";
+
+	return price.toLocaleString("pt-BR", {
+		style: "currency",
+		currency: "BRL"
+	});
+};
+
+export const transformPriceToDatabase = (price: number): number => {
 	if (price < 0) throw new Error("Price cannot be negative");
 
 	return Math.round(price * Constants.PRICE_MULTIPLIER);
-}
+};
 
-export function transformPriceFromDatabase(price: number): number {
+export const transformPriceFromDatabase = (price: number): number => {
 	return price / Constants.PRICE_MULTIPLIER;
-}
+};
 
 export const transformValueToPercentageFromDatabase = (
 	value: number

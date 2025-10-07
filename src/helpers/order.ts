@@ -1,5 +1,12 @@
 import type { OrderFromRepository, OrderPayload } from "@/types/order.ts";
-import { OrderStatusType } from "@prisma/client";
+import {
+	CouponType,
+	DeliveryType,
+	DiscountType,
+	OrderStatusType,
+	PaymentMethodType
+} from "@prisma/client";
+import { transformPriceToHumanReadable } from "./price.ts";
 
 export const getStatusLabel = (status: OrderStatusType) => {
 	switch (status) {
@@ -26,4 +33,46 @@ export const transformOrderByStatus = (
 			value: order.statuses[0].value
 		}
 	};
+};
+
+export const getCouponLabels = (
+	couponType: CouponType,
+	discountType: DiscountType,
+	couponValue: number
+): string => {
+	const labels = {
+		[DiscountType.PERCENTAGE]: `Desconto de ${couponValue}%`,
+		[DiscountType.FIXED]: `Desconto de ${transformPriceToHumanReadable(
+			couponValue
+		)}`
+	};
+
+	switch (couponType) {
+		case CouponType.ORDER:
+			return `${labels[discountType]} no pedido`;
+		case CouponType.SHIPPING:
+			return `${labels[discountType]} na entrega`;
+	}
+};
+
+export const getDeliveryTypeLabel = (deliveryType: DeliveryType): string => {
+	switch (deliveryType) {
+		case DeliveryType.DELIVERY:
+			return "Entrega a domicílio";
+		case DeliveryType.PICKUP:
+			return "Retirada no local";
+	}
+};
+
+export const getPaymentMethodLabel = (
+	paymentMethod: PaymentMethodType
+): string => {
+	switch (paymentMethod) {
+		case PaymentMethodType.CARD:
+			return "Cartão";
+		case PaymentMethodType.PIX:
+			return "PIX";
+		case PaymentMethodType.MONEY:
+			return "Dinheiro";
+	}
 };
