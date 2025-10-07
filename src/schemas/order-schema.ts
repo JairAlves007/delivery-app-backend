@@ -4,11 +4,12 @@ import {
 	PaymentMethodType
 } from "@prisma/client";
 import z from "zod";
-import { establishmentIdSchema } from "./generic-schema.ts";
+import { establishmentIdSchema, phoneSchema } from "./generic-schema.ts";
 
 export const createOrderBodySchema = z
 	.object({
 		establishmentId: establishmentIdSchema,
+		contactPhone: phoneSchema.optional().nullable(),
 		addressId: z
 			.ulid("O endereço deve ser preenchido")
 			.min(1, "O endereço deve ser preenchido")
@@ -83,7 +84,7 @@ export const createOrderBodySchema = z
 			data.paymentMethod === PaymentMethodType.MONEY &&
 			(data.changeAmount === undefined ||
 				data.changeAmount === null ||
-				data.changeAmount <= 0)
+				data.changeAmount < 0)
 		) {
 			ctx.addIssue({
 				path: ["changeAmount"],
@@ -108,7 +109,25 @@ export const createOrderBodySchema = z
 					message: "O bairro deve ser preenchido"
 				});
 			}
+		} else {
+			if (!!!data.contactPhone) {
+				ctx.addIssue({
+					path: ["contactPhone"],
+					code: "custom",
+					message: "Precisamos saber o telefone para contato sobre o pedido"
+				});
+			}
 		}
+	})
+	.transform(data => {
+		if (data.paymentMethod !== PaymentMethodType.MONEY) {
+			return {
+				...data,
+				changeAmount: null
+			};
+		}
+
+		return data;
 	});
 
 export const cancelOrderBodySchema = z.object({

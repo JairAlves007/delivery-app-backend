@@ -7,7 +7,7 @@ import type {
 	Prisma
 } from "@prisma/client";
 import type { EstablishmentID } from "./establishment.ts";
-import type { UserID } from "./user.ts";
+import type { UserID, UserWithRole } from "./user.ts";
 import type { ProductFromRepository } from "./product.ts";
 import type { AddonFromRepository } from "./addon.ts";
 import type { UserAddressWithDefault } from "./address.ts";
@@ -36,15 +36,32 @@ export interface OrderPayload extends Omit<OrderFromRepository, "statuses"> {
 	};
 }
 
+export interface OrderAddonsToProcess extends AddonFromRepository {
+	quantity: number;
+}
+
+export type BuildOrderItemsParams = {
+	user: UserWithRole;
+	comment?: string | null;
+	contactPhone?: string | null;
+	deliveryType: DeliveryType;
+	paymentMethod: PaymentMethodType;
+	establishmentId: EstablishmentID;
+	changeAmount?: number | null;
+	couponDiscount: number;
+	coupon: Coupon | null;
+	address: UserAddressWithDefault | null;
+	district: District | null;
+	shippingCost: number;
+	subtotal: number;
+	orderItemsToProcess: OrderItemsToProcess[];
+};
+
 export type OrderInfo = {
 	coupon: Coupon | null;
 	address: UserAddressWithDefault | null;
 	district: District | null;
 };
-
-export interface OrderAddonsToProcess extends AddonFromRepository {
-	quantity: number;
-}
 
 export type OrderItems = {
 	id: string;
@@ -72,6 +89,7 @@ export type OrderAddons = {
 export type OrderIntent = {
 	establishmentId: EstablishmentID;
 	userId: UserID;
+	contactPhone?: string | null;
 	addressId?: string | null;
 	districtId?: string | null;
 	couponId?: number | null;

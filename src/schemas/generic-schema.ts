@@ -27,16 +27,18 @@ export const userEmailSchema = z
 	.email("Endereço de e-mail inválido")
 	.min(1, "Endereço de e-mail inválido");
 
+export const phoneSchema = z
+	.string()
+	.min(1, "O telefone deve ser preenchido")
+	.regex(Constants.PHONE_REGEX, "Telefone inválido")
+	.transform(val => val.replace(/\D/g, ""));
+
 export const addressLocationSchema = z.object({
 	city: z.string().min(1, "A cidade deve ser preenchida"),
 	state: z.string().min(1, "O estado deve ser preenchido"),
 	neighborhood: z.string().min(1, "O bairro deve ser preenchido"),
 	street: z.string().min(1, "A rua deve ser preenchida"),
-	phone: z
-		.string()
-		.min(1, "O telefone deve ser preenchido")
-		.regex(Constants.PHONE_REGEX, "Telefone inválido")
-		.transform(val => val.replace(/\D/g, "")),
+	phone: phoneSchema,
 	number: z
 		.string()
 		.min(1, "O número deve ser preenchido")

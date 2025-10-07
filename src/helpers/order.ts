@@ -35,7 +35,7 @@ export const transformOrderByStatus = (
 	};
 };
 
-export const getCouponLabels = (
+export const getCouponAppliedLabel = (
 	couponType: CouponType,
 	discountType: DiscountType,
 	couponValue: number

@@ -45,8 +45,6 @@ export class CalculateCouponDiscountFromOrderService {
 				valueByType[coupon.type]
 			);
 
-			console.log("couponDiscount", couponDiscount);
-
 			switch (coupon.type) {
 				case CouponType.ORDER:
 					subtotal -= couponDiscount;

@@ -22,7 +22,6 @@ export default class Constants {
 	public static readonly ORDER_SUB_SECTIONS_MESSAGE_TEMPLATES: OrderSubSectionMessage =
 		{
 			address: `
-				📞 Telefone: {address_phone}
 				📍 Entrega em: {address_simplified}
 				🗺️ Distrito: {district_name}
 				{reference_point_section}
@@ -36,7 +35,7 @@ export default class Constants {
 				{addons_section}
 			`,
 			addon: `
-				- {addon_name} ({addon_price})
+				- {addon_quantity}x {addon_name} ({addon_price})
 			`,
 			coupon: `🏷️ Cupom aplicado: {coupon_code} ({coupon_value})`,
 			changeAmount: `💵 Troco para: {change_amount_value}`,
@@ -48,6 +47,7 @@ export default class Constants {
 		📦 Novo Pedido Recebido!
 
 		🧑‍💼 Cliente: {customer_name}
+		📞 Telefone: {customer_phone}
 		{address}
 
 		🛍️ Itens do Pedido:
