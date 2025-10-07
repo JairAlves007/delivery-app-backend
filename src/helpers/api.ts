@@ -1,10 +1,10 @@
 import type { ErrorResponse, SuccessResponse } from "@/types/response.ts";
 
 export class ApiResponse {
-	static success<T>(code: string, details?: T): SuccessResponse {
+	static success<T>(message: string, details?: T): SuccessResponse {
 		return {
 			success: true,
-			code,
+			message,
 			details
 		};
 	}

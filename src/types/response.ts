@@ -1,6 +1,6 @@
 export type SuccessResponse<T = any> = {
 	success: true;
-	code: string;
+	message: string;
 	details?: T;
 };
 

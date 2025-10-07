@@ -1,7 +1,7 @@
 import { makeSendResetPasswordMailService } from "@/factories/services/mail/make-send-reset-password-mail-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
 import { resetPasswordMailBodySchema } from "@/schemas/mail-schema.ts";
-import { logger, schemaTask, wait } from "@trigger.dev/sdk/v3";
+import { logger, schemaTask } from "@trigger.dev/sdk/v3";
 
 export const sendResetPasswordMailTaskId = "send-reset-password-mail";
 

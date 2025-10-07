@@ -21,6 +21,11 @@ import { makeListOrderService } from "@/factories/services/order/make-list-order
 import { makeUpdateOrderService } from "@/factories/services/order/make-update-order-service.ts";
 import { makeListMyOrdersService } from "@/factories/services/order/make-list-my-orders-service.ts";
 import { makeCancelOrderFromCustomerService } from "@/factories/services/order/make-cancel-order-from-customer-service.ts";
+import { tasks } from "@trigger.dev/sdk";
+import {
+	createOrderTask,
+	createOrderTaskId
+} from "@/tasks/create-order-task.ts";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const query = listQueryParamsSchema.parse(request.query);
@@ -104,9 +109,19 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 
 		await createOrderService.handle({ ...body, userId });
 
+		await tasks.trigger<typeof createOrderTask>(createOrderTaskId, {
+			...body,
+			userId
+		});
+
 		return reply
 			.status(HTTPStatusCodes.CREATED)
-			.send(ApiResponse.success("Pedido criado com sucesso", {}));
+			.send(
+				ApiResponse.success(
+					"Estamos processando seu pedido, em instantes você receberá uma notificação.",
+					{}
+				)
+			);
 	} catch (error) {
 		return reply.sendError(error);
 	}

@@ -39,6 +39,11 @@ import { makeCalculateCouponDiscountFromOrderService } from "@/factories/service
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import Constants from "@/helpers/constants.ts";
 import { makeSendOrderConfirmationMessageService } from "@/factories/services/order/make-send-order-confirmation-message.ts";
+import { tasks } from "@trigger.dev/sdk";
+import {
+	sendOrderConfirmationTask,
+	sendOrderConfirmationTaskId
+} from "@/tasks/send-order-confirmation-message-task.ts";
 
 export class CreateOrderService {
 	private orderRepository: IOrderRepository;
@@ -192,8 +197,6 @@ export class CreateOrderService {
 		const validateDeliveryService = makeValidateDeliveryFromOrderService();
 		const validateProductService = makeValidateProductFromOrderService();
 		const validateAddonsService = makeValidateAddonsFromOrderService();
-		const sendOrderConfirmationMessageService =
-			makeSendOrderConfirmationMessageService();
 		const calculateCouponDiscountService =
 			makeCalculateCouponDiscountFromOrderService();
 
@@ -265,20 +268,23 @@ export class CreateOrderService {
 			})
 		);
 
-		await sendOrderConfirmationMessageService.handle({
-			...params,
-			user,
-			address,
-			coupon,
-			couponDiscount,
-			shippingCost,
-			orderItemsToProcess,
-			district,
-			subtotal
-		});
-
 		const cache = makeCache();
 
 		await cache.forgetKeysContaining(cache.keys.orders);
+
+		await tasks.trigger<typeof sendOrderConfirmationTask>(
+			sendOrderConfirmationTaskId,
+			{
+				...params,
+				user,
+				address,
+				coupon,
+				couponDiscount,
+				shippingCost,
+				orderItemsToProcess,
+				district,
+				subtotal
+			}
+		);
 	}
 }
