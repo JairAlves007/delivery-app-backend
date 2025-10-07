@@ -26,17 +26,22 @@ export class ListEstablishmentCatalogService {
 	}
 
 	public async handle({
-		id,
+		id: establishmentId,
 		limit,
 		cursor
 	}: ListEstablishmentCatalogServiceRequest): Promise<ListEstablishmentCatalogServiceResponse> {
 		const cache = makeCache();
 		const cursorSuffix = cursor ? `_cursor_${cursor}` : "";
-		const key = `${cache.keys.establishments}_${id}_limit_${limit}${cursorSuffix}`;
+		const key = `${cache.keys.establishments}_${establishmentId}_limit_${limit}${cursorSuffix}`;
 
 		const raw = await cache.rememberForever(
 			key,
-			async () => await this.productRepository.getCatalog(id, limit, cursor)
+			async () =>
+				await this.productRepository.cursorPaginate({
+					limit,
+					cursor,
+					filterParams: { establishment_id: establishmentId }
+				})
 		);
 		const hasNextPage = raw.length > limit;
 		const catalog = hasNextPage ? raw.slice(0, limit) : raw;

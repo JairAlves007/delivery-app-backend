@@ -101,18 +101,6 @@ export class ProductPrismaRepository implements IProductRepository {
 		});
 	}
 
-	async getCatalog(
-		establishmentId: EstablishmentID,
-		limit: number,
-		cursor?: string | null
-	): Promise<ProductFromRepository[]> {
-		return await this.cursorPaginate({
-			limit,
-			cursor,
-			filterParams: { establishment_id: establishmentId }
-		});
-	}
-
 	async findById({
 		id,
 		filterParams
