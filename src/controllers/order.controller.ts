@@ -1,6 +1,5 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { FilterParams } from "@/types/crud.ts";
-import { makeCreateOrderService } from "@/factories/services/order/make-create-order-service.ts";
 import {
 	cancelOrderBodySchema,
 	createOrderBodySchema,
@@ -105,17 +104,13 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 	const userId = userIdSchema.parse(request.user.sub);
 
 	try {
-		const createOrderService = makeCreateOrderService();
-
-		await createOrderService.handle({ ...body, userId });
-
 		await tasks.trigger<typeof createOrderTask>(createOrderTaskId, {
 			...body,
 			userId
 		});
 
 		return reply
-			.status(HTTPStatusCodes.CREATED)
+			.status(HTTPStatusCodes.ACCEPTED)
 			.send(
 				ApiResponse.success(
 					"Estamos processando seu pedido, em instantes você receberá uma notificação.",

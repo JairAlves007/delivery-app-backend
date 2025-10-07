@@ -9,7 +9,7 @@ import { formatDateToHumanReadable } from "@/helpers/utils.ts";
 import type { BuildOrderItemsParams } from "@/types/order.ts";
 
 export class SendOrderConfirmationMessageService {
-	private makeMessage({
+	private generateMessage({
 		user,
 		deliveryType,
 		paymentMethod,
@@ -45,7 +45,9 @@ export class SendOrderConfirmationMessageService {
 				.replaceAll("{product_quantity}", item.product.quantity.toString())
 				.replaceAll(
 					"{product_price}",
-					transformPriceToHumanReadable(item.product.price)
+					transformPriceToHumanReadable(
+						item.product.price * item.product.quantity
+					)
 				);
 
 			if (!!item.addons && item.addons.length > 0) {
@@ -79,7 +81,7 @@ export class SendOrderConfirmationMessageService {
 			.replaceAll("{customer_name}", user.name)
 			.replaceAll(
 				"{customer_phone}",
-				!!address ? address.phone : contactPhone ?? ""
+				this.applyPhoneMask(!!address ? address.phone : contactPhone ?? "")
 			)
 			.replaceAll("{delivery_type}", getDeliveryTypeLabel(deliveryType))
 			.replaceAll("{payment_method}", getPaymentMethodLabel(paymentMethod))
@@ -150,7 +152,21 @@ export class SendOrderConfirmationMessageService {
 			.replaceAll("\t", "");
 	}
 
+	private applyPhoneMask(phone: string): string {
+		const phoneLength = phone.length;
+
+		if (phoneLength < 10) return phone;
+
+		const phoneRegex =
+			phoneLength === 11 ? /(\d{2})(\d{5})(\d{4})/ : /(\d{2})(\d{4})(\d{4})/;
+
+		return phone.replace(phoneRegex, "($1) $2-$3");
+	}
+
 	async handle(params: BuildOrderItemsParams) {
-		console.log(this.makeMessage(params));
+		// TODO: Implement message sending via WhatsApp Business API
+		const message = this.generateMessage(params);
+
+		console.log({ message });
 	}
 }
