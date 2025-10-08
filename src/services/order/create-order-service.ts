@@ -100,6 +100,7 @@ export class CreateOrderService {
 		user,
 		deliveryType,
 		paymentMethod,
+		contactPhone,
 		changeAmount,
 		establishmentId,
 		comment,
@@ -118,13 +119,14 @@ export class CreateOrderService {
 		);
 
 		return {
-			comment,
 			customer_name: user.name,
+			customer_phone: !!address ? address.phone : contactPhone ?? "S/N",
 			delivery_type: deliveryType,
 			payment_method: paymentMethod,
 			shipping_fee: shippingCost,
-			subtotal,
 			change_amount: changeAmount,
+			comment,
+			subtotal,
 			establishment: {
 				connect: {
 					id: establishmentId

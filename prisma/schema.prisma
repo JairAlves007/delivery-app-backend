@@ -504,6 +504,7 @@ model Order {
   shipping_fee         Int
   subtotal             Int
   customer_name        String
+  customer_phone       String
   user_id              String
   establishment_id     String
   coupon_id            Int?
