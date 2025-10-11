@@ -9,11 +9,13 @@ import { adminAddonCategoryRoutes } from "./addon/category/addon-category.route.
 import { adminAddonRoutes } from "./addon/addon.route.ts";
 import { adminCouponRoutes } from "./coupon/coupon.route.ts";
 import { adminOrderRoutes } from "./order/order.route.ts";
+import { uploadRoutes } from "./upload/upload.route.ts";
 
 export const adminRoutes = (app: FastifyInstance) => {
 	app.register(
 		async api => {
 			api.register(adminAuthRoutes, { prefix: "/auth" });
+			api.register(uploadRoutes, { prefix: "/upload" });
 			api.register(establishmentRoutes, { prefix: "/establishment" });
 			api.register(adminProductRoutes, { prefix: "/products" });
 			api.register(adminProductCategoryRoutes, { prefix: "/product/category" });

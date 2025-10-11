@@ -11,6 +11,7 @@ export type FilterField = {
 export type FilterParams = {
 	establishment_id?: string | null;
 	user_id?: UserID | null;
+	category_id?: string | null;
 };
 
 export type PaginationParams = FilterField & {

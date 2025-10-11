@@ -1,7 +1,8 @@
 import { transformValidFilterParams } from "@/helpers/crud.ts";
-import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
+import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
 import type {
+	CursorPaginationParams,
 	DeleteContentParams,
 	FilterParams,
 	FindByIdParams,
@@ -72,6 +73,41 @@ export class ProductCategoryPrismaRepository
 			orderBy: {
 				order: "asc"
 			}
+		});
+	}
+
+	async cursorPaginate({
+		limit,
+		cursor,
+		filterParams
+	}: CursorPaginationParams<string>): Promise<ProductCategoryFromRepository[]> {
+		const params = transformValidFilterParams(filterParams);
+
+		return await prisma.productCategory.findMany({
+			where: {
+				deleted_at: null,
+				products: {
+					some: {
+						deleted_at: null,
+						OR: [{ valid_until: null }, { valid_until: { gt: new Date() } }],
+						...params
+					}
+				},
+				...params
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				}
+			},
+			orderBy: {
+				order: "asc"
+			},
+			take: limit + 1,
+			skip: cursor ? 1 : 0,
+			cursor: !!cursor ? { id: cursor } : undefined
 		});
 	}
 

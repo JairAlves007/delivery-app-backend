@@ -3,6 +3,7 @@ import type { IBannerRepository } from "@/interfaces/repositories/banner-reposit
 import { prisma } from "@/lib/prisma.ts";
 import type { BannerFromRepository } from "@/types/banner.ts";
 import type {
+	CursorPaginationParams,
 	DeleteContentParams,
 	FilterParams,
 	FindByIdParams,
@@ -68,6 +69,34 @@ export class BannerPrismaRepository implements IBannerRepository {
 			orderBy: {
 				created_at: "desc"
 			}
+		});
+	}
+
+	async cursorPaginate({
+		limit,
+		cursor,
+		filterParams
+	}: CursorPaginationParams<number>): Promise<BannerFromRepository[]> {
+		const params = transformValidFilterParams(filterParams);
+
+		return await prisma.banner.findMany({
+			where: {
+				deleted_at: null,
+				...params
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				}
+			},
+			orderBy: {
+				created_at: "desc"
+			},
+			take: limit + 1,
+			skip: cursor ? 1 : 0,
+			cursor: !!cursor ? { id: cursor } : undefined
 		});
 	}
 
