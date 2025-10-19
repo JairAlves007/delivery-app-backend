@@ -2,8 +2,8 @@ import z from "zod";
 
 const envSchema = z.object({
 	NODE_ENV: z.enum(["development", "production"]).default("development"),
-	PORT: z.coerce.number().default(3000),
-	BASE_URL: z.url("Base url is required").default("http://localhost:3000"),
+	PORT: z.coerce.number().default(3333),
+	BASE_URL: z.url("Base url is required").default("http://localhost:3333"),
 	CORS_ORIGIN: z.string().default("*"),
 	PUBLIC_BUCKET_URL: z
 		.url("Public bucket url is required")
