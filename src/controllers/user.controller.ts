@@ -35,13 +35,15 @@ export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
 					establishmentId: user.establishment?.owner_id
 				},
 				{
-					sub: user.id
+					sub: user.id,
+					expiresIn: Constants.ACCESS_TOKEN_EXPIRATION_TIME
 				}
 			);
 
 			return reply.status(HTTPStatusCodes.OK).send(
 				ApiResponse.success("Usuário autenticado com sucesso", {
 					type: Constants.TOKEN_TYPE,
+					expiresIn: Constants.ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
 					token
 				})
 			);
@@ -70,7 +72,8 @@ export const signUp = (roleType: RoleType, isAdmin: boolean = false) => {
 					role
 				},
 				{
-					sub: user.id
+					sub: user.id,
+					expiresIn: Constants.ACCESS_TOKEN_EXPIRATION_TIME
 				}
 			);
 
@@ -83,6 +86,7 @@ export const signUp = (roleType: RoleType, isAdmin: boolean = false) => {
 			return reply.status(HTTPStatusCodes.CREATED).send(
 				ApiResponse.success("Usuário registrado com sucesso", {
 					type: Constants.TOKEN_TYPE,
+					expiresIn: Constants.ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
 					token
 				})
 			);

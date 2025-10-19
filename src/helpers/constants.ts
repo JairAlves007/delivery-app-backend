@@ -18,6 +18,11 @@ export default class Constants {
 	public static readonly POSTAL_CODE_REGEX: RegExp = /^\d{5}-?\d{3}$/;
 	public static readonly MIME_TYPE_REGEX: RegExp = /\w+\/[-+.\w]+/;
 
+	// Token
+	public static readonly ACCESS_TOKEN_EXPIRATION_IN_SECONDS: number =
+		60 * 60 * 24 * 1;
+	public static readonly ACCESS_TOKEN_EXPIRATION_TIME: string = "1d";
+
 	// Order
 	public static readonly ORDER_SUB_SECTIONS_MESSAGE_TEMPLATES: OrderSubSectionMessage =
 		{
