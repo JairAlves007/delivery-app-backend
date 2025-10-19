@@ -32,7 +32,7 @@ export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
 			const token = await reply.jwtSign(
 				{
 					role: user.role.name,
-					establishmentId: user.establishment?.owner_id
+					establishmentId: user.establishment?.id
 				},
 				{
 					sub: user.id,
@@ -69,7 +69,8 @@ export const signUp = (roleType: RoleType, isAdmin: boolean = false) => {
 
 			const token = await reply.jwtSign(
 				{
-					role
+					role,
+					...(isAdmin && { establishmentId: user.establishment?.id })
 				},
 				{
 					sub: user.id,

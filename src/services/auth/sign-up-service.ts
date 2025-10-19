@@ -3,17 +3,18 @@ import type { IRoleRepository } from "@/interfaces/repositories/role-repository.
 import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
 import type { RoleWithPermissions } from "@/types/role.ts";
 import { signUpBodySchema } from "@/schemas/auth-schema.ts";
-import { RoleType, type User } from "@prisma/client";
+import { RoleType } from "@prisma/client";
 import z from "zod";
 import Constants from "@/helpers/constants.ts";
 import { hash } from "bcrypt-ts";
+import type { UserWithRole } from "@/types/user.ts";
 
 type SignUpServiceRequest = z.infer<typeof signUpBodySchema> & {
 	role: RoleType;
 };
 
 interface SignUpServiceResponse {
-	user: User;
+	user: UserWithRole;
 	role: RoleType;
 }
 
