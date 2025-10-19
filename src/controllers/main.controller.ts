@@ -43,6 +43,10 @@ export const profileData = async (
 			ApiResponse.success("Dados carregados com sucesso", {
 				menu,
 				profile,
+				establishment: {
+					...establishment,
+					isOpen: isEstablishmentOpen(establishment)
+				},
 				bucketUrl: env.PUBLIC_BUCKET_URL
 			})
 		);

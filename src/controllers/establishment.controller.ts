@@ -1,21 +1,16 @@
 import { makeCreateEstablishmentService } from "@/factories/services/establishment/make-create-establishment-service.ts";
 import { makeDeleteEstablishmentService } from "@/factories/services/establishment/make-delete-establishment-service.ts";
 import { makeFindEstablishmentByIdService } from "@/factories/services/establishment/make-find-establishment-by-id-service.ts";
-import { makeFindEstablishmentBySlugService } from "@/factories/services/establishment/make-find-establishment-by-slug-service.ts";
 import { makeListEstablishmentService } from "@/factories/services/establishment/make-list-establishment-service.ts";
 import { makeUpdateEstablishmentService } from "@/factories/services/establishment/make-update-establishment-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
-import { isEstablishmentOpen } from "@/helpers/establishment.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
 	createEstablishmentBodySchema,
 	establishmentParamsSchema,
 	updateEstablishmentBodySchema
 } from "@/schemas/establishment-schema.ts";
-import {
-	establishmentSlugSchema,
-	listQueryParamsSchema
-} from "@/schemas/generic-schema.ts";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
@@ -55,30 +50,6 @@ export const find = async (request: FastifyRequest, reply: FastifyReply) => {
 					establishment
 				)
 			);
-	} catch (error) {
-		return reply.sendError(error);
-	}
-};
-
-export const findBySlug = async (
-	request: FastifyRequest,
-	reply: FastifyReply
-) => {
-	const { slug } = establishmentSlugSchema.parse(request.params);
-
-	try {
-		const findEstablishmentService = makeFindEstablishmentBySlugService();
-
-		const establishment = await findEstablishmentService.handle(slug);
-
-		return reply.status(HTTPStatusCodes.OK).send(
-			ApiResponse.success("Estabelecimento encontrado com sucesso", {
-				establishment: {
-					...establishment,
-					isOpen: isEstablishmentOpen(establishment)
-				}
-			})
-		);
 	} catch (error) {
 		return reply.sendError(error);
 	}
