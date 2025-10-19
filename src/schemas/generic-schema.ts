@@ -9,6 +9,10 @@ export const establishmentParamsSchema = z.object({
 	establishmentId: establishmentIdSchema
 });
 
+export const establishmentSlugSchema = z.object({
+	slug: z.string().min(1, "O slug deve ser preenchido")
+});
+
 export const listQueryParamsSchema = z.object({
 	page: z.coerce.number().min(1, "Pagina inválida").optional(),
 	perPage: z.coerce.number().min(1, "Limite inválido").default(12)

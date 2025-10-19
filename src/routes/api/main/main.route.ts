@@ -2,7 +2,7 @@ import {
 	listBannersCatalog,
 	listProductCategoriesCatalog,
 	listProductsFromCategoryCatalog,
-	main
+	profileData
 } from "@/controllers/main.controller.ts";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.ts";
 import { isAuthenticated } from "@/middlewares/is-auth.ts";
@@ -21,7 +21,7 @@ const homeMiddlewares = {
 };
 
 export const mainRoutes = async (app: FastifyInstance) => {
-	app.get("/:slug", mainMiddlewares, main);
+	app.get("/:slug", mainMiddlewares, profileData);
 
 	app.register(
 		async api => {

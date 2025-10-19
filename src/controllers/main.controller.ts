@@ -3,14 +3,11 @@ import { env } from "@/env.ts";
 import { makeProfileService } from "@/factories/services/main/make-get-profile-service.ts";
 import { makeGetMenuService } from "@/factories/services/main/make-get-menu-service.ts";
 import { makeFindEstablishmentBySlugService } from "@/factories/services/establishment/make-find-establishment-by-slug-service.ts";
-import {
-	listProductsFromCategorySchema,
-	mainParamsSchema
-} from "@/schemas/main-schema.ts";
+import { listProductsFromCategorySchema } from "@/schemas/main-schema.ts";
 import { isEstablishmentOpen } from "@/helpers/establishment.ts";
 import {
-	establishmentIdSchema,
 	establishmentParamsSchema,
+	establishmentSlugSchema,
 	listCursorQueryParamsSchema,
 	userIdSchema
 } from "@/schemas/generic-schema.ts";
@@ -20,8 +17,11 @@ import { makeListBannersCatalogService } from "@/factories/services/banner/make-
 import { makeListProductCategoriesCatalogService } from "@/factories/services/product/category/make-list-product-categories-catalog-service.ts";
 import { makeListProductsFromCategoryCatalogService } from "@/factories/services/product/make-list-products-from-category-catalog-service.ts";
 
-export const main = async (request: FastifyRequest, reply: FastifyReply) => {
-	const { slug } = mainParamsSchema.parse(request.params);
+export const profileData = async (
+	request: FastifyRequest,
+	reply: FastifyReply
+) => {
+	const { slug } = establishmentSlugSchema.parse(request.params);
 	const userId = userIdSchema.parse(request.user.sub);
 
 	try {
@@ -43,10 +43,6 @@ export const main = async (request: FastifyRequest, reply: FastifyReply) => {
 			ApiResponse.success("Dados carregados com sucesso", {
 				menu,
 				profile,
-				establishment: {
-					...establishment,
-					isOpen: isEstablishmentOpen(establishment)
-				},
 				bucketUrl: env.PUBLIC_BUCKET_URL
 			})
 		);
