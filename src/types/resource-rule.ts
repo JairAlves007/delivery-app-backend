@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
-import type { ResourceIntent } from "./resource.ts";
 import type { EstablishmentID } from "./establishment.ts";
+import type { ResourceIntent } from "./resource.ts";
 
 export type ValidateResourceRuleParams = {
 	establishmentId: EstablishmentID;

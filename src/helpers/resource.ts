@@ -1,11 +1,11 @@
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import {
 	fileMimeTypeValues,
-	type ObjectResources,
-	type ResourceItem,
 	type FileMimeType,
+	type ObjectResources,
 	type ResourceInfo,
-	type ResourceIntent
+	type ResourceIntent,
+	type ResourceItem
 } from "@/types/resource.ts";
 import { FileFormatType, ForObjectResourceType } from "@prisma/client";
 

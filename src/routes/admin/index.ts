@@ -1,14 +1,14 @@
 import type { FastifyInstance } from "fastify";
-import { adminAuthRoutes } from "./auth/auth.route.ts";
-import { establishmentRoutes } from "./establishment/establishment.route.ts";
-import { adminProductRoutes } from "./product/product.route.ts";
-import { adminProductCategoryRoutes } from "./product/category/category.route.ts";
-import { adminDistrictRoutes } from "./district/district.route.ts";
-import { adminBannerRoutes } from "./banner/banner.route.ts";
-import { adminAddonCategoryRoutes } from "./addon/category/addon-category.route.ts";
 import { adminAddonRoutes } from "./addon/addon.route.ts";
+import { adminAddonCategoryRoutes } from "./addon/category/addon-category.route.ts";
+import { adminAuthRoutes } from "./auth/auth.route.ts";
+import { adminBannerRoutes } from "./banner/banner.route.ts";
 import { adminCouponRoutes } from "./coupon/coupon.route.ts";
+import { adminDistrictRoutes } from "./district/district.route.ts";
+import { establishmentRoutes } from "./establishment/establishment.route.ts";
 import { adminOrderRoutes } from "./order/order.route.ts";
+import { adminProductCategoryRoutes } from "./product/category/category.route.ts";
+import { adminProductRoutes } from "./product/product.route.ts";
 import { uploadRoutes } from "./upload/upload.route.ts";
 
 export const adminRoutes = (app: FastifyInstance) => {

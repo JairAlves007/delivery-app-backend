@@ -1,11 +1,11 @@
 import { InvalidCredentials } from "@/errors/user/invalid-credentials-error.ts";
-import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
-import type { UserWithRole } from "@/types/user.ts";
-import { signInBodySchema } from "@/schemas/auth-schema.ts";
-import { RoleType } from "@prisma/client";
-import z from "zod";
 import { InvalidEstablishment } from "@/errors/user/invalid-establishment-error.ts";
+import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
+import { signInBodySchema } from "@/schemas/auth-schema.ts";
+import type { UserWithRole } from "@/types/user.ts";
+import { RoleType } from "@prisma/client";
 import { compare } from "bcrypt-ts";
+import z from "zod";
 
 type SignInServiceRequest = z.infer<typeof signInBodySchema> & {
 	allowedRoles: RoleType[];

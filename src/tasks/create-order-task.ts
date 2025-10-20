@@ -1,6 +1,6 @@
-import type { OrderIntent } from "@/types/order.ts";
 import { makeCreateOrderService } from "@/factories/services/order/make-create-order-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
+import type { OrderIntent } from "@/types/order.ts";
 import { logger, task } from "@trigger.dev/sdk";
 
 export const createOrderTaskId = "create-order";

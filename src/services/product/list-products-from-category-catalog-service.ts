@@ -1,11 +1,11 @@
-import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
-import type { ProductFromRepository, ProductList } from "@/types/product.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import { transformPriceFromDatabase } from "@/helpers/price.ts";
 import { mapObjectResourcesList } from "@/helpers/resource.ts";
+import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
 import { listCursorQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import { listProductsFromCategorySchema } from "@/schemas/main-schema.ts";
+import type { ProductFromRepository, ProductList } from "@/types/product.ts";
 import z from "zod";
 
 type ListProductsFromCategoryCatalogServiceRequest = z.infer<

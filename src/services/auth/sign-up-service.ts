@@ -1,20 +1,19 @@
 import { UserUnauthorized } from "@/errors/user/user-unauthorized.ts";
+import Constants from "@/helpers/constants.ts";
 import type { IRoleRepository } from "@/interfaces/repositories/role-repository.ts";
 import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
-import type { RoleWithPermissions } from "@/types/role.ts";
 import { signUpBodySchema } from "@/schemas/auth-schema.ts";
-import { RoleType } from "@prisma/client";
-import z from "zod";
-import Constants from "@/helpers/constants.ts";
+import type { RoleWithPermissions } from "@/types/role.ts";
+import { RoleType, type User } from "@prisma/client";
 import { hash } from "bcrypt-ts";
-import type { UserWithRole } from "@/types/user.ts";
+import z from "zod";
 
 type SignUpServiceRequest = z.infer<typeof signUpBodySchema> & {
 	role: RoleType;
 };
 
 interface SignUpServiceResponse {
-	user: UserWithRole;
+	user: User;
 	role: RoleType;
 }
 

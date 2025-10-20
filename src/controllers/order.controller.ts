@@ -1,14 +1,10 @@
-import type { FastifyReply, FastifyRequest } from "fastify";
-import type { FilterParams } from "@/types/crud.ts";
-import {
-	cancelOrderBodySchema,
-	createOrderBodySchema,
-	orderParamsSchema,
-	updateOrderStatusBodySchema
-} from "@/schemas/order-schema.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
-import { ApiResponse } from "@/helpers/api.ts";
+import { makeCancelOrderFromCustomerService } from "@/factories/services/order/make-cancel-order-from-customer-service.ts";
 import { makeFindOrderService } from "@/factories/services/order/make-find-order-service.ts";
+import { makeListMyOrdersService } from "@/factories/services/order/make-list-my-orders-service.ts";
+import { makeListOrderService } from "@/factories/services/order/make-list-order-service.ts";
+import { makeUpdateOrderService } from "@/factories/services/order/make-update-order-service.ts";
+import { ApiResponse } from "@/helpers/api.ts";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
 	establishmentIdSchema,
 	establishmentParamsSchema,
@@ -16,15 +12,19 @@ import {
 	listQueryParamsSchema,
 	userIdSchema
 } from "@/schemas/generic-schema.ts";
-import { makeListOrderService } from "@/factories/services/order/make-list-order-service.ts";
-import { makeUpdateOrderService } from "@/factories/services/order/make-update-order-service.ts";
-import { makeListMyOrdersService } from "@/factories/services/order/make-list-my-orders-service.ts";
-import { makeCancelOrderFromCustomerService } from "@/factories/services/order/make-cancel-order-from-customer-service.ts";
-import { tasks } from "@trigger.dev/sdk";
+import {
+	cancelOrderBodySchema,
+	createOrderBodySchema,
+	orderParamsSchema,
+	updateOrderStatusBodySchema
+} from "@/schemas/order-schema.ts";
 import {
 	createOrderTask,
 	createOrderTaskId
 } from "@/tasks/create-order-task.ts";
+import type { FilterParams } from "@/types/crud.ts";
+import { tasks } from "@trigger.dev/sdk";
+import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const query = listQueryParamsSchema.parse(request.query);

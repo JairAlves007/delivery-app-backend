@@ -1,13 +1,13 @@
-import type { FastifyPluginAsync } from "fastify";
-import fp from "fastify-plugin";
+import { env } from "@/env.ts";
+import { ErrorBase } from "@/errors/error-base.ts";
 import { ApiResponse } from "@/helpers/api.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
-import { env } from "@/env.ts";
-import { ZodError } from "zod";
-import type { DefaultErrorResponse } from "@/types/response.ts";
-import { ErrorBase } from "@/errors/error-base.ts";
-import { Prisma } from "@prisma/client";
 import { beautifyValidationErrors } from "@/helpers/validation-errors.ts";
+import type { DefaultErrorResponse } from "@/types/response.ts";
+import { Prisma } from "@prisma/client";
+import type { FastifyPluginAsync } from "fastify";
+import fp from "fastify-plugin";
+import { ZodError } from "zod";
 
 declare module "fastify" {
 	interface FastifyReply {

@@ -1,6 +1,6 @@
-import type { BuildOrderItemsParams } from "@/types/order.ts";
 import { makeSendOrderConfirmationMessageService } from "@/factories/services/order/make-send-order-confirmation-message.ts";
 import { ApiResponse } from "@/helpers/api.ts";
+import type { BuildOrderItemsParams } from "@/types/order.ts";
 import { logger, task } from "@trigger.dev/sdk";
 
 export const sendOrderConfirmationTaskId = "send-order-confirmation-message";

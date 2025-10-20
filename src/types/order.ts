@@ -6,11 +6,11 @@ import type {
 	PaymentMethodType,
 	Prisma
 } from "@prisma/client";
-import type { EstablishmentID } from "./establishment.ts";
-import type { UserID, UserWithRole } from "./user.ts";
-import type { ProductFromRepository } from "./product.ts";
 import type { AddonFromRepository } from "./addon.ts";
 import type { UserAddressWithDefault } from "./address.ts";
+import type { EstablishmentID } from "./establishment.ts";
+import type { ProductFromRepository } from "./product.ts";
+import type { UserID, UserWithRole } from "./user.ts";
 
 export type OrderFromRepository = Prisma.OrderGetPayload<{
 	include: {

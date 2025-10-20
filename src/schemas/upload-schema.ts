@@ -1,6 +1,6 @@
-import z from "zod";
 import { fileMimeTypeValues } from "@/types/resource.ts";
 import { ForObjectResourceType, ResourceType } from "@prisma/client";
+import z from "zod";
 import { establishmentIdSchema } from "./generic-schema.ts";
 
 export const uploadSignedUrlBodySchema = z.object({

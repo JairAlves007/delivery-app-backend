@@ -4,7 +4,6 @@ import type {
 	Resource,
 	ResourceType
 } from "@prisma/client";
-import type { EstablishmentID } from "./establishment.ts";
 
 export const fileMimeTypeValues = {
 	PNG: "image/png",

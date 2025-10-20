@@ -1,4 +1,23 @@
+import { UserNotFound } from "@/errors/user/user-not-found.ts";
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { makeCalculateCouponDiscountFromOrderService } from "@/factories/services/order/validations/make-calculate-coupon-discount-from-order-service.ts";
+import { makeValidateAddonsFromOrderService } from "@/factories/services/order/validations/make-validate-addons-from-order-service.ts";
+import { makeValidateDeliveryFromOrderService } from "@/factories/services/order/validations/make-validate-delivery-from-order-service.ts";
+import { makeValidateEstablishmentFromOrderService } from "@/factories/services/order/validations/make-validate-establishment-from-order-service.ts";
+import { makeValidateProductFromOrderService } from "@/factories/services/order/validations/make-validate-product-from-order-service.ts";
+import { makeFindUserService } from "@/factories/services/user/make-find-user-service.ts";
+import { getStatusLabel } from "@/helpers/order.ts";
+import {
+	getValueDiscounted,
+	transformPriceFromDatabase
+} from "@/helpers/price.ts";
+import { removeDuplicateItems } from "@/helpers/utils.ts";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
+import {
+	sendOrderConfirmationTask,
+	sendOrderConfirmationTaskId
+} from "@/tasks/send-order-confirmation-message-task.ts";
+import type { UserAddressWithDefault } from "@/types/address.ts";
 import type {
 	BuildOrderItemsParams,
 	OrderAddonsToProcess,
@@ -13,26 +32,7 @@ import {
 	type District,
 	type Prisma
 } from "@prisma/client";
-import type { UserAddressWithDefault } from "@/types/address.ts";
-import { makeValidateEstablishmentFromOrderService } from "@/factories/services/order/validations/make-validate-establishment-from-order-service.ts";
-import { removeDuplicateItems } from "@/helpers/utils.ts";
-import { makeValidateProductFromOrderService } from "@/factories/services/order/validations/make-validate-product-from-order-service.ts";
-import {
-	getValueDiscounted,
-	transformPriceFromDatabase
-} from "@/helpers/price.ts";
-import { makeFindUserService } from "@/factories/services/user/make-find-user-service.ts";
-import { UserNotFound } from "@/errors/user/user-not-found.ts";
-import { getStatusLabel } from "@/helpers/order.ts";
-import { makeValidateDeliveryFromOrderService } from "@/factories/services/order/validations/make-validate-delivery-from-order-service.ts";
-import { makeValidateAddonsFromOrderService } from "@/factories/services/order/validations/make-validate-addons-from-order-service.ts";
-import { makeCalculateCouponDiscountFromOrderService } from "@/factories/services/order/validations/make-calculate-coupon-discount-from-order-service.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { tasks } from "@trigger.dev/sdk";
-import {
-	sendOrderConfirmationTask,
-	sendOrderConfirmationTaskId
-} from "@/tasks/send-order-confirmation-message-task.ts";
 
 export class CreateOrderService {
 	private orderRepository: IOrderRepository;

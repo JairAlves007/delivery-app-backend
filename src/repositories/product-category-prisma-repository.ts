@@ -1,6 +1,6 @@
 import { transformValidFilterParams } from "@/helpers/crud.ts";
-import { prisma } from "@/lib/prisma.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
+import { prisma } from "@/lib/prisma.ts";
 import type {
 	CursorPaginationParams,
 	DeleteContentParams,

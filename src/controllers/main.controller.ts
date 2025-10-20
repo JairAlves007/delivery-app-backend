@@ -1,20 +1,20 @@
-import type { FastifyReply, FastifyRequest } from "fastify";
 import { env } from "@/env.ts";
-import { makeProfileService } from "@/factories/services/main/make-get-profile-service.ts";
-import { makeGetMenuService } from "@/factories/services/main/make-get-menu-service.ts";
+import { makeListBannersCatalogService } from "@/factories/services/banner/make-list-banners-catalog-service.ts";
 import { makeFindEstablishmentBySlugService } from "@/factories/services/establishment/make-find-establishment-by-slug-service.ts";
-import { listProductsFromCategorySchema } from "@/schemas/main-schema.ts";
+import { makeGetMenuService } from "@/factories/services/main/make-get-menu-service.ts";
+import { makeProfileService } from "@/factories/services/main/make-get-profile-service.ts";
+import { makeListProductCategoriesCatalogService } from "@/factories/services/product/category/make-list-product-categories-catalog-service.ts";
+import { makeListProductsFromCategoryCatalogService } from "@/factories/services/product/make-list-products-from-category-catalog-service.ts";
+import { ApiResponse } from "@/helpers/api.ts";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
 	establishmentParamsSchema,
 	establishmentSlugSchema,
 	listCursorQueryParamsSchema,
 	userIdSchema
 } from "@/schemas/generic-schema.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import { makeListBannersCatalogService } from "@/factories/services/banner/make-list-banners-catalog-service.ts";
-import { makeListProductCategoriesCatalogService } from "@/factories/services/product/category/make-list-product-categories-catalog-service.ts";
-import { makeListProductsFromCategoryCatalogService } from "@/factories/services/product/make-list-products-from-category-catalog-service.ts";
+import { listProductsFromCategorySchema } from "@/schemas/main-schema.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const profileData = async (
 	request: FastifyRequest,

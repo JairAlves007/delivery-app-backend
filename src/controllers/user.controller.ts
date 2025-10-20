@@ -1,5 +1,9 @@
-import Constants from "@/helpers/constants.ts";
+import { makeForgotPasswordService } from "@/factories/services/auth/make-forgot-password-service.ts";
+import { makeResetPasswordService } from "@/factories/services/auth/make-reset-password-service.ts";
+import { makeSignInService } from "@/factories/services/auth/make-sign-in-service.ts";
+import { makeSignUpService } from "@/factories/services/auth/make-sign-up-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
+import Constants from "@/helpers/constants.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
 	adminSignInBodySchema,
@@ -11,10 +15,6 @@ import {
 } from "@/schemas/auth-schema.ts";
 import { RoleType } from "@prisma/client";
 import type { FastifyReply, FastifyRequest } from "fastify";
-import { makeSignInService } from "@/factories/services/auth/make-sign-in-service.ts";
-import { makeSignUpService } from "@/factories/services/auth/make-sign-up-service.ts";
-import { makeForgotPasswordService } from "@/factories/services/auth/make-forgot-password-service.ts";
-import { makeResetPasswordService } from "@/factories/services/auth/make-reset-password-service.ts";
 
 export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
@@ -70,7 +70,7 @@ export const signUp = (roleType: RoleType, isAdmin: boolean = false) => {
 			const token = await reply.jwtSign(
 				{
 					role,
-					...(isAdmin && { establishmentId: user.establishment?.id })
+					...(isAdmin && { establishmentId: body.establishmentId })
 				},
 				{
 					sub: user.id,

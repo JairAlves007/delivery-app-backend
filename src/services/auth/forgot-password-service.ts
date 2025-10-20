@@ -1,6 +1,5 @@
 import { env } from "@/env.ts";
 import { InvalidCredentials } from "@/errors/user/invalid-credentials-error.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import Constants from "@/helpers/constants.ts";
 import type { IPasswordResetTokenRepository } from "@/interfaces/repositories/password-reset-token-repository.ts";
 import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";

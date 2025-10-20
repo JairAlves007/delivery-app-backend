@@ -19,9 +19,9 @@ export class AddonPrismaRepository implements IAddonRepository {
 			where: {
 				deleted_at: null,
 				category: {
-					deleted_at: null
-				},
-				...params
+					deleted_at: null,
+					...params
+				}
 			},
 			include: {
 				category: true
@@ -39,9 +39,9 @@ export class AddonPrismaRepository implements IAddonRepository {
 			where: {
 				deleted_at: null,
 				category: {
-					deleted_at: null
-				},
-				...params
+					deleted_at: null,
+					...params
+				}
 			}
 		});
 	}
@@ -59,9 +59,9 @@ export class AddonPrismaRepository implements IAddonRepository {
 			where: {
 				deleted_at: null,
 				category: {
-					deleted_at: null
-				},
-				...params
+					deleted_at: null,
+					...params
+				}
 			},
 			include: {
 				category: true
@@ -83,9 +83,9 @@ export class AddonPrismaRepository implements IAddonRepository {
 				id,
 				deleted_at: null,
 				category: {
-					deleted_at: null
-				},
-				...params
+					deleted_at: null,
+					...params
+				}
 			},
 			include: {
 				category: true
@@ -99,16 +99,12 @@ export class AddonPrismaRepository implements IAddonRepository {
 
 	async update({
 		id,
-		filterParams,
 		data
 	}: UpdateContentParams<number, Prisma.AddonUpdateInput>): Promise<void> {
-		const params = transformValidFilterParams(filterParams);
-
 		await prisma.addon.update({
 			where: {
 				id,
-				deleted_at: null,
-				...params
+				deleted_at: null
 			},
 			data
 		});
@@ -119,13 +115,10 @@ export class AddonPrismaRepository implements IAddonRepository {
 		force,
 		filterParams
 	}: DeleteContentParams<number>): Promise<void> {
-		const params = transformValidFilterParams(filterParams);
-
 		if (force) {
 			await prisma.addon.delete({
 				where: {
-					id,
-					...params
+					id
 				}
 			});
 		}

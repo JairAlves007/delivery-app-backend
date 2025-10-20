@@ -1,13 +1,13 @@
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma.ts";
-import type { EstablishmentFromRepository } from "@/types/establishment.ts";
 import type {
 	DeleteContentParams,
 	FindByIdParams,
 	PaginationParams,
 	UpdateContentParams
 } from "@/types/crud.ts";
+import type { EstablishmentFromRepository } from "@/types/establishment.ts";
+import type { Prisma } from "@prisma/client";
 
 export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	async listAll(): Promise<EstablishmentFromRepository[]> {

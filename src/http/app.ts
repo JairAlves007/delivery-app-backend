@@ -1,13 +1,13 @@
 import "@/@types/zod.d.ts";
 
 import { env } from "@/env.ts";
-import { routes } from "@/routes/index.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import replySendErrorPlugin from "@/plugins/reply-send-error.ts";
+import { routes } from "@/routes/index.ts";
 import type { DefaultErrorResponse } from "@/types/response.ts";
 import fastifyCors from "@fastify/cors";
-import fastify from "fastify";
-import replySendErrorPlugin from "@/plugins/reply-send-error.ts";
 import fastifyJwt from "@fastify/jwt";
+import fastify from "fastify";
 
 const app = fastify({
 	logger: {

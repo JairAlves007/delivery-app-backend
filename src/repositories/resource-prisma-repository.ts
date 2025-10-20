@@ -1,10 +1,10 @@
 import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.ts";
+import { prisma } from "@/lib/prisma.ts";
 import type {
 	ResourceRuleFromRepository,
 	ValidateResourceRuleParams
 } from "@/types/resource-rule.ts";
 import type { Prisma, Resource } from "@prisma/client";
-import { prisma } from "@/lib/prisma.ts";
 
 export class ResourcePrismaRepository implements IResourceRepository {
 	async validateResourceRule({
