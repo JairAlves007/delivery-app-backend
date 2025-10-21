@@ -6,6 +6,7 @@ import { makeProfileService } from "@/factories/services/main/make-get-profile-s
 import { makeListProductCategoriesCatalogService } from "@/factories/services/product/category/make-list-product-categories-catalog-service.ts";
 import { makeListProductsFromCategoryCatalogService } from "@/factories/services/product/make-list-products-from-category-catalog-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
+import { isEstablishmentOpen } from "@/helpers/establishment.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
 	establishmentParamsSchema,
@@ -42,6 +43,10 @@ export const profileData = async (
 			ApiResponse.success("Dados carregados com sucesso", {
 				menu,
 				profile,
+				establishment: {
+					...establishment,
+					isOpen: isEstablishmentOpen(establishment)
+				},
 				bucketUrl: env.PUBLIC_BUCKET_URL
 			})
 		);
