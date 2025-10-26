@@ -362,14 +362,15 @@ model Product {
 model Tag {
   id               Int              @id @default(autoincrement())
   establishment_id String
-  name             TagType
+  label            String
+  type             TagType
   deleted_at       DateTime?
   establishment    Establishment    @relation(fields: [establishment_id], references: [id])
   productTags      ProductTag[]
   fromTags         TagCombination[] @relation("FromTag")
   toTags           TagCombination[] @relation("ToTag")
 
-  @@unique([name, establishment_id])
+  @@unique([type, establishment_id])
 }
 
 model TagCombination {

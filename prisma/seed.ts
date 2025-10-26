@@ -2,21 +2,21 @@ import Constants from "@/helpers/constants.ts";
 import { transformPriceToDatabase } from "@/helpers/price.ts";
 import { slugify } from "@/helpers/utils.ts";
 import {
-	PrismaClient,
-	PermissionType,
-	RoleType,
-	type ProductCategory,
-	type Product,
-	type AddonCategory,
 	AddonType,
+	BannerLinkType,
 	CouponType,
 	DiscountType,
-	BannerLinkType,
-	SocialPlatform,
-	WeekDay,
+	FileFormatType,
+	PermissionType,
 	Prisma,
+	PrismaClient,
+	RoleType,
+	SocialPlatform,
 	TagType,
-	FileFormatType
+	WeekDay,
+	type AddonCategory,
+	type Product,
+	type ProductCategory
 } from "@prisma/client";
 import { hash } from "bcrypt-ts";
 
@@ -231,9 +231,53 @@ async function main() {
 		]
 	});
 
+	const tagLabel = {
+		[TagType.ALCOHOLIC_DRINK]: "Bebidas alcoólicas",
+		[TagType.APPETIZER]: "Aperitivos",
+		[TagType.BREAKFAST]: "Cafe da manhã",
+		[TagType.BURGER]: "Hambúrgueres",
+		[TagType.CAKE]: "Bolos",
+		[TagType.COFFEE]: "Café",
+		[TagType.COLD_DRINK]: "Bebidas frias",
+		[TagType.COMBO]: "Combos",
+		[TagType.COOKIE]: "Biscoitos",
+		[TagType.DESSERT]: "Sobremesas",
+		[TagType.DINNER]: "Jantar",
+		[TagType.DRINK]: "Bebidas",
+		[TagType.FISH]: "Peixes",
+		[TagType.FOOD]: "Alimentos",
+		[TagType.FRUIT]: "Frutas",
+		[TagType.GLUTEN_FREE]: "Sem Glúten",
+		[TagType.GRILL]: "Churrasco",
+		[TagType.HOT_DRINK]: "Bebidas quentes",
+		[TagType.ICE_CREAM]: "Sorvetes",
+		[TagType.JUICE]: "Sucos",
+		[TagType.LUNCH]: "Almoço",
+		[TagType.MEAT]: "Carnes",
+		[TagType.MILK_SHAKE]: "Milk Shakes",
+		[TagType.NON_ALCOHOLIC_DRINK]: "Bebidas não alcoólicas",
+		[TagType.PASTA]: "Massas",
+		[TagType.PASTRY]: "Padarias",
+		[TagType.PIE]: "Tortas",
+		[TagType.PIZZA]: "Pizzas",
+		[TagType.SALAD]: "Saladas",
+		[TagType.SANDWICH]: "Sanduíches",
+		[TagType.SIDE]: "Entradas",
+		[TagType.SMOOTHIE]: "Smoothies",
+		[TagType.SNACK]: "Snacks",
+		[TagType.SODA]: "Refrigerantes",
+		[TagType.SOUP]: "Sopas",
+		[TagType.SUSHI]: "Sushi",
+		[TagType.TEA]: "Chá",
+		[TagType.VEGAN]: "Vegano",
+		[TagType.VEGETABLE]: "Vegetais",
+		[TagType.VEGETARIAN]: "Vegetariano"
+	} as const;
+
 	// ----- Tags -----
 	const tagsData = Object.values(TagType).map(tag => ({
-		name: tag,
+		type: tag,
+		label: tagLabel[tag],
 		establishment_id: establishment.id
 	}));
 
@@ -247,51 +291,51 @@ async function main() {
 			// Coca Cola 2L
 			{
 				product_id: products[0].id,
-				tag_id: tags.find(t => t.name === TagType.COLD_DRINK)!.id
+				tag_id: tags.find(t => t.type === TagType.COLD_DRINK)!.id
 			},
 			{
 				product_id: products[0].id,
-				tag_id: tags.find(t => t.name === TagType.NON_ALCOHOLIC_DRINK)!.id
+				tag_id: tags.find(t => t.type === TagType.NON_ALCOHOLIC_DRINK)!.id
 			},
 			{
 				product_id: products[0].id,
-				tag_id: tags.find(t => t.name === TagType.DRINK)!.id
+				tag_id: tags.find(t => t.type === TagType.DRINK)!.id
 			},
 
 			// Pizza Calabresa
 			{
 				product_id: products[1].id,
-				tag_id: tags.find(t => t.name === TagType.FOOD)!.id
+				tag_id: tags.find(t => t.type === TagType.FOOD)!.id
 			},
 			{
 				product_id: products[1].id,
-				tag_id: tags.find(t => t.name === TagType.PIZZA)!.id
+				tag_id: tags.find(t => t.type === TagType.PIZZA)!.id
 			},
 			{
 				product_id: products[1].id,
-				tag_id: tags.find(t => t.name === TagType.LUNCH)!.id
+				tag_id: tags.find(t => t.type === TagType.LUNCH)!.id
 			},
 			{
 				product_id: products[1].id,
-				tag_id: tags.find(t => t.name === TagType.DINNER)!.id
+				tag_id: tags.find(t => t.type === TagType.DINNER)!.id
 			},
 
 			// X-Tudo
 			{
 				product_id: products[2].id,
-				tag_id: tags.find(t => t.name === TagType.FOOD)!.id
+				tag_id: tags.find(t => t.type === TagType.FOOD)!.id
 			},
 			{
 				product_id: products[2].id,
-				tag_id: tags.find(t => t.name === TagType.BURGER)!.id
+				tag_id: tags.find(t => t.type === TagType.BURGER)!.id
 			},
 			{
 				product_id: products[2].id,
-				tag_id: tags.find(t => t.name === TagType.LUNCH)!.id
+				tag_id: tags.find(t => t.type === TagType.LUNCH)!.id
 			},
 			{
 				product_id: products[2].id,
-				tag_id: tags.find(t => t.name === TagType.DINNER)!.id
+				tag_id: tags.find(t => t.type === TagType.DINNER)!.id
 			}
 		]
 	});
@@ -375,8 +419,8 @@ async function main() {
 	// Criar no banco
 	await prisma.tagCombination.createMany({
 		data: tagCombinationsData.map(tc => ({
-			from_tag_id: tags.find(t => t.name === tc.from)!.id,
-			to_tag_id: tags.find(t => t.name === tc.to)!.id
+			from_tag_id: tags.find(t => t.type === tc.from)!.id,
+			to_tag_id: tags.find(t => t.type === tc.to)!.id
 		})),
 		skipDuplicates: true
 	});
