@@ -1,7 +1,6 @@
 import {
 	destroy,
 	find,
-	findBySlug,
 	index,
 	store,
 	update
@@ -21,7 +20,6 @@ const establishmentMiddlewares = {
 export const establishmentRoutes = async (app: FastifyInstance) => {
 	app.get("/", establishmentMiddlewares, index);
 	app.get("/:id", establishmentMiddlewares, find);
-	app.get("/:slug/info", findBySlug);
 	app.post("/", establishmentMiddlewares, store);
 	app.patch("/:id", establishmentMiddlewares, update);
 	app.delete("/:id", establishmentMiddlewares, destroy);
