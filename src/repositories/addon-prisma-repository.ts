@@ -1,4 +1,7 @@
-import { transformValidFilterParams } from "@/helpers/crud.ts";
+import {
+	buildFilterQueryOptions,
+	transformValidFilterParams
+} from "@/helpers/crud.ts";
 import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
 import type { AddonFromRepository } from "@/types/addon.ts";
@@ -13,11 +16,22 @@ import type { Prisma } from "@prisma/client";
 
 export class AddonPrismaRepository implements IAddonRepository {
 	async listAll(filterParams?: FilterParams): Promise<AddonFromRepository[]> {
-		const params = transformValidFilterParams(filterParams);
+		const { search, sortField, sortOrder, ...params } =
+			transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.AddonOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "name",
+				sortOrder: sortOrder ?? "asc",
+				searchableFields: ["name"],
+				defaultSortField: "name"
+			});
 
 		return await prisma.addon.findMany({
 			where: {
 				deleted_at: null,
+				...where,
 				category: {
 					deleted_at: null,
 					...params
@@ -26,18 +40,31 @@ export class AddonPrismaRepository implements IAddonRepository {
 			include: {
 				category: true
 			},
-			orderBy: {
-				name: "asc"
-			}
+			orderBy
 		});
 	}
 
 	async count(filterParams?: FilterParams): Promise<number> {
-		const params = transformValidFilterParams(filterParams);
+		const {
+			search,
+			sortField = undefined,
+			sortOrder = undefined,
+			...params
+		} = transformValidFilterParams(filterParams);
+
+		const { where } =
+			buildFilterQueryOptions<Prisma.AddonOrderByWithRelationInput>({
+				search,
+				sortField,
+				sortOrder,
+				searchableFields: ["name"],
+				defaultSortField: "name"
+			});
 
 		return await prisma.addon.count({
 			where: {
 				deleted_at: null,
+				...where,
 				category: {
 					deleted_at: null,
 					...params
@@ -51,13 +78,24 @@ export class AddonPrismaRepository implements IAddonRepository {
 		perPage,
 		filterParams
 	}: PaginationParams): Promise<AddonFromRepository[]> {
-		const params = transformValidFilterParams(filterParams);
+		const { search, sortField, sortOrder, ...params } =
+			transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.AddonOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "name",
+				sortOrder: sortOrder ?? "asc",
+				searchableFields: ["name"],
+				defaultSortField: "name"
+			});
 
 		return await prisma.addon.findMany({
 			skip: (page - 1) * perPage,
 			take: perPage,
 			where: {
 				deleted_at: null,
+				...where,
 				category: {
 					deleted_at: null,
 					...params
@@ -66,9 +104,7 @@ export class AddonPrismaRepository implements IAddonRepository {
 			include: {
 				category: true
 			},
-			orderBy: {
-				name: "asc"
-			}
+			orderBy
 		});
 	}
 

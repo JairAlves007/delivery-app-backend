@@ -1,4 +1,7 @@
-import { transformValidFilterParams } from "@/helpers/crud.ts";
+import {
+	buildFilterQueryOptions,
+	transformValidFilterParams
+} from "@/helpers/crud.ts";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
 import type { BannerFromRepository } from "@/types/banner.ts";
@@ -14,11 +17,22 @@ import type { Prisma } from "@prisma/client";
 
 export class BannerPrismaRepository implements IBannerRepository {
 	async listAll(filterParams?: FilterParams): Promise<BannerFromRepository[]> {
-		const params = transformValidFilterParams(filterParams);
+		const { search, sortField, sortOrder, ...params } =
+			transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.BannerOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "created_at",
+				sortOrder: sortOrder ?? "desc",
+				searchableFields: ["name"],
+				defaultSortField: "created_at"
+			});
 
 		return await prisma.banner.findMany({
 			where: {
 				deleted_at: null,
+				...where,
 				...params
 			},
 			include: {
@@ -28,18 +42,31 @@ export class BannerPrismaRepository implements IBannerRepository {
 					}
 				}
 			},
-			orderBy: {
-				created_at: "desc"
-			}
+			orderBy
 		});
 	}
 
 	async count(filterParams?: FilterParams): Promise<number> {
-		const params = transformValidFilterParams(filterParams);
+		const {
+			search,
+			sortField = undefined,
+			sortOrder = undefined,
+			...params
+		} = transformValidFilterParams(filterParams);
+
+		const { where } =
+			buildFilterQueryOptions<Prisma.BannerOrderByWithRelationInput>({
+				search,
+				sortField,
+				sortOrder,
+				searchableFields: ["name"],
+				defaultSortField: "created_at"
+			});
 
 		return await prisma.banner.count({
 			where: {
 				deleted_at: null,
+				...where,
 				...params
 			}
 		});
@@ -50,13 +77,24 @@ export class BannerPrismaRepository implements IBannerRepository {
 		page,
 		filterParams
 	}: PaginationParams): Promise<BannerFromRepository[]> {
-		const params = transformValidFilterParams(filterParams);
+		const { search, sortField, sortOrder, ...params } =
+			transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.BannerOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "created_at",
+				sortOrder: sortOrder ?? "desc",
+				searchableFields: ["name"],
+				defaultSortField: "created_at"
+			});
 
 		return await prisma.banner.findMany({
 			skip: (page - 1) * perPage,
 			take: perPage,
 			where: {
 				deleted_at: null,
+				...where,
 				...params
 			},
 			include: {
@@ -66,9 +104,7 @@ export class BannerPrismaRepository implements IBannerRepository {
 					}
 				}
 			},
-			orderBy: {
-				created_at: "desc"
-			}
+			orderBy
 		});
 	}
 
@@ -77,11 +113,22 @@ export class BannerPrismaRepository implements IBannerRepository {
 		cursor,
 		filterParams
 	}: CursorPaginationParams<number>): Promise<BannerFromRepository[]> {
-		const params = transformValidFilterParams(filterParams);
+		const { search, sortField, sortOrder, ...params } =
+			transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.BannerOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "created_at",
+				sortOrder: sortOrder ?? "desc",
+				searchableFields: ["name"],
+				defaultSortField: "created_at"
+			});
 
 		return await prisma.banner.findMany({
 			where: {
 				deleted_at: null,
+				...where,
 				...params
 			},
 			include: {
@@ -91,9 +138,7 @@ export class BannerPrismaRepository implements IBannerRepository {
 					}
 				}
 			},
-			orderBy: {
-				created_at: "desc"
-			},
+			orderBy,
 			take: limit + 1,
 			skip: cursor ? 1 : 0,
 			cursor: !!cursor ? { id: cursor } : undefined

@@ -1,4 +1,8 @@
-import type { FilterParams, ValidFilterParams } from "@/types/crud.ts";
+import type {
+	FilterParams,
+	SearchableModelFromRepositoryFields,
+	ValidFilterParams
+} from "@/types/crud.ts";
 
 export const transformValidFilterParams = (
 	filterParams?: FilterParams
@@ -20,5 +24,33 @@ export const getFilterParamsCacheKey = (
 		cacheKey.push(key, value);
 	});
 
-	return cacheKey.join("_");
+	return cacheKey.join("_") + "_";
 };
+
+export function buildFilterQueryOptions<Field>({
+	search,
+	sortField,
+	sortOrder,
+	searchableFields,
+	defaultSortField
+}: SearchableModelFromRepositoryFields<Field>) {
+	const where = {
+		...(search &&
+			searchableFields.length > 0 && {
+				OR: searchableFields.map(field => ({
+					[field]: { contains: search, mode: "insensitive" }
+				}))
+			})
+	};
+
+	if (!sortField || !searchableFields.includes(sortField as keyof Field))
+		sortField = defaultSortField as string;
+
+	const orderBy = {
+		[sortField]: sortOrder ?? "asc"
+	};
+
+	console.log({ where, orderBy });
+
+	return { where, orderBy };
+}

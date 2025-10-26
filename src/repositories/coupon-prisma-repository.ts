@@ -1,4 +1,7 @@
-import { transformValidFilterParams } from "@/helpers/crud.ts";
+import {
+	buildFilterQueryOptions,
+	transformValidFilterParams
+} from "@/helpers/crud.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
 import type { CouponWithUserCoupons } from "@/types/coupon.ts";
@@ -14,24 +17,52 @@ import type { Coupon, Prisma } from "@prisma/client";
 
 export class CouponPrismaRepository implements ICouponRepository {
 	async listAll(filterParams?: FilterParams): Promise<Coupon[]> {
-		const params = transformValidFilterParams(filterParams);
+		const { search, sortField, sortOrder, ...params } =
+			transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.CouponOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "id",
+				sortOrder: sortOrder ?? "asc",
+				searchableFields: ["code"],
+				defaultSortField: "id"
+			});
 
 		return await prisma.coupon.findMany({
 			where: {
 				deleted_at: null,
+				...where,
 				...params
-			}
+			},
+			orderBy
 		});
 	}
 
 	async count(filterParams?: FilterParams): Promise<number> {
-		const params = transformValidFilterParams(filterParams);
+		const {
+			search,
+			sortField = undefined,
+			sortOrder = undefined,
+			...params
+		} = transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.CouponOrderByWithRelationInput>({
+				search,
+				sortField,
+				sortOrder,
+				searchableFields: ["code"],
+				defaultSortField: "id"
+			});
 
 		return await prisma.coupon.count({
 			where: {
 				deleted_at: null,
+				...where,
 				...params
-			}
+			},
+			orderBy
 		});
 	}
 
@@ -40,15 +71,27 @@ export class CouponPrismaRepository implements ICouponRepository {
 		page,
 		filterParams
 	}: PaginationParams): Promise<Coupon[]> {
-		const params = transformValidFilterParams(filterParams);
+		const { search, sortField, sortOrder, ...params } =
+			transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.CouponOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "id",
+				sortOrder: sortOrder ?? "asc",
+				searchableFields: ["code"],
+				defaultSortField: "id"
+			});
 
 		return await prisma.coupon.findMany({
 			skip: (page - 1) * perPage,
 			take: perPage,
 			where: {
 				deleted_at: null,
+				...where,
 				...params
-			}
+			},
+			orderBy
 		});
 	}
 

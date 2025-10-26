@@ -17,7 +17,12 @@ import {
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
-	const query = listCursorQueryParamsSchema.parse(request.query);
+	const {
+		search = undefined,
+		sortField = undefined,
+		sortOrder = undefined,
+		...query
+	} = listCursorQueryParamsSchema.parse(request.query);
 	const userId = userIdSchema.parse(request.user.sub);
 
 	try {

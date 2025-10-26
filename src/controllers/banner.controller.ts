@@ -13,14 +13,20 @@ import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
-	const query = listQueryParamsSchema.parse(request.query);
+	const { search, sortField, sortOrder, ...query } =
+		listQueryParamsSchema.parse(request.query);
 
 	try {
 		const listBannerService = makeListBannerService();
 
 		const banners = await listBannerService.handle({
 			...query,
-			filterParams: { establishment_id: request.user.establishmentId }
+			filterParams: {
+				establishment_id: request.user.establishmentId,
+				search,
+				sortField,
+				sortOrder
+			}
 		});
 
 		return reply

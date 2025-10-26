@@ -1,4 +1,7 @@
-import { transformValidFilterParams } from "@/helpers/crud.ts";
+import {
+	buildFilterQueryOptions,
+	transformValidFilterParams
+} from "@/helpers/crud.ts";
 import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
 import type { AddonCategoryFromRepository } from "@/types/addon-category.ts";
@@ -15,28 +18,52 @@ export class AddonCategoryPrismaRepository implements IAddonCategoryRepository {
 	async listAll(
 		filterParams?: FilterParams
 	): Promise<AddonCategoryFromRepository[]> {
-		const params = transformValidFilterParams(filterParams);
+		const { search, sortField, sortOrder, ...params } =
+			transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.AddonCategoryOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "name",
+				sortOrder: sortOrder ?? "asc",
+				searchableFields: ["name"],
+				defaultSortField: "name"
+			});
 
 		return await prisma.addonCategory.findMany({
 			where: {
 				deleted_at: null,
+				...where,
 				...params
 			},
 			include: {
 				addons: true
 			},
-			orderBy: {
-				name: "asc"
-			}
+			orderBy
 		});
 	}
 
 	async count(filterParams?: FilterParams): Promise<number> {
-		const params = transformValidFilterParams(filterParams);
+		const {
+			search,
+			sortField = undefined,
+			sortOrder = undefined,
+			...params
+		} = transformValidFilterParams(filterParams);
+
+		const { where } =
+			buildFilterQueryOptions<Prisma.AddonCategoryOrderByWithRelationInput>({
+				search,
+				sortField,
+				sortOrder,
+				searchableFields: ["name"],
+				defaultSortField: "name"
+			});
 
 		return await prisma.addonCategory.count({
 			where: {
 				deleted_at: null,
+				...where,
 				...params
 			}
 		});
@@ -47,21 +74,30 @@ export class AddonCategoryPrismaRepository implements IAddonCategoryRepository {
 		perPage,
 		filterParams
 	}: PaginationParams): Promise<AddonCategoryFromRepository[]> {
-		const params = transformValidFilterParams(filterParams);
+		const { search, sortField, sortOrder, ...params } =
+			transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.AddonCategoryOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "name",
+				sortOrder: sortOrder ?? "asc",
+				searchableFields: ["name"],
+				defaultSortField: "name"
+			});
 
 		return await prisma.addonCategory.findMany({
 			skip: (page - 1) * perPage,
 			take: perPage,
 			where: {
 				deleted_at: null,
+				...where,
 				...params
 			},
 			include: {
 				addons: true
 			},
-			orderBy: {
-				name: "asc"
-			}
+			orderBy
 		});
 	}
 

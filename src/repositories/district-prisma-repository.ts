@@ -1,4 +1,7 @@
-import { transformValidFilterParams } from "@/helpers/crud.ts";
+import {
+	buildFilterQueryOptions,
+	transformValidFilterParams
+} from "@/helpers/crud.ts";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
 import type {
@@ -12,27 +15,52 @@ import type { District, Prisma } from "@prisma/client";
 
 export class DistrictPrismaRepository implements IDistrictRepository {
 	async listAll(filterParams?: FilterParams): Promise<District[]> {
-		const params = transformValidFilterParams(filterParams);
+		const { search, sortField, sortOrder, ...params } =
+			transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.DistrictOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "name",
+				sortOrder: sortOrder ?? "asc",
+				searchableFields: ["name"],
+				defaultSortField: "name"
+			});
 
 		return await prisma.district.findMany({
 			where: {
 				deleted_at: null,
+				...where,
 				...params
 			},
-			orderBy: {
-				name: "asc"
-			}
+			orderBy
 		});
 	}
 
 	async count(filterParams?: FilterParams): Promise<number> {
-		const params = transformValidFilterParams(filterParams);
+		const {
+			search,
+			sortField = undefined,
+			sortOrder = undefined,
+			...params
+		} = transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.DistrictOrderByWithRelationInput>({
+				search,
+				sortField,
+				sortOrder,
+				searchableFields: ["name"],
+				defaultSortField: "name"
+			});
 
 		return await prisma.district.count({
 			where: {
 				deleted_at: null,
+				...where,
 				...params
-			}
+			},
+			orderBy
 		});
 	}
 
@@ -41,18 +69,27 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 		perPage,
 		filterParams
 	}: PaginationParams): Promise<District[]> {
-		const params = transformValidFilterParams(filterParams);
+		const { search, sortField, sortOrder, ...params } =
+			transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.DistrictOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "name",
+				sortOrder: sortOrder ?? "asc",
+				searchableFields: ["name"],
+				defaultSortField: "name"
+			});
 
 		return await prisma.district.findMany({
 			skip: (page - 1) * perPage,
 			take: perPage,
 			where: {
 				deleted_at: null,
+				...where,
 				...params
 			},
-			orderBy: {
-				name: "asc"
-			}
+			orderBy
 		});
 	}
 

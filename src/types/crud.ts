@@ -1,3 +1,5 @@
+import { searchAndOrderBySchema } from "@/schemas/generic-schema.ts";
+import z from "zod";
 import type { UserID } from "./user.ts";
 
 export type ValidFilterParams = {
@@ -8,10 +10,18 @@ export type FilterField = {
 	filterParams?: FilterParams;
 };
 
-export type FilterParams = {
+export type FilterParams = z.infer<typeof searchAndOrderBySchema> & {
 	establishment_id?: string | null;
 	user_id?: UserID | null;
 	category_id?: string | null;
+};
+
+export type SearchableModelFromRepositoryFields<Field> = Pick<
+	Partial<ValidFilterParams>,
+	"search" | "sortField" | "sortOrder"
+> & {
+	searchableFields: (keyof Field)[];
+	defaultSortField: keyof Field;
 };
 
 export type PaginationParams = FilterField & {

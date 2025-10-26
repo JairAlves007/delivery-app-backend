@@ -13,12 +13,32 @@ export const establishmentSlugSchema = z.object({
 	slug: z.string().min(1, "O slug deve ser preenchido")
 });
 
-export const listQueryParamsSchema = z.object({
+export const searchAndOrderBySchema = z.object({
+	search: z
+		.string()
+		.min(1, "O filtro de busca deve ser preenchido")
+		.transform(val => val.toLowerCase())
+		.optional()
+		.nullable(),
+	sortField: z
+		.string()
+		.min(1, "O campo de ordenação deve ser preenchido")
+		.transform(val => val.toLowerCase())
+		.optional()
+		.nullable(),
+	sortOrder: z
+		.enum(["asc", "desc"], "Ordenação inválida")
+		.transform(val => val.toLowerCase())
+		.optional()
+		.nullable()
+});
+
+export const listQueryParamsSchema = searchAndOrderBySchema.extend({
 	page: z.coerce.number().min(1, "Pagina inválida").optional(),
 	perPage: z.coerce.number().min(1, "Limite inválido").default(12)
 });
 
-export const listCursorQueryParamsSchema = z.object({
+export const listCursorQueryParamsSchema = searchAndOrderBySchema.extend({
 	limit: z.coerce.number().min(1, "Limite inválido").default(12),
 	cursor: z.ulid("Cursor inválido").nullable().optional()
 });

@@ -1,5 +1,6 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import { mapObjectResourcesList } from "@/helpers/resource.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
@@ -39,24 +40,30 @@ export class ListEstablishmentService {
 
 	async handle({
 		page,
-		perPage
+		perPage,
+		...filterParams
 	}: ListEstablishmentServiceRequest): Promise<ListEstablishmentServiceResponse> {
 		const cache = makeCache();
+		const prefixKey = getFilterParamsCacheKey(filterParams);
 
 		const isPaging = !!page;
 		const totalPromise = cache.rememberForever(
-			`total_${cache.keys.establishments}`,
-			async () => await this.establishmentRepository.count()
+			`${prefixKey}total_${cache.keys.establishments}`,
+			async () => await this.establishmentRepository.count({ ...filterParams })
 		);
 
 		if (isPaging) {
-			const key = `${cache.keys.establishments}_page_${page}_per_page_${perPage}`;
+			const key = `${prefixKey}${cache.keys.establishments}_page_${page}_per_page_${perPage}`;
 			const [total, establishments] = await Promise.all([
 				totalPromise,
 				cache.rememberForever(
 					key,
 					async () =>
-						await this.establishmentRepository.paginate({ page, perPage })
+						await this.establishmentRepository.paginate({
+							page,
+							perPage,
+							filterParams
+						})
 				)
 			]);
 
@@ -79,8 +86,9 @@ export class ListEstablishmentService {
 		const [total, establishments] = await Promise.all([
 			totalPromise,
 			cache.rememberForever(
-				`all_${cache.keys.establishments}`,
-				async () => await this.establishmentRepository.listAll()
+				`${prefixKey}all_${cache.keys.establishments}`,
+				async () =>
+					await this.establishmentRepository.listAll({ ...filterParams })
 			)
 		]);
 

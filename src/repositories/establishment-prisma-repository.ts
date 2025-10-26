@@ -1,7 +1,12 @@
+import {
+	buildFilterQueryOptions,
+	transformValidFilterParams
+} from "@/helpers/crud.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
 import type {
 	DeleteContentParams,
+	FilterParams,
 	FindByIdParams,
 	PaginationParams,
 	UpdateContentParams
@@ -10,10 +15,25 @@ import type { EstablishmentFromRepository } from "@/types/establishment.ts";
 import type { Prisma } from "@prisma/client";
 
 export class EstablishmentPrismaRepository implements IEstablishmentRepository {
-	async listAll(): Promise<EstablishmentFromRepository[]> {
+	async listAll(
+		filterParams?: FilterParams
+	): Promise<EstablishmentFromRepository[]> {
+		const { search, sortField, sortOrder } =
+			transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.EstablishmentOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "created_at",
+				sortOrder: sortOrder ?? "desc",
+				searchableFields: ["name", "cnpj", "description", "email"],
+				defaultSortField: "created_at"
+			});
+
 		return await prisma.establishment.findMany({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...where
 			},
 			include: {
 				resources: {
@@ -25,29 +45,53 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 				openingHours: true,
 				closures: true
 			},
-			orderBy: {
-				created_at: "desc"
-			}
+			orderBy
 		});
 	}
 
-	async count(): Promise<number> {
+	async count(filterParams?: FilterParams): Promise<number> {
+		const { search } = transformValidFilterParams(filterParams);
+
+		const { where } =
+			buildFilterQueryOptions<Prisma.EstablishmentOrderByWithRelationInput>({
+				search,
+				sortField: undefined,
+				sortOrder: undefined,
+				searchableFields: ["name", "cnpj", "description", "email"],
+				defaultSortField: "created_at"
+			});
+
 		return await prisma.establishment.count({
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...where
 			}
 		});
 	}
 
 	async paginate({
 		perPage,
-		page
+		page,
+		filterParams
 	}: PaginationParams): Promise<EstablishmentFromRepository[]> {
+		const { search, sortField, sortOrder } =
+			transformValidFilterParams(filterParams);
+
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.EstablishmentOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "created_at",
+				sortOrder: sortOrder ?? "desc",
+				searchableFields: ["name", "cnpj", "description", "email"],
+				defaultSortField: "created_at"
+			});
+
 		return await prisma.establishment.findMany({
 			skip: (page - 1) * perPage,
 			take: perPage,
 			where: {
-				deleted_at: null
+				deleted_at: null,
+				...where
 			},
 			include: {
 				resources: {
@@ -59,9 +103,7 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 				openingHours: true,
 				closures: true
 			},
-			orderBy: {
-				created_at: "desc"
-			}
+			orderBy
 		});
 	}
 
