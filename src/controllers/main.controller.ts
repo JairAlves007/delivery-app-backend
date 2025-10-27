@@ -1,5 +1,5 @@
 import { env } from "@/env.ts";
-import { makeListBannersCatalogService } from "@/factories/services/banner/make-list-banners-catalog-service.ts";
+import { makeListBannerService } from "@/factories/services/banner/make-list-banner-service.ts";
 import { makeFindEstablishmentBySlugService } from "@/factories/services/establishment/make-find-establishment-by-slug-service.ts";
 import { makeGetMenuService } from "@/factories/services/main/make-get-menu-service.ts";
 import { makeProfileService } from "@/factories/services/main/make-get-profile-service.ts";
@@ -62,10 +62,13 @@ export const listBannersCatalog = async (
 	const { establishmentId } = establishmentParamsSchema.parse(request.params);
 
 	try {
-		const listBannersCatalogService = makeListBannersCatalogService();
+		const listBannerService = makeListBannerService();
 
-		const banners = await listBannersCatalogService.handle({
-			establishmentId
+		const banners = await listBannerService.handle({
+			perPage: 12,
+			filterParams: {
+				establishment_id: establishmentId
+			}
 		});
 
 		return reply
