@@ -1,11 +1,11 @@
 import Constants from "@/helpers/constants.ts";
+import { formatDateToHumanReadable } from "@/helpers/date.ts";
 import {
 	getCouponAppliedLabel,
 	getDeliveryTypeLabel,
 	getPaymentMethodLabel
 } from "@/helpers/order.ts";
 import { transformPriceToHumanReadable } from "@/helpers/price.ts";
-import { formatDateToHumanReadable } from "@/helpers/utils.ts";
 import type { BuildOrderItemsParams } from "@/types/order.ts";
 
 export class SendOrderConfirmationMessageService {

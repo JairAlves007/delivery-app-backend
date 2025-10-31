@@ -1,4 +1,4 @@
-import { checkIfCNPJIsValid } from "@/helpers/utils.ts";
+import { checkIfCNPJIsValid } from "@/helpers/validation-errors.ts";
 import z from "zod";
 import { addressLocationSchema } from "./generic-schema.ts";
 

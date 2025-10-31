@@ -9,60 +9,8 @@ export function slugify(text: string): string {
 		.replace(/--+/g, "-");
 }
 
-export function checkIfCNPJIsValid(cnpj: string): boolean {
-	cnpj = cnpj.replace(/\D/g, "");
-
-	if (cnpj.length !== 14) return false;
-
-	if (/^(\d)\1+$/.test(cnpj)) return false;
-
-	let size = cnpj.length - 2;
-	let numbers = cnpj.substring(0, size);
-	let digits = cnpj.substring(size);
-	let sum = 0;
-	let position = size - 7;
-
-	for (let i = size; i >= 1; i--) {
-		sum += parseInt(numbers.charAt(size - i), 10) * position--;
-		if (position < 2) position = 9;
-	}
-
-	let result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
-	if (result !== parseInt(digits.charAt(0), 10)) return false;
-
-	size++;
-	numbers = cnpj.substring(0, size);
-	sum = 0;
-	position = size - 7;
-
-	for (let i = size; i >= 1; i--) {
-		sum += parseInt(numbers.charAt(size - i), 10) * position--;
-		if (position < 2) position = 9;
-	}
-	result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
-	return result === parseInt(digits.charAt(1), 10);
-}
-
 export const removeDuplicateItems = <T extends { id: string | number }>(
 	items: T[]
 ): T[] => {
 	return [...new Map(items.map(item => [item.id, item])).values()];
-};
-
-export const formatDateToHumanReadable = (date: Date): string => {
-	const options: Intl.DateTimeFormatOptions = {
-		day: "2-digit",
-		month: "2-digit",
-		year: "numeric",
-		hour: "2-digit",
-		minute: "2-digit",
-		hour12: false,
-		timeZone: "America/Sao_Paulo"
-	};
-
-	const formatter = new Intl.DateTimeFormat("pt-BR", options);
-
-	const defaultFormat: string = formatter.format(date);
-
-	return defaultFormat.replace(", ", " às ");
 };
