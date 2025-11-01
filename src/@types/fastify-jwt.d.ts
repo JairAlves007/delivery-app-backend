@@ -7,7 +7,8 @@ declare module "@fastify/jwt" {
 	export interface FastifyJWT {
 		user: {
 			sub: string;
-			myEstablishmentId?: EstablishmentID | null;
+			activeTenantId: EstablishmentID;
+			primaryTenantId?: EstablishmentID | null;
 			role: RoleType;
 		};
 	}

@@ -27,7 +27,7 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 		const coupons = await listCouponService.handle({
 			...query,
 			filterParams: {
-				establishment_id: request.user.myEstablishmentId,
+				establishment_id: request.user.primaryTenantId,
 				search,
 				sortField,
 				sortOrder
@@ -50,7 +50,7 @@ export const find = async (request: FastifyRequest, reply: FastifyReply) => {
 
 		const coupon = await findCouponService.handle({
 			id,
-			filterParams: { establishment_id: request.user.myEstablishmentId }
+			filterParams: { establishment_id: request.user.primaryTenantId }
 		});
 
 		return reply

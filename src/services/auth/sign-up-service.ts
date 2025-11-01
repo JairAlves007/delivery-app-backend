@@ -74,14 +74,13 @@ export class SignUpService {
 					}
 				}
 			},
-			...(!!establishmentId &&
-				role === RoleType.ESTABLISHMENT_OWNER && {
-					establishment: {
-						connect: {
-							id: establishmentId
-						}
+			...(role === RoleType.ESTABLISHMENT_OWNER && {
+				establishment: {
+					connect: {
+						id: establishmentId
 					}
-				})
+				}
+			})
 		});
 
 		return {

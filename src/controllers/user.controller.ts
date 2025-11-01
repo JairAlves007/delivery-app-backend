@@ -14,7 +14,7 @@ import {
 import { RoleType } from "@prisma/client";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
-export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
+export const signIn = (allowedRoles: RoleType[]) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
 		const body = signInBodySchema.parse(request.body);
 
@@ -29,7 +29,8 @@ export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
 			const token = await reply.jwtSign(
 				{
 					role: user.role.name,
-					...(isAdmin && { myEstablishmentId: establishmentId })
+					activeTenantId: establishmentId,
+					primaryTenantId: user.establishment?.id ?? null
 				},
 				{
 					sub: user.id,
@@ -41,8 +42,7 @@ export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
 				ApiResponse.success("Usuário autenticado com sucesso", {
 					type: Constants.TOKEN_TYPE,
 					expiresIn: Constants.ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
-					token,
-					establishmentId
+					token
 				})
 			);
 		} catch (error) {
@@ -51,7 +51,7 @@ export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
 	};
 };
 
-export const signUp = (roleType: RoleType, isAdmin: boolean = false) => {
+export const signUp = (roleType: RoleType) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
 		const body = signUpBodySchema.parse(request.body);
 
@@ -63,10 +63,17 @@ export const signUp = (roleType: RoleType, isAdmin: boolean = false) => {
 				role: roleType
 			});
 
+			if (request.user?.role === RoleType.ADMIN) {
+				return reply
+					.status(HTTPStatusCodes.CREATED)
+					.send(ApiResponse.success("Usuário registrado com sucesso", {}));
+			}
+
 			const token = await reply.jwtSign(
 				{
 					role,
-					...(isAdmin && { myEstablishmentId: establishmentId })
+					activeTenantId: establishmentId,
+					primaryTenantId: null
 				},
 				{
 					sub: user.id,
@@ -74,18 +81,11 @@ export const signUp = (roleType: RoleType, isAdmin: boolean = false) => {
 				}
 			);
 
-			if (request.user?.role === RoleType.ADMIN) {
-				return reply
-					.status(HTTPStatusCodes.CREATED)
-					.send(ApiResponse.success("Usuário registrado com sucesso", {}));
-			}
-
 			return reply.status(HTTPStatusCodes.CREATED).send(
 				ApiResponse.success("Usuário registrado com sucesso", {
 					type: Constants.TOKEN_TYPE,
 					expiresIn: Constants.ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
-					token,
-					establishmentId
+					token
 				})
 			);
 		} catch (error) {
