@@ -2,11 +2,9 @@ import { makeForgotPasswordService } from "@/factories/services/auth/make-forgot
 import { makeResetPasswordService } from "@/factories/services/auth/make-reset-password-service.ts";
 import { makeSignInService } from "@/factories/services/auth/make-sign-in-service.ts";
 import { makeSignUpService } from "@/factories/services/auth/make-sign-up-service.ts";
-import { makeGetMenuService } from "@/factories/services/main/make-get-menu-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
 import Constants from "@/helpers/constants.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
-import { getAvailableRoutes } from "@/helpers/utils.ts";
 import {
 	forgotPasswordBodySchema,
 	resetPasswordBodySchema,
@@ -28,15 +26,11 @@ export const signIn = (allowedRoles: RoleType[]) => {
 				allowedRoles
 			});
 
-			const getMenuService = makeGetMenuService();
-			const menu = await getMenuService.handle(user.role.name, establishmentId);
-
 			const token = await reply.jwtSign(
 				{
 					role: user.role.name,
 					activeTenantId: establishmentId,
-					primaryTenantId: user.establishment?.id ?? null,
-					availableRoutes: getAvailableRoutes(menu)
+					primaryTenantId: user.establishment?.id ?? null
 				},
 				{
 					sub: user.id,
@@ -75,15 +69,11 @@ export const signUp = (roleType: RoleType) => {
 					.send(ApiResponse.success("Usuário registrado com sucesso", {}));
 			}
 
-			const getMenuService = makeGetMenuService();
-			const menu = await getMenuService.handle(role, establishmentId);
-
 			const token = await reply.jwtSign(
 				{
 					role,
 					activeTenantId: establishmentId,
-					primaryTenantId: null,
-					availableRoutes: getAvailableRoutes(menu)
+					primaryTenantId: null
 				},
 				{
 					sub: user.id,

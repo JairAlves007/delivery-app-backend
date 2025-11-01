@@ -10,7 +10,6 @@ declare module "@fastify/jwt" {
 			activeTenantId: EstablishmentID;
 			primaryTenantId?: EstablishmentID | null;
 			role: RoleType;
-			availableRoutes: string[];
 		};
 	}
 }
