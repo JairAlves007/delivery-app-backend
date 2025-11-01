@@ -29,10 +29,7 @@ export const signIn = (allowedRoles: RoleType[]) => {
 			});
 
 			const getMenuService = makeGetMenuService();
-			const menu = await getMenuService.handle(
-				request.user.role,
-				establishmentId
-			);
+			const menu = await getMenuService.handle(user.role.name, establishmentId);
 
 			const token = await reply.jwtSign(
 				{
@@ -79,10 +76,7 @@ export const signUp = (roleType: RoleType) => {
 			}
 
 			const getMenuService = makeGetMenuService();
-			const menu = await getMenuService.handle(
-				request.user.role,
-				establishmentId
-			);
+			const menu = await getMenuService.handle(role, establishmentId);
 
 			const token = await reply.jwtSign(
 				{

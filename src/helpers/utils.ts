@@ -1,4 +1,4 @@
-import { MenuWithSubmenus } from "@/types/menu.ts";
+import type { MenuWithSubmenus } from "@/types/menu.ts";
 
 export function slugify(text: string): string {
 	return text
