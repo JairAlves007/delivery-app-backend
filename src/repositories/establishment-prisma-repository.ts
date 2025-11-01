@@ -12,7 +12,7 @@ import type {
 	UpdateContentParams
 } from "@/types/crud.ts";
 import type { EstablishmentFromRepository } from "@/types/establishment.ts";
-import type { Prisma } from "@prisma/client";
+import type { Establishment, Prisma } from "@prisma/client";
 
 export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	async listAll(
@@ -149,8 +149,8 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		});
 	}
 
-	async create(data: Prisma.EstablishmentCreateInput): Promise<void> {
-		await prisma.establishment.create({ data });
+	async create(data: Prisma.EstablishmentCreateInput): Promise<Establishment> {
+		return await prisma.establishment.create({ data });
 	}
 
 	async update({
@@ -159,8 +159,8 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	}: UpdateContentParams<
 		string,
 		Prisma.EstablishmentUpdateInput
-	>): Promise<void> {
-		await prisma.establishment.update({
+	>): Promise<Establishment> {
+		return await prisma.establishment.update({
 			where: {
 				id,
 				deleted_at: null
@@ -169,16 +169,19 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		});
 	}
 
-	async delete({ id, force }: DeleteContentParams<string>): Promise<void> {
+	async delete({
+		id,
+		force
+	}: DeleteContentParams<string>): Promise<Establishment> {
 		if (force) {
-			await prisma.establishment.delete({
+			return await prisma.establishment.delete({
 				where: {
 					id
 				}
 			});
 		}
 
-		await this.update({
+		return await this.update({
 			id,
 			data: { deleted_at: new Date() }
 		});

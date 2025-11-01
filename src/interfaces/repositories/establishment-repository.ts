@@ -1,5 +1,5 @@
 import type { EstablishmentFromRepository } from "@/types/establishment.ts";
-import type { Prisma } from "@prisma/client";
+import type { Establishment, Prisma } from "@prisma/client";
 import type { ICRUDBase } from "../crud-base.ts";
 
 export interface IEstablishmentRepository
@@ -7,7 +7,8 @@ export interface IEstablishmentRepository
 		EstablishmentFromRepository,
 		Prisma.EstablishmentCreateInput,
 		Prisma.EstablishmentUpdateInput,
-		string
+		string,
+		Establishment
 	> {
 	findBySlug(slug: string): Promise<EstablishmentFromRepository | null>;
 }

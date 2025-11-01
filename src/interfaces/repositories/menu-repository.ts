@@ -7,4 +7,6 @@ export interface IMenuRepository {
 		forRole: RoleType,
 		establishmentId: EstablishmentID
 	): Promise<MenuWithSubmenus[] | null>;
+
+	createForNewEstablishment(establishmentId: EstablishmentID): Promise<void>;
 }

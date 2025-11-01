@@ -5,7 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"dev": "node --loader esm-module-alias/loader --no-warnings --watch --env-file .env src/http/server.ts",
-		"task:dev": "dotenv -e .env npx trigger.dev@latest dev",
+		"task:dev": "dotenv -e .env npx trigger.dev@4.0.5 dev",
 		"db:migrate": "prisma migrate",
 		"db:studio": "prisma studio"
 	},
@@ -17,7 +17,7 @@
 	"license": "MIT",
 	"type": "module",
 	"devDependencies": {
-		"@trigger.dev/build": "4.0.4",
+		"@trigger.dev/build": "4.0.5",
 		"@types/ejs": "3.1.5",
 		"@types/node": "24.2.0",
 		"dotenv-cli": "10.0.0",
@@ -30,7 +30,7 @@
 		"@fastify/cors": "11.1.0",
 		"@fastify/jwt": "9.1.0",
 		"@prisma/client": "6.17.0",
-		"@trigger.dev/sdk": "4.0.4",
+		"@trigger.dev/sdk": "4.0.5",
 		"bcrypt-ts": "7.1.0",
 		"ejs": "3.1.10",
 		"esm-module-alias": "2.2.1",
