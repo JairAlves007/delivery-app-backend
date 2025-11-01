@@ -1,6 +1,7 @@
 import { env } from "@/env.ts";
+import { InvalidEstablishment } from "@/errors/user/invalid-establishment-error.ts";
 import { makeListBannerService } from "@/factories/services/banner/make-list-banner-service.ts";
-import { makeFindEstablishmentBySlugService } from "@/factories/services/establishment/make-find-establishment-by-slug-service.ts";
+import { makeFindEstablishmentByIdService } from "@/factories/services/establishment/make-find-establishment-by-id-service.ts";
 import { makeGetMenuService } from "@/factories/services/main/make-get-menu-service.ts";
 import { makeProfileService } from "@/factories/services/main/make-get-profile-service.ts";
 import { makeListProductCategoriesCatalogService } from "@/factories/services/product/category/make-list-product-categories-catalog-service.ts";
@@ -10,7 +11,6 @@ import { isEstablishmentOpen } from "@/helpers/establishment.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
 	establishmentParamsSchema,
-	establishmentSlugSchema,
 	listCursorQueryParamsSchema,
 	userIdSchema
 } from "@/schemas/generic-schema.ts";
@@ -21,19 +21,23 @@ export const profileData = async (
 	request: FastifyRequest,
 	reply: FastifyReply
 ) => {
-	const { slug } = establishmentSlugSchema.parse(request.params);
+	const { establishmentId } = establishmentParamsSchema.parse(request.params);
 	const userId = userIdSchema.parse(request.user.sub);
 
 	try {
 		const getMenuService = makeGetMenuService();
 		const getProfileService = makeProfileService();
-		const findEstablishmentService = makeFindEstablishmentBySlugService();
+		const findEstablishmentService = makeFindEstablishmentByIdService();
 
-		const establishment = await findEstablishmentService.handle(slug);
+		const establishment = await findEstablishmentService.handle({
+			id: establishmentId
+		});
+
+		if (!establishment) throw new InvalidEstablishment();
 
 		const menu = await getMenuService.handle(
 			request.user.role,
-			establishment.id
+			establishmentId
 		);
 		const profile = await getProfileService.handle({
 			id: userId

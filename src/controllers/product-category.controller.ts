@@ -21,7 +21,7 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 
 		const productCategories = await listProductCategoryService.handle({
 			...query,
-			filterParams: { establishment_id: request.user.establishmentId }
+			filterParams: { establishment_id: request.user.myEstablishmentId }
 		});
 
 		return reply
@@ -45,7 +45,7 @@ export const find = async (request: FastifyRequest, reply: FastifyReply) => {
 
 		const productCategory = await findProductCategoryService.handle({
 			id,
-			filterParams: { establishment_id: request.user.establishmentId }
+			filterParams: { establishment_id: request.user.myEstablishmentId }
 		});
 
 		return reply

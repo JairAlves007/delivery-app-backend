@@ -6,8 +6,6 @@ import { ApiResponse } from "@/helpers/api.ts";
 import Constants from "@/helpers/constants.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
-	adminSignInBodySchema,
-	adminSignUpBodySchema,
 	forgotPasswordBodySchema,
 	resetPasswordBodySchema,
 	signInBodySchema,
@@ -18,13 +16,12 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
-		const schema = isAdmin ? adminSignInBodySchema : signInBodySchema;
-		const body = schema.parse(request.body);
+		const body = signInBodySchema.parse(request.body);
 
 		try {
 			const signInService = makeSignInService();
 
-			const { user } = await signInService.handle({
+			const { user, establishmentId } = await signInService.handle({
 				...body,
 				allowedRoles
 			});
@@ -32,7 +29,7 @@ export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
 			const token = await reply.jwtSign(
 				{
 					role: user.role.name,
-					establishmentId: user.establishment?.id
+					...(isAdmin && { myEstablishmentId: establishmentId })
 				},
 				{
 					sub: user.id,
@@ -44,7 +41,8 @@ export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
 				ApiResponse.success("Usuário autenticado com sucesso", {
 					type: Constants.TOKEN_TYPE,
 					expiresIn: Constants.ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
-					token
+					token,
+					establishmentId
 				})
 			);
 		} catch (error) {
@@ -55,14 +53,12 @@ export const signIn = (allowedRoles: RoleType[], isAdmin: boolean = false) => {
 
 export const signUp = (roleType: RoleType, isAdmin: boolean = false) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
-		const schema = isAdmin ? adminSignUpBodySchema : signUpBodySchema;
-
-		const body = schema.parse(request.body);
+		const body = signUpBodySchema.parse(request.body);
 
 		try {
 			const signUpService = makeSignUpService();
 
-			const { user, role } = await signUpService.handle({
+			const { user, role, establishmentId } = await signUpService.handle({
 				...body,
 				role: roleType
 			});
@@ -70,7 +66,7 @@ export const signUp = (roleType: RoleType, isAdmin: boolean = false) => {
 			const token = await reply.jwtSign(
 				{
 					role,
-					...(isAdmin && { establishmentId: body.establishmentId })
+					...(isAdmin && { myEstablishmentId: establishmentId })
 				},
 				{
 					sub: user.id,
@@ -88,7 +84,8 @@ export const signUp = (roleType: RoleType, isAdmin: boolean = false) => {
 				ApiResponse.success("Usuário registrado com sucesso", {
 					type: Constants.TOKEN_TYPE,
 					expiresIn: Constants.ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
-					token
+					token,
+					establishmentId
 				})
 			);
 		} catch (error) {

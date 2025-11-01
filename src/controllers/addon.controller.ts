@@ -23,7 +23,7 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 		const addonCategories = await listAddonService.handle({
 			...query,
 			filterParams: {
-				establishment_id: request.user.establishmentId,
+				establishment_id: request.user.myEstablishmentId,
 				search,
 				sortField,
 				sortOrder
@@ -51,7 +51,7 @@ export const find = async (request: FastifyRequest, reply: FastifyReply) => {
 
 		const addon = await findAddonService.handle({
 			id,
-			filterParams: { establishment_id: request.user.establishmentId }
+			filterParams: { establishment_id: request.user.myEstablishmentId }
 		});
 
 		return reply

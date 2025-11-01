@@ -49,7 +49,7 @@ export const find = async (request: FastifyRequest, reply: FastifyReply) => {
 
 		const address = await findAddressService.handle({
 			id,
-			filterParams: { establishment_id: request.user.establishmentId }
+			filterParams: { establishment_id: request.user.myEstablishmentId }
 		});
 
 		return reply

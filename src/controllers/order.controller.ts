@@ -34,7 +34,7 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 
 		const orders = await listOrderService.handle({
 			...query,
-			filterParams: { establishment_id: request.user.establishmentId }
+			filterParams: { establishment_id: request.user.myEstablishmentId }
 		});
 
 		return reply
@@ -74,7 +74,7 @@ export const find = (isAdmin: boolean) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
 		const { id } = orderParamsSchema.parse(request.params);
 		const establishmentId = establishmentIdSchema.parse(
-			request.user.establishmentId
+			request.user.myEstablishmentId
 		);
 		const filterParams: FilterParams = {
 			establishment_id: establishmentId

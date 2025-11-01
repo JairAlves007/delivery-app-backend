@@ -1,7 +1,9 @@
 import { InvalidCredentials } from "@/errors/user/invalid-credentials-error.ts";
 import { InvalidEstablishment } from "@/errors/user/invalid-establishment-error.ts";
+import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
 import { signInBodySchema } from "@/schemas/auth-schema.ts";
+import type { EstablishmentID } from "@/types/establishment.ts";
 import type { UserWithRole } from "@/types/user.ts";
 import { RoleType } from "@prisma/client";
 import { compare } from "bcrypt-ts";
@@ -13,13 +15,19 @@ type SignInServiceRequest = z.infer<typeof signInBodySchema> & {
 
 interface SignInServiceResponse {
 	user: UserWithRole;
+	establishmentId: EstablishmentID;
 }
 
 export class SignInService {
 	private userRepository: IUserRepository;
+	private establishmentRepository: IEstablishmentRepository;
 
-	constructor(userRepository: IUserRepository) {
+	constructor(
+		userRepository: IUserRepository,
+		establishmentRepository: IEstablishmentRepository
+	) {
 		this.userRepository = userRepository;
+		this.establishmentRepository = establishmentRepository;
 	}
 
 	async handle({
@@ -35,7 +43,7 @@ export class SignInService {
 
 			if (
 				user.role.name === RoleType.ESTABLISHMENT_OWNER &&
-				(!user.establishment || !origin || user.establishment.slug !== origin)
+				(!user.establishment || user.establishment.slug !== origin)
 			)
 				throw new InvalidEstablishment();
 
@@ -46,8 +54,15 @@ export class SignInService {
 
 			if (!doesPasswordMatches) throw new InvalidCredentials();
 
+			const establishment = await this.establishmentRepository.findBySlug(
+				origin
+			);
+
+			if (!establishment) throw new InvalidEstablishment();
+
 			return {
-				user
+				user,
+				establishmentId: establishment.id
 			};
 		} catch (error) {
 			throw error;

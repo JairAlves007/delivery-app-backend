@@ -22,7 +22,7 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 		const banners = await listBannerService.handle({
 			...query,
 			filterParams: {
-				establishment_id: request.user.establishmentId,
+				establishment_id: request.user.myEstablishmentId,
 				search,
 				sortField,
 				sortOrder
@@ -45,7 +45,7 @@ export const find = async (request: FastifyRequest, reply: FastifyReply) => {
 
 		const banner = await findBannerService.handle({
 			id,
-			filterParams: { establishment_id: request.user.establishmentId }
+			filterParams: { establishment_id: request.user.myEstablishmentId }
 		});
 
 		return reply
