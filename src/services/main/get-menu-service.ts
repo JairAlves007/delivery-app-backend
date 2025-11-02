@@ -4,6 +4,11 @@ import type { EstablishmentID } from "@/types/establishment.ts";
 import type { MenuWithSubmenus } from "@/types/menu.ts";
 import type { RoleType } from "@prisma/client";
 
+type GetMenuServiceResponse = {
+	items: MenuWithSubmenus[] | null;
+	forRole: RoleType;
+};
+
 export class GetMenuService {
 	private menuRepository: IMenuRepository;
 
@@ -14,7 +19,7 @@ export class GetMenuService {
 	async handle(
 		forRole: RoleType,
 		establishmentId: EstablishmentID
-	): Promise<MenuWithSubmenus[] | null> {
+	): Promise<GetMenuServiceResponse> {
 		const cache = makeCache();
 
 		const menu = await cache.rememberForever(
@@ -22,6 +27,9 @@ export class GetMenuService {
 			async () => await this.menuRepository.get(forRole, establishmentId)
 		);
 
-		return menu;
+		return {
+			items: menu,
+			forRole
+		};
 	}
 }

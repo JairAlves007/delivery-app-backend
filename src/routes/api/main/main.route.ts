@@ -21,7 +21,7 @@ const homeMiddlewares = {
 };
 
 export const mainRoutes = async (app: FastifyInstance) => {
-	app.get("/me/:establishmentId", mainMiddlewares, profileData);
+	app.get("/profile/data/:establishmentId", mainMiddlewares, profileData);
 
 	app.register(
 		async api => {
