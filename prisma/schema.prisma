@@ -219,11 +219,33 @@ model PasswordResetToken {
   @@map("password_reset_tokens")
 }
 
+enum ViewType {
+  VIEW_CATALOG
+  VIEW_OWN_BAG
+  VIEW_OWN_FAVORITES
+  MAKE_OWN_ORDER
+  VIEW_OWN_ORDERS
+  VIEW_OWN_ADDRESSES
+  CREATE_OWN_ADDRESS
+  VIEW_ESTABLISHMENTS
+  CREATE_ESTABLISHMENT
+  VIEW_CUSTOMERS
+  CREATE_ESTABLISHMENT_OWNER
+  VIEW_PRODUCTS
+  CREATE_PRODUCT
+  VIEW_PRODUCT_CATEGORIES
+  CREATE_PRODUCT_CATEGORY
+  VIEW_ORDERS
+  VIEW_COUPONS
+  CREATE_COUPON
+}
+
 model Menu {
   id               Int           @id @default(autoincrement())
   label            String
   slug             String
   order            Int
+  view_type        ViewType?
   submenus         SubMenu[]
   for_role         RoleType
   establishment_id String
@@ -236,12 +258,13 @@ model Menu {
 }
 
 model SubMenu {
-  id      Int    @id @default(autoincrement())
-  label   String
-  slug    String
-  order   Int
-  menu_id Int
-  menu    Menu   @relation(fields: [menu_id], references: [id])
+  id        Int       @id @default(autoincrement())
+  label     String
+  slug      String
+  view_type ViewType?
+  order     Int
+  menu_id   Int
+  menu      Menu      @relation(fields: [menu_id], references: [id])
 
   @@unique([menu_id, slug])
   @@map("submenus")

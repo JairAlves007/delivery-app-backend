@@ -13,6 +13,7 @@ import {
 	RoleType,
 	SocialPlatform,
 	TagType,
+	ViewType,
 	WeekDay,
 	type AddonCategory,
 	type Product,
@@ -533,6 +534,7 @@ async function main() {
 			label: "Cardápio",
 			slug: "catalog",
 			establishment_id: establishment.id,
+			view_type: ViewType.VIEW_CATALOG,
 			order: 1,
 			for_role: RoleType.CUSTOMER
 		},
@@ -540,6 +542,7 @@ async function main() {
 			label: "Sacola",
 			slug: "bag",
 			establishment_id: establishment.id,
+			view_type: ViewType.VIEW_OWN_BAG,
 			order: 2,
 			for_role: RoleType.CUSTOMER
 		},
@@ -547,6 +550,7 @@ async function main() {
 			label: "Favoritos",
 			slug: "favorites",
 			establishment_id: establishment.id,
+			view_type: ViewType.VIEW_OWN_FAVORITES,
 			order: 3,
 			for_role: RoleType.CUSTOMER
 		},
@@ -554,6 +558,7 @@ async function main() {
 			label: "Meus Pedidos",
 			slug: "orders",
 			establishment_id: establishment.id,
+			view_type: ViewType.VIEW_OWN_ORDERS,
 			order: 4,
 			for_role: RoleType.CUSTOMER
 		},
@@ -561,6 +566,7 @@ async function main() {
 			label: "Meus Endereços",
 			slug: "addresses",
 			establishment_id: establishment.id,
+			view_type: ViewType.VIEW_OWN_ADDRESSES,
 			order: 5,
 			for_role: RoleType.CUSTOMER
 		}
@@ -571,6 +577,7 @@ async function main() {
 			label: "Produtos",
 			slug: "products",
 			establishment_id: establishment.id,
+			view_type: ViewType.VIEW_PRODUCTS,
 			order: 4,
 			for_role: RoleType.ESTABLISHMENT_OWNER
 		},
@@ -578,6 +585,7 @@ async function main() {
 			label: "Categorias dos Produtos",
 			slug: "product-categories",
 			establishment_id: establishment.id,
+			view_type: ViewType.VIEW_PRODUCT_CATEGORIES,
 			order: 5,
 			for_role: RoleType.ESTABLISHMENT_OWNER
 		},
@@ -585,6 +593,7 @@ async function main() {
 			label: "Pedidos",
 			slug: "orders",
 			establishment_id: establishment.id,
+			view_type: ViewType.VIEW_ORDERS,
 			order: 6,
 			for_role: RoleType.ESTABLISHMENT_OWNER
 		},
@@ -592,6 +601,7 @@ async function main() {
 			label: "Cupons",
 			slug: "coupons",
 			establishment_id: establishment.id,
+			view_type: ViewType.VIEW_COUPONS,
 			order: 7,
 			for_role: RoleType.ESTABLISHMENT_OWNER
 		}
@@ -609,6 +619,7 @@ async function main() {
 			label: "Estabelecimentos",
 			slug: "establishments",
 			establishment_id: establishment.id,
+			view_type: ViewType.VIEW_ESTABLISHMENTS,
 			order: 2,
 			for_role: RoleType.ADMIN
 		},
@@ -616,6 +627,7 @@ async function main() {
 			label: "Clientes",
 			slug: "customers",
 			establishment_id: establishment.id,
+			view_type: ViewType.VIEW_CUSTOMERS,
 			order: 3,
 			for_role: RoleType.ADMIN
 		},
@@ -640,96 +652,118 @@ async function main() {
 	const establishmentOwnerSubmenuItems: Prisma.SubMenuCreateManyInput[] = [
 		{
 			label: "Ver produtos",
-			slug: "view-products",
+			slug: "view",
 			order: 1,
-			menu_id: establishmentOwnerMenus[0].id
+			menu_id: establishmentOwnerMenus[0].id,
+			view_type: ViewType.VIEW_PRODUCTS
 		},
 		{
 			label: "Criar produto",
-			slug: "create-product",
+			slug: "create",
 			order: 2,
-			menu_id: establishmentOwnerMenus[0].id
+			menu_id: establishmentOwnerMenus[0].id,
+			view_type: ViewType.CREATE_PRODUCT
 		},
 		{
 			label: "Ver categorias dos produtos",
-			slug: "view-product-categories",
+			slug: "view",
 			order: 1,
-			menu_id: establishmentOwnerMenus[1].id
+			menu_id: establishmentOwnerMenus[1].id,
+			view_type: ViewType.VIEW_PRODUCT_CATEGORIES
 		},
 		{
 			label: "Criar categoria de produto",
-			slug: "create-product-category",
+			slug: "create",
 			order: 2,
-			menu_id: establishmentOwnerMenus[1].id
+			menu_id: establishmentOwnerMenus[1].id,
+			view_type: ViewType.CREATE_PRODUCT_CATEGORY
 		},
 		{
 			label: "Ver cupons",
-			slug: "view-coupons",
+			slug: "view",
 			order: 1,
-			menu_id: establishmentOwnerMenus[3].id
+			menu_id: establishmentOwnerMenus[3].id,
+			view_type: ViewType.VIEW_COUPONS
 		},
 		{
 			label: "Criar cupom",
-			slug: "create-coupon",
+			slug: "create",
 			order: 2,
-			menu_id: establishmentOwnerMenus[3].id
+			menu_id: establishmentOwnerMenus[3].id,
+			view_type: ViewType.CREATE_COUPON
 		}
 	];
 
 	const adminSubmenuItems: Prisma.SubMenuCreateManyInput[] = [
 		{
 			label: "Ver estabelecimentos",
-			slug: "view-establishments",
+			slug: "view",
 			order: 1,
-			menu_id: adminMenus[1].id
+			menu_id: adminMenus[1].id,
+			view_type: ViewType.VIEW_ESTABLISHMENTS
 		},
 		{
 			label: "Criar estabelecimento",
-			slug: "create-establishment",
+			slug: "create",
 			order: 2,
-			menu_id: adminMenus[1].id
+			menu_id: adminMenus[1].id,
+			view_type: ViewType.CREATE_ESTABLISHMENT
 		},
 		{
 			label: "Ver clientes",
-			slug: "view-customers",
+			slug: "view",
 			order: 1,
-			menu_id: adminMenus[2].id
+			menu_id: adminMenus[2].id,
+			view_type: ViewType.VIEW_CUSTOMERS
+		},
+		{
+			label: "Criar Dono de estabelecimento",
+			slug: "create-establishment-owner",
+			order: 1,
+			menu_id: adminMenus[2].id,
+			view_type: ViewType.CREATE_ESTABLISHMENT_OWNER
 		},
 		{
 			label: "Ver produtos",
-			slug: "view-products",
+			slug: "view",
 			order: 1,
-			menu_id: adminMenus[3].id
+			menu_id: adminMenus[3].id,
+			view_type: ViewType.VIEW_PRODUCTS
 		},
 		{
 			label: "Criar produto",
-			slug: "create-product",
+			slug: "create",
 			order: 2,
-			menu_id: adminMenus[3].id
+			menu_id: adminMenus[3].id,
+			view_type: ViewType.CREATE_PRODUCT
 		},
 		{
 			label: "Ver categorias dos produtos",
-			slug: "view-product-categories",
+			slug: "view",
 			order: 1,
-			menu_id: adminMenus[4].id
+			menu_id: adminMenus[4].id,
+			view_type: ViewType.VIEW_PRODUCT_CATEGORIES
 		},
 		{
 			label: "Criar categoria de produto",
-			slug: "create-product-category",
+			slug: "create",
 			order: 2,
-			menu_id: adminMenus[4].id
+			menu_id: adminMenus[4].id,
+			view_type: ViewType.CREATE_PRODUCT_CATEGORY
 		},
 		{
 			label: "Ver cupons",
-			slug: "view-coupons",
+			slug: "view",
 			order: 1,
-			menu_id: adminMenus[6].id
+			menu_id: adminMenus[6].id,
+			view_type: ViewType.VIEW_COUPONS
 		},
 		{
 			label: "Criar cupom",
-			slug: "create-coupon",
+			slug: "create",
 			order: 2,
-			menu_id: adminMenus[6].id
+			menu_id: adminMenus[6].id,
+			view_type: ViewType.CREATE_COUPON
 		}
 	];
 
