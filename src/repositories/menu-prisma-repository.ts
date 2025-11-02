@@ -12,23 +12,7 @@ export class MenuPrismaRepository implements IMenuRepository {
 		return await prisma.menu.findMany({
 			where: {
 				for_role: forRole,
-				establishment_id: establishmentId,
-				OR: [
-					{
-						view_type: {
-							not: null
-						}
-					},
-					{
-						submenus: {
-							every: {
-								view_type: {
-									not: null
-								}
-							}
-						}
-					}
-				]
+				establishment_id: establishmentId
 			},
 			select: {
 				label: true,
@@ -43,9 +27,7 @@ export class MenuPrismaRepository implements IMenuRepository {
 					orderBy: { order: "asc" }
 				}
 			},
-			orderBy: {
-				order: "asc"
-			}
+			orderBy: { order: "asc" }
 		});
 	}
 

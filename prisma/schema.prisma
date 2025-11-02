@@ -258,13 +258,13 @@ model Menu {
 }
 
 model SubMenu {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   label     String
   slug      String
-  view_type ViewType?
+  view_type ViewType
   order     Int
   menu_id   Int
-  menu      Menu      @relation(fields: [menu_id], references: [id])
+  menu      Menu     @relation(fields: [menu_id], references: [id])
 
   @@unique([menu_id, slug])
   @@map("submenus")
