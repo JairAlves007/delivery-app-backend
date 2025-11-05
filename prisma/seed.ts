@@ -612,6 +612,7 @@ async function main() {
 			label: "Dashboard",
 			slug: "dashboard",
 			establishment_id: establishment.id,
+			view_type: ViewType.DASHBOARD,
 			order: 1,
 			for_role: RoleType.ADMIN
 		},
