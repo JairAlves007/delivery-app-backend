@@ -118,7 +118,7 @@ export class MenuPrismaRepository implements IMenuRepository {
 				label: "Dashboard",
 				slug: "dashboard",
 				establishment_id: establishmentId,
-				view_type: ViewType.DASHBOARD,
+				view_type: ViewType.VIEW_DASHBOARD,
 				order: 1,
 				for_role: RoleType.ADMIN
 			},
