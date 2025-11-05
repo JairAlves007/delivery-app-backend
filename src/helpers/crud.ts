@@ -50,7 +50,5 @@ export function buildFilterQueryOptions<Field>({
 		[sortField]: sortOrder ?? "asc"
 	};
 
-	console.log({ where, orderBy });
-
 	return { where, orderBy };
 }

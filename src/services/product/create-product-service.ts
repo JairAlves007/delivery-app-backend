@@ -2,6 +2,11 @@ import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
 import { createProductBodySchema } from "@/schemas/product-schema.ts";
+import {
+	forgetAllListingCacheKeysTaskId,
+	forgetAllListingCacheKeysTaskTask
+} from "@/tasks/forget-all-listing-cache-keys.ts";
+import { tasks } from "@trigger.dev/sdk";
 import z from "zod";
 
 type CreateProductServiceRequest = z.infer<typeof createProductBodySchema>;
@@ -48,6 +53,12 @@ export class CreateProductService {
 			}
 		});
 
-		await cache.forgetKeysContaining(cache.keys.products);
+		await tasks.trigger<typeof forgetAllListingCacheKeysTaskTask>(
+			forgetAllListingCacheKeysTaskId,
+			{
+				baseCacheKey: "products",
+				paramsToClean: { establishment_id: establishmentId }
+			}
+		);
 	}
 }

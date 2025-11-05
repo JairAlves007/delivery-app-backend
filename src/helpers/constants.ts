@@ -23,6 +23,24 @@ export default class Constants {
 		60 * 60 * 24 * 1;
 	public static readonly ACCESS_TOKEN_EXPIRATION_TIME: string = "1d";
 
+	// Cache
+	public static readonly CACHE_KEYS = {
+		products: "products",
+		productCategories: "product_categories",
+		establishments: "establishments",
+		districts: "districts",
+		coupons: "coupons",
+		banners: "banners",
+		addons: "addons",
+		addonCategories: "addon_categories",
+		profile: "profile",
+		users: "users",
+		menus: "menus",
+		addresses: "addresses",
+		resourceRules: "resource_rules",
+		orders: "orders"
+	};
+
 	// Order
 	public static readonly ORDER_SUB_SECTIONS_MESSAGE_TEMPLATES: OrderSubSectionMessage =
 		{

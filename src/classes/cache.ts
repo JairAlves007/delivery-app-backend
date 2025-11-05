@@ -1,25 +1,13 @@
+import Constants from "@/helpers/constants.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import type { ICacheBase } from "@/interfaces/cache/cache-base.ts";
 import { redis } from "@/lib/redis.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 
 export class Cache implements ICacheBase {
 	private static instance: Cache | null = null;
 
-	readonly keys = {
-		products: "products",
-		productCategories: "product_categories",
-		establishments: "establishments",
-		districts: "districts",
-		coupons: "coupons",
-		banners: "banners",
-		addons: "addons",
-		addonCategories: "addon_categories",
-		profile: "profile",
-		users: "users",
-		menus: "menus",
-		addresses: "addresses",
-		resourceRules: "resource_rules",
-		orders: "orders"
-	};
+	readonly keys = Constants.CACHE_KEYS;
 
 	static getInstance() {
 		if (!this.instance) this.instance = new Cache();
@@ -136,5 +124,24 @@ export class Cache implements ICacheBase {
 			);
 			throw error;
 		}
+	}
+
+	async forgetAllListingCacheKeys({
+		baseCacheKey,
+		paramsToClean
+	}: ForgetAllListingCacheKeysParams) {
+		const prefixKey = getFilterParamsCacheKey(paramsToClean);
+		const forgetCacheKeysPromises = [];
+		const listingCacheKeys = [
+			`${prefixKey}${this.keys[baseCacheKey]}`,
+			`${prefixKey}total_${this.keys[baseCacheKey]}`,
+			`${prefixKey}all_${this.keys[baseCacheKey]}`
+		];
+
+		for (const key of listingCacheKeys) {
+			forgetCacheKeysPromises.push(this.forgetKeysContaining(key));
+		}
+
+		await Promise.all(forgetCacheKeysPromises);
 	}
 }

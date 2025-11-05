@@ -1,4 +1,5 @@
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import type { IMenuRepository } from "@/interfaces/repositories/menu-repository.ts";
 import type { EstablishmentID } from "@/types/establishment.ts";
 import type { MenuWithSubmenus } from "@/types/menu.ts";
@@ -21,9 +22,12 @@ export class GetMenuService {
 		establishmentId: EstablishmentID
 	): Promise<GetMenuServiceResponse> {
 		const cache = makeCache();
+		const prefixKey = getFilterParamsCacheKey({
+			establishment_id: establishmentId
+		});
 
 		const menu = await cache.rememberForever(
-			`${cache.keys.menus}_${forRole.toLowerCase()}_${establishmentId}`,
+			`${prefixKey}${cache.keys.menus}_${forRole.toLowerCase()}`,
 			async () => await this.menuRepository.get(forRole, establishmentId)
 		);
 
