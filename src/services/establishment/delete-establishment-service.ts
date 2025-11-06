@@ -1,5 +1,10 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+
+type DeleteEstablishmentParams = {
+	id: string;
+} & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class DeleteEstablishmentService {
 	private establishmentRepository: IEstablishmentRepository;
@@ -8,11 +13,12 @@ export class DeleteEstablishmentService {
 		this.establishmentRepository = establishmentRepository;
 	}
 
-	public async handle(id: string) {
-		const cache = makeCache();
-
+	public async handle({ id, paramsToForget }: DeleteEstablishmentParams) {
 		await this.establishmentRepository.delete({ id, force: false });
 
-		await cache.forgetKeysContaining(cache.keys.establishments);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "establishments",
+			paramsToForget
+		});
 	}
 }

@@ -26,7 +26,7 @@ export default class Constants {
 	// Cache
 	public static readonly CACHE_KEYS = {
 		products: "products",
-		productCategories: "product_categories",
+		productCategories: "products_categories",
 		establishments: "establishments",
 		districts: "districts",
 		coupons: "coupons",
@@ -94,9 +94,4 @@ export default class Constants {
 
 		> 🔗 Este pedido foi feito via sistema
 	`;
-
-	// EVENTS
-	public static readonly EVENTS_KEYS = {
-		forgetAllListingCacheKeys: "forgetAllListingCacheKeys"
-	};
 }

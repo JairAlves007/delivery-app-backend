@@ -73,7 +73,10 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const createAddonCategoryService = makeCreateAddonCategoryService();
 
-		await createAddonCategoryService.handle(body);
+		await createAddonCategoryService.handle({
+			...body,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.CREATED)
@@ -92,7 +95,11 @@ export const update = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const updateAddonCategoryService = makeUpdateAddonCategoryService();
 
-		await updateAddonCategoryService.handle(id, body);
+		await updateAddonCategoryService.handle({
+			id,
+			...body,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)
@@ -110,7 +117,10 @@ export const destroy = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const deleteAddonCategoryService = makeDeleteAddonCategoryService();
 
-		await deleteAddonCategoryService.handle(id);
+		await deleteAddonCategoryService.handle({
+			id,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)

@@ -1,12 +1,14 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
 import { createProductCategoryBodySchema } from "@/schemas/product-category-schema.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
 
 type CreateProductCategoryServiceRequest = z.infer<
 	typeof createProductCategoryBodySchema
->;
+> &
+	Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class CreateProductCategoryService {
 	private productCategoryRepository: IProductCategoryRepository;
@@ -18,10 +20,9 @@ export class CreateProductCategoryService {
 	async handle({
 		establishmentId,
 		bannerIds,
+		paramsToForget,
 		...data
 	}: CreateProductCategoryServiceRequest) {
-		const cache = makeCache();
-
 		await this.productCategoryRepository.create({
 			...data,
 			slug: slugify(data.name),
@@ -35,6 +36,9 @@ export class CreateProductCategoryService {
 			}
 		});
 
-		await cache.forgetKeysContaining(cache.keys.productCategories);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "productCategories",
+			paramsToForget
+		});
 	}
 }

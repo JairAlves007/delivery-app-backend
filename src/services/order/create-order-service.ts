@@ -1,5 +1,5 @@
 import { UserNotFound } from "@/errors/user/user-not-found.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { makeCalculateCouponDiscountFromOrderService } from "@/factories/services/order/validations/make-calculate-coupon-discount-from-order-service.ts";
 import { makeValidateAddonsFromOrderService } from "@/factories/services/order/validations/make-validate-addons-from-order-service.ts";
 import { makeValidateDeliveryFromOrderService } from "@/factories/services/order/validations/make-validate-delivery-from-order-service.ts";
@@ -20,8 +20,8 @@ import {
 import type { UserAddressWithDefault } from "@/types/address.ts";
 import type {
 	BuildOrderItemsParams,
+	CreateOrderParams,
 	OrderAddonsToProcess,
-	OrderIntent,
 	OrderItems,
 	OrderItemsToProcess
 } from "@/types/order.ts";
@@ -158,7 +158,7 @@ export class CreateOrderService {
 		};
 	}
 
-	async handle(params: OrderIntent) {
+	async handle({ order, paramsToForget }: CreateOrderParams) {
 		const {
 			deliveryType,
 			paymentMethod,
@@ -170,7 +170,7 @@ export class CreateOrderService {
 			userId,
 			comment,
 			items
-		} = params;
+		} = order;
 		const findUserService = makeFindUserService();
 
 		const user = await findUserService.handle(userId);
@@ -259,14 +259,15 @@ export class CreateOrderService {
 			})
 		);
 
-		const cache = makeCache();
-
-		await cache.forgetKeysContaining(cache.keys.orders);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "orders",
+			paramsToForget
+		});
 
 		await tasks.trigger<typeof sendOrderConfirmationTask>(
 			sendOrderConfirmationTaskId,
 			{
-				...params,
+				...order,
 				user,
 				address,
 				coupon,

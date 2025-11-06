@@ -62,7 +62,10 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const createBannerService = makeCreateBannerService();
 
-		await createBannerService.handle(body);
+		await createBannerService.handle({
+			...body,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.CREATED)
@@ -79,7 +82,11 @@ export const update = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const updateBannerService = makeUpdateBannerService();
 
-		await updateBannerService.handle(id, body);
+		await updateBannerService.handle({
+			id,
+			...body,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)
@@ -95,7 +102,10 @@ export const destroy = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const deleteBannerService = makeDeleteBannerService();
 
-		await deleteBannerService.handle(id);
+		await deleteBannerService.handle({
+			id,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)

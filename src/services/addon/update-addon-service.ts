@@ -1,9 +1,14 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.ts";
 import { updateAddonBodySchema } from "@/schemas/addon-schema.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
 
-type UpdateAddonServiceRequest = z.infer<typeof updateAddonBodySchema>;
+interface UpdateAddonServiceRequest
+	extends z.infer<typeof updateAddonBodySchema>,
+		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
+	id: number;
+}
 
 export class UpdateAddonService {
 	private addonRepository: IAddonRepository;
@@ -12,9 +17,12 @@ export class UpdateAddonService {
 		this.addonRepository = addonRepository;
 	}
 
-	async handle(id: number, { categoryId, ...data }: UpdateAddonServiceRequest) {
-		const cache = makeCache();
-
+	async handle({
+		id,
+		categoryId,
+		paramsToForget,
+		...data
+	}: UpdateAddonServiceRequest) {
 		await this.addonRepository.update({
 			id,
 			data: {
@@ -27,6 +35,9 @@ export class UpdateAddonService {
 			}
 		});
 
-		await cache.forgetKeysContaining(cache.keys.addons);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "addons",
+			paramsToForget
+		});
 	}
 }

@@ -61,7 +61,10 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const createEstablishmentService = makeCreateEstablishmentService();
 
-		await createEstablishmentService.handle(body);
+		await createEstablishmentService.handle({
+			...body,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.CREATED)
@@ -78,7 +81,11 @@ export const update = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const updateEstablishmentService = makeUpdateEstablishmentService();
 
-		await updateEstablishmentService.handle(id, data);
+		await updateEstablishmentService.handle({
+			id,
+			...data,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)
@@ -94,7 +101,10 @@ export const destroy = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const deleteEstablishmentService = makeDeleteEstablishmentService();
 
-		await deleteEstablishmentService.handle(id);
+		await deleteEstablishmentService.handle({
+			id,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)

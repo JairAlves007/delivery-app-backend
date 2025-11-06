@@ -1,13 +1,12 @@
-import Constants from "@/helpers/constants.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
-import { domainEvents } from "@/lib/domain-event.ts";
 import { createProductBodySchema } from "@/schemas/product-schema.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
 
 type CreateProductServiceRequest = z.infer<typeof createProductBodySchema> &
-	Omit<ForgetAllListingCacheKeysParams, "baseCacheKey">;
+	Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class CreateProductService {
 	private productRepository: IProductRepository;
@@ -51,7 +50,7 @@ export class CreateProductService {
 			}
 		});
 
-		domainEvents.emit(Constants.EVENTS_KEYS.forgetAllListingCacheKeys, {
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
 			baseCacheKey: "products",
 			paramsToForget
 		});

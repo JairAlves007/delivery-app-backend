@@ -1,4 +1,5 @@
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import { mapObjectResourcesList } from "@/helpers/resource.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
 import {
@@ -49,7 +50,10 @@ export class ListProductCategoriesCatalogService {
 	}: ListProductCategoriesCatalogServiceRequest): Promise<ListProductCategoriesCatalogServiceResponse> {
 		const cache = makeCache();
 		const cursorSuffix = cursor ? `_cursor_${cursor}` : "";
-		const key = `${cache.keys.establishments}_${establishmentId}_${cache.keys.productCategories}_limit_${limit}${cursorSuffix}`;
+		const prefixKey = getFilterParamsCacheKey({
+			establishment_id: establishmentId
+		});
+		const key = `${prefixKey}${cache.keys.productCategories}_limit_${limit}${cursorSuffix}`;
 
 		const raw = await cache.rememberForever(
 			key,

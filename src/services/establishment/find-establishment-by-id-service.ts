@@ -1,5 +1,6 @@
 import { EstablishmentNotFound } from "@/errors/establishment/not-found-error.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import { establishmentParamsSchema } from "@/schemas/establishment-schema.ts";
 import type { EstablishmentFromRepository } from "@/types/establishment.ts";
@@ -20,7 +21,10 @@ export class FindEstablishmentByIdService {
 		id
 	}: FindEstablishmentByIdServiceRequest): Promise<EstablishmentFromRepository> {
 		const cache = makeCache();
-		const key = `${cache.keys.establishments}_${id}`;
+		const prefixKey = getFilterParamsCacheKey({
+			establishment_id: id
+		});
+		const key = `${prefixKey}${cache.keys.establishments}`;
 
 		const establishment = await cache.rememberForever(
 			key,

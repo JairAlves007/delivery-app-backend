@@ -8,6 +8,7 @@ import type {
 } from "@prisma/client";
 import type { AddonFromRepository } from "./addon.ts";
 import type { UserAddressWithDefault } from "./address.ts";
+import type { ForgetAllListingCacheKeysParams } from "./cache.ts";
 import type { EstablishmentID } from "./establishment.ts";
 import type { ProductFromRepository } from "./product.ts";
 import type { UserID, UserWithRole } from "./user.ts";
@@ -110,3 +111,7 @@ export type OrderSubSectionMessage = {
 	comment: string;
 	discount: string;
 };
+
+export type CreateOrderParams = {
+	order: OrderIntent;
+} & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;

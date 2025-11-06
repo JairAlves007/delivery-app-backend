@@ -1,11 +1,13 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { transformPriceToDatabase } from "@/helpers/price.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
 import { createCouponBodySchema } from "@/schemas/coupon-schema.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import { DiscountType } from "@prisma/client";
 import z from "zod";
 
-type CreateCouponServiceRequest = z.infer<typeof createCouponBodySchema>;
+type CreateCouponServiceRequest = z.infer<typeof createCouponBodySchema> &
+	Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class CreateCouponService {
 	private couponRepository: ICouponRepository;
@@ -22,10 +24,9 @@ export class CreateCouponService {
 		endsAt: ends_at,
 		maxUses: max_uses,
 		usesPerUser: uses_per_user,
+		paramsToForget,
 		...data
 	}: CreateCouponServiceRequest) {
-		const cache = makeCache();
-
 		await this.couponRepository.create({
 			...data,
 			value:
@@ -44,6 +45,9 @@ export class CreateCouponService {
 			}
 		});
 
-		await cache.forgetKeysContaining(cache.keys.coupons);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "coupons",
+			paramsToForget
+		});
 	}
 }

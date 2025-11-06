@@ -52,8 +52,6 @@ export class ListProductsFromCategoryCatalogService {
 		};
 		const key = [
 			getFilterParamsCacheKey(filterParams),
-			cache.keys.productCategories,
-			categoryId,
 			cache.keys.products,
 			"limit",
 			limit,

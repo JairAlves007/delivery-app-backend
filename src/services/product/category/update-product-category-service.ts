@@ -1,12 +1,15 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
 import { updateProductCategoryBodySchema } from "@/schemas/product-category-schema.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
 
-type UpdateProductCategoryRequest = z.infer<
-	typeof updateProductCategoryBodySchema
->;
+interface UpdateProductCategoryRequest
+	extends z.infer<typeof updateProductCategoryBodySchema>,
+		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
+	id: string;
+}
 
 export class UpdateProductCategoryService {
 	private productCategoryRepository: IProductCategoryRepository;
@@ -15,12 +18,14 @@ export class UpdateProductCategoryService {
 		this.productCategoryRepository = productCategoryRepository;
 	}
 
-	async handle(
-		id: string,
-		{ name, establishmentId, bannerIds, ...data }: UpdateProductCategoryRequest
-	) {
-		const cache = makeCache();
-
+	async handle({
+		id,
+		name,
+		establishmentId,
+		bannerIds,
+		paramsToForget,
+		...data
+	}: UpdateProductCategoryRequest) {
 		await this.productCategoryRepository.update({
 			id,
 			data: {
@@ -39,6 +44,9 @@ export class UpdateProductCategoryService {
 			}
 		});
 
-		await cache.forgetKeysContaining(cache.keys.productCategories);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "productCategories",
+			paramsToForget
+		});
 	}
 }

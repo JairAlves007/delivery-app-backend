@@ -1,13 +1,16 @@
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { makeSetAllAddressesAsNotDefaultService } from "@/factories/services/address/user/make-set-all-addresses-as-not-default-service.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
 import { createAddressBodySchema } from "@/schemas/address-schema.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import type { UserID } from "@/types/user.ts";
 import z from "zod";
 
 type CreateAddressServiceRequest = z.infer<typeof createAddressBodySchema> & {
 	userId: UserID;
-};
+} & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class CreateAddressService {
 	private addressRepository: IAddressRepository;
@@ -20,11 +23,13 @@ export class CreateAddressService {
 		referencePoint: reference_point,
 		postalCode: postal_code,
 		isDefault: is_default,
+		paramsToForget,
 		userId,
 		...data
 	}: CreateAddressServiceRequest): Promise<void> {
 		const cache = makeCache();
-		const countKey = `${cache.keys.addresses}_user_id_${userId}`;
+		const prefixKey = getFilterParamsCacheKey({ user_id: userId });
+		const countKey = `${prefixKey}${cache.keys.addresses}`;
 
 		const count = await cache.rememberForever(
 			countKey,
@@ -56,6 +61,9 @@ export class CreateAddressService {
 			}
 		});
 
-		await cache.forgetKeysContaining(cache.keys.addresses);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "addresses",
+			paramsToForget
+		});
 	}
 }

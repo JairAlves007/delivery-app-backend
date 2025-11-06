@@ -1,5 +1,10 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+
+type DeleteAddonCategoryServiceParams = {
+	id: number;
+} & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class DeleteAddonCategoryService {
 	private addonCategoryRepository: IAddonCategoryRepository;
@@ -8,14 +13,15 @@ export class DeleteAddonCategoryService {
 		this.addonCategoryRepository = addonCategoryRepository;
 	}
 
-	async handle(id: number) {
-		const cache = makeCache();
-
+	async handle({ id, paramsToForget }: DeleteAddonCategoryServiceParams) {
 		await this.addonCategoryRepository.delete({
 			id,
 			force: false
 		});
 
-		await cache.forgetKeysContaining(cache.keys.addonCategories);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "addonCategories",
+			paramsToForget
+		});
 	}
 }

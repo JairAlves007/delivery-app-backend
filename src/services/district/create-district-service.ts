@@ -1,9 +1,11 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
 import { createDistrictBodySchema } from "@/schemas/district-schema.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
 
-type CreateDistrictServiceRequest = z.infer<typeof createDistrictBodySchema>;
+type CreateDistrictServiceRequest = z.infer<typeof createDistrictBodySchema> &
+	Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class CreateDistrictService {
 	private districtRepository: IDistrictRepository;
@@ -15,10 +17,9 @@ export class CreateDistrictService {
 	async handle({
 		establishmentId,
 		shippingCost: shipping_cost,
+		paramsToForget,
 		...data
 	}: CreateDistrictServiceRequest) {
-		const cache = makeCache();
-
 		await this.districtRepository.create({
 			...data,
 			shipping_cost,
@@ -29,6 +30,9 @@ export class CreateDistrictService {
 			}
 		});
 
-		await cache.forgetKeysContaining(cache.keys.districts);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "districts",
+			paramsToForget
+		});
 	}
 }

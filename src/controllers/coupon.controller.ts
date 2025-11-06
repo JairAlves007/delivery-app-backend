@@ -67,7 +67,10 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const createCouponService = makeCreateCouponService();
 
-		await createCouponService.handle(body);
+		await createCouponService.handle({
+			...body,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.CREATED)
@@ -84,7 +87,11 @@ export const update = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const updateCouponService = makeUpdateCouponService();
 
-		await updateCouponService.handle(id, body);
+		await updateCouponService.handle({
+			id,
+			...body,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)
@@ -100,7 +107,10 @@ export const destroy = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const deleteCouponService = makeDeleteCouponService();
 
-		await deleteCouponService.handle(id);
+		await deleteCouponService.handle({
+			id,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)

@@ -1,10 +1,12 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
 import { createBannerBodySchema } from "@/schemas/banner-schema.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import { BannerLinkType } from "@prisma/client";
 import z from "zod";
 
-type CreateBannerServiceRequest = z.infer<typeof createBannerBodySchema>;
+type CreateBannerServiceRequest = z.infer<typeof createBannerBodySchema> &
+	Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class CreateBannerService {
 	private bannerRepository: IBannerRepository;
@@ -18,10 +20,9 @@ export class CreateBannerService {
 		categoryId,
 		productId,
 		linkType: link_type,
+		paramsToForget,
 		...data
 	}: CreateBannerServiceRequest) {
-		const cache = makeCache();
-
 		await this.bannerRepository.create({
 			...data,
 			link_type,
@@ -44,6 +45,9 @@ export class CreateBannerService {
 				})
 		});
 
-		await cache.forgetKeysContaining(cache.keys.banners);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "banners",
+			paramsToForget
+		});
 	}
 }

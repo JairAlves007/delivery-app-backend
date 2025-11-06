@@ -12,6 +12,7 @@ export type FilterField = {
 
 export type FilterParams = z.infer<typeof searchAndOrderBySchema> & {
 	establishment_id?: string | null;
+	establishment_slug?: string | null;
 	user_id?: UserID | null;
 	category_id?: string | null;
 };

@@ -83,7 +83,11 @@ export const update = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const updateProductService = makeUpdateProductService();
 
-		await updateProductService.handle(id, data);
+		await updateProductService.handle({
+			id,
+			...data,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)
@@ -99,7 +103,10 @@ export const destroy = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const deleteProductService = makeDeleteProductService();
 
-		await deleteProductService.handle(id);
+		await deleteProductService.handle({
+			id,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)

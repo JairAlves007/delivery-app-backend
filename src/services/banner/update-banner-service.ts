@@ -1,10 +1,15 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
 import { updateBannerBodySchema } from "@/schemas/banner-schema.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import { BannerLinkType } from "@prisma/client";
 import z from "zod";
 
-type UpdateBannerServiceRequest = z.infer<typeof updateBannerBodySchema>;
+interface UpdateBannerServiceRequest
+	extends z.infer<typeof updateBannerBodySchema>,
+		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
+	id: number;
+}
 
 export class UpdateBannerService {
 	private bannerRepository: IBannerRepository;
@@ -13,18 +18,15 @@ export class UpdateBannerService {
 		this.bannerRepository = bannerRepository;
 	}
 
-	async handle(
-		id: number,
-		{
-			establishmentId,
-			categoryId,
-			productId,
-			linkType: link_type,
-			...data
-		}: UpdateBannerServiceRequest
-	) {
-		const cache = makeCache();
-
+	async handle({
+		id,
+		establishmentId,
+		categoryId,
+		productId,
+		linkType: link_type,
+		paramsToForget,
+		...data
+	}: UpdateBannerServiceRequest) {
 		await this.bannerRepository.update({
 			id,
 			data: {
@@ -50,6 +52,9 @@ export class UpdateBannerService {
 			}
 		});
 
-		await cache.forgetKeysContaining(cache.keys.banners);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "addresses",
+			paramsToForget
+		});
 	}
 }

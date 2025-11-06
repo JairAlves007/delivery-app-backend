@@ -1,10 +1,15 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { getStatusLabel } from "@/helpers/order.ts";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
 import { updateOrderStatusBodySchema } from "@/schemas/order-schema.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
 
-type UpdateOrderRequest = z.infer<typeof updateOrderStatusBodySchema>;
+interface UpdateOrderRequest
+	extends z.infer<typeof updateOrderStatusBodySchema>,
+		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
+	id: string;
+}
 
 export class UpdateOrderService {
 	private orderRepository: IOrderRepository;
@@ -13,9 +18,12 @@ export class UpdateOrderService {
 		this.orderRepository = orderRepository;
 	}
 
-	async handle(id: string, { status, establishmentId }: UpdateOrderRequest) {
-		const cache = makeCache();
-
+	async handle({
+		id,
+		status,
+		establishmentId,
+		paramsToForget
+	}: UpdateOrderRequest) {
 		await this.orderRepository.update({
 			id,
 			filterParams: { establishment_id: establishmentId },
@@ -29,6 +37,9 @@ export class UpdateOrderService {
 			}
 		});
 
-		await cache.forgetKeysContaining(cache.keys.orders);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "orders",
+			paramsToForget
+		});
 	}
 }

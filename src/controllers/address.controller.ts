@@ -67,7 +67,13 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const createAddressService = makeCreateAddressService();
 
-		await createAddressService.handle({ userId, ...body });
+		await createAddressService.handle({
+			userId,
+			...body,
+			paramsToForget: {
+				user_id: userId
+			}
+		});
 
 		return reply
 			.status(HTTPStatusCodes.CREATED)
@@ -85,7 +91,14 @@ export const update = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const updateAddressService = makeUpdateAddressService();
 
-		await updateAddressService.handle(id, { userId, ...body });
+		await updateAddressService.handle({
+			id,
+			userId,
+			...body,
+			paramsToForget: {
+				user_id: userId
+			}
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)
@@ -101,7 +114,10 @@ export const destroy = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const deleteAddressService = makeDeleteAddressService();
 
-		await deleteAddressService.handle(id);
+		await deleteAddressService.handle({
+			id,
+			paramsToForget: { user_id: request.user.sub }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)

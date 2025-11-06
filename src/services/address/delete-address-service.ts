@@ -1,5 +1,10 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+
+type DeleteAddressServiceParams = {
+	id: string;
+} & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class DeleteAddressService {
 	private addressRepository: IAddressRepository;
@@ -8,11 +13,15 @@ export class DeleteAddressService {
 		this.addressRepository = addressRepository;
 	}
 
-	async handle(id: string): Promise<void> {
-		const cache = makeCache();
-
+	async handle({
+		id,
+		paramsToForget
+	}: DeleteAddressServiceParams): Promise<void> {
 		await this.addressRepository.delete({ id, force: false });
 
-		await cache.forgetKeysContaining(cache.keys.addresses);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "addresses",
+			paramsToForget
+		});
 	}
 }

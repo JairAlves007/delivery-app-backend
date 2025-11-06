@@ -1,11 +1,16 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import { updateEstablishmentBodySchema } from "@/schemas/establishment-schema.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import { Prisma } from "@prisma/client";
 import z from "zod";
 
-type UpdateEstablishmentRequest = z.infer<typeof updateEstablishmentBodySchema>;
+interface UpdateEstablishmentRequest
+	extends z.infer<typeof updateEstablishmentBodySchema>,
+		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
+	id: string;
+}
 
 export class UpdateEstablishmentService {
 	private establishmentRepository: IEstablishmentRepository;
@@ -14,12 +19,13 @@ export class UpdateEstablishmentService {
 		this.establishmentRepository = establishmentRepository;
 	}
 
-	async handle(
-		id: string,
-		{ name, address, ...data }: UpdateEstablishmentRequest
-	) {
-		const cache = makeCache();
-
+	async handle({
+		id,
+		name,
+		address,
+		paramsToForget,
+		...data
+	}: UpdateEstablishmentRequest) {
 		const updateInput: Prisma.EstablishmentUpdateInput = {
 			...data,
 			...(!!name && { slug: slugify(name) })
@@ -45,6 +51,9 @@ export class UpdateEstablishmentService {
 			data: updateInput
 		});
 
-		await cache.forgetKeysContaining(cache.keys.establishments);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "establishments",
+			paramsToForget
+		});
 	}
 }

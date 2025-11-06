@@ -1,4 +1,3 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { IMenuRepository } from "@/interfaces/repositories/menu-repository.ts";
 import { prisma } from "@/lib/prisma.ts";
 import type { EstablishmentID } from "@/types/establishment.ts";
@@ -282,9 +281,5 @@ export class MenuPrismaRepository implements IMenuRepository {
 		await prisma.subMenu.createMany({
 			data: adminSubmenuItems
 		});
-
-		const cache = makeCache();
-
-		await cache.forgetKeysContaining(`${cache.keys.menus}_${establishmentId}`);
 	}
 }

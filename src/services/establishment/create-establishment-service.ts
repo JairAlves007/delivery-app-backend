@@ -1,4 +1,4 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import { createEstablishmentBodySchema } from "@/schemas/establishment-schema.ts";
@@ -6,8 +6,14 @@ import {
 	createMenuForNewEstablishmentId,
 	createMenuForNewEstablishmentTask
 } from "@/tasks/create-menu-for-new-establishment.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import { tasks } from "@trigger.dev/sdk";
 import z from "zod";
+
+type CreateEstablishmentServiceParams = z.infer<
+	typeof createEstablishmentBodySchema
+> &
+	Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class CreateEstablishmentService {
 	private establishmentRepository: IEstablishmentRepository;
@@ -22,10 +28,9 @@ export class CreateEstablishmentService {
 		acceptsCreditCard: accepts_credit_card,
 		onlyDelivery: only_delivery,
 		nextBillingDate: next_billing_date,
+		paramsToForget,
 		...data
-	}: z.infer<typeof createEstablishmentBodySchema>): Promise<void> {
-		const cache = makeCache();
-
+	}: CreateEstablishmentServiceParams): Promise<void> {
 		const establishment = await this.establishmentRepository.create({
 			...data,
 			name,
@@ -50,6 +55,9 @@ export class CreateEstablishmentService {
 			{ establishmentId: establishment.id }
 		);
 
-		await cache.forgetKeysContaining(cache.keys.establishments);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "establishments",
+			paramsToForget
+		});
 	}
 }

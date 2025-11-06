@@ -1,6 +1,6 @@
 import { makeCreateOrderService } from "@/factories/services/order/make-create-order-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
-import type { OrderIntent } from "@/types/order.ts";
+import type { CreateOrderParams } from "@/types/order.ts";
 import { logger, task } from "@trigger.dev/sdk";
 
 export const createOrderTaskId = "create-order";
@@ -13,7 +13,7 @@ export const createOrderTask = task({
 	onFailure: async () => {
 		logger.log("Error creating order!");
 	},
-	run: async (payload: OrderIntent, { ctx }) => {
+	run: async (payload: CreateOrderParams, { ctx }) => {
 		logger.log("Creating order!", { payload, ctx });
 
 		const createOrderService = makeCreateOrderService();

@@ -1,5 +1,10 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+
+type DeleteBannerServiceParams = {
+	id: number;
+} & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class DeleteBannerService {
 	private bannerRepository: IBannerRepository;
@@ -8,11 +13,12 @@ export class DeleteBannerService {
 		this.bannerRepository = bannerRepository;
 	}
 
-	async handle(id: number) {
-		const cache = makeCache();
-
+	async handle({ id, paramsToForget }: DeleteBannerServiceParams) {
 		await this.bannerRepository.delete({ id, force: false });
 
-		await cache.forgetKeysContaining(cache.keys.banners);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "banners",
+			paramsToForget
+		});
 	}
 }

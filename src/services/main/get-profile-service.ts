@@ -1,5 +1,6 @@
 import { UserNotFound } from "@/errors/user/user-not-found.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
 import type { Profile } from "@/types/user.ts";
 
@@ -17,7 +18,10 @@ export class GetProfileService {
 	async handle({ id }: GetProfileServiceRequest): Promise<Profile | null> {
 		try {
 			const cache = makeCache();
-			const key = `${cache.keys.profile}_${id}`;
+			const prefixKey = getFilterParamsCacheKey({
+				user_id: id
+			});
+			const key = `${prefixKey}${cache.keys.profile}`;
 
 			const user = await cache.rememberForever(
 				key,

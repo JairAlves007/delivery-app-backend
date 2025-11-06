@@ -105,8 +105,11 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 
 	try {
 		await tasks.trigger<typeof createOrderTask>(createOrderTaskId, {
-			...body,
-			userId
+			order: {
+				...body,
+				userId
+			},
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
 		});
 
 		return reply
@@ -129,7 +132,11 @@ export const update = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const updateOrderService = makeUpdateOrderService();
 
-		await updateOrderService.handle(id, body);
+		await updateOrderService.handle({
+			id,
+			...body,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)
@@ -147,7 +154,8 @@ export const cancel = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const cancelOrderService = makeCancelOrderFromCustomerService();
 
-		await cancelOrderService.handle(id, {
+		await cancelOrderService.handle({
+			id,
 			filterParams: { establishment_id: establishmentId, user_id: userId }
 		});
 

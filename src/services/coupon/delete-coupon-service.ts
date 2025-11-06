@@ -1,5 +1,10 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+
+type DeleteCouponParams = {
+	id: number;
+} & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class DeleteCouponService {
 	private couponRepository: ICouponRepository;
@@ -8,11 +13,12 @@ export class DeleteCouponService {
 		this.couponRepository = couponRepository;
 	}
 
-	async handle(id: number) {
-		const cache = makeCache();
-
+	async handle({ id, paramsToForget }: DeleteCouponParams) {
 		await this.couponRepository.delete({ id, force: false });
 
-		await cache.forgetKeysContaining(cache.keys.coupons);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "coupons",
+			paramsToForget
+		});
 	}
 }

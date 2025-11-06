@@ -63,7 +63,10 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const createDistrictService = makeCreateDistrictService();
 
-		await createDistrictService.handle(body);
+		await createDistrictService.handle({
+			...body,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.CREATED)
@@ -80,7 +83,11 @@ export const update = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const updateDistrictService = makeUpdateDistrictService();
 
-		await updateDistrictService.handle(id, body);
+		await updateDistrictService.handle({
+			id,
+			...body,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)
@@ -96,7 +103,10 @@ export const destroy = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const deleteDistrictService = makeDeleteDistrictService();
 
-		await deleteDistrictService.handle(id);
+		await deleteDistrictService.handle({
+			id,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.NO_CONTENT)

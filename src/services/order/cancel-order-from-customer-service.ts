@@ -1,10 +1,14 @@
 import { CancelOrderNotAllowed } from "@/errors/order/cancel-not-allowed-error.ts";
 import { OrderNotFound } from "@/errors/order/not-found-error.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { getStatusLabel, transformOrderByStatus } from "@/helpers/order.ts";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
 import type { FilterField } from "@/types/crud.ts";
 import { OrderStatusType } from "@prisma/client";
+
+type CancelOrderFromCustomerServiceParams = {
+	id: string;
+} & FilterField;
 
 export class CancelOrderFromCustomerService {
 	private orderRepository: IOrderRepository;
@@ -13,7 +17,7 @@ export class CancelOrderFromCustomerService {
 		this.orderRepository = orderRepository;
 	}
 
-	async handle(id: string, { filterParams }: FilterField) {
+	async handle({ id, filterParams }: CancelOrderFromCustomerServiceParams) {
 		const orderFromRepository = await this.orderRepository.findById({
 			id,
 			filterParams
@@ -26,7 +30,6 @@ export class CancelOrderFromCustomerService {
 		if (order.status.value !== OrderStatusType.PREPARING)
 			throw new CancelOrderNotAllowed();
 
-		const cache = makeCache();
 		const cancelStatus: OrderStatusType = OrderStatusType.CANCELLED;
 
 		await this.orderRepository.update({
@@ -42,6 +45,9 @@ export class CancelOrderFromCustomerService {
 			}
 		});
 
-		await cache.forgetKeysContaining(cache.keys.orders);
+		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+			baseCacheKey: "orders",
+			paramsToForget: filterParams
+		});
 	}
 }

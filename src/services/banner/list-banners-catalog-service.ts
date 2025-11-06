@@ -1,4 +1,5 @@
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import { mapObjectResourcesList } from "@/helpers/resource.ts";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
 import { establishmentParamsSchema } from "@/schemas/generic-schema.ts";
@@ -33,7 +34,10 @@ export class ListBannersCatalogService {
 		establishmentId
 	}: ListBannersCatalogServiceRequest): Promise<ListBannersCatalogServiceResponse> {
 		const cache = makeCache();
-		const key = `${cache.keys.establishments}_${establishmentId}_${cache.keys.banners}`;
+		const prefixKey = getFilterParamsCacheKey({
+			establishment_id: establishmentId
+		});
+		const key = `${prefixKey}all_${cache.keys.banners}`;
 
 		const banners = await cache.rememberForever(
 			key,
