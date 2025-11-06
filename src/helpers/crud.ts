@@ -20,26 +20,24 @@ export const getFilterParamsCacheKey = (
 	const params = transformValidFilterParams(filterParams);
 	if (!params || Object.keys(params).length === 0) return "";
 
-	const cacheKey: string[] = [];
-
 	const primaryKeys: (keyof FilterParams)[] = [
 		"search",
 		"sortField",
 		"sortOrder"
 	];
 
-	for (const key of primaryKeys) {
-		const value = params[key];
-		if (value != null && value !== "") cacheKey.push(key, String(value));
-	}
+	const orderedEntries = [
+		...primaryKeys.map(key => [key, params[key]] as const),
+		...Object.entries(params).filter(
+			([key]) => !primaryKeys.includes(key as keyof FilterParams)
+		)
+	];
 
-	for (const [key, value] of Object.entries(params)) {
-		if (primaryKeys.includes(key as keyof FilterParams)) continue;
+	const validEntries = orderedEntries.filter(
+		([, value]) => value != null && value !== ""
+	);
 
-		if (value != null && value !== "") cacheKey.push(key, String(value));
-	}
-
-	return cacheKey.join("_") + "_";
+	return validEntries.map(([key, value]) => `${key}_${value}`).join("_") + "_";
 };
 
 export function buildFilterQueryOptions<Field>({
