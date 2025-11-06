@@ -18,13 +18,26 @@ export const getFilterParamsCacheKey = (
 	filterParams?: FilterParams
 ): string => {
 	const params = transformValidFilterParams(filterParams);
+	if (!params || Object.keys(params).length === 0) return "";
+
 	const cacheKey: string[] = [];
 
-	Object.entries(params).forEach(([key, value]) => {
-		cacheKey.push(key, value);
-	});
+	const primaryKeys: (keyof FilterParams)[] = [
+		"search",
+		"sortField",
+		"sortOrder"
+	];
 
-	if (cacheKey.length <= 0) return "";
+	for (const key of primaryKeys) {
+		const value = params[key];
+		if (value != null && value !== "") cacheKey.push(key, String(value));
+	}
+
+	for (const [key, value] of Object.entries(params)) {
+		if (primaryKeys.includes(key as keyof FilterParams)) continue;
+
+		if (value != null && value !== "") cacheKey.push(key, String(value));
+	}
 
 	return cacheKey.join("_") + "_";
 };
