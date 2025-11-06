@@ -63,7 +63,10 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const createProductService = makeCreateProductService();
 
-		await createProductService.handle(body);
+		await createProductService.handle({
+			...body,
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		});
 
 		return reply
 			.status(HTTPStatusCodes.CREATED)

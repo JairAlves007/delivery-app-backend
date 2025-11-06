@@ -5,5 +5,5 @@ export type CacheKeys = keyof typeof Constants.CACHE_KEYS;
 
 export type ForgetAllListingCacheKeysParams = {
 	baseCacheKey: CacheKeys;
-	paramsToClean?: FilterParams;
+	paramsToForget?: FilterParams;
 };

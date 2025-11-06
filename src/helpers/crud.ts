@@ -24,6 +24,8 @@ export const getFilterParamsCacheKey = (
 		cacheKey.push(key, value);
 	});
 
+	if (cacheKey.length <= 0) return "";
+
 	return cacheKey.join("_") + "_";
 };
 

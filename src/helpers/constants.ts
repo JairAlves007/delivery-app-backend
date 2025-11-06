@@ -94,4 +94,9 @@ export default class Constants {
 
 		> 🔗 Este pedido foi feito via sistema
 	`;
+
+	// EVENTS
+	public static readonly EVENTS_KEYS = {
+		forgetAllListingCacheKeys: "forgetAllListingCacheKeys"
+	};
 }

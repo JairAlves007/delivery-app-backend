@@ -128,9 +128,9 @@ export class Cache implements ICacheBase {
 
 	async forgetAllListingCacheKeys({
 		baseCacheKey,
-		paramsToClean
+		paramsToForget
 	}: ForgetAllListingCacheKeysParams) {
-		const prefixKey = getFilterParamsCacheKey(paramsToClean);
+		const prefixKey = getFilterParamsCacheKey(paramsToForget);
 		const forgetCacheKeysPromises = [];
 		const listingCacheKeys = [
 			`${prefixKey}${this.keys[baseCacheKey]}`,

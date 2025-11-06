@@ -16,8 +16,6 @@ export type EstablishmentFromRepository = Prisma.EstablishmentGetPayload<{
 	};
 }>;
 
-export type EstablishmentCatalog = Prisma.ProductGetPayload<{}>;
-
 export type EstablishmentsList = Omit<
 	EstablishmentFromRepository,
 	"resources"

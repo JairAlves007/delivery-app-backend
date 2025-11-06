@@ -5,7 +5,7 @@ import { logger, task } from "@trigger.dev/sdk";
 
 export const forgetAllListingCacheKeysTaskId = "forget-all-listing-cache-keys";
 
-export const forgetAllListingCacheKeysTaskTask = task({
+export const forgetAllListingCacheKeysTask = task({
 	id: forgetAllListingCacheKeysTaskId,
 	queue: {
 		name: forgetAllListingCacheKeysTaskId
@@ -14,17 +14,17 @@ export const forgetAllListingCacheKeysTaskTask = task({
 		logger.log("Error forgetting all listing cache keys!");
 	},
 	run: async (
-		{ baseCacheKey, paramsToClean }: ForgetAllListingCacheKeysParams,
+		{ baseCacheKey, paramsToForget }: ForgetAllListingCacheKeysParams,
 		{ ctx }
 	) => {
 		logger.log("Forgetting all listing cache keys!", {
 			baseCacheKey,
-			paramsToClean,
+			paramsToForget,
 			ctx
 		});
 
 		const cache = makeCache();
-		await cache.forgetAllListingCacheKeys({ baseCacheKey, paramsToClean });
+		await cache.forgetAllListingCacheKeys({ baseCacheKey, paramsToForget });
 
 		return ApiResponse.success("Cache keys limpas com sucesso!", {});
 	}

@@ -1,15 +1,13 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import Constants from "@/helpers/constants.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
+import { domainEvents } from "@/lib/domain-event.ts";
 import { createProductBodySchema } from "@/schemas/product-schema.ts";
-import {
-	forgetAllListingCacheKeysTaskId,
-	forgetAllListingCacheKeysTaskTask
-} from "@/tasks/forget-all-listing-cache-keys.ts";
-import { tasks } from "@trigger.dev/sdk";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
 
-type CreateProductServiceRequest = z.infer<typeof createProductBodySchema>;
+type CreateProductServiceRequest = z.infer<typeof createProductBodySchema> &
+	Omit<ForgetAllListingCacheKeysParams, "baseCacheKey">;
 
 export class CreateProductService {
 	private productRepository: IProductRepository;
@@ -23,9 +21,9 @@ export class CreateProductService {
 		categoryId,
 		bannerIds,
 		tagIds,
+		paramsToForget,
 		...data
 	}: CreateProductServiceRequest): Promise<void> {
-		const cache = makeCache();
 		const banners = !!bannerIds
 			? {
 					connect: bannerIds.map(bannerId => ({ id: bannerId }))
@@ -53,12 +51,9 @@ export class CreateProductService {
 			}
 		});
 
-		await tasks.trigger<typeof forgetAllListingCacheKeysTaskTask>(
-			forgetAllListingCacheKeysTaskId,
-			{
-				baseCacheKey: "products",
-				paramsToClean: { establishment_id: establishmentId }
-			}
-		);
+		domainEvents.emit(Constants.EVENTS_KEYS.forgetAllListingCacheKeys, {
+			baseCacheKey: "products",
+			paramsToForget
+		});
 	}
 }
