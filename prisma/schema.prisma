@@ -190,8 +190,8 @@ model User {
   email               String               @unique
   password            String
   role_id             Int
-  created_at          DateTime             @default(now())
-  deleted_at          DateTime?
+  created_at          DateTime             @default(now()) @db.Timestamptz
+  deleted_at          DateTime?            @db.Timestamptz
   role                Role                 @relation(fields: [role_id], references: [id])
   addresses           UserAddress[]
   orders              Order[]
@@ -209,9 +209,9 @@ model PasswordResetToken {
   id         Int       @id @default(autoincrement())
   user_id    String
   token_hash String
-  expires_at DateTime
-  used_at    DateTime?
-  created_at DateTime  @default(now())
+  expires_at DateTime  @db.Timestamptz
+  used_at    DateTime? @db.Timestamptz
+  created_at DateTime  @default(now()) @db.Timestamptz
 
   user User @relation(fields: [user_id], references: [id])
 
@@ -250,8 +250,8 @@ model Menu {
   submenus         SubMenu[]
   for_role         RoleType
   establishment_id String
-  created_at       DateTime      @default(now())
-  updated_at       DateTime      @updatedAt
+  created_at       DateTime      @default(now()) @db.Timestamptz
+  updated_at       DateTime      @updatedAt @db.Timestamptz
   establishment    Establishment @relation(fields: [establishment_id], references: [id])
 
   @@unique([establishment_id, slug, for_role])
@@ -281,10 +281,10 @@ model Establishment {
   only_delivery          Boolean
   accepts_credit_card    Boolean
   is_manually_closed     Boolean                 @default(false)
-  next_billing_date      DateTime
+  next_billing_date      DateTime                @db.Timestamptz
   owner_id               String?                 @unique
-  created_at             DateTime                @default(now())
-  deleted_at             DateTime?
+  created_at             DateTime                @default(now()) @db.Timestamptz
+  deleted_at             DateTime?               @db.Timestamptz
   owner                  User?                   @relation(fields: [owner_id], references: [id])
   openingHours           OpeningHour[]
   socialLinks            SocialLink[]
@@ -322,8 +322,8 @@ model OpeningHour {
 model Closure {
   id               Int           @id @default(autoincrement())
   establishment_id String
-  starts_at        DateTime
-  ends_at          DateTime?
+  starts_at        DateTime      @db.Timestamptz
+  ends_at          DateTime?     @db.Timestamptz
   reason           String?
   establishment    Establishment @relation(fields: [establishment_id], references: [id])
 
@@ -347,7 +347,7 @@ model ProductCategory {
   name             String
   slug             String
   order            Int?
-  deleted_at       DateTime?
+  deleted_at       DateTime?                 @db.Timestamptz
   establishment    Establishment             @relation(fields: [establishment_id], references: [id])
   products         Product[]
   banners          Banner[]
@@ -367,10 +367,10 @@ model Product {
   slug                String
   discount_percentage Float?
   stock               Int?
-  valid_until         DateTime?
-  created_at          DateTime          @default(now())
-  updated_at          DateTime          @updatedAt
-  deleted_at          DateTime?
+  valid_until         DateTime?         @db.Timestamptz
+  created_at          DateTime          @default(now()) @db.Timestamptz
+  updated_at          DateTime          @updatedAt @db.Timestamptz
+  deleted_at          DateTime?         @db.Timestamptz
   establishment       Establishment     @relation(fields: [establishment_id], references: [id])
   category            ProductCategory   @relation(fields: [category_id], references: [id])
   favorites           Favorite[]
@@ -388,7 +388,7 @@ model Tag {
   establishment_id String
   label            String
   type             TagType
-  deleted_at       DateTime?
+  deleted_at       DateTime?        @db.Timestamptz
   establishment    Establishment    @relation(fields: [establishment_id], references: [id])
   productTags      ProductTag[]
   fromTags         TagCombination[] @relation("FromTag")
@@ -422,7 +422,7 @@ model AddonCategory {
   name             String
   type             AddonType
   max_quantity     Int?
-  deleted_at       DateTime?
+  deleted_at       DateTime?     @db.Timestamptz
   establishment    Establishment @relation(fields: [establishment_id], references: [id])
   addons           Addon[]
 
@@ -435,7 +435,7 @@ model Addon {
   category_id     Int
   name            String
   price           Int              @default(0)
-  deleted_at      DateTime?
+  deleted_at      DateTime?        @db.Timestamptz
   category        AddonCategory    @relation(fields: [category_id], references: [id])
   orderItemAddons OrderItemAddon[]
 
@@ -450,7 +450,7 @@ model District {
   shipping_cost          Int
   establishment          Establishment          @relation(fields: [establishment_id], references: [id])
   deliveryLinks          DeliveryAddress[]
-  deleted_at             DateTime?
+  deleted_at             DateTime?              @db.Timestamptz
   orderDeliveryAddresses OrderDeliveryAddress[]
 
   @@unique([name, establishment_id])
@@ -464,9 +464,9 @@ model Coupon {
   type             CouponType
   discount_type    DiscountType
   value            Float
-  starts_at        DateTime?
-  ends_at          DateTime?
-  deleted_at       DateTime?
+  starts_at        DateTime?     @db.Timestamptz
+  ends_at          DateTime?     @db.Timestamptz
+  deleted_at       DateTime?     @db.Timestamptz
   max_uses         Int?
   uses_per_user    Int?
   establishment    Establishment @relation(fields: [establishment_id], references: [id])
@@ -509,9 +509,9 @@ model Banner {
   link_type        BannerLinkType
   product_id       String?
   category_id      String?
-  created_at       DateTime         @default(now())
-  updated_at       DateTime         @updatedAt
-  deleted_at       DateTime?
+  created_at       DateTime         @default(now()) @db.Timestamptz
+  updated_at       DateTime         @updatedAt @db.Timestamptz
+  deleted_at       DateTime?        @db.Timestamptz
   product          Product?         @relation(fields: [product_id], references: [id])
   category         ProductCategory? @relation(fields: [category_id], references: [id])
   establishment    Establishment    @relation(fields: [establishment_id], references: [id])
@@ -533,9 +533,9 @@ model Order {
   user_id              String
   establishment_id     String
   coupon_id            Int?
-  created_at           DateTime              @default(now())
-  updated_at           DateTime              @updatedAt
-  deleted_at           DateTime?
+  created_at           DateTime              @default(now()) @db.Timestamptz
+  updated_at           DateTime              @updatedAt @db.Timestamptz
+  deleted_at           DateTime?             @db.Timestamptz
   user                 User                  @relation(fields: [user_id], references: [id])
   establishment        Establishment         @relation(fields: [establishment_id], references: [id])
   items                OrderItem[]
@@ -553,7 +553,7 @@ model OrderCoupon {
   code           String
   discount_type  DiscountType
   discount_value Int
-  created_at     DateTime     @default(now())
+  created_at     DateTime     @default(now()) @db.Timestamptz
   order          Order        @relation(fields: [order_id], references: [id])
 
   @@map("order_coupons")
@@ -566,7 +566,7 @@ model OrderItem {
   product_name  String
   product_price Int
   quantity      Int
-  created_at    DateTime @default(now())
+  created_at    DateTime @default(now()) @db.Timestamptz
 
   order   Order            @relation(fields: [order_id], references: [id])
   product Product          @relation(fields: [product_id], references: [id])
@@ -595,7 +595,7 @@ model OrderStatus {
   order_id   String
   label      String
   value      OrderStatusType
-  created_at DateTime        @default(now())
+  created_at DateTime        @default(now()) @db.Timestamptz
   order      Order           @relation(fields: [order_id], references: [id])
 
   @@unique([order_id, value])
@@ -615,9 +615,9 @@ model Address {
   phone                  String
   latitude               Float?
   longitude              Float?
-  created_at             DateTime               @default(now())
-  updated_at             DateTime               @updatedAt
-  deleted_at             DateTime?
+  created_at             DateTime               @default(now()) @db.Timestamptz
+  updated_at             DateTime               @updatedAt @db.Timestamptz
+  deleted_at             DateTime?              @db.Timestamptz
   userAddresses          UserAddress[]
   establishmentAddresses EstablishmentAddress[]
   orderDeliveryAddresses OrderDeliveryAddress[]
@@ -631,8 +631,8 @@ model UserAddress {
   user_id           String
   address_id        String
   is_default        Boolean           @default(false)
-  created_at        DateTime          @default(now())
-  deleted_at        DateTime?
+  created_at        DateTime          @default(now()) @db.Timestamptz
+  deleted_at        DateTime?         @db.Timestamptz
   user              User              @relation(fields: [user_id], references: [id])
   address           Address           @relation(fields: [address_id], references: [id])
   deliveryAddresses DeliveryAddress[]
@@ -647,8 +647,8 @@ model EstablishmentAddress {
   id               String        @id @default(ulid())
   establishment_id String        @unique
   address_id       String
-  created_at       DateTime      @default(now())
-  deleted_at       DateTime?
+  created_at       DateTime      @default(now()) @db.Timestamptz
+  deleted_at       DateTime?     @db.Timestamptz
   address          Address       @relation(fields: [address_id], references: [id])
   establishment    Establishment @relation(fields: [establishment_id], references: [id])
 
@@ -664,8 +664,8 @@ model DeliveryAddress {
   establishment_id String
   district_id      String
   user_address_id  String
-  created_at       DateTime      @default(now())
-  updated_at       DateTime      @updatedAt
+  created_at       DateTime      @default(now()) @db.Timestamptz
+  updated_at       DateTime      @updatedAt @db.Timestamptz
   userAddress      UserAddress   @relation(fields: [user_address_id], references: [id])
   establishment    Establishment @relation(fields: [establishment_id], references: [id])
   district         District      @relation(fields: [district_id], references: [id])
@@ -689,7 +689,7 @@ model OrderDeliveryAddress {
   order_id      String   @unique
   address_id    String
   district_id   String
-  created_at    DateTime @default(now())
+  created_at    DateTime @default(now()) @db.Timestamptz
   address       Address  @relation(fields: [address_id], references: [id])
   district      District @relation(fields: [district_id], references: [id])
   order         Order    @relation(fields: [order_id], references: [id])
@@ -706,8 +706,8 @@ model Resource {
   path                     String
   file_key                 String
   establishment_id         String
-  created_at               DateTime                  @default(now())
-  updated_at               DateTime                  @updatedAt
+  created_at               DateTime                  @default(now()) @db.Timestamptz
+  updated_at               DateTime                  @updatedAt @db.Timestamptz
   establishment            Establishment             @relation(fields: [establishment_id], references: [id])
   productResources         ProductResource[]
   establishmentResources   EstablishmentResource[]
@@ -724,8 +724,8 @@ model FileFormat {
   id               Int            @id @default(autoincrement())
   type             FileFormatType
   resource_rule_id Int
-  created_at       DateTime       @default(now())
-  updated_at       DateTime       @updatedAt
+  created_at       DateTime       @default(now()) @db.Timestamptz
+  updated_at       DateTime       @updatedAt @db.Timestamptz
   resourceType     ResourceRule   @relation(fields: [resource_rule_id], references: [id])
 
   @@index([resource_rule_id], name: "idx_file_formats_resource_rule_id")
@@ -752,8 +752,8 @@ model BannerResource {
   id          String   @id @default(ulid())
   resource_id String
   banner_id   Int
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  created_at  DateTime @default(now()) @db.Timestamptz
+  updated_at  DateTime @updatedAt @db.Timestamptz
   resource    Resource @relation(fields: [resource_id], references: [id])
   banner      Banner   @relation(fields: [banner_id], references: [id])
 
@@ -767,8 +767,8 @@ model ProductResource {
   id          String   @id @default(ulid())
   resource_id String
   product_id  String
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  created_at  DateTime @default(now()) @db.Timestamptz
+  updated_at  DateTime @updatedAt @db.Timestamptz
   resource    Resource @relation(fields: [resource_id], references: [id])
   product     Product  @relation(fields: [product_id], references: [id])
 
@@ -782,8 +782,8 @@ model EstablishmentResource {
   id               String        @id @default(ulid())
   resource_id      String
   establishment_id String
-  created_at       DateTime      @default(now())
-  updated_at       DateTime      @updatedAt
+  created_at       DateTime      @default(now()) @db.Timestamptz
+  updated_at       DateTime      @updatedAt @db.Timestamptz
   resource         Resource      @relation(fields: [resource_id], references: [id])
   establishment    Establishment @relation(fields: [establishment_id], references: [id])
 
@@ -797,8 +797,8 @@ model ProductCategoryResource {
   id          String          @id @default(ulid())
   resource_id String
   category_id String
-  created_at  DateTime        @default(now())
-  updated_at  DateTime        @updatedAt
+  created_at  DateTime        @default(now()) @db.Timestamptz
+  updated_at  DateTime        @updatedAt @db.Timestamptz
   resource    Resource        @relation(fields: [resource_id], references: [id])
   category    ProductCategory @relation(fields: [category_id], references: [id])
 
