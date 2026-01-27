@@ -10,6 +10,11 @@ forgetAllListingCacheKeysEvent.on(
 		);
 
 		const cache = makeCache();
-		await cache.forgetAllListingCacheKeys({ baseCacheKey, paramsToForget });
+
+		try {
+			await cache.forgetAllListingCacheKeys({ baseCacheKey, paramsToForget });
+		} catch (error) {
+			console.log("[Event] Error forgetting all listing cache keys:", error);
+		}
 	}
 );

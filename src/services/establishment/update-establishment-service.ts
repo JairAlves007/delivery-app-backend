@@ -7,7 +7,8 @@ import { Prisma } from "@prisma/client";
 import z from "zod";
 
 interface UpdateEstablishmentRequest
-	extends z.infer<typeof updateEstablishmentBodySchema>,
+	extends
+		z.infer<typeof updateEstablishmentBodySchema>,
 		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
 	id: string;
 }
@@ -23,11 +24,13 @@ export class UpdateEstablishmentService {
 		id,
 		name,
 		address,
+		nextBillingDate: next_billing_date,
 		paramsToForget,
 		...data
 	}: UpdateEstablishmentRequest) {
 		const updateInput: Prisma.EstablishmentUpdateInput = {
 			...data,
+			next_billing_date,
 			...(!!name && { slug: slugify(name) })
 		};
 

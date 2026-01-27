@@ -3,10 +3,14 @@ import { makeCreateOrderService } from "@/factories/services/order/make-create-o
 import type { CreateOrderEventType } from "@/types/order.ts";
 
 createOrderEvent.on(
-	"create-task",
+	"create-order",
 	async ({ payload }: CreateOrderEventType) => {
 		const createOrderService = makeCreateOrderService();
 
-		await createOrderService.handle({ ...payload });
+		try {
+			await createOrderService.handle({ ...payload });
+		} catch (error) {
+			console.log("[Event] Error creating order:", error);
+		}
 	}
 );

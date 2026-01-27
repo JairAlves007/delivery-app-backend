@@ -15,14 +15,18 @@ createMenuForNewEstablishmentEvent.on(
 
 		const createMenuService = makeCreateMenuForNewEstablishmentService();
 
-		await createMenuService.handle({
-			establishmentId,
-			paramsToForget: { establishment_id: establishmentId }
-		});
+		try {
+			await createMenuService.handle({
+				establishmentId,
+				paramsToForget: { establishment_id: establishmentId }
+			});
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
-			baseCacheKey: "establishments",
-			paramsToForget: paramsToForget
-		});
+			forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+				baseCacheKey: "establishments",
+				paramsToForget: paramsToForget
+			});
+		} catch (error) {
+			console.log("[Event] Error creating menu for new establishment:", error);
+		}
 	}
 );

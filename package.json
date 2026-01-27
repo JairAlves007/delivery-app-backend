@@ -1,46 +1,43 @@
 {
-  "name": "delivery-micro-saas-backend",
-  "version": "1.0.0",
-  "description": "Delivery Micro SAAS Backend",
-  "main": "index.js",
-  "scripts": {
-    "dev": "node --loader esm-module-alias/loader --no-warnings --watch --env-file .env src/http/server.ts",
-    "task:dev": "dotenv -e .env npx trigger.dev@4.0.6 dev",
-    "db:migrate": "prisma migrate",
-    "db:studio": "prisma studio"
-  },
-  "prisma": {
-    "seed": "node --loader esm-module-alias/loader --no-warnings prisma/seed.ts"
-  },
-  "keywords": [],
-  "author": "Jair Alves",
-  "license": "MIT",
-  "type": "module",
-  "devDependencies": {
-    "@trigger.dev/build": "4.0.6",
-    "@types/ejs": "3.1.5",
-    "@types/node": "24.2.0",
-    "dotenv-cli": "10.0.0",
-    "prisma": "6.19.0",
-    "typescript": "5.9.2"
-  },
-  "dependencies": {
-    "@aws-sdk/client-s3": "3.864.0",
-    "@aws-sdk/s3-request-presigner": "3.864.0",
-    "@fastify/cors": "11.1.0",
-    "@fastify/jwt": "9.1.0",
-    "@prisma/client": "6.19.0",
-    "@trigger.dev/sdk": "4.0.6",
-    "bcrypt-ts": "7.1.0",
-    "ejs": "3.1.10",
-    "esm-module-alias": "2.2.1",
-    "fastify": "5.4.0",
-    "ioredis": "5.7.0",
-    "pino-pretty": "13.1.1",
-    "resend": "6.1.0",
-    "zod": "4.0.14"
-  },
-  "aliases": {
-    "@": "src"
-  }
+	"name": "delivery-micro-saas-backend",
+	"version": "1.0.0",
+	"description": "Delivery Micro SAAS Backend",
+	"main": "index.js",
+	"scripts": {
+		"dev": "node --loader esm-module-alias/loader --no-warnings --watch --env-file .env src/http/server.ts",
+		"db:migrate": "prisma migrate",
+		"db:studio": "prisma studio"
+	},
+	"prisma": {
+		"seed": "node --loader esm-module-alias/loader --no-warnings prisma/seed.ts"
+	},
+	"keywords": [],
+	"author": "Jair Alves",
+	"license": "MIT",
+	"type": "module",
+	"devDependencies": {
+		"@types/ejs": "3.1.5",
+		"@types/node": "24.2.0",
+		"dotenv-cli": "10.0.0",
+		"prisma": "6.19.0",
+		"typescript": "5.9.2"
+	},
+	"dependencies": {
+		"@aws-sdk/client-s3": "3.864.0",
+		"@aws-sdk/s3-request-presigner": "3.864.0",
+		"@fastify/cors": "11.1.0",
+		"@fastify/jwt": "9.1.0",
+		"@prisma/client": "6.19.0",
+		"bcrypt-ts": "7.1.0",
+		"ejs": "3.1.10",
+		"esm-module-alias": "2.2.1",
+		"fastify": "5.4.0",
+		"ioredis": "5.7.0",
+		"pino-pretty": "13.1.1",
+		"resend": "6.1.0",
+		"zod": "4.0.14"
+	},
+	"aliases": {
+		"@": "src"
+	}
 }

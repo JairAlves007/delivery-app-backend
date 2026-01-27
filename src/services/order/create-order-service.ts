@@ -1,5 +1,6 @@
 import { UserNotFound } from "@/errors/user/user-not-found.ts";
 import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
+import { sendOrderConfirmationMessageEvent } from "@/events/send-order-confirmation-message-event.ts";
 import { makeCalculateCouponDiscountFromOrderService } from "@/factories/services/order/validations/make-calculate-coupon-discount-from-order-service.ts";
 import { makeValidateAddonsFromOrderService } from "@/factories/services/order/validations/make-validate-addons-from-order-service.ts";
 import { makeValidateDeliveryFromOrderService } from "@/factories/services/order/validations/make-validate-delivery-from-order-service.ts";
@@ -13,10 +14,6 @@ import {
 } from "@/helpers/price.ts";
 import { removeDuplicateItems } from "@/helpers/utils.ts";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
-import {
-	sendOrderConfirmationTask,
-	sendOrderConfirmationTaskId
-} from "@/tasks/send-order-confirmation-message-task.ts";
 import type { UserAddressWithDefault } from "@/types/address.ts";
 import type {
 	BuildOrderItemsParams,
@@ -32,7 +29,6 @@ import {
 	type District,
 	type Prisma
 } from "@prisma/client";
-import { tasks } from "@trigger.dev/sdk";
 
 export class CreateOrderService {
 	private orderRepository: IOrderRepository;
@@ -264,19 +260,16 @@ export class CreateOrderService {
 			paramsToForget
 		});
 
-		await tasks.trigger<typeof sendOrderConfirmationTask>(
-			sendOrderConfirmationTaskId,
-			{
-				...order,
-				user,
-				address,
-				coupon,
-				couponDiscount,
-				shippingCost,
-				orderItemsToProcess,
-				district,
-				subtotal
-			}
-		);
+		sendOrderConfirmationMessageEvent.emit("send-order-confirmation-message", {
+			...order,
+			user,
+			address,
+			coupon,
+			couponDiscount,
+			shippingCost,
+			orderItemsToProcess,
+			district,
+			subtotal
+		});
 	}
 }

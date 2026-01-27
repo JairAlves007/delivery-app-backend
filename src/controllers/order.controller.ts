@@ -100,7 +100,7 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 	const userId = userIdSchema.parse(request.user.sub);
 
 	try {
-		createOrderEvent.emit("create-task", {
+		createOrderEvent.emit("create-order", {
 			payload: {
 				order: {
 					...body,
