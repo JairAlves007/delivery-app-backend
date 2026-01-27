@@ -120,7 +120,7 @@ export class CreateOrderService {
 
 		return {
 			customer_name: user.name,
-			customer_phone: !!address ? address.phone : contactPhone ?? "S/N",
+			customer_phone: !!address ? address.phone : (contactPhone ?? "S/N"),
 			delivery_type: deliveryType,
 			payment_method: paymentMethod,
 			shipping_fee: shippingCost,

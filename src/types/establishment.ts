@@ -1,6 +1,7 @@
 import { establishmentIdSchema } from "@/schemas/generic-schema.ts";
 import type { Prisma } from "@prisma/client";
 import z from "zod";
+import type { FilterParams } from "./crud.ts";
 import type { ResourceItem } from "./resource.ts";
 
 export type EstablishmentFromRepository = Prisma.EstablishmentGetPayload<{
@@ -21,6 +22,11 @@ export type EstablishmentsList = Omit<
 	"resources"
 > & {
 	resources: ResourceItem;
+};
+
+export type CreateMenuForNewEstablishmentEventType = {
+	establishmentId: EstablishmentID;
+	paramsToForget?: FilterParams;
 };
 
 export type EstablishmentID = z.infer<typeof establishmentIdSchema>;

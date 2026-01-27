@@ -1,13 +1,8 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
+import { createMenuForNewEstablishmentEvent } from "@/events/create-menu-for-new-establishment-event.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import { createEstablishmentBodySchema } from "@/schemas/establishment-schema.ts";
-import {
-	createMenuForNewEstablishmentId,
-	createMenuForNewEstablishmentTask
-} from "@/tasks/create-menu-for-new-establishment.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
-import { tasks } from "@trigger.dev/sdk";
 import z from "zod";
 
 type CreateEstablishmentServiceParams = z.infer<
@@ -50,14 +45,12 @@ export class CreateEstablishmentService {
 			}
 		});
 
-		await tasks.trigger<typeof createMenuForNewEstablishmentTask>(
-			createMenuForNewEstablishmentId,
-			{ establishmentId: establishment.id }
+		createMenuForNewEstablishmentEvent.emit(
+			"create-menu-for-new-establishment",
+			{
+				establishmentId: establishment.id,
+				paramsToForget
+			}
 		);
-
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
-			baseCacheKey: "establishments",
-			paramsToForget
-		});
 	}
 }

@@ -1,3 +1,4 @@
+import { createOrderEvent } from "@/events/create-order-event.ts";
 import { makeCancelOrderFromCustomerService } from "@/factories/services/order/make-cancel-order-from-customer-service.ts";
 import { makeFindOrderService } from "@/factories/services/order/make-find-order-service.ts";
 import { makeListMyOrdersService } from "@/factories/services/order/make-list-my-orders-service.ts";
@@ -18,12 +19,7 @@ import {
 	orderParamsSchema,
 	updateOrderStatusBodySchema
 } from "@/schemas/order-schema.ts";
-import {
-	createOrderTask,
-	createOrderTaskId
-} from "@/tasks/create-order-task.ts";
 import type { FilterParams } from "@/types/crud.ts";
-import { tasks } from "@trigger.dev/sdk";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
@@ -104,12 +100,14 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 	const userId = userIdSchema.parse(request.user.sub);
 
 	try {
-		await tasks.trigger<typeof createOrderTask>(createOrderTaskId, {
-			order: {
-				...body,
-				userId
-			},
-			paramsToForget: { establishment_id: request.user.primaryTenantId }
+		createOrderEvent.emit("create-task", {
+			payload: {
+				order: {
+					...body,
+					userId
+				},
+				paramsToForget: { establishment_id: request.user.primaryTenantId }
+			}
 		});
 
 		return reply
