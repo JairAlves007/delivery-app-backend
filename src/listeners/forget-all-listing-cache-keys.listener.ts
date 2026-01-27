@@ -1,10 +1,6 @@
 import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
-import {
-	forgetAllListingCacheKeysTask,
-	forgetAllListingCacheKeysTaskId
-} from "@/tasks/forget-all-listing-cache-keys.ts";
+import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
-import { tasks } from "@trigger.dev/sdk";
 
 forgetAllListingCacheKeysEvent.on(
 	"forget-all-listing-cache-keys",
@@ -13,12 +9,7 @@ forgetAllListingCacheKeysEvent.on(
 			`[Event] Forgetting all listing cache keys: ${baseCacheKey} to ${paramsToForget}`
 		);
 
-		await tasks.trigger<typeof forgetAllListingCacheKeysTask>(
-			forgetAllListingCacheKeysTaskId,
-			{
-				baseCacheKey,
-				paramsToForget
-			}
-		);
+		const cache = makeCache();
+		await cache.forgetAllListingCacheKeys({ baseCacheKey, paramsToForget });
 	}
 );

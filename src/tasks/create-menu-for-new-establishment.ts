@@ -22,7 +22,10 @@ export const createMenuForNewEstablishmentTask = task({
 
 		const createMenuService = makeCreateMenuForNewEstablishmentService();
 
-		await createMenuService.handle(establishmentId);
+		await createMenuService.handle({
+			establishmentId,
+			paramsToForget: { establishment_id: establishmentId }
+		});
 
 		return ApiResponse.success("Menu criado com sucesso!", {});
 	}
