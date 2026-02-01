@@ -1,5 +1,5 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 
 type DeleteCouponParams = {
@@ -16,7 +16,7 @@ export class DeleteCouponService {
 	async handle({ id, paramsToForget }: DeleteCouponParams) {
 		await this.couponRepository.delete({ id, force: false });
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "coupons",
 			paramsToForget
 		});

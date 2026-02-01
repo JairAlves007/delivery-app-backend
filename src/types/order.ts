@@ -112,10 +112,6 @@ export type OrderSubSectionMessage = {
 	discount: string;
 };
 
-export type CreateOrderEventType = {
-	payload: CreateOrderParams;
-};
-
 export type CreateOrderParams = {
 	order: OrderIntent;
 } & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;

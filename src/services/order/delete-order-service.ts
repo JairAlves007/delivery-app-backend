@@ -1,5 +1,5 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 
 type DeleteOrderServiceParams = {
@@ -16,7 +16,7 @@ export class DeleteOrderService {
 	async handle({ id, paramsToForget }: DeleteOrderServiceParams) {
 		await this.orderRepository.delete({ id, force: false });
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "orders",
 			paramsToForget
 		});

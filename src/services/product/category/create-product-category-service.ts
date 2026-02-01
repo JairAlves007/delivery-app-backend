@@ -1,6 +1,6 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import { createProductCategoryBodySchema } from "@/schemas/product-category-schema.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
@@ -36,7 +36,7 @@ export class CreateProductCategoryService {
 			}
 		});
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "productCategories",
 			paramsToForget
 		});

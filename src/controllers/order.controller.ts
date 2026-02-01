@@ -1,4 +1,3 @@
-import { createOrderEvent } from "@/events/create-order-event.ts";
 import { makeCancelOrderFromCustomerService } from "@/factories/services/order/make-cancel-order-from-customer-service.ts";
 import { makeFindOrderService } from "@/factories/services/order/make-find-order-service.ts";
 import { makeListMyOrdersService } from "@/factories/services/order/make-list-my-orders-service.ts";
@@ -6,6 +5,7 @@ import { makeListOrderService } from "@/factories/services/order/make-list-order
 import { makeUpdateOrderService } from "@/factories/services/order/make-update-order-service.ts";
 import { ApiResponse } from "@/helpers/api.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import { createOrderQueue } from "@/queues/order-queue.ts";
 import {
 	establishmentIdSchema,
 	establishmentParamsSchema,
@@ -100,14 +100,12 @@ export const store = async (request: FastifyRequest, reply: FastifyReply) => {
 	const userId = userIdSchema.parse(request.user.sub);
 
 	try {
-		createOrderEvent.emit("create-order", {
-			payload: {
-				order: {
-					...body,
-					userId
-				},
-				paramsToForget: { establishment_id: request.user.primaryTenantId }
-			}
+		await createOrderQueue({
+			order: {
+				...body,
+				userId
+			},
+			paramsToForget: { establishment_id: request.user.primaryTenantId }
 		});
 
 		return reply

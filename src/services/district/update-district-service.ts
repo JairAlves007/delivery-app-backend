@@ -1,11 +1,12 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import { updateDistrictBodySchema } from "@/schemas/district-schema.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
 
 interface UpdateDistrictRequest
-	extends z.infer<typeof updateDistrictBodySchema>,
+	extends
+		z.infer<typeof updateDistrictBodySchema>,
 		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
 	id: string;
 }
@@ -37,7 +38,7 @@ export class UpdateDistrictService {
 			}
 		});
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "districts",
 			paramsToForget
 		});

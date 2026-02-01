@@ -1,8 +1,8 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { makeSetAllAddressesAsNotDefaultService } from "@/factories/services/address/user/make-set-all-addresses-as-not-default-service.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import { createAddressBodySchema } from "@/schemas/address-schema.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import type { UserID } from "@/types/user.ts";
@@ -61,7 +61,7 @@ export class CreateAddressService {
 			}
 		});
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "addresses",
 			paramsToForget
 		});

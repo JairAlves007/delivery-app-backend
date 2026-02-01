@@ -1,5 +1,5 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 
 type DeleteBannerServiceParams = {
@@ -16,7 +16,7 @@ export class DeleteBannerService {
 	async handle({ id, paramsToForget }: DeleteBannerServiceParams) {
 		await this.bannerRepository.delete({ id, force: false });
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "banners",
 			paramsToForget
 		});

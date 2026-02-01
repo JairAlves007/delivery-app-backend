@@ -24,7 +24,7 @@ export type EstablishmentsList = Omit<
 	resources: ResourceItem;
 };
 
-export type CreateMenuForNewEstablishmentEventType = {
+export type CreateMenuForNewEstablishmentType = {
 	establishmentId: EstablishmentID;
 	paramsToForget?: FilterParams;
 };

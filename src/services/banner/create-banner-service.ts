@@ -1,6 +1,6 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { BannerLinkType } from "@/generated/prisma/client.ts";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import { createBannerBodySchema } from "@/schemas/banner-schema.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
@@ -45,7 +45,7 @@ export class CreateBannerService {
 				})
 		});
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "banners",
 			paramsToForget
 		});

@@ -1,11 +1,12 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import { updateAddonCategoryBodySchema } from "@/schemas/addon-category-schema.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
 
 interface UpdateAddonCategoryServiceRequest
-	extends z.infer<typeof updateAddonCategoryBodySchema>,
+	extends
+		z.infer<typeof updateAddonCategoryBodySchema>,
 		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
 	id: number;
 }
@@ -30,7 +31,7 @@ export class UpdateAddonCategoryService {
 					set: addonIds.map(addonId => ({
 						id: addonId
 					}))
-			  }
+				}
 			: undefined;
 
 		await this.addonCategoryRepository.update({
@@ -47,7 +48,7 @@ export class UpdateAddonCategoryService {
 			}
 		});
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "addonCategories",
 			paramsToForget
 		});

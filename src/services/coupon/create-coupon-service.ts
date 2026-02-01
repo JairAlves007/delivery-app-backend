@@ -1,7 +1,7 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { DiscountType } from "@/generated/prisma/client.ts";
 import { transformPriceToDatabase } from "@/helpers/price.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import { createCouponBodySchema } from "@/schemas/coupon-schema.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
@@ -45,7 +45,7 @@ export class CreateCouponService {
 			}
 		});
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "coupons",
 			paramsToForget
 		});

@@ -1,11 +1,11 @@
 import "@/@types/zod.d.ts";
-import "@/listeners/index.ts";
 
 import { env } from "@/env.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import replySendErrorPlugin from "@/plugins/reply-send-error.ts";
 import { routes } from "@/routes/index.ts";
 import type { DefaultErrorResponse } from "@/types/response.ts";
+import { setupWorkers } from "@/workers/setup.ts";
 import fastifyCors from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
 import fastify from "fastify";
@@ -33,8 +33,17 @@ app.register(fastifyJwt, {
 app.register(replySendErrorPlugin);
 app.register(routes);
 
+app.addHook("onReady", () => {
+	try {
+		setupWorkers();
+		app.log.info("👷 BullMQ Workers initialized successfully");
+	} catch (error) {
+		app.log.error("❌ Failed to initialize BullMQ Workers", error);
+	}
+});
+
 app.setErrorHandler((error, _request, reply) => {
-	if (env.NODE_ENV !== "production") console.error(error);
+	if (env.NODE_ENV !== "production") app.log.error(error);
 
 	return reply.sendError(error);
 });

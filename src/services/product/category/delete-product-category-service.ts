@@ -1,5 +1,5 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 
 type DeleteProductCategoryServiceParams = {
@@ -16,7 +16,7 @@ export class DeleteProductCategoryService {
 	async handle({ id, paramsToForget }: DeleteProductCategoryServiceParams) {
 		await this.productCategoryRepository.delete({ id, force: false });
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "productCategories",
 			paramsToForget
 		});

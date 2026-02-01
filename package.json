@@ -27,6 +27,7 @@
 		"@prisma/adapter-pg": "7.3.0",
 		"@prisma/client": "7.3.0",
 		"bcrypt-ts": "7.1.0",
+		"bullmq": "5.67.2",
 		"ejs": "3.1.10",
 		"esm-module-alias": "2.2.1",
 		"fastify": "5.4.0",

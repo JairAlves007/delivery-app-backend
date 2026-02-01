@@ -1,9 +1,9 @@
 import { CancelOrderNotAllowed } from "@/errors/order/cancel-not-allowed-error.ts";
 import { OrderNotFound } from "@/errors/order/not-found-error.ts";
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { OrderStatusType } from "@/generated/prisma/client.ts";
 import { getStatusLabel, transformOrderByStatus } from "@/helpers/order.ts";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import type { FilterField } from "@/types/crud.ts";
 
 type CancelOrderFromCustomerServiceParams = {
@@ -45,7 +45,7 @@ export class CancelOrderFromCustomerService {
 			}
 		});
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "orders",
 			paramsToForget: filterParams
 		});

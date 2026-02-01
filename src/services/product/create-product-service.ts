@@ -1,6 +1,6 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import { createProductBodySchema } from "@/schemas/product-schema.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
@@ -26,7 +26,7 @@ export class CreateProductService {
 		const banners = !!bannerIds
 			? {
 					connect: bannerIds.map(bannerId => ({ id: bannerId }))
-			  }
+				}
 			: undefined;
 
 		await this.productRepository.create({
@@ -50,7 +50,7 @@ export class CreateProductService {
 			}
 		});
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "products",
 			paramsToForget
 		});

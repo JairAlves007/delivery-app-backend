@@ -1,9 +1,9 @@
 import { env } from "@/env.ts";
 import { InvalidCredentials } from "@/errors/user/invalid-credentials-error.ts";
-import { sendResetPasswordMailEvent } from "@/events/send-reset-password-mail-event.ts";
 import Constants from "@/helpers/constants.ts";
 import type { IPasswordResetTokenRepository } from "@/interfaces/repositories/password-reset-token-repository.ts";
 import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
+import { sendResetPasswordMailQueue } from "@/queues/mail-queue.ts";
 import { hash } from "bcrypt-ts";
 import { randomBytes } from "node:crypto";
 
@@ -42,7 +42,7 @@ export class ForgotPasswordService {
 		const resetPasswordUrl = `${env.APP_URL}/reset-password?token=${rawToken}`;
 		const supportEmail = "onboarding@resend.dev";
 
-		sendResetPasswordMailEvent.emit("send-reset-password-mail", {
+		await sendResetPasswordMailQueue({
 			from: `Enterprise <${supportEmail}>`,
 			to: email,
 			resetPasswordUrl,

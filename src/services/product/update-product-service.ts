@@ -1,12 +1,13 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import { updateProductBodySchema } from "@/schemas/product-schema.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
 
 interface UpdateProductRequest
-	extends z.infer<typeof updateProductBodySchema>,
+	extends
+		z.infer<typeof updateProductBodySchema>,
 		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
 	id: string;
 }
@@ -59,7 +60,7 @@ export class UpdateProductService {
 			}
 		});
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "products",
 			paramsToForget
 		});

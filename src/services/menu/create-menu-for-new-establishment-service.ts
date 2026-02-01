@@ -1,5 +1,5 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IMenuRepository } from "@/interfaces/repositories/menu-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import type { EstablishmentID } from "@/types/establishment.ts";
 
@@ -20,8 +20,8 @@ export class CreateMenuForNewEstablishmentService {
 	}: CreateMenuForNewEstablishmentParams) {
 		await this.menuRepository.createForNewEstablishment(establishmentId);
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
-			baseCacheKey: "menus",
+		await forgetAllListingCacheKeysQueue({
+			baseCacheKey: "establishments",
 			paramsToForget
 		});
 	}

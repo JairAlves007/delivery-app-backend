@@ -1,11 +1,12 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import { updateAddonBodySchema } from "@/schemas/addon-schema.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
 
 interface UpdateAddonServiceRequest
-	extends z.infer<typeof updateAddonBodySchema>,
+	extends
+		z.infer<typeof updateAddonBodySchema>,
 		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
 	id: number;
 }
@@ -35,7 +36,7 @@ export class UpdateAddonService {
 			}
 		});
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "addons",
 			paramsToForget
 		});

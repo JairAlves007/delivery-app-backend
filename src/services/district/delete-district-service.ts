@@ -1,5 +1,5 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 
 type DeleteDistrictParams = {
@@ -16,7 +16,7 @@ export class DeleteDistrictService {
 	async handle({ id, paramsToForget }: DeleteDistrictParams) {
 		await this.districtRepository.delete({ id, force: false });
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "districts",
 			paramsToForget
 		});

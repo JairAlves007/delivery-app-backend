@@ -1,6 +1,6 @@
-import { createMenuForNewEstablishmentEvent } from "@/events/create-menu-for-new-establishment-event.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
+import { createMenuForNewEstablishmentQueue } from "@/queues/establishment-queue.ts";
 import { createEstablishmentBodySchema } from "@/schemas/establishment-schema.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
@@ -45,12 +45,9 @@ export class CreateEstablishmentService {
 			}
 		});
 
-		createMenuForNewEstablishmentEvent.emit(
-			"create-menu-for-new-establishment",
-			{
-				establishmentId: establishment.id,
-				paramsToForget
-			}
-		);
+		await createMenuForNewEstablishmentQueue({
+			establishmentId: establishment.id,
+			paramsToForget
+		});
 	}
 }

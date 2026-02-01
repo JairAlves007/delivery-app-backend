@@ -1,13 +1,14 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import { makeSetAllAddressesAsNotDefaultService } from "@/factories/services/address/user/make-set-all-addresses-as-not-default-service.ts";
 import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import { updateAddressBodySchema } from "@/schemas/address-schema.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import type { UserID } from "@/types/user.ts";
 import z from "zod";
 
 interface UpdateAddressServiceRequest
-	extends z.infer<typeof updateAddressBodySchema>,
+	extends
+		z.infer<typeof updateAddressBodySchema>,
 		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
 	id: string;
 	userId: UserID;
@@ -50,7 +51,7 @@ export class UpdateAddressService {
 			}
 		});
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "addresses",
 			paramsToForget
 		});

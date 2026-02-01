@@ -1,5 +1,5 @@
-import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
 import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 
 type DeleteAddressServiceParams = {
@@ -19,7 +19,7 @@ export class DeleteAddressService {
 	}: DeleteAddressServiceParams): Promise<void> {
 		await this.addressRepository.delete({ id, force: false });
 
-		forgetAllListingCacheKeysEvent.emit("forget-all-listing-cache-keys", {
+		await forgetAllListingCacheKeysQueue({
 			baseCacheKey: "addresses",
 			paramsToForget
 		});
