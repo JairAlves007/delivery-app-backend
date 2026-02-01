@@ -1,10 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum OrderStatusType {
@@ -395,6 +395,7 @@ model Tag {
   toTags           TagCombination[] @relation("ToTag")
 
   @@unique([type, establishment_id])
+  @@map("tags")
 }
 
 model TagCombination {
@@ -405,6 +406,7 @@ model TagCombination {
   to_tag      Tag @relation("ToTag", fields: [to_tag_id], references: [id])
 
   @@unique([from_tag_id, to_tag_id])
+  @@map("tag_combinations")
 }
 
 model ProductTag {
@@ -414,6 +416,7 @@ model ProductTag {
   tag        Tag     @relation(fields: [tag_id], references: [id])
 
   @@id([product_id, tag_id])
+  @@map("product_tags")
 }
 
 model AddonCategory {

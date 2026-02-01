@@ -1,9 +1,10 @@
+import type { Coupon, Prisma } from "@/generated/prisma/client.ts";
 import {
 	buildFilterQueryOptions,
 	transformValidFilterParams
 } from "@/helpers/crud.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
-import { prisma } from "@/lib/prisma.ts";
+import prisma from "@/lib/prisma.ts";
 import type { CouponWithUserCoupons } from "@/types/coupon.ts";
 import type {
 	DeleteContentParams,
@@ -13,7 +14,6 @@ import type {
 	UpdateContentParams
 } from "@/types/crud.ts";
 import type { EstablishmentID } from "@/types/establishment.ts";
-import type { Coupon, Prisma } from "@prisma/client";
 
 export class CouponPrismaRepository implements ICouponRepository {
 	async listAll(filterParams?: FilterParams): Promise<Coupon[]> {

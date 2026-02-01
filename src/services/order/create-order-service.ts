@@ -7,6 +7,13 @@ import { makeValidateDeliveryFromOrderService } from "@/factories/services/order
 import { makeValidateEstablishmentFromOrderService } from "@/factories/services/order/validations/make-validate-establishment-from-order-service.ts";
 import { makeValidateProductFromOrderService } from "@/factories/services/order/validations/make-validate-product-from-order-service.ts";
 import { makeFindUserService } from "@/factories/services/user/make-find-user-service.ts";
+import {
+	DiscountType,
+	OrderStatusType,
+	type Coupon,
+	type District,
+	type Prisma
+} from "@/generated/prisma/client.ts";
 import { getStatusLabel } from "@/helpers/order.ts";
 import {
 	getValueDiscounted,
@@ -22,13 +29,6 @@ import type {
 	OrderItems,
 	OrderItemsToProcess
 } from "@/types/order.ts";
-import {
-	DiscountType,
-	OrderStatusType,
-	type Coupon,
-	type District,
-	type Prisma
-} from "@prisma/client";
 
 export class CreateOrderService {
 	private orderRepository: IOrderRepository;

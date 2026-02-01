@@ -1,4 +1,4 @@
-import { CouponType, DiscountType } from "@prisma/client";
+import { CouponType, DiscountType } from "@/generated/prisma/client.ts";
 import z from "zod";
 import { establishmentIdSchema } from "./generic-schema.ts";
 

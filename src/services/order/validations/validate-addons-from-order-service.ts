@@ -1,6 +1,7 @@
 import { AddonNotFound } from "@/errors/addon/not-found-error.ts";
 import { makeFindAddonService } from "@/factories/services/addon/make-find-addon-service.ts";
 import { makeValidateAddonCategoriesFromOrderService } from "@/factories/services/order/validations/make-validate-addon-categories-from-order-service.ts";
+import { AddonType } from "@/generated/prisma/client.ts";
 import { transformPriceFromDatabase } from "@/helpers/price.ts";
 import { removeDuplicateItems } from "@/helpers/utils.ts";
 import type { EstablishmentID } from "@/types/establishment.ts";
@@ -8,7 +9,6 @@ import type {
 	OrderAddonsToProcess,
 	OrderCategoryAddons
 } from "@/types/order.ts";
-import { AddonType } from "@prisma/client";
 
 type ValidateAddonsFromOrderServiceRequest = {
 	establishmentId: EstablishmentID;

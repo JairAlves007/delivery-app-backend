@@ -8,9 +8,6 @@
 		"db:migrate": "prisma migrate",
 		"db:studio": "prisma studio"
 	},
-	"prisma": {
-		"seed": "node --loader esm-module-alias/loader --no-warnings prisma/seed.ts"
-	},
 	"keywords": [],
 	"author": "Jair Alves",
 	"license": "MIT",
@@ -18,8 +15,8 @@
 	"devDependencies": {
 		"@types/ejs": "3.1.5",
 		"@types/node": "24.2.0",
-		"dotenv-cli": "10.0.0",
-		"prisma": "6.19.0",
+		"dotenv": "17.2.3",
+		"prisma": "7.3.0",
 		"typescript": "5.9.2"
 	},
 	"dependencies": {
@@ -27,7 +24,8 @@
 		"@aws-sdk/s3-request-presigner": "3.864.0",
 		"@fastify/cors": "11.1.0",
 		"@fastify/jwt": "9.1.0",
-		"@prisma/client": "6.19.0",
+		"@prisma/adapter-pg": "7.3.0",
+		"@prisma/client": "7.3.0",
 		"bcrypt-ts": "7.1.0",
 		"ejs": "3.1.10",
 		"esm-module-alias": "2.2.1",

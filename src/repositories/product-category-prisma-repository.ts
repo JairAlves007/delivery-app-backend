@@ -1,9 +1,10 @@
+import type { Prisma } from "@/generated/prisma/client.ts";
 import {
 	buildFilterQueryOptions,
 	transformValidFilterParams
 } from "@/helpers/crud.ts";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
-import { prisma } from "@/lib/prisma.ts";
+import prisma from "@/lib/prisma.ts";
 import type {
 	CursorPaginationParams,
 	DeleteContentParams,
@@ -13,11 +14,8 @@ import type {
 	UpdateContentParams
 } from "@/types/crud.ts";
 import type { ProductCategoryFromRepository } from "@/types/product-category.ts";
-import type { Prisma } from "@prisma/client";
 
-export class ProductCategoryPrismaRepository
-	implements IProductCategoryRepository
-{
+export class ProductCategoryPrismaRepository implements IProductCategoryRepository {
 	async listAll(
 		filterParams?: FilterParams
 	): Promise<ProductCategoryFromRepository[]> {

@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@/generated/prisma/client.ts";
 import type { ResourceItem } from "./resource.ts";
 
 export type ProductCategoryFromRepository = Prisma.ProductCategoryGetPayload<{

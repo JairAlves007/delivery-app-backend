@@ -1,6 +1,7 @@
+import type { Prisma } from "@/generated/prisma/client.ts";
 import { transformValidFilterParams } from "@/helpers/crud.ts";
 import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
-import { prisma } from "@/lib/prisma.ts";
+import prisma from "@/lib/prisma.ts";
 import type { UserAddressWithDefault } from "@/types/address.ts";
 import type {
 	CursorPaginationParams,
@@ -10,7 +11,6 @@ import type {
 	PaginationParams,
 	UpdateContentParams
 } from "@/types/crud.ts";
-import type { Prisma } from "@prisma/client";
 
 type UserAddressStructured = Prisma.UserAddressGetPayload<{
 	select: {

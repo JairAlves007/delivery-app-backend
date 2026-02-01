@@ -5,7 +5,7 @@ import type {
 	OrderStatusType,
 	PaymentMethodType,
 	Prisma
-} from "@prisma/client";
+} from "@/generated/prisma/client.ts";
 import type { AddonFromRepository } from "./addon.ts";
 import type { UserAddressWithDefault } from "./address.ts";
 import type { ForgetAllListingCacheKeysParams } from "./cache.ts";

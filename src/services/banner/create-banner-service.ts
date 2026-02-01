@@ -1,8 +1,8 @@
 import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
+import { BannerLinkType } from "@/generated/prisma/client.ts";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
 import { createBannerBodySchema } from "@/schemas/banner-schema.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
-import { BannerLinkType } from "@prisma/client";
 import z from "zod";
 
 type CreateBannerServiceRequest = z.infer<typeof createBannerBodySchema> &

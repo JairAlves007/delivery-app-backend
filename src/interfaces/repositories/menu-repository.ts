@@ -1,6 +1,6 @@
+import type { RoleType } from "@/generated/prisma/client.ts";
 import type { EstablishmentID } from "@/types/establishment.ts";
 import type { MenuWithSubmenus } from "@/types/menu.ts";
-import type { RoleType } from "@prisma/client";
 
 export interface IMenuRepository {
 	get(

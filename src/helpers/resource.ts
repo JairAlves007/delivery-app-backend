@@ -1,5 +1,9 @@
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import {
+	FileFormatType,
+	ForObjectResourceType
+} from "@/generated/prisma/client.ts";
+import {
 	fileMimeTypeValues,
 	type FileMimeType,
 	type ObjectResources,
@@ -7,7 +11,6 @@ import {
 	type ResourceIntent,
 	type ResourceItem
 } from "@/types/resource.ts";
-import { FileFormatType, ForObjectResourceType } from "@prisma/client";
 
 export const mapMimeTypeToFileFormat = (
 	mimeType: FileMimeType

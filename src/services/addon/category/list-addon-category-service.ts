@@ -1,17 +1,19 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import type { AddonCategory } from "@/generated/prisma/client.ts";
 import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { FilterField } from "@/types/crud.ts";
-import type { AddonCategory } from "@prisma/client";
 import z from "zod";
 
 type ListAddonCategoryServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;
 
-interface ListAddonCategoryServiceResponse
-	extends Pick<ListAddonCategoryServiceRequest, "page"> {
+interface ListAddonCategoryServiceResponse extends Pick<
+	ListAddonCategoryServiceRequest,
+	"page"
+> {
 	addonCategories: AddonCategory[];
 	total: number;
 	perPage?: number;

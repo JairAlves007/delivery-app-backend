@@ -1,11 +1,11 @@
-import type { OrderFromRepository, OrderPayload } from "@/types/order.ts";
 import {
 	CouponType,
 	DeliveryType,
 	DiscountType,
 	OrderStatusType,
 	PaymentMethodType
-} from "@prisma/client";
+} from "@/generated/prisma/client.ts";
+import type { OrderFromRepository, OrderPayload } from "@/types/order.ts";
 import { transformPriceToHumanReadable } from "./price.ts";
 
 export const getStatusLabel = (status: OrderStatusType) => {

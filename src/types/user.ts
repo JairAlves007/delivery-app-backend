@@ -1,5 +1,9 @@
+import type {
+	PasswordResetToken,
+	Prisma,
+	RoleType
+} from "@/generated/prisma/client.ts";
 import { userIdSchema } from "@/schemas/generic-schema.ts";
-import type { PasswordResetToken, Prisma, RoleType } from "@prisma/client";
 import z from "zod";
 
 export type Profile = Prisma.UserGetPayload<{

@@ -1,5 +1,5 @@
+import { WeekDay } from "@/generated/prisma/client.ts";
 import type { EstablishmentFromRepository } from "@/types/establishment.ts";
-import { WeekDay } from "@prisma/client";
 import { parseHourToToday } from "./date.ts";
 
 export function isEstablishmentOpen(

@@ -1,9 +1,9 @@
 import { forgetAllListingCacheKeysEvent } from "@/events/forget-listing-cache-keys-event.ts";
+import { Prisma } from "@/generated/prisma/client.ts";
 import { slugify } from "@/helpers/utils.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
 import { updateEstablishmentBodySchema } from "@/schemas/establishment-schema.ts";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
-import { Prisma } from "@prisma/client";
 import z from "zod";
 
 interface UpdateEstablishmentRequest

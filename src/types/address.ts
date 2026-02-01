@@ -1,4 +1,4 @@
-import type { Address, Prisma } from "@prisma/client";
+import type { Address, Prisma } from "@/generated/prisma/client.ts";
 
 export type UserAddressStructured = Prisma.UserAddressGetPayload<{
 	select: {

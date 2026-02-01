@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@/generated/prisma/client.ts";
 import type { EstablishmentID } from "./establishment.ts";
 import type { ResourceIntent } from "./resource.ts";
 

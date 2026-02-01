@@ -1,18 +1,20 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import type { District } from "@/generated/prisma/client.ts";
 import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import { transformPriceFromDatabase } from "@/helpers/price.ts";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { FilterField } from "@/types/crud.ts";
-import type { District } from "@prisma/client";
 import z from "zod";
 
 type ListDistrictServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;
 
-interface ListDistrictServiceResponse
-	extends Pick<ListDistrictServiceRequest, "page"> {
+interface ListDistrictServiceResponse extends Pick<
+	ListDistrictServiceRequest,
+	"page"
+> {
 	districts: District[];
 	total: number;
 	perPage?: number;

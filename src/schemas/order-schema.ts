@@ -2,7 +2,7 @@ import {
 	DeliveryType,
 	OrderStatusType,
 	PaymentMethodType
-} from "@prisma/client";
+} from "@/generated/prisma/client.ts";
 import z from "zod";
 import { establishmentIdSchema, phoneSchema } from "./generic-schema.ts";
 

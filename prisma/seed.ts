@@ -1,6 +1,3 @@
-import Constants from "@/helpers/constants.ts";
-import { transformPriceToDatabase } from "@/helpers/price.ts";
-import { slugify } from "@/helpers/utils.ts";
 import {
 	AddonType,
 	BannerLinkType,
@@ -9,7 +6,6 @@ import {
 	FileFormatType,
 	PermissionType,
 	Prisma,
-	PrismaClient,
 	RoleType,
 	SocialPlatform,
 	TagType,
@@ -18,10 +14,12 @@ import {
 	type AddonCategory,
 	type Product,
 	type ProductCategory
-} from "@prisma/client";
+} from "@/generated/prisma/client.ts";
+import Constants from "@/helpers/constants.ts";
+import { transformPriceToDatabase } from "@/helpers/price.ts";
+import { slugify } from "@/helpers/utils.ts";
+import prisma from "@/lib/prisma.ts";
 import { hash } from "bcrypt-ts";
-
-const prisma = new PrismaClient();
 
 async function main() {
 	console.log("🔄 Seeding database...");

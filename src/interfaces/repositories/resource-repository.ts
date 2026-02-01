@@ -1,8 +1,8 @@
+import type { Prisma, Resource } from "@/generated/prisma/client.ts";
 import type {
 	ResourceRuleFromRepository,
 	ValidateResourceRuleParams
 } from "@/types/resource-rule.ts";
-import type { Prisma, Resource } from "@prisma/client";
 
 export interface IResourceRepository {
 	validateResourceRule(

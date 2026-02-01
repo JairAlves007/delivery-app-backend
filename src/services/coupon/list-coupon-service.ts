@@ -1,17 +1,19 @@
 import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import type { Coupon } from "@/generated/prisma/client.ts";
 import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
 import type { FilterField } from "@/types/crud.ts";
-import type { Coupon } from "@prisma/client";
 import z from "zod";
 
 type ListCouponServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;
 
-interface ListCouponServiceResponse
-	extends Pick<ListCouponServiceRequest, "page"> {
+interface ListCouponServiceResponse extends Pick<
+	ListCouponServiceRequest,
+	"page"
+> {
 	coupons: Coupon[];
 	total: number;
 	perPage?: number;

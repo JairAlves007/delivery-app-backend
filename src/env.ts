@@ -1,3 +1,4 @@
+import "dotenv/config";
 import z from "zod";
 
 const envSchema = z.object({
@@ -10,6 +11,9 @@ const envSchema = z.object({
 		.min(1, "Public bucket url is required"),
 	APP_URL: z.url("App url is required").min(1, "App url is required"),
 	DATABASE_URL: z.url(),
+	DATABASE_USER: z.string().min(1, "Database user is required"),
+	DATABASE_PASSWORD: z.string().min(1, "Database password is required"),
+	DATABASE_NAME: z.string().min(1, "Database name is required"),
 	JWT_SECRET: z.string().min(1, "JWT secret is required"),
 	CLOUDFLARE_ENDPOINT: z.url("Cloudflare endpoint is required"),
 	CLOUDFLARE_ACCESS_KEY_ID: z

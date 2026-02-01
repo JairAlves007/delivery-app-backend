@@ -1,10 +1,10 @@
 import { makeFindAddressService } from "@/factories/services/address/make-find-address-service.ts";
 import { makeFindDistrictService } from "@/factories/services/district/make-find-district-service.ts";
 import { makeValidateCouponFromOrderService } from "@/factories/services/order/validations/make-validate-coupon-from-order-service.ts";
+import { DeliveryType } from "@/generated/prisma/client.ts";
 import type { EstablishmentID } from "@/types/establishment.ts";
 import type { OrderInfo } from "@/types/order.ts";
 import type { UserID } from "@/types/user.ts";
-import { DeliveryType } from "@prisma/client";
 
 type ValidateDeliveryFromOrderServiceRequest = {
 	establishmentId: EstablishmentID;
@@ -48,13 +48,13 @@ export class ValidateDeliveryFromOrderService {
 				? findAddressService.handle({
 						id: addressId,
 						filterParams: { user_id: userId }
-				  })
+					})
 				: null,
 			districtId
 				? findDistrictService.handle({
 						id: districtId,
 						filterParams: { establishment_id: establishmentId }
-				  })
+					})
 				: null
 		]);
 

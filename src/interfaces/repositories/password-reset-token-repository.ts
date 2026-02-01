@@ -1,5 +1,5 @@
+import type { PasswordResetToken, Prisma } from "@/generated/prisma/client.ts";
 import type { ResetPasswordParams } from "@/types/user.ts";
-import type { PasswordResetToken, Prisma } from "@prisma/client";
 
 export interface IPasswordResetTokenRepository {
 	create(

@@ -1,4 +1,4 @@
-import { BannerLinkType } from "@prisma/client";
+import { BannerLinkType } from "@/generated/prisma/client.ts";
 import z from "zod";
 import { establishmentIdSchema } from "./generic-schema.ts";
 

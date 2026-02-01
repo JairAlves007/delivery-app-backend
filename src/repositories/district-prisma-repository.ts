@@ -1,9 +1,10 @@
+import type { District, Prisma } from "@/generated/prisma/client.ts";
 import {
 	buildFilterQueryOptions,
 	transformValidFilterParams
 } from "@/helpers/crud.ts";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
-import { prisma } from "@/lib/prisma.ts";
+import prisma from "@/lib/prisma.ts";
 import type {
 	DeleteContentParams,
 	FilterParams,
@@ -11,7 +12,6 @@ import type {
 	PaginationParams,
 	UpdateContentParams
 } from "@/types/crud.ts";
-import type { District, Prisma } from "@prisma/client";
 
 export class DistrictPrismaRepository implements IDistrictRepository {
 	async listAll(filterParams?: FilterParams): Promise<District[]> {

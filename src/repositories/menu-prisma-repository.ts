@@ -1,8 +1,8 @@
+import { type Prisma, RoleType, ViewType } from "@/generated/prisma/client.ts";
 import type { IMenuRepository } from "@/interfaces/repositories/menu-repository.ts";
-import { prisma } from "@/lib/prisma.ts";
+import prisma from "@/lib/prisma.ts";
 import type { EstablishmentID } from "@/types/establishment.ts";
 import type { MenuWithSubmenus } from "@/types/menu.ts";
-import { type Prisma, RoleType, ViewType } from "@prisma/client";
 
 export class MenuPrismaRepository implements IMenuRepository {
 	async get(

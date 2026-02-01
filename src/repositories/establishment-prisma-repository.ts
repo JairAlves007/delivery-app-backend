@@ -1,9 +1,10 @@
+import type { Establishment, Prisma } from "@/generated/prisma/client.ts";
 import {
 	buildFilterQueryOptions,
 	transformValidFilterParams
 } from "@/helpers/crud.ts";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import { prisma } from "@/lib/prisma.ts";
+import prisma from "@/lib/prisma.ts";
 import type {
 	DeleteContentParams,
 	FilterParams,
@@ -12,7 +13,6 @@ import type {
 	UpdateContentParams
 } from "@/types/crud.ts";
 import type { EstablishmentFromRepository } from "@/types/establishment.ts";
-import type { Establishment, Prisma } from "@prisma/client";
 
 export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	async listAll(

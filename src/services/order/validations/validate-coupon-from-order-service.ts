@@ -1,9 +1,9 @@
 import { CouponNotFound } from "@/errors/coupon/not-found.ts";
 import { makeCheckCouponService } from "@/factories/services/coupon/make-check-coupon-service.ts";
 import { makeFindCouponService } from "@/factories/services/coupon/make-find-coupon-service.ts";
+import type { Coupon } from "@/generated/prisma/client.ts";
 import type { EstablishmentID } from "@/types/establishment.ts";
 import type { UserID } from "@/types/user.ts";
-import type { Coupon } from "@prisma/client";
 
 type ValidateCouponFromOrderServiceRequest = {
 	establishmentId: EstablishmentID;

@@ -1,4 +1,4 @@
-import { AddonType } from "@prisma/client";
+import { AddonType } from "@/generated/prisma/client.ts";
 import z from "zod";
 import { establishmentIdSchema } from "./generic-schema.ts";
 

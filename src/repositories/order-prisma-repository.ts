@@ -1,6 +1,7 @@
+import type { Prisma } from "@/generated/prisma/client.ts";
 import { transformValidFilterParams } from "@/helpers/crud.ts";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
-import { prisma } from "@/lib/prisma.ts";
+import prisma from "@/lib/prisma.ts";
 import type {
 	CursorPaginationParams,
 	DeleteContentParams,
@@ -10,7 +11,6 @@ import type {
 	UpdateContentParams
 } from "@/types/crud.ts";
 import type { OrderFromRepository } from "@/types/order.ts";
-import type { Prisma } from "@prisma/client";
 
 export class OrderPrismaRepository implements IOrderRepository {
 	async listAll(filterParams?: FilterParams): Promise<OrderFromRepository[]> {

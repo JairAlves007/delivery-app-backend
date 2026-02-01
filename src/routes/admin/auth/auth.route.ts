@@ -1,7 +1,7 @@
 import { signIn, signUp } from "@/controllers/user.controller.ts";
+import { RoleType } from "@/generated/prisma/client.ts";
 import { ensureUserHasRoles } from "@/middlewares/ensure-user-has-roles.ts";
 import { isAuthenticated } from "@/middlewares/is-auth.ts";
-import { RoleType } from "@prisma/client";
 import type { FastifyInstance } from "fastify";
 
 const authMiddlewares = {

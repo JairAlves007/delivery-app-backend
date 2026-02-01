@@ -1,10 +1,10 @@
 import { DistrictNotFound } from "@/errors/district/not-found-error.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import type { District } from "@/generated/prisma/client.ts";
 import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
 import { districtParamsSchema } from "@/schemas/district-schema.ts";
 import type { FilterField } from "@/types/crud.ts";
-import type { District } from "@prisma/client";
 import z from "zod";
 
 type FindDistrictServiceRequest = z.infer<typeof districtParamsSchema> &
