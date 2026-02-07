@@ -1,3 +1,4 @@
+import { env } from "@/env.ts";
 import { makeCache } from "@/factories/services/cache/make-cache.ts";
 import {
 	FileFormatType,
@@ -39,7 +40,7 @@ export const mapObjectResourcesList = (
 
 		acc[type.toLowerCase()] = {
 			id,
-			path: `${path}/${file_key}`
+			path: env.PUBLIC_BUCKET_URL + `${path}/${file_key}`
 		};
 
 		return acc;

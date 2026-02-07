@@ -2,9 +2,12 @@ import { makeForgotPasswordService } from "@/factories/services/auth/make-forgot
 import { makeResetPasswordService } from "@/factories/services/auth/make-reset-password-service.ts";
 import { makeSignInService } from "@/factories/services/auth/make-sign-in-service.ts";
 import { makeSignUpService } from "@/factories/services/auth/make-sign-up-service.ts";
+import { makeFindEstablishmentByIdService } from "@/factories/services/establishment/make-find-establishment-by-id-service.ts";
+import { makeGetMenuService } from "@/factories/services/menu/make-get-menu-service.ts";
 import { RoleType } from "@/generated/prisma/client.ts";
 import { ApiResponse } from "@/helpers/api.ts";
 import Constants from "@/helpers/constants.ts";
+import { isEstablishmentOpen } from "@/helpers/establishment.ts";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
 import {
 	forgotPasswordBodySchema,
@@ -20,11 +23,18 @@ export const signIn = (allowedRoles: RoleType[]) => {
 
 		try {
 			const signInService = makeSignInService();
+			const menuService = makeGetMenuService();
+			const findEstablishmentByIdService = makeFindEstablishmentByIdService();
 
 			const { user, establishmentId } = await signInService.handle({
 				...body,
 				allowedRoles
 			});
+
+			const [establishment, menu] = await Promise.all([
+				findEstablishmentByIdService.handle({ id: establishmentId }),
+				menuService.handle(user.role.name, establishmentId)
+			]);
 
 			const token = await reply.jwtSign(
 				{
@@ -40,6 +50,16 @@ export const signIn = (allowedRoles: RoleType[]) => {
 
 			return reply.status(HTTPStatusCodes.OK).send(
 				ApiResponse.success("Usuário autenticado com sucesso", {
+					user: {
+						id: user.id,
+						name: user.name,
+						email: user.email
+					},
+					establishment: {
+						...establishment,
+						isOpen: isEstablishmentOpen(establishment)
+					},
+					menu,
 					type: Constants.TOKEN_TYPE,
 					expiresIn: Constants.ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
 					token

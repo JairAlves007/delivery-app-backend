@@ -33,7 +33,6 @@ export default class Constants {
 		banners: "banners",
 		addons: "addons",
 		addonCategories: "addon_categories",
-		profile: "profile",
 		users: "users",
 		menus: "menus",
 		addresses: "addresses",
