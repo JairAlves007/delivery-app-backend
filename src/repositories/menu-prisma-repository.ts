@@ -23,6 +23,7 @@ export class MenuPrismaRepository implements IMenuRepository {
 					select: {
 						label: true,
 						slug: true,
+						view_type: true,
 						order: true
 					},
 					orderBy: { order: "asc" }
