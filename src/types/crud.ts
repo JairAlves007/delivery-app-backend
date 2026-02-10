@@ -19,7 +19,7 @@ export type FilterParams = z.infer<typeof searchAndOrderBySchema> & {
 
 export type SearchableModelFromRepositoryFields<Field> = Pick<
 	Partial<ValidFilterParams>,
-	"search" | "sortField" | "sortOrder"
+	"search" | "sortField" | "sortDirection"
 > & {
 	searchableFields: (keyof Field)[];
 	defaultSortField: keyof Field;

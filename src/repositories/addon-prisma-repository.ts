@@ -16,14 +16,14 @@ import type {
 
 export class AddonPrismaRepository implements IAddonRepository {
 	async listAll(filterParams?: FilterParams): Promise<AddonFromRepository[]> {
-		const { search, sortField, sortOrder, ...params } =
+		const { search, sortField, sortDirection, ...params } =
 			transformValidFilterParams(filterParams);
 
 		const { where, orderBy } =
 			buildFilterQueryOptions<Prisma.AddonOrderByWithRelationInput>({
 				search,
 				sortField: sortField ?? "name",
-				sortOrder: sortOrder ?? "asc",
+				sortDirection: sortDirection ?? "asc",
 				searchableFields: ["name"],
 				defaultSortField: "name"
 			});
@@ -48,7 +48,7 @@ export class AddonPrismaRepository implements IAddonRepository {
 		const {
 			search,
 			sortField = undefined,
-			sortOrder = undefined,
+			sortDirection = undefined,
 			...params
 		} = transformValidFilterParams(filterParams);
 
@@ -56,7 +56,7 @@ export class AddonPrismaRepository implements IAddonRepository {
 			buildFilterQueryOptions<Prisma.AddonOrderByWithRelationInput>({
 				search,
 				sortField,
-				sortOrder,
+				sortDirection,
 				searchableFields: ["name"],
 				defaultSortField: "name"
 			});
@@ -78,14 +78,14 @@ export class AddonPrismaRepository implements IAddonRepository {
 		perPage,
 		filterParams
 	}: PaginationParams): Promise<AddonFromRepository[]> {
-		const { search, sortField, sortOrder, ...params } =
+		const { search, sortField, sortDirection, ...params } =
 			transformValidFilterParams(filterParams);
 
 		const { where, orderBy } =
 			buildFilterQueryOptions<Prisma.AddonOrderByWithRelationInput>({
 				search,
 				sortField: sortField ?? "name",
-				sortOrder: sortOrder ?? "asc",
+				sortDirection: sortDirection ?? "asc",
 				searchableFields: ["name"],
 				defaultSortField: "name"
 			});

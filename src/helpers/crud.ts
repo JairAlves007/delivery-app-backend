@@ -1,3 +1,4 @@
+import { searchAndOrderBySchema } from "@/schemas/generic-schema.ts";
 import type {
 	FilterParams,
 	SearchableModelFromRepositoryFields,
@@ -20,11 +21,8 @@ export const getFilterParamsCacheKey = (
 	const params = transformValidFilterParams(filterParams);
 	if (!params || Object.keys(params).length === 0) return "";
 
-	const primaryKeys: (keyof FilterParams)[] = [
-		"search",
-		"sortField",
-		"sortOrder"
-	];
+	const primaryKeys: (keyof FilterParams)[] =
+		searchAndOrderBySchema.keyof().options;
 
 	const orderedEntries = [
 		...primaryKeys.map(key => [key, params[key]] as const),
@@ -43,7 +41,7 @@ export const getFilterParamsCacheKey = (
 export function buildFilterQueryOptions<Field>({
 	search,
 	sortField,
-	sortOrder,
+	sortDirection,
 	searchableFields,
 	defaultSortField
 }: SearchableModelFromRepositoryFields<Field>) {
@@ -60,7 +58,7 @@ export function buildFilterQueryOptions<Field>({
 		sortField = defaultSortField as string;
 
 	const orderBy = {
-		[sortField]: sortOrder ?? "asc"
+		[sortField]: sortDirection ?? "asc"
 	};
 
 	return { where, orderBy };

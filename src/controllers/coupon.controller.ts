@@ -18,7 +18,7 @@ import {
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
-	const { search, sortField, sortOrder, ...query } =
+	const { search, sortField, sortDirection, ...query } =
 		listQueryParamsSchema.parse(request.query);
 
 	try {
@@ -30,7 +30,7 @@ export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 				establishment_id: request.user.primaryTenantId,
 				search,
 				sortField,
-				sortOrder
+				sortDirection
 			}
 		});
 

@@ -12,8 +12,10 @@ import z from "zod";
 
 type ListEstablishmentServiceRequest = z.infer<typeof listQueryParamsSchema>;
 
-interface ListEstablishmentServiceResponse
-	extends Pick<ListEstablishmentServiceRequest, "page"> {
+interface ListEstablishmentServiceResponse extends Pick<
+	ListEstablishmentServiceRequest,
+	"page"
+> {
 	establishments: EstablishmentsList[];
 	total: number;
 	perPage?: number;

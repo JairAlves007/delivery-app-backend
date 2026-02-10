@@ -17,14 +17,14 @@ import type { EstablishmentID } from "@/types/establishment.ts";
 
 export class CouponPrismaRepository implements ICouponRepository {
 	async listAll(filterParams?: FilterParams): Promise<Coupon[]> {
-		const { search, sortField, sortOrder, ...params } =
+		const { search, sortField, sortDirection, ...params } =
 			transformValidFilterParams(filterParams);
 
 		const { where, orderBy } =
 			buildFilterQueryOptions<Prisma.CouponOrderByWithRelationInput>({
 				search,
 				sortField: sortField ?? "id",
-				sortOrder: sortOrder ?? "asc",
+				sortDirection: sortDirection ?? "asc",
 				searchableFields: ["code"],
 				defaultSortField: "id"
 			});
@@ -43,7 +43,7 @@ export class CouponPrismaRepository implements ICouponRepository {
 		const {
 			search,
 			sortField = undefined,
-			sortOrder = undefined,
+			sortDirection = undefined,
 			...params
 		} = transformValidFilterParams(filterParams);
 
@@ -51,7 +51,7 @@ export class CouponPrismaRepository implements ICouponRepository {
 			buildFilterQueryOptions<Prisma.CouponOrderByWithRelationInput>({
 				search,
 				sortField,
-				sortOrder,
+				sortDirection,
 				searchableFields: ["code"],
 				defaultSortField: "id"
 			});
@@ -71,14 +71,14 @@ export class CouponPrismaRepository implements ICouponRepository {
 		page,
 		filterParams
 	}: PaginationParams): Promise<Coupon[]> {
-		const { search, sortField, sortOrder, ...params } =
+		const { search, sortField, sortDirection, ...params } =
 			transformValidFilterParams(filterParams);
 
 		const { where, orderBy } =
 			buildFilterQueryOptions<Prisma.CouponOrderByWithRelationInput>({
 				search,
 				sortField: sortField ?? "id",
-				sortOrder: sortOrder ?? "asc",
+				sortDirection: sortDirection ?? "asc",
 				searchableFields: ["code"],
 				defaultSortField: "id"
 			});

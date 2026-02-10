@@ -15,14 +15,14 @@ import type {
 
 export class DistrictPrismaRepository implements IDistrictRepository {
 	async listAll(filterParams?: FilterParams): Promise<District[]> {
-		const { search, sortField, sortOrder, ...params } =
+		const { search, sortField, sortDirection, ...params } =
 			transformValidFilterParams(filterParams);
 
 		const { where, orderBy } =
 			buildFilterQueryOptions<Prisma.DistrictOrderByWithRelationInput>({
 				search,
 				sortField: sortField ?? "name",
-				sortOrder: sortOrder ?? "asc",
+				sortDirection: sortDirection ?? "asc",
 				searchableFields: ["name"],
 				defaultSortField: "name"
 			});
@@ -41,7 +41,7 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 		const {
 			search,
 			sortField = undefined,
-			sortOrder = undefined,
+			sortDirection = undefined,
 			...params
 		} = transformValidFilterParams(filterParams);
 
@@ -49,7 +49,7 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 			buildFilterQueryOptions<Prisma.DistrictOrderByWithRelationInput>({
 				search,
 				sortField,
-				sortOrder,
+				sortDirection,
 				searchableFields: ["name"],
 				defaultSortField: "name"
 			});
@@ -69,14 +69,14 @@ export class DistrictPrismaRepository implements IDistrictRepository {
 		perPage,
 		filterParams
 	}: PaginationParams): Promise<District[]> {
-		const { search, sortField, sortOrder, ...params } =
+		const { search, sortField, sortDirection, ...params } =
 			transformValidFilterParams(filterParams);
 
 		const { where, orderBy } =
 			buildFilterQueryOptions<Prisma.DistrictOrderByWithRelationInput>({
 				search,
 				sortField: sortField ?? "name",
-				sortOrder: sortOrder ?? "asc",
+				sortDirection: sortDirection ?? "asc",
 				searchableFields: ["name"],
 				defaultSortField: "name"
 			});

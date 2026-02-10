@@ -17,14 +17,14 @@ import type {
 
 export class BannerPrismaRepository implements IBannerRepository {
 	async listAll(filterParams?: FilterParams): Promise<BannerFromRepository[]> {
-		const { search, sortField, sortOrder, ...params } =
+		const { search, sortField, sortDirection, ...params } =
 			transformValidFilterParams(filterParams);
 
 		const { where, orderBy } =
 			buildFilterQueryOptions<Prisma.BannerOrderByWithRelationInput>({
 				search,
 				sortField: sortField ?? "created_at",
-				sortOrder: sortOrder ?? "desc",
+				sortDirection: sortDirection ?? "desc",
 				searchableFields: ["name"],
 				defaultSortField: "created_at"
 			});
@@ -50,7 +50,7 @@ export class BannerPrismaRepository implements IBannerRepository {
 		const {
 			search,
 			sortField = undefined,
-			sortOrder = undefined,
+			sortDirection = undefined,
 			...params
 		} = transformValidFilterParams(filterParams);
 
@@ -58,7 +58,7 @@ export class BannerPrismaRepository implements IBannerRepository {
 			buildFilterQueryOptions<Prisma.BannerOrderByWithRelationInput>({
 				search,
 				sortField,
-				sortOrder,
+				sortDirection,
 				searchableFields: ["name"],
 				defaultSortField: "created_at"
 			});
@@ -77,14 +77,14 @@ export class BannerPrismaRepository implements IBannerRepository {
 		page,
 		filterParams
 	}: PaginationParams): Promise<BannerFromRepository[]> {
-		const { search, sortField, sortOrder, ...params } =
+		const { search, sortField, sortDirection, ...params } =
 			transformValidFilterParams(filterParams);
 
 		const { where, orderBy } =
 			buildFilterQueryOptions<Prisma.BannerOrderByWithRelationInput>({
 				search,
 				sortField: sortField ?? "created_at",
-				sortOrder: sortOrder ?? "desc",
+				sortDirection: sortDirection ?? "desc",
 				searchableFields: ["name"],
 				defaultSortField: "created_at"
 			});
@@ -113,14 +113,14 @@ export class BannerPrismaRepository implements IBannerRepository {
 		cursor,
 		filterParams
 	}: CursorPaginationParams<number>): Promise<BannerFromRepository[]> {
-		const { search, sortField, sortOrder, ...params } =
+		const { search, sortField, sortDirection, ...params } =
 			transformValidFilterParams(filterParams);
 
 		const { where, orderBy } =
 			buildFilterQueryOptions<Prisma.BannerOrderByWithRelationInput>({
 				search,
 				sortField: sortField ?? "created_at",
-				sortOrder: sortOrder ?? "desc",
+				sortDirection: sortDirection ?? "desc",
 				searchableFields: ["name"],
 				defaultSortField: "created_at"
 			});

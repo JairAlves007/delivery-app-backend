@@ -17,14 +17,14 @@ import type { ProductFromRepository } from "@/types/product.ts";
 
 export class ProductPrismaRepository implements IProductRepository {
 	async listAll(filterParams?: FilterParams): Promise<ProductFromRepository[]> {
-		const { search, sortField, sortOrder, ...params } =
+		const { search, sortField, sortDirection, ...params } =
 			transformValidFilterParams(filterParams);
 
 		const { where, orderBy } =
 			buildFilterQueryOptions<Prisma.ProductOrderByWithRelationInput>({
 				search,
 				sortField: sortField ?? "created_at",
-				sortOrder: sortOrder ?? "desc",
+				sortDirection: sortDirection ?? "desc",
 				searchableFields: ["name", "description"],
 				defaultSortField: "created_at"
 			});
@@ -50,7 +50,7 @@ export class ProductPrismaRepository implements IProductRepository {
 		const {
 			search,
 			sortField = undefined,
-			sortOrder = undefined,
+			sortDirection = undefined,
 			...params
 		} = transformValidFilterParams(filterParams);
 
@@ -58,7 +58,7 @@ export class ProductPrismaRepository implements IProductRepository {
 			buildFilterQueryOptions<Prisma.ProductOrderByWithRelationInput>({
 				search,
 				sortField,
-				sortOrder,
+				sortDirection,
 				searchableFields: ["name", "description"],
 				defaultSortField: "created_at"
 			});
@@ -77,14 +77,14 @@ export class ProductPrismaRepository implements IProductRepository {
 		page,
 		filterParams
 	}: PaginationParams): Promise<ProductFromRepository[]> {
-		const { search, sortField, sortOrder, ...params } =
+		const { search, sortField, sortDirection, ...params } =
 			transformValidFilterParams(filterParams);
 
 		const { where, orderBy } =
 			buildFilterQueryOptions<Prisma.ProductOrderByWithRelationInput>({
 				search,
 				sortField: sortField ?? "created_at",
-				sortOrder: sortOrder ?? "desc",
+				sortDirection: sortDirection ?? "desc",
 				searchableFields: ["name", "description"],
 				defaultSortField: "created_at"
 			});
@@ -113,14 +113,14 @@ export class ProductPrismaRepository implements IProductRepository {
 		cursor,
 		filterParams
 	}: CursorPaginationParams<string>): Promise<ProductFromRepository[]> {
-		const { search, sortField, sortOrder, ...params } =
+		const { search, sortField, sortDirection, ...params } =
 			transformValidFilterParams(filterParams);
 
 		const { where, orderBy } =
 			buildFilterQueryOptions<Prisma.ProductOrderByWithRelationInput>({
 				search,
 				sortField: sortField ?? "created_at",
-				sortOrder: sortOrder ?? "desc",
+				sortDirection: sortDirection ?? "desc",
 				searchableFields: ["name", "description"],
 				defaultSortField: "created_at"
 			});

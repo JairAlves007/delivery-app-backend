@@ -18,14 +18,14 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	async listAll(
 		filterParams?: FilterParams
 	): Promise<EstablishmentFromRepository[]> {
-		const { search, sortField, sortOrder } =
+		const { search, sortField, sortDirection } =
 			transformValidFilterParams(filterParams);
 
 		const { where, orderBy } =
 			buildFilterQueryOptions<Prisma.EstablishmentOrderByWithRelationInput>({
 				search,
 				sortField: sortField ?? "created_at",
-				sortOrder: sortOrder ?? "desc",
+				sortDirection: sortDirection ?? "desc",
 				searchableFields: ["name", "cnpj", "description", "email"],
 				defaultSortField: "created_at"
 			});
@@ -56,7 +56,7 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 			buildFilterQueryOptions<Prisma.EstablishmentOrderByWithRelationInput>({
 				search,
 				sortField: undefined,
-				sortOrder: undefined,
+				sortDirection: undefined,
 				searchableFields: ["name", "cnpj", "description", "email"],
 				defaultSortField: "created_at"
 			});
@@ -74,14 +74,14 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		page,
 		filterParams
 	}: PaginationParams): Promise<EstablishmentFromRepository[]> {
-		const { search, sortField, sortOrder } =
+		const { search, sortField, sortDirection } =
 			transformValidFilterParams(filterParams);
 
 		const { where, orderBy } =
 			buildFilterQueryOptions<Prisma.EstablishmentOrderByWithRelationInput>({
 				search,
 				sortField: sortField ?? "created_at",
-				sortOrder: sortOrder ?? "desc",
+				sortDirection: sortDirection ?? "desc",
 				searchableFields: ["name", "cnpj", "description", "email"],
 				defaultSortField: "created_at"
 			});

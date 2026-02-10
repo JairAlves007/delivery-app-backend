@@ -26,7 +26,7 @@ export const searchAndOrderBySchema = z.object({
 		.transform(val => val.toLowerCase())
 		.optional()
 		.nullable(),
-	sortOrder: z
+	sortDirection: z
 		.enum(["asc", "desc"], "Ordenação inválida")
 		.transform(val => val.toLowerCase())
 		.optional()
