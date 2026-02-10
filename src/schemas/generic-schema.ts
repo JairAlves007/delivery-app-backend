@@ -16,13 +16,13 @@ export const establishmentSlugSchema = z.object({
 export const searchAndOrderBySchema = z.object({
 	search: z
 		.string()
-		.min(1, "O filtro de busca deve ser preenchido")
+		// .min(1, "O filtro de busca deve ser preenchido")
 		.transform(val => val.toLowerCase())
 		.optional()
 		.nullable(),
 	sortField: z
 		.string()
-		.min(1, "O campo de ordenação deve ser preenchido")
+		// .min(1, "O campo de ordenação deve ser preenchido")
 		.transform(val => val.toLowerCase())
 		.optional()
 		.nullable(),

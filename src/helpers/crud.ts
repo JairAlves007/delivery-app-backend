@@ -32,7 +32,7 @@ export const getFilterParamsCacheKey = (
 	];
 
 	const validEntries = orderedEntries.filter(
-		([, value]) => value != null && value !== ""
+		([, value]) => !!value && value.trim().length > 0
 	);
 
 	return validEntries.map(([key, value]) => `${key}_${value}`).join("_") + "_";
