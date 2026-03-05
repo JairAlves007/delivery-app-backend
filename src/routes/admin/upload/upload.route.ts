@@ -1,4 +1,7 @@
-import { generateUploadSignedUrl } from "@/controllers/upload.controller.ts";
+import {
+	generateUploadSignedUrl,
+	getUploadResourceRules
+} from "@/controllers/upload.controller.ts";
 import { PermissionType } from "@/generated/prisma/client.ts";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.ts";
 import { isAuthenticated } from "@/middlewares/is-auth.ts";
@@ -17,4 +20,5 @@ const uploadMiddlewares = {
 
 export const uploadRoutes = (app: FastifyInstance) => {
 	app.post("/", uploadMiddlewares, generateUploadSignedUrl);
+	app.get("/rules", uploadMiddlewares, getUploadResourceRules);
 };

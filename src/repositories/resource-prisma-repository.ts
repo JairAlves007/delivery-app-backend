@@ -3,6 +3,7 @@ import type { IResourceRepository } from "@/interfaces/repositories/resource-rep
 import prisma from "@/lib/prisma.ts";
 import type {
 	ResourceRuleFromRepository,
+	UploadResourceRulesParams,
 	ValidateResourceRuleParams
 } from "@/types/resource-rule.ts";
 
@@ -18,6 +19,21 @@ export class ResourcePrismaRepository implements IResourceRepository {
 					type,
 					for: forResource
 				}
+			},
+			include: {
+				availableFormats: true
+			}
+		});
+	}
+
+	async getUploadResourceRules({
+		establishmentId,
+		forObject
+	}: UploadResourceRulesParams): Promise<ResourceRuleFromRepository[]> {
+		return await prisma.resourceRule.findMany({
+			where: {
+				establishment_id: establishmentId,
+				for: forObject
 			},
 			include: {
 				availableFormats: true

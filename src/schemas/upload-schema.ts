@@ -34,3 +34,13 @@ export const uploadSignedUrlBodySchema = z.object({
 			.enumCaseInsensitive(ResourceType, "Tipo de recurso inválido")
 	})
 });
+
+export const uploadResourceRulesQuerySchema = z.object({
+	establishmentId: establishmentIdSchema,
+	forObject: z
+		.string()
+		.enumCaseInsensitive(
+			ForObjectResourceType,
+			"Precisamos saber para qual recurso pertencem as imagens"
+		)
+});
