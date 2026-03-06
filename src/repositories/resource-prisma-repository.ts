@@ -9,13 +9,11 @@ import type {
 
 export class ResourcePrismaRepository implements IResourceRepository {
 	async validateResourceRule({
-		establishmentId,
 		resourceIntent: { type, for: forResource }
 	}: ValidateResourceRuleParams): Promise<ResourceRuleFromRepository | null> {
 		return await prisma.resourceRule.findUnique({
 			where: {
-				establishment_id_type_for: {
-					establishment_id: establishmentId,
+				type_for: {
 					type,
 					for: forResource
 				}
@@ -27,12 +25,10 @@ export class ResourcePrismaRepository implements IResourceRepository {
 	}
 
 	async getUploadResourceRules({
-		establishmentId,
 		forObject
 	}: UploadResourceRulesParams): Promise<ResourceRuleFromRepository[]> {
 		return await prisma.resourceRule.findMany({
 			where: {
-				establishment_id: establishmentId,
 				for: forObject
 			},
 			include: {

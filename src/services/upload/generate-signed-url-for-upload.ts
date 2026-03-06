@@ -30,7 +30,6 @@ export class GenerateSignedUrlForUploadService {
 	}
 
 	private async validateResourceRule({
-		establishmentId,
 		resourceIntent
 	}: ValidateResourceRuleParams) {
 		try {
@@ -41,7 +40,6 @@ export class GenerateSignedUrlForUploadService {
 				key,
 				async () =>
 					await this.resourceRepository.validateResourceRule({
-						establishmentId,
 						resourceIntent
 					})
 			);
@@ -80,7 +78,6 @@ export class GenerateSignedUrlForUploadService {
 			const resourcePromises = [];
 
 			await this.validateResourceRule({
-				establishmentId,
 				resourceIntent
 			});
 
@@ -112,7 +109,7 @@ export class GenerateSignedUrlForUploadService {
 							establishment_id: establishmentId,
 							file_key: fileKey
 						}
-				  };
+					};
 
 			resourcePromises.push(
 				this.resourceRepository.storeResource({

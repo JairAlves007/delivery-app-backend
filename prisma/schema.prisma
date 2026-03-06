@@ -302,7 +302,6 @@ model Establishment {
   deliveryAddresses      DeliveryAddress[]
   establishmentResources Resource[]
   resources              EstablishmentResource[]
-  resourceRules          ResourceRule[]
 
   @@map("establishments")
 }
@@ -741,11 +740,9 @@ model ResourceRule {
   width            Int
   height           Int
   for              ForObjectResourceType
-  establishment_id String
-  establishment    Establishment         @relation(fields: [establishment_id], references: [id])
   availableFormats FileFormat[]
 
-  @@unique([establishment_id, type, for])
+  @@unique([type, for])
   @@index([type], name: "idx_resource_rules_type")
   @@index([for], name: "idx_resource_rules_for")
   @@map("resource_rules")

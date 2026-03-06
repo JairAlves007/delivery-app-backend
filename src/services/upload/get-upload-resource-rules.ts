@@ -13,18 +13,16 @@ export class GetUploadResourceRulesService {
 	}
 
 	async handle({
-		establishmentId,
 		forObject
 	}: UploadResourceRulesParams): Promise<ResourceRuleFromRepository[]> {
 		try {
 			const cache = makeCache();
-			const key = `${cache.keys.resourceRules}_${forObject}_${establishmentId}`;
+			const key = `${cache.keys.resourceRules}_${forObject}`;
 
 			return await cache.rememberForever(
 				key,
 				async () =>
 					await this.resourceRepository.getUploadResourceRules({
-						establishmentId,
 						forObject
 					})
 			);
