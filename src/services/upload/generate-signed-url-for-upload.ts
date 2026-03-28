@@ -1,18 +1,19 @@
-import { IncorrectResourceSize } from "@/errors/resource/incorrect-resource-size-error.ts";
-import { InvalidResource } from "@/errors/resource/invalid-resource-error.ts";
-import { UnavailableResourceMimeType } from "@/errors/resource/unavailable-resource-mime-type-error.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import z from "zod";
+
+import { IncorrectResourceSize } from "@/errors/resource/incorrect-resource-size-error.js";
+import { InvalidResource } from "@/errors/resource/invalid-resource-error.js";
+import { UnavailableResourceMimeType } from "@/errors/resource/unavailable-resource-mime-type-error.js";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
 import {
 	forgetCacheByForResource,
 	getInfoByForResource,
 	mapMimeTypeToFileFormat
-} from "@/helpers/resource.ts";
-import { SignedUrl } from "@/helpers/signed-url.ts";
-import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.ts";
-import { uploadSignedUrlBodySchema } from "@/schemas/upload-schema.ts";
-import type { ValidateResourceRuleParams } from "@/types/resource-rule.ts";
-import type { ResourceIntent } from "@/types/resource.ts";
-import z from "zod";
+} from "@/helpers/resource.js";
+import { SignedUrl } from "@/helpers/signed-url.js";
+import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.js";
+import { uploadSignedUrlBodySchema } from "@/schemas/upload-schema.js";
+import type { ResourceIntent } from "@/types/resource.js";
+import type { ValidateResourceRuleParams } from "@/types/resource-rule.js";
 
 type GenerateSignedUrlForUploadServiceRequest = z.infer<
 	typeof uploadSignedUrlBodySchema

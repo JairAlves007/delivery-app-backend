@@ -1,9 +1,10 @@
-import { slugify } from "@/helpers/utils.ts";
-import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import { createProductCategoryBodySchema } from "@/schemas/product-category-schema.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
+
+import { slugify } from "@/helpers/utils.js";
+import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { createProductCategoryBodySchema } from "@/schemas/product-category-schema.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type CreateProductCategoryServiceRequest = z.infer<
 	typeof createProductCategoryBodySchema

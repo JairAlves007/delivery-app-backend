@@ -1,9 +1,9 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.ts";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.js";
 import type {
 	ResourceRuleFromRepository,
 	UploadResourceRulesParams
-} from "@/types/resource-rule.ts";
+} from "@/types/resource-rule.js";
 
 export class GetUploadResourceRulesService {
 	private resourceRepository: IResourceRepository;

@@ -1,7 +1,8 @@
-// fastify-jwt.d.ts
-import type { RoleType } from "@/generated/prisma/client.ts";
-import type { EstablishmentID } from "@/types/establishment.ts";
+// fastify-jwt.d.js
 import "@fastify/jwt";
+
+import type { RoleType } from "@/generated/prisma/client.js";
+import type { EstablishmentID } from "@/types/establishment.js";
 
 declare module "@fastify/jwt" {
 	export interface FastifyJWT {

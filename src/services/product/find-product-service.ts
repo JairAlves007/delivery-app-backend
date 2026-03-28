@@ -1,11 +1,12 @@
-import { ProductNotFound } from "@/errors/product/not-found-error.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
-import { productParamsSchema } from "@/schemas/product-schema.ts";
-import type { FilterField } from "@/types/crud.ts";
-import type { ProductFromRepository } from "@/types/product.ts";
 import z from "zod";
+
+import { ProductNotFound } from "@/errors/product/not-found-error.js";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
+import { productParamsSchema } from "@/schemas/product-schema.js";
+import type { FilterField } from "@/types/crud.js";
+import type { ProductFromRepository } from "@/types/product.js";
 
 type FindProductServiceRequest = z.infer<typeof productParamsSchema> &
 	FilterField;

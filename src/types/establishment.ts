@@ -1,8 +1,10 @@
-import type { Prisma } from "@/generated/prisma/client.ts";
-import { establishmentIdSchema } from "@/schemas/generic-schema.ts";
 import z from "zod";
-import type { FilterParams } from "./crud.ts";
-import type { ResourceItem } from "./resource.ts";
+
+import type { Prisma } from "@/generated/prisma/client.js";
+import { establishmentIdSchema } from "@/schemas/generic-schema.js";
+
+import type { FilterParams } from "./crud.js";
+import type { ResourceItem } from "./resource.js";
 
 export type EstablishmentFromRepository = Prisma.EstablishmentGetPayload<{
 	include: {

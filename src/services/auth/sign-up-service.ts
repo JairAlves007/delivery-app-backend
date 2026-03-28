@@ -1,14 +1,15 @@
-import { UserUnauthorized } from "@/errors/user/user-unauthorized.ts";
-import { RoleType, type User } from "@/generated/prisma/client.ts";
-import Constants from "@/helpers/constants.ts";
-import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import type { IRoleRepository } from "@/interfaces/repositories/role-repository.ts";
-import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
-import { signUpBodySchema } from "@/schemas/auth-schema.ts";
-import type { EstablishmentID } from "@/types/establishment.ts";
-import type { RoleWithPermissions } from "@/types/role.ts";
 import { hash } from "bcrypt-ts";
 import z from "zod";
+
+import { UserUnauthorized } from "@/errors/user/user-unauthorized.js";
+import { RoleType, type User } from "@/generated/prisma/client.js";
+import Constants from "@/helpers/constants.js";
+import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
+import type { IRoleRepository } from "@/interfaces/repositories/role-repository.js";
+import type { IUserRepository } from "@/interfaces/repositories/user-repository.js";
+import { signUpBodySchema } from "@/schemas/auth-schema.js";
+import type { EstablishmentID } from "@/types/establishment.js";
+import type { RoleWithPermissions } from "@/types/role.js";
 
 type SignUpServiceRequest = z.infer<typeof signUpBodySchema> & {
 	role: RoleType;

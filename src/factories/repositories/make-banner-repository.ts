@@ -1,4 +1,4 @@
-import { BannerPrismaRepository } from "@/repositories/banner-prisma-repository.ts";
+import { BannerPrismaRepository } from "@/repositories/banner-prisma-repository.js";
 
 export const makeBannerRepository = () => {
 	return new BannerPrismaRepository();

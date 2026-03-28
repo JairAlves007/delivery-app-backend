@@ -1,11 +1,12 @@
-import { AddonCategoryNotFound } from "@/errors/addon/category/not-found-error.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.ts";
-import { addonParamsSchema } from "@/schemas/addon-schema.ts";
-import type { AddonCategoryFromRepository } from "@/types/addon-category.ts";
-import type { FilterField } from "@/types/crud.ts";
 import z from "zod";
+
+import { AddonCategoryNotFound } from "@/errors/addon/category/not-found-error.js";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.js";
+import { addonParamsSchema } from "@/schemas/addon-schema.js";
+import type { AddonCategoryFromRepository } from "@/types/addon-category.js";
+import type { FilterField } from "@/types/crud.js";
 
 type FindAddonCategoryServiceRequest = z.infer<typeof addonParamsSchema> &
 	FilterField;

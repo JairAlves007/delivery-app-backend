@@ -1,8 +1,9 @@
-import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import { updateAddonBodySchema } from "@/schemas/addon-schema.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
+
+import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { updateAddonBodySchema } from "@/schemas/addon-schema.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 interface UpdateAddonServiceRequest
 	extends

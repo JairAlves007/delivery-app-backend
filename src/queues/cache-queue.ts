@@ -1,5 +1,5 @@
-import { makeQueue } from "@/factories/services/queue/make-queue.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+import { makeQueue } from "@/factories/services/queue/make-queue.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 export const cacheQueueName = "cache-queue";
 

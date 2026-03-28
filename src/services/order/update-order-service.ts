@@ -1,9 +1,10 @@
-import { getStatusLabel } from "@/helpers/order.ts";
-import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import { updateOrderStatusBodySchema } from "@/schemas/order-schema.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
+
+import { getStatusLabel } from "@/helpers/order.js";
+import type { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { updateOrderStatusBodySchema } from "@/schemas/order-schema.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 interface UpdateOrderRequest
 	extends

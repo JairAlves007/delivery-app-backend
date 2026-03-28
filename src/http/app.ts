@@ -1,14 +1,13 @@
-import "@/@types/zod.d.ts";
-
-import { env } from "@/env.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
-import replySendErrorPlugin from "@/plugins/reply-send-error.ts";
-import { routes } from "@/routes/index.ts";
-import type { DefaultErrorResponse } from "@/types/response.ts";
-import { setupWorkers } from "@/workers/setup.ts";
 import fastifyCors from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
 import fastify from "fastify";
+
+import { env } from "@/env.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import replySendErrorPlugin from "@/plugins/reply-send-error.js";
+import { routes } from "@/routes/index.js";
+import type { DefaultErrorResponse } from "@/types/response.js";
+import { setupWorkers } from "@/workers/setup.js";
 
 const app = fastify({
 	logger: {
@@ -38,7 +37,7 @@ app.addHook("onReady", () => {
 		setupWorkers();
 		app.log.info("👷 BullMQ Workers initialized successfully");
 	} catch (error) {
-		app.log.error("❌ Failed to initialize BullMQ Workers", error);
+		app.log.error({ error }, "❌ Failed to initialize BullMQ Workers");
 	}
 });
 

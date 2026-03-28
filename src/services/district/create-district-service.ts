@@ -1,8 +1,9 @@
-import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import { createDistrictBodySchema } from "@/schemas/district-schema.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
+
+import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { createDistrictBodySchema } from "@/schemas/district-schema.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type CreateDistrictServiceRequest = z.infer<typeof createDistrictBodySchema> &
 	Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;

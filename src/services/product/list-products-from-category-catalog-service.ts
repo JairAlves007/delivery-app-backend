@@ -1,12 +1,13 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import { transformPriceFromDatabase } from "@/helpers/price.ts";
-import { mapObjectResourcesList } from "@/helpers/resource.ts";
-import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
-import { listCursorQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import { listProductsFromCategorySchema } from "@/schemas/main-schema.ts";
-import type { ProductFromRepository, ProductList } from "@/types/product.ts";
 import z from "zod";
+
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import { transformPriceFromDatabase } from "@/helpers/price.js";
+import { mapObjectResourcesList } from "@/helpers/resource.js";
+import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
+import { listCursorQueryParamsSchema } from "@/schemas/generic-schema.js";
+import { listProductsFromCategorySchema } from "@/schemas/main-schema.js";
+import type { ProductFromRepository, ProductList } from "@/types/product.js";
 
 type ListProductsFromCategoryCatalogServiceRequest = z.infer<
 	typeof listCursorQueryParamsSchema

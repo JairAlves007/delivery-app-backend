@@ -1,10 +1,11 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import { mapObjectResourcesList } from "@/helpers/resource.ts";
-import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
-import { establishmentParamsSchema } from "@/schemas/generic-schema.ts";
-import type { BannerFromRepository, BannerList } from "@/types/banner.ts";
 import z from "zod";
+
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import { mapObjectResourcesList } from "@/helpers/resource.js";
+import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.js";
+import { establishmentParamsSchema } from "@/schemas/generic-schema.js";
+import type { BannerFromRepository, BannerList } from "@/types/banner.js";
 
 type ListBannersCatalogServiceRequest = z.infer<
 	typeof establishmentParamsSchema

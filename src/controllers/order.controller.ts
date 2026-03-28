@@ -1,26 +1,27 @@
-import { makeCancelOrderFromCustomerService } from "@/factories/services/order/make-cancel-order-from-customer-service.ts";
-import { makeFindOrderService } from "@/factories/services/order/make-find-order-service.ts";
-import { makeListMyOrdersService } from "@/factories/services/order/make-list-my-orders-service.ts";
-import { makeListOrderService } from "@/factories/services/order/make-list-order-service.ts";
-import { makeUpdateOrderService } from "@/factories/services/order/make-update-order-service.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
-import { createOrderQueue } from "@/queues/order-queue.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
+
+import { makeCancelOrderFromCustomerService } from "@/factories/services/order/make-cancel-order-from-customer-service.js";
+import { makeFindOrderService } from "@/factories/services/order/make-find-order-service.js";
+import { makeListMyOrdersService } from "@/factories/services/order/make-list-my-orders-service.js";
+import { makeListOrderService } from "@/factories/services/order/make-list-order-service.js";
+import { makeUpdateOrderService } from "@/factories/services/order/make-update-order-service.js";
+import { ApiResponse } from "@/helpers/api.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { createOrderQueue } from "@/queues/order-queue.js";
 import {
 	establishmentIdSchema,
 	establishmentParamsSchema,
 	listCursorQueryParamsSchema,
 	listQueryParamsSchema,
 	userIdSchema
-} from "@/schemas/generic-schema.ts";
+} from "@/schemas/generic-schema.js";
 import {
 	cancelOrderBodySchema,
 	createOrderBodySchema,
 	orderParamsSchema,
 	updateOrderStatusBodySchema
-} from "@/schemas/order-schema.ts";
-import type { FilterParams } from "@/types/crud.ts";
-import type { FastifyReply, FastifyRequest } from "fastify";
+} from "@/schemas/order-schema.js";
+import type { FilterParams } from "@/types/crud.js";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const query = listQueryParamsSchema.parse(request.query);

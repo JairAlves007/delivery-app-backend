@@ -1,6 +1,6 @@
-import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type DeleteAddonParams = {
 	id: number;

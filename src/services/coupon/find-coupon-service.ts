@@ -1,11 +1,12 @@
-import { CouponNotFound } from "@/errors/coupon/not-found.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import type { Coupon } from "@/generated/prisma/client.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
-import { couponParamsSchema } from "@/schemas/coupon-schema.ts";
-import type { FilterField } from "@/types/crud.ts";
 import z from "zod";
+
+import { CouponNotFound } from "@/errors/coupon/not-found.js";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import type { Coupon } from "@/generated/prisma/client.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.js";
+import { couponParamsSchema } from "@/schemas/coupon-schema.js";
+import type { FilterField } from "@/types/crud.js";
 
 type FindCouponServiceRequest = z.infer<typeof couponParamsSchema> &
 	FilterField;

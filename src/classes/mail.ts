@@ -1,9 +1,11 @@
-import { FailedToSendMail } from "@/errors/mail/failed-to-send-mail-error.ts";
-import type { IMail } from "@/interfaces/mail/mail-base.ts";
-import { mail } from "@/lib/mail.ts";
-import type { ResetPasswordMailData } from "@/types/mail.ts";
-import { renderFile } from "ejs";
 import { join, resolve } from "node:path";
+
+import { renderFile } from "ejs";
+
+import { FailedToSendMail } from "@/errors/mail/failed-to-send-mail-error.js";
+import type { IMail } from "@/interfaces/mail/mail-base.js";
+import { mail } from "@/lib/mail.js";
+import type { ResetPasswordMailData } from "@/types/mail.js";
 
 export class Mail implements IMail {
 	private static instance: Mail | null = null;

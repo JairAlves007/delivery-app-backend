@@ -1,6 +1,6 @@
-import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type DeleteEstablishmentParams = {
 	id: string;

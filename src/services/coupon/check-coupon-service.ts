@@ -1,10 +1,11 @@
-import { CouponExpired } from "@/errors/coupon/expired.ts";
-import { CouponMaxUsesReached } from "@/errors/coupon/max-uses-reached.ts";
-import { CouponNotFound } from "@/errors/coupon/not-found.ts";
-import { CouponUserLimitReached } from "@/errors/coupon/user-limit-reached.ts";
-import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
-import { checkCouponBodySchema } from "@/schemas/coupon-schema.ts";
 import z from "zod";
+
+import { CouponExpired } from "@/errors/coupon/expired.js";
+import { CouponMaxUsesReached } from "@/errors/coupon/max-uses-reached.js";
+import { CouponNotFound } from "@/errors/coupon/not-found.js";
+import { CouponUserLimitReached } from "@/errors/coupon/user-limit-reached.js";
+import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.js";
+import { checkCouponBodySchema } from "@/schemas/coupon-schema.js";
 
 type CheckCouponServiceRequest = z.infer<typeof checkCouponBodySchema> & {
 	userId: string;

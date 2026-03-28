@@ -1,4 +1,4 @@
-import type { OrderSubSectionMessage } from "@/types/order.ts";
+import type { OrderSubSectionMessage } from "@/types/order.js";
 
 export default class Constants {
 	// Hash

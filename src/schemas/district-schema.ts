@@ -1,6 +1,8 @@
-import { transformPriceToDatabase } from "@/helpers/price.ts";
 import z from "zod";
-import { establishmentIdSchema } from "./generic-schema.ts";
+
+import { transformPriceToDatabase } from "@/helpers/price.js";
+
+import { establishmentIdSchema } from "./generic-schema.js";
 
 export const createDistrictBodySchema = z.object({
 	name: z.string().min(1, "O nome deve ser preenchido"),

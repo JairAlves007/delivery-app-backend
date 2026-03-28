@@ -1,7 +1,7 @@
-import { makeEstablishmentRepository } from "@/factories/repositories/make-establishment-repository.ts";
-import { makeRoleRepository } from "@/factories/repositories/make-role-repository.ts";
-import { makeUserRepository } from "@/factories/repositories/make-user-repository.ts";
-import { SignUpService } from "@/services/auth/sign-up-service.ts";
+import { makeEstablishmentRepository } from "@/factories/repositories/make-establishment-repository.js";
+import { makeRoleRepository } from "@/factories/repositories/make-role-repository.js";
+import { makeUserRepository } from "@/factories/repositories/make-user-repository.js";
+import { SignUpService } from "@/services/auth/sign-up-service.js";
 
 export const makeSignUpService = () => {
 	const userRepository = makeUserRepository();

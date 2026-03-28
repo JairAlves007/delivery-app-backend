@@ -1,6 +1,7 @@
-import type { Establishment, Prisma } from "@/generated/prisma/client.ts";
-import type { EstablishmentFromRepository } from "@/types/establishment.ts";
-import type { ICRUDBase } from "../crud-base.ts";
+import type { Establishment, Prisma } from "@/generated/prisma/client.js";
+import type { EstablishmentFromRepository } from "@/types/establishment.js";
+
+import type { ICRUDBase } from "../crud-base.js";
 
 export interface IEstablishmentRepository extends ICRUDBase<
 	EstablishmentFromRepository,

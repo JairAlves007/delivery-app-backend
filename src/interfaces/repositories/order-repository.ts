@@ -1,7 +1,8 @@
-import type { Prisma } from "@/generated/prisma/client.ts";
-import type { OrderFromRepository } from "@/types/order.ts";
-import type { ICRUDBase } from "../crud-base.ts";
-import type { CursorPagination } from "../cursor-pagination.ts";
+import type { Prisma } from "@/generated/prisma/client.js";
+import type { OrderFromRepository } from "@/types/order.js";
+
+import type { ICRUDBase } from "../crud-base.js";
+import type { CursorPagination } from "../cursor-pagination.js";
 
 export interface IOrderRepository
 	extends

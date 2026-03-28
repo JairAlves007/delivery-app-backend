@@ -1,11 +1,11 @@
-import type { Prisma } from "@/generated/prisma/client.ts";
+import type { Prisma } from "@/generated/prisma/client.js";
 import {
 	buildFilterQueryOptions,
 	transformValidFilterParams
-} from "@/helpers/crud.ts";
-import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
-import prisma from "@/lib/prisma.ts";
-import type { BannerFromRepository } from "@/types/banner.ts";
+} from "@/helpers/crud.js";
+import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.js";
+import prisma from "@/lib/prisma.js";
+import type { BannerFromRepository } from "@/types/banner.js";
 import type {
 	CursorPaginationParams,
 	DeleteContentParams,
@@ -13,7 +13,7 @@ import type {
 	FindByIdParams,
 	PaginationParams,
 	UpdateContentParams
-} from "@/types/crud.ts";
+} from "@/types/crud.js";
 
 export class BannerPrismaRepository implements IBannerRepository {
 	async listAll(filterParams?: FilterParams): Promise<BannerFromRepository[]> {
@@ -141,7 +141,7 @@ export class BannerPrismaRepository implements IBannerRepository {
 			orderBy,
 			take: limit + 1,
 			skip: cursor ? 1 : 0,
-			cursor: !!cursor ? { id: cursor } : undefined
+			cursor: cursor ? { id: cursor } : undefined
 		});
 	}
 

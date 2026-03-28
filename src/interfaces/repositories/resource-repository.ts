@@ -1,9 +1,9 @@
-import type { Prisma, Resource } from "@/generated/prisma/client.ts";
+import type { Prisma, Resource } from "@/generated/prisma/client.js";
 import type {
 	ResourceRuleFromRepository,
 	UploadResourceRulesParams,
 	ValidateResourceRuleParams
-} from "@/types/resource-rule.ts";
+} from "@/types/resource-rule.js";
 
 export interface IResourceRepository {
 	validateResourceRule(

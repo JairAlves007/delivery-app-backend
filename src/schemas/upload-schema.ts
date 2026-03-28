@@ -1,10 +1,12 @@
+import z from "zod";
+
 import {
 	ForObjectResourceType,
 	ResourceType
-} from "@/generated/prisma/client.ts";
-import { fileMimeTypeValues } from "@/types/resource.ts";
-import z from "zod";
-import { establishmentIdSchema } from "./generic-schema.ts";
+} from "@/generated/prisma/client.js";
+import { fileMimeTypeValues } from "@/types/resource.js";
+
+import { establishmentIdSchema } from "./generic-schema.js";
 
 export const uploadSignedUrlBodySchema = z.object({
 	objectId: z
@@ -19,28 +21,22 @@ export const uploadSignedUrlBodySchema = z.object({
 	resource: z.object({
 		width: z.coerce.number("A largura deve ser preenchida"),
 		height: z.coerce.number("A altura deve ser preenchida"),
-		for: z
-			.string()
-			.enumCaseInsensitive(
-				ForObjectResourceType,
-				"Precisamos saber para qual recurso pertencem as imagens"
-			),
+		for: z.enum(
+			ForObjectResourceType,
+			"Precisamos saber para qual recurso pertencem as imagens"
+		),
 		mimeType: z.enum(
 			Object.values(fileMimeTypeValues),
 			"Tipo de arquivo inválido"
 		),
-		type: z
-			.string()
-			.enumCaseInsensitive(ResourceType, "Tipo de recurso inválido")
+		type: z.enum(ResourceType, "Tipo de recurso inválido")
 	})
 });
 
 export const uploadResourceRulesQuerySchema = z.object({
 	establishmentId: establishmentIdSchema,
-	forObject: z
-		.string()
-		.enumCaseInsensitive(
-			ForObjectResourceType,
-			"Precisamos saber para qual recurso pertencem as imagens"
-		)
+	forObject: z.enum(
+		ForObjectResourceType,
+		"Precisamos saber para qual recurso pertencem as imagens"
+	)
 });

@@ -1,9 +1,10 @@
-import { slugify } from "@/helpers/utils.ts";
-import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import { updateProductBodySchema } from "@/schemas/product-schema.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
+
+import { slugify } from "@/helpers/utils.js";
+import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { updateProductBodySchema } from "@/schemas/product-schema.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 interface UpdateProductRequest
 	extends

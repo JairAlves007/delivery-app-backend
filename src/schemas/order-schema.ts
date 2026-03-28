@@ -1,10 +1,12 @@
+import z from "zod";
+
 import {
 	DeliveryType,
 	OrderStatusType,
 	PaymentMethodType
-} from "@/generated/prisma/client.ts";
-import z from "zod";
-import { establishmentIdSchema, phoneSchema } from "./generic-schema.ts";
+} from "@/generated/prisma/client.js";
+
+import { establishmentIdSchema, phoneSchema } from "./generic-schema.js";
 
 export const createOrderBodySchema = z
 	.object({
@@ -30,18 +32,11 @@ export const createOrderBodySchema = z
 			.min(1, "O comentário deve ser preenchido")
 			.optional()
 			.nullable(),
-		paymentMethod: z
-			.string()
-			.enumCaseInsensitive(
-				PaymentMethodType,
-				"O método de pagamento deve ser preenchido"
-			),
-		deliveryType: z
-			.string()
-			.enumCaseInsensitive(
-				DeliveryType,
-				"O tipo de entrega deve ser preenchido"
-			),
+		paymentMethod: z.enum(
+			PaymentMethodType,
+			"O método de pagamento deve ser preenchido"
+		),
+		deliveryType: z.enum(DeliveryType, "O tipo de entrega deve ser preenchido"),
 		changeAmount: z.coerce
 			.number()
 			.min(0, "O troco deve ser maior que zero")
@@ -94,7 +89,7 @@ export const createOrderBodySchema = z
 		}
 
 		if (data.deliveryType === DeliveryType.DELIVERY) {
-			if (!!!data.addressId) {
+			if (!data.addressId) {
 				ctx.addIssue({
 					path: ["addressId"],
 					code: "custom",
@@ -102,7 +97,7 @@ export const createOrderBodySchema = z
 				});
 			}
 
-			if (!!!data.districtId) {
+			if (!data.districtId) {
 				ctx.addIssue({
 					path: ["districtId"],
 					code: "custom",
@@ -110,7 +105,7 @@ export const createOrderBodySchema = z
 				});
 			}
 		} else {
-			if (!!!data.contactPhone) {
+			if (!data.contactPhone) {
 				ctx.addIssue({
 					path: ["contactPhone"],
 					code: "custom",
@@ -135,12 +130,7 @@ export const cancelOrderBodySchema = z.object({
 });
 
 export const updateOrderStatusBodySchema = cancelOrderBodySchema.extend({
-	status: z
-		.string()
-		.enumCaseInsensitive(
-			OrderStatusType,
-			"O status do pedido deve ser preenchido"
-		)
+	status: z.enum(OrderStatusType, "O status do pedido deve ser preenchido")
 });
 
 export const orderParamsSchema = z.object({

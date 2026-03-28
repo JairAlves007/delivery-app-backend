@@ -1,4 +1,4 @@
-import { Prisma } from "@/generated/prisma/client.ts";
+import { Prisma } from "@/generated/prisma/client.js";
 
 export type AddonFromRepository = Prisma.AddonGetPayload<{
 	include: {

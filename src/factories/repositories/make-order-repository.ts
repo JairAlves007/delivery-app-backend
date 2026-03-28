@@ -1,4 +1,4 @@
-import { OrderPrismaRepository } from "@/repositories/order-prisma-repository.ts";
+import { OrderPrismaRepository } from "@/repositories/order-prisma-repository.js";
 
 export const makeOrderRepository = () => {
 	return new OrderPrismaRepository();

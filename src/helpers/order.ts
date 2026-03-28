@@ -4,9 +4,10 @@ import {
 	DiscountType,
 	OrderStatusType,
 	PaymentMethodType
-} from "@/generated/prisma/client.ts";
-import type { OrderFromRepository, OrderPayload } from "@/types/order.ts";
-import { transformPriceToHumanReadable } from "./price.ts";
+} from "@/generated/prisma/client.js";
+import type { OrderFromRepository, OrderPayload } from "@/types/order.js";
+
+import { transformPriceToHumanReadable } from "./price.js";
 
 export const getStatusLabel = (status: OrderStatusType) => {
 	switch (status) {

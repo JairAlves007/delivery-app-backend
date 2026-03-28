@@ -1,19 +1,19 @@
-import type { Coupon, Prisma } from "@/generated/prisma/client.ts";
+import type { Coupon, Prisma } from "@/generated/prisma/client.js";
 import {
 	buildFilterQueryOptions,
 	transformValidFilterParams
-} from "@/helpers/crud.ts";
-import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.ts";
-import prisma from "@/lib/prisma.ts";
-import type { CouponWithUserCoupons } from "@/types/coupon.ts";
+} from "@/helpers/crud.js";
+import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.js";
+import prisma from "@/lib/prisma.js";
+import type { CouponWithUserCoupons } from "@/types/coupon.js";
 import type {
 	DeleteContentParams,
 	FilterParams,
 	FindByIdParams,
 	PaginationParams,
 	UpdateContentParams
-} from "@/types/crud.ts";
-import type { EstablishmentID } from "@/types/establishment.ts";
+} from "@/types/crud.js";
+import type { EstablishmentID } from "@/types/establishment.js";
 
 export class CouponPrismaRepository implements ICouponRepository {
 	async listAll(filterParams?: FilterParams): Promise<Coupon[]> {

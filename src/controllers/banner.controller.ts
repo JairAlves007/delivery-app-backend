@@ -1,16 +1,17 @@
-import { makeCreateBannerService } from "@/factories/services/banner/make-create-banner-service.ts";
-import { makeDeleteBannerService } from "@/factories/services/banner/make-delete-banner-service.ts";
-import { makeFindBannerService } from "@/factories/services/banner/make-find-banner-service.ts";
-import { makeListBannerService } from "@/factories/services/banner/make-list-banner-service.ts";
-import { makeUpdateBannerService } from "@/factories/services/banner/make-update-banner-service.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
+
+import { makeCreateBannerService } from "@/factories/services/banner/make-create-banner-service.js";
+import { makeDeleteBannerService } from "@/factories/services/banner/make-delete-banner-service.js";
+import { makeFindBannerService } from "@/factories/services/banner/make-find-banner-service.js";
+import { makeListBannerService } from "@/factories/services/banner/make-list-banner-service.js";
+import { makeUpdateBannerService } from "@/factories/services/banner/make-update-banner-service.js";
+import { ApiResponse } from "@/helpers/api.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import {
 	bannerParamsSchema,
 	createBannerBodySchema
-} from "@/schemas/banner-schema.ts";
-import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import type { FastifyReply, FastifyRequest } from "fastify";
+} from "@/schemas/banner-schema.js";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const { search, sortField, sortDirection, ...query } =

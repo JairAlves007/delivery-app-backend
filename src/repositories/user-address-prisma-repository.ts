@@ -1,6 +1,6 @@
-import type { IUserAddressRepository } from "@/interfaces/repositories/user-address-repository.ts";
-import prisma from "@/lib/prisma.ts";
-import type { UserID } from "@/types/user.ts";
+import type { IUserAddressRepository } from "@/interfaces/repositories/user-address-repository.js";
+import prisma from "@/lib/prisma.js";
+import type { UserID } from "@/types/user.js";
 
 export class UserAddressPrismaRepository implements IUserAddressRepository {
 	async setAllAsNotDefault(userId: UserID): Promise<void> {

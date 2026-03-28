@@ -1,8 +1,8 @@
-import { ProductNotFound } from "@/errors/product/not-found-error.ts";
-import { ProductOutOfStockError } from "@/errors/product/out-of-stock-error.ts";
-import { makeFindProductService } from "@/factories/services/product/make-find-product-service.ts";
-import type { EstablishmentID } from "@/types/establishment.ts";
-import type { ProductFromRepository } from "@/types/product.ts";
+import { ProductNotFound } from "@/errors/product/not-found-error.js";
+import { ProductOutOfStockError } from "@/errors/product/out-of-stock-error.js";
+import { makeFindProductService } from "@/factories/services/product/make-find-product-service.js";
+import type { EstablishmentID } from "@/types/establishment.js";
+import type { ProductFromRepository } from "@/types/product.js";
 
 type ValidateProductFromOrderServiceRequest = {
 	establishmentId: EstablishmentID;

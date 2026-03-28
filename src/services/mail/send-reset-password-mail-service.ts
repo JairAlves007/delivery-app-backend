@@ -1,5 +1,5 @@
-import type { IMail } from "@/interfaces/mail/mail-base.ts";
-import type { ResetPasswordMailData } from "@/types/mail.ts";
+import type { IMail } from "@/interfaces/mail/mail-base.js";
+import type { ResetPasswordMailData } from "@/types/mail.js";
 
 export class SendResetPasswordMailService {
 	private mail: IMail;

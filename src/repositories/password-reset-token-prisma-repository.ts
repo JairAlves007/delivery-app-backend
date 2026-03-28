@@ -1,9 +1,10 @@
-import type { PasswordResetToken, Prisma } from "@/generated/prisma/client.ts";
-import Constants from "@/helpers/constants.ts";
-import type { IPasswordResetTokenRepository } from "@/interfaces/repositories/password-reset-token-repository.ts";
-import prisma from "@/lib/prisma.ts";
-import type { ResetPasswordParams } from "@/types/user.ts";
 import { compare, hash } from "bcrypt-ts";
+
+import type { PasswordResetToken, Prisma } from "@/generated/prisma/client.js";
+import Constants from "@/helpers/constants.js";
+import type { IPasswordResetTokenRepository } from "@/interfaces/repositories/password-reset-token-repository.js";
+import prisma from "@/lib/prisma.js";
+import type { ResetPasswordParams } from "@/types/user.js";
 
 export class PasswordResetTokenPrismaRepository implements IPasswordResetTokenRepository {
 	async create(

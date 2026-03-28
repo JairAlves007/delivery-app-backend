@@ -1,5 +1,6 @@
 import z from "zod";
-import { establishmentIdSchema } from "./generic-schema.ts";
+
+import { establishmentIdSchema } from "./generic-schema.js";
 
 export const createProductCategoryBodySchema = z.object({
 	name: z.string().min(1, "O nome deve ser preenchido"),

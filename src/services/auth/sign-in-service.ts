@@ -1,13 +1,14 @@
-import { InvalidCredentials } from "@/errors/user/invalid-credentials-error.ts";
-import { InvalidEstablishment } from "@/errors/user/invalid-establishment-error.ts";
-import { RoleType } from "@/generated/prisma/client.ts";
-import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
-import { signInBodySchema } from "@/schemas/auth-schema.ts";
-import type { EstablishmentID } from "@/types/establishment.ts";
-import type { UserWithRole } from "@/types/user.ts";
 import { compare } from "bcrypt-ts";
 import z from "zod";
+
+import { InvalidCredentials } from "@/errors/user/invalid-credentials-error.js";
+import { InvalidEstablishment } from "@/errors/user/invalid-establishment-error.js";
+import { RoleType } from "@/generated/prisma/client.js";
+import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
+import type { IUserRepository } from "@/interfaces/repositories/user-repository.js";
+import { signInBodySchema } from "@/schemas/auth-schema.js";
+import type { EstablishmentID } from "@/types/establishment.js";
+import type { UserWithRole } from "@/types/user.js";
 
 type SignInServiceRequest = z.infer<typeof signInBodySchema> & {
 	allowedRoles: RoleType[];

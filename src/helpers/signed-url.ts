@@ -1,8 +1,10 @@
-import { env } from "@/env.ts";
-import { r2 } from "@/lib/cloudflare.ts";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import Constants from "./constants.ts";
+
+import { env } from "@/env.js";
+import { r2 } from "@/lib/cloudflare.js";
+
+import Constants from "./constants.js";
 
 interface CreateUploadSignedUrlResponse {
 	signedUrl: string;

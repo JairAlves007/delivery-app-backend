@@ -1,5 +1,6 @@
-import Constants from "@/helpers/constants.ts";
-import type { FilterParams } from "./crud.ts";
+import Constants from "@/helpers/constants.js";
+
+import type { FilterParams } from "./crud.js";
 
 export type CacheKeys = keyof typeof Constants.CACHE_KEYS;
 

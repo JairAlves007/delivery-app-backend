@@ -1,6 +1,7 @@
-import type { Prisma } from "@/generated/prisma/client.ts";
-import type { AddonCategoryFromRepository } from "@/types/addon-category.ts";
-import type { ICRUDBase } from "../crud-base.ts";
+import type { Prisma } from "@/generated/prisma/client.js";
+import type { AddonCategoryFromRepository } from "@/types/addon-category.js";
+
+import type { ICRUDBase } from "../crud-base.js";
 
 export interface IAddonCategoryRepository extends ICRUDBase<
 	AddonCategoryFromRepository,

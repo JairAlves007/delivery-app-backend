@@ -1,5 +1,5 @@
-import { makeOrderRepository } from "@/factories/repositories/make-order-repository.ts";
-import { ListMyOrdersService } from "@/services/order/list-my-orders-service.ts";
+import { makeOrderRepository } from "@/factories/repositories/make-order-repository.js";
+import { ListMyOrdersService } from "@/services/order/list-my-orders-service.js";
 
 export const makeListMyOrdersService = () => {
 	const orderRepository = makeOrderRepository();

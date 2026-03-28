@@ -1,14 +1,15 @@
-import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import { mapObjectResourcesList } from "@/helpers/resource.ts";
-import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import z from "zod";
+
+import { InvalidPage } from "@/errors/pagination/invalid-page.js";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import { mapObjectResourcesList } from "@/helpers/resource.js";
+import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
 import type {
 	EstablishmentFromRepository,
 	EstablishmentsList
-} from "@/types/establishment.ts";
-import z from "zod";
+} from "@/types/establishment.js";
 
 type ListEstablishmentServiceRequest = z.infer<typeof listQueryParamsSchema>;
 

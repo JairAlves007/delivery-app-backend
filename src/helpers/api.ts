@@ -1,4 +1,4 @@
-import type { ErrorResponse, SuccessResponse } from "@/types/response.ts";
+import type { ErrorResponse, SuccessResponse } from "@/types/response.js";
 
 export class ApiResponse {
 	static success<T>(message: string, details?: T): SuccessResponse {

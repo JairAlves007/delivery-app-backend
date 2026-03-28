@@ -1,5 +1,6 @@
-import { DiscountType } from "@/generated/prisma/client.ts";
-import Constants from "./constants.ts";
+import { DiscountType } from "@/generated/prisma/client.js";
+
+import Constants from "./constants.js";
 
 export const transformPriceToHumanReadable = (price: number): string => {
 	if (price <= 0) return "GRÁTIS";

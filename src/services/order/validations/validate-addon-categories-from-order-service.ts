@@ -1,12 +1,12 @@
-import { AddonCategoryNotFound } from "@/errors/addon/category/not-found-error.ts";
-import { AddonQuantityExceeded } from "@/errors/addon/quantity-exceeded-error.ts";
-import { makeFindAddonCategoryService } from "@/factories/services/addon/category/make-find-addon-category-service.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import { removeDuplicateItems } from "@/helpers/utils.ts";
-import type { AddonCategoryFromRepository } from "@/types/addon-category.ts";
-import type { EstablishmentID } from "@/types/establishment.ts";
-import type { OrderAddons } from "@/types/order.ts";
+import { AddonCategoryNotFound } from "@/errors/addon/category/not-found-error.js";
+import { AddonQuantityExceeded } from "@/errors/addon/quantity-exceeded-error.js";
+import { makeFindAddonCategoryService } from "@/factories/services/addon/category/make-find-addon-category-service.js";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import { removeDuplicateItems } from "@/helpers/utils.js";
+import type { AddonCategoryFromRepository } from "@/types/addon-category.js";
+import type { EstablishmentID } from "@/types/establishment.js";
+import type { OrderAddons } from "@/types/order.js";
 
 type ValidateAddonCategoriesFromOrderServiceRequest = {
 	establishmentId: EstablishmentID;
@@ -41,7 +41,7 @@ export class ValidateAddonCategoriesFromOrderService {
 
 		const orderAddonsValidated = removeDuplicateItems(orderAddons);
 
-		if (!!addonCategory.max_quantity) {
+		if (addonCategory.max_quantity) {
 			const quantity = orderAddonsValidated.reduce((acc, addon) => {
 				return (acc += addon.quantity);
 			}, 0);

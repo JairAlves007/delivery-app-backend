@@ -1,12 +1,13 @@
-import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import type { Addon } from "@/generated/prisma/client.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import { transformPriceFromDatabase } from "@/helpers/price.ts";
-import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.ts";
-import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import type { FilterField } from "@/types/crud.ts";
 import z from "zod";
+
+import { InvalidPage } from "@/errors/pagination/invalid-page.js";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import type { Addon } from "@/generated/prisma/client.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import { transformPriceFromDatabase } from "@/helpers/price.js";
+import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.js";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
+import type { FilterField } from "@/types/crud.js";
 
 type ListAddonServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;

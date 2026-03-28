@@ -1,10 +1,10 @@
-import { Prisma } from "@/generated/prisma/client.ts";
+import { Prisma } from "@/generated/prisma/client.js";
 import {
 	buildFilterQueryOptions,
 	transformValidFilterParams
-} from "@/helpers/crud.ts";
-import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
-import prisma from "@/lib/prisma.ts";
+} from "@/helpers/crud.js";
+import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
+import prisma from "@/lib/prisma.js";
 import type {
 	CursorPaginationParams,
 	DeleteContentParams,
@@ -12,8 +12,8 @@ import type {
 	FindByIdParams,
 	PaginationParams,
 	UpdateContentParams
-} from "@/types/crud.ts";
-import type { ProductFromRepository } from "@/types/product.ts";
+} from "@/types/crud.js";
+import type { ProductFromRepository } from "@/types/product.js";
 
 export class ProductPrismaRepository implements IProductRepository {
 	async listAll(filterParams?: FilterParams): Promise<ProductFromRepository[]> {
@@ -141,7 +141,7 @@ export class ProductPrismaRepository implements IProductRepository {
 			orderBy,
 			take: limit + 1,
 			skip: cursor ? 1 : 0,
-			cursor: !!cursor ? { id: cursor } : undefined
+			cursor: cursor ? { id: cursor } : undefined
 		});
 	}
 

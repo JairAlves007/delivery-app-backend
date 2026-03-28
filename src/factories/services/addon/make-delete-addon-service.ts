@@ -1,5 +1,5 @@
-import { makeAddonRepository } from "@/factories/repositories/make-addon-repository.ts";
-import { DeleteAddonService } from "@/services/addon/delete-addon-service.ts";
+import { makeAddonRepository } from "@/factories/repositories/make-addon-repository.js";
+import { DeleteAddonService } from "@/services/addon/delete-addon-service.js";
 
 export const makeDeleteAddonService = () => {
 	const addonRepository = makeAddonRepository();

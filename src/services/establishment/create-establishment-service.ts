@@ -1,9 +1,10 @@
-import { slugify } from "@/helpers/utils.ts";
-import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import { createMenuForNewEstablishmentQueue } from "@/queues/establishment-queue.ts";
-import { createEstablishmentBodySchema } from "@/schemas/establishment-schema.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
+
+import { slugify } from "@/helpers/utils.js";
+import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
+import { createMenuForNewEstablishmentQueue } from "@/queues/establishment-queue.js";
+import { createEstablishmentBodySchema } from "@/schemas/establishment-schema.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type CreateEstablishmentServiceParams = z.infer<
 	typeof createEstablishmentBodySchema

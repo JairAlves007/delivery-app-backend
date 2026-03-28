@@ -1,8 +1,8 @@
-import type { Prisma } from "@/generated/prisma/client.ts";
-import { transformValidFilterParams } from "@/helpers/crud.ts";
-import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
-import prisma from "@/lib/prisma.ts";
-import type { UserAddressWithDefault } from "@/types/address.ts";
+import type { Prisma } from "@/generated/prisma/client.js";
+import { transformValidFilterParams } from "@/helpers/crud.js";
+import type { IAddressRepository } from "@/interfaces/repositories/address-repository.js";
+import prisma from "@/lib/prisma.js";
+import type { UserAddressWithDefault } from "@/types/address.js";
 import type {
 	CursorPaginationParams,
 	DeleteContentParams,
@@ -10,7 +10,7 @@ import type {
 	FindByIdParams,
 	PaginationParams,
 	UpdateContentParams
-} from "@/types/crud.ts";
+} from "@/types/crud.js";
 
 type UserAddressStructured = Prisma.UserAddressGetPayload<{
 	select: {
@@ -117,7 +117,7 @@ export class AddressPrismaRepository implements IAddressRepository {
 			},
 			take: limit + 1,
 			skip: cursor ? 1 : 0,
-			cursor: !!cursor ? { id: cursor } : undefined
+			cursor: cursor ? { id: cursor } : undefined
 		});
 
 		return addresses.map(address => this.transformAddress(address));

@@ -1,7 +1,7 @@
-import { makeSendOrderConfirmationMessageService } from "@/factories/services/order/make-send-order-confirmation-message.ts";
-import { makeQueue } from "@/factories/services/queue/make-queue.ts";
-import { mailQueueName } from "@/queues/mail-queue.ts";
-import type { BuildOrderItemsParams } from "@/types/order.ts";
+import { makeSendOrderConfirmationMessageService } from "@/factories/services/order/make-send-order-confirmation-message.js";
+import { makeQueue } from "@/factories/services/queue/make-queue.js";
+import { mailQueueName } from "@/queues/mail-queue.js";
+import type { BuildOrderItemsParams } from "@/types/order.js";
 
 export const setupSendOrderConfirmationMessageWorker = async () => {
 	const mailQueue = makeQueue<BuildOrderItemsParams>(mailQueueName);

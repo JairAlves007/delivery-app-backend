@@ -1,8 +1,9 @@
 import type {
 	ForObjectResourceType,
 	Prisma
-} from "@/generated/prisma/client.ts";
-import type { ResourceIntent } from "./resource.ts";
+} from "@/generated/prisma/client.js";
+
+import type { ResourceIntent } from "./resource.js";
 
 export type ValidateResourceRuleParams = {
 	resourceIntent: ResourceIntent;

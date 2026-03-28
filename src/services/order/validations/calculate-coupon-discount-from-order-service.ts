@@ -1,13 +1,13 @@
 import {
-	CouponType,
 	type Coupon,
+	CouponType,
 	type District
-} from "@/generated/prisma/client.ts";
+} from "@/generated/prisma/client.js";
 import {
 	getValueDiscounted,
 	transformPriceFromDatabase
-} from "@/helpers/price.ts";
-import type { OrderItemsToProcess } from "@/types/order.ts";
+} from "@/helpers/price.js";
+import type { OrderItemsToProcess } from "@/types/order.js";
 
 type CalculateCouponDiscountsRequest = {
 	coupon: Coupon | null;

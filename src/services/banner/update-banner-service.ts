@@ -1,9 +1,10 @@
-import { BannerLinkType } from "@/generated/prisma/client.ts";
-import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import { updateBannerBodySchema } from "@/schemas/banner-schema.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
+
+import { BannerLinkType } from "@/generated/prisma/client.js";
+import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { updateBannerBodySchema } from "@/schemas/banner-schema.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 interface UpdateBannerServiceRequest
 	extends

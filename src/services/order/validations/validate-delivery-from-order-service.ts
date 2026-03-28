@@ -1,10 +1,10 @@
-import { makeFindAddressService } from "@/factories/services/address/make-find-address-service.ts";
-import { makeFindDistrictService } from "@/factories/services/district/make-find-district-service.ts";
-import { makeValidateCouponFromOrderService } from "@/factories/services/order/validations/make-validate-coupon-from-order-service.ts";
-import { DeliveryType } from "@/generated/prisma/client.ts";
-import type { EstablishmentID } from "@/types/establishment.ts";
-import type { OrderInfo } from "@/types/order.ts";
-import type { UserID } from "@/types/user.ts";
+import { makeFindAddressService } from "@/factories/services/address/make-find-address-service.js";
+import { makeFindDistrictService } from "@/factories/services/district/make-find-district-service.js";
+import { makeValidateCouponFromOrderService } from "@/factories/services/order/validations/make-validate-coupon-from-order-service.js";
+import { DeliveryType } from "@/generated/prisma/client.js";
+import type { EstablishmentID } from "@/types/establishment.js";
+import type { OrderInfo } from "@/types/order.js";
+import type { UserID } from "@/types/user.js";
 
 type ValidateDeliveryFromOrderServiceRequest = {
 	establishmentId: EstablishmentID;
@@ -30,7 +30,7 @@ export class ValidateDeliveryFromOrderService {
 			district: null
 		};
 
-		if (!!!couponId || deliveryType != DeliveryType.DELIVERY) return orderInfos;
+		if (!couponId || deliveryType != DeliveryType.DELIVERY) return orderInfos;
 
 		const validateCoupon = makeValidateCouponFromOrderService();
 
@@ -58,9 +58,9 @@ export class ValidateDeliveryFromOrderService {
 				: null
 		]);
 
-		if (!!address) orderInfos.address = address;
+		if (address) orderInfos.address = address;
 
-		if (!!district) orderInfos.district = district;
+		if (district) orderInfos.district = district;
 
 		return orderInfos;
 	}

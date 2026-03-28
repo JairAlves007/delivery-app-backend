@@ -1,6 +1,6 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
-import type { UserID, UserWithRole } from "@/types/user.ts";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import type { IUserRepository } from "@/interfaces/repositories/user-repository.js";
+import type { UserID, UserWithRole } from "@/types/user.js";
 
 export class FindUserService {
 	private userRepository: IUserRepository;

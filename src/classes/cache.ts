@@ -1,8 +1,8 @@
-import Constants from "@/helpers/constants.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import type { ICacheBase } from "@/interfaces/cache/cache-base.ts";
-import { redis } from "@/lib/redis.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+import Constants from "@/helpers/constants.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import type { ICacheBase } from "@/interfaces/cache/cache-base.js";
+import { redis } from "@/lib/redis.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 export class Cache implements ICacheBase {
 	private static instance: Cache | null = null;
@@ -91,7 +91,7 @@ export class Cache implements ICacheBase {
 		try {
 			const cachedValue = await this.get<T>(key);
 
-			if (!!cachedValue) return cachedValue;
+			if (cachedValue) return cachedValue;
 
 			const value = await fetchFunction();
 			await this.set(key, value);
@@ -111,7 +111,7 @@ export class Cache implements ICacheBase {
 		try {
 			const cachedValue = await this.get<T>(key);
 
-			if (!!cachedValue) return cachedValue;
+			if (cachedValue) return cachedValue;
 
 			const value = await fetchFunction();
 			await this.set(key, value, duration);

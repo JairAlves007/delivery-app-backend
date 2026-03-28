@@ -1,5 +1,3 @@
-import { env } from "@/env.ts";
-import type { IJob, IQueueProvider } from "@/interfaces/queue/queue-base.ts";
 import {
 	type ConnectionOptions,
 	type DefaultJobOptions,
@@ -7,6 +5,9 @@ import {
 	Queue,
 	Worker
 } from "bullmq";
+
+import { env } from "@/env.js";
+import type { IJob, IQueueProvider } from "@/interfaces/queue/queue-base.js";
 
 class BullMQProvider implements IQueueProvider {
 	private queueName: string;

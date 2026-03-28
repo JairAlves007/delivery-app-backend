@@ -1,17 +1,18 @@
-import { makeCreateProductService } from "@/factories/services/product/make-create-product-service.ts";
-import { makeDeleteProductService } from "@/factories/services/product/make-delete-product-service.ts";
-import { makeFindProductService } from "@/factories/services/product/make-find-product-service.ts";
-import { makeListProductService } from "@/factories/services/product/make-list-product-service.ts";
-import { makeUpdateProductService } from "@/factories/services/product/make-update-product-service.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
-import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
+
+import { makeCreateProductService } from "@/factories/services/product/make-create-product-service.js";
+import { makeDeleteProductService } from "@/factories/services/product/make-delete-product-service.js";
+import { makeFindProductService } from "@/factories/services/product/make-find-product-service.js";
+import { makeListProductService } from "@/factories/services/product/make-list-product-service.js";
+import { makeUpdateProductService } from "@/factories/services/product/make-update-product-service.js";
+import { ApiResponse } from "@/helpers/api.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
 import {
 	createProductBodySchema,
 	productParamsSchema,
 	updateProductBodySchema
-} from "@/schemas/product-schema.ts";
-import type { FastifyReply, FastifyRequest } from "fastify";
+} from "@/schemas/product-schema.js";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const { search, sortField, sortDirection, ...query } =

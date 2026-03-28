@@ -1,7 +1,7 @@
-import type { IMenuRepository } from "@/interfaces/repositories/menu-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
-import type { EstablishmentID } from "@/types/establishment.ts";
+import type { IMenuRepository } from "@/interfaces/repositories/menu-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
+import type { EstablishmentID } from "@/types/establishment.js";
 
 type CreateMenuForNewEstablishmentParams = {
 	establishmentId: EstablishmentID;

@@ -1,6 +1,8 @@
-import { searchAndOrderBySchema } from "@/schemas/generic-schema.ts";
 import z from "zod";
-import type { UserID } from "./user.ts";
+
+import { searchAndOrderBySchema } from "@/schemas/generic-schema.js";
+
+import type { UserID } from "./user.js";
 
 export type ValidFilterParams = {
 	[K in keyof FilterParams]-?: Exclude<FilterParams[K], null | undefined>;

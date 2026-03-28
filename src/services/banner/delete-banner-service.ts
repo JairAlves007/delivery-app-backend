@@ -1,6 +1,6 @@
-import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type DeleteBannerServiceParams = {
 	id: number;

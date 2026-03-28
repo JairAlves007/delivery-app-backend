@@ -1,8 +1,8 @@
-import { makeCreateMenuForNewEstablishmentService } from "@/factories/services/menu/make-create-menu-for-new-establishment-service.ts";
-import { makeQueue } from "@/factories/services/queue/make-queue.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import { establishmentQueueName } from "@/queues/establishment-queue.ts";
-import type { CreateMenuForNewEstablishmentType } from "@/types/establishment.ts";
+import { makeCreateMenuForNewEstablishmentService } from "@/factories/services/menu/make-create-menu-for-new-establishment-service.js";
+import { makeQueue } from "@/factories/services/queue/make-queue.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { establishmentQueueName } from "@/queues/establishment-queue.js";
+import type { CreateMenuForNewEstablishmentType } from "@/types/establishment.js";
 
 export const setupCreateMenuForNewEstablishmentWorker = async () => {
 	const establishmentQueue = makeQueue<CreateMenuForNewEstablishmentType>(

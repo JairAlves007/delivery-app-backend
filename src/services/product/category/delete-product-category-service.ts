@@ -1,6 +1,6 @@
-import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type DeleteProductCategoryServiceParams = {
 	id: string;

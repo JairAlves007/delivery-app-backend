@@ -1,5 +1,6 @@
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
-import { ErrorBase } from "../error-base.ts";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+
+import { ErrorBase } from "../error-base.js";
 
 export class EstablishmentDoesNotAcceptCardError extends ErrorBase {
 	constructor() {

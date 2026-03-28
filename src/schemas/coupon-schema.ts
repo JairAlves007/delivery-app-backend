@@ -1,37 +1,38 @@
-import { CouponType, DiscountType } from "@/generated/prisma/client.ts";
 import z from "zod";
-import { establishmentIdSchema } from "./generic-schema.ts";
 
-export const createCouponBodySchema = z
-	.object({
-		type: z.string().enumCaseInsensitive(CouponType, "Tipo de cupom inválido"),
-		value: z.coerce.number().min(1, "O valor deve ser maior que zero"),
-		code: z
-			.string()
-			.min(1, "O código deve ser preenchido")
-			.transform(val => val.toUpperCase()),
-		discountType: z
-			.string()
-			.enumCaseInsensitive(DiscountType, "Tipo de desconto inválido"),
-		startsAt: z.coerce
-			.date("A data de inicio deve ser preenchida")
-			.refine(val => val >= new Date(), "A data de inicio deve ser futura")
-			.nullable(),
-		endsAt: z.coerce
-			.date("A data de fim deve ser preenchida")
-			.refine(val => val >= new Date(), "A data de fim deve ser futura")
-			.nullable(),
-		maxUses: z.coerce
-			.number()
-			.min(1, "O uso máximo deve ser maior que zero")
-			.nullable(),
-		usesPerUser: z.coerce
-			.number()
-			.min(1, "O uso por usuário deve ser maior que zero")
-			.nullable(),
-		establishmentId: establishmentIdSchema
-	})
-	.superRefine((data, ctx) => {
+import { CouponType, DiscountType } from "@/generated/prisma/client.js";
+
+import { establishmentIdSchema } from "./generic-schema.js";
+
+const createCouponBodyBaseSchema = z.object({
+	type: z.enum(CouponType, "Tipo de cupom inválido"),
+	value: z.coerce.number().min(1, "O valor deve ser maior que zero"),
+	code: z
+		.string()
+		.min(1, "O código deve ser preenchido")
+		.transform(val => val.toUpperCase()),
+	discountType: z.enum(DiscountType, "Tipo de desconto inválido"),
+	startsAt: z.coerce
+		.date("A data de inicio deve ser preenchida")
+		.refine(val => val >= new Date(), "A data de inicio deve ser futura")
+		.nullable(),
+	endsAt: z.coerce
+		.date("A data de fim deve ser preenchida")
+		.refine(val => val >= new Date(), "A data de fim deve ser futura")
+		.nullable(),
+	maxUses: z.coerce
+		.number()
+		.min(1, "O uso máximo deve ser maior que zero")
+		.nullable(),
+	usesPerUser: z.coerce
+		.number()
+		.min(1, "O uso por usuário deve ser maior que zero")
+		.nullable(),
+	establishmentId: establishmentIdSchema
+});
+
+export const createCouponBodySchema = createCouponBodyBaseSchema.superRefine(
+	(data, ctx) => {
 		if (data.discountType === DiscountType.PERCENTAGE && data.value > 100) {
 			ctx.addIssue({
 				path: ["value"],
@@ -61,11 +62,14 @@ export const createCouponBodySchema = z
 				});
 			}
 		}
-	});
+	}
+);
 
-export const updateCouponBodySchema = createCouponBodySchema.partial().extend({
-	establishmentId: createCouponBodySchema.shape.establishmentId
-});
+export const updateCouponBodySchema = createCouponBodyBaseSchema
+	.partial()
+	.extend({
+		establishmentId: createCouponBodyBaseSchema.shape.establishmentId
+	});
 
 export const checkCouponBodySchema = z.object({
 	code: z

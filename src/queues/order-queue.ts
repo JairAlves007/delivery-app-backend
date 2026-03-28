@@ -1,5 +1,5 @@
-import { makeQueue } from "@/factories/services/queue/make-queue.ts";
-import type { CreateOrderParams } from "@/types/order.ts";
+import { makeQueue } from "@/factories/services/queue/make-queue.js";
+import type { CreateOrderParams } from "@/types/order.js";
 
 export const orderQueueName = "order-queue";
 

@@ -40,7 +40,7 @@ export function checkIfCNPJIsValid(cnpj: string): boolean {
 
 	let size = cnpj.length - 2;
 	let numbers = cnpj.substring(0, size);
-	let digits = cnpj.substring(size);
+	const digits = cnpj.substring(size);
 	let sum = 0;
 	let position = size - 7;
 

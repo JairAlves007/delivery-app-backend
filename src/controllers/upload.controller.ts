@@ -1,12 +1,13 @@
-import { makeGenerateSignedUrlForUploadService } from "@/factories/services/upload/make-generate-signed-url-for-upload-service.ts";
-import { makeGetUploadResourceRulesService } from "@/factories/services/upload/make-get-upload-resource-rules-service.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
+
+import { makeGenerateSignedUrlForUploadService } from "@/factories/services/upload/make-generate-signed-url-for-upload-service.js";
+import { makeGetUploadResourceRulesService } from "@/factories/services/upload/make-get-upload-resource-rules-service.js";
+import { ApiResponse } from "@/helpers/api.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import {
 	uploadResourceRulesQuerySchema,
 	uploadSignedUrlBodySchema
-} from "@/schemas/upload-schema.ts";
-import type { FastifyReply, FastifyRequest } from "fastify";
+} from "@/schemas/upload-schema.js";
 
 export const generateUploadSignedUrl = async (
 	request: FastifyRequest,

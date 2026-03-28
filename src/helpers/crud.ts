@@ -1,9 +1,9 @@
-import { searchAndOrderBySchema } from "@/schemas/generic-schema.ts";
+import { searchAndOrderBySchema } from "@/schemas/generic-schema.js";
 import type {
 	FilterParams,
 	SearchableModelFromRepositoryFields,
 	ValidFilterParams
-} from "@/types/crud.ts";
+} from "@/types/crud.js";
 
 export const transformValidFilterParams = (
 	filterParams?: FilterParams

@@ -1,8 +1,9 @@
+import z from "zod";
+
 import {
 	baseMailSchema,
 	resetPasswordMailBodySchema
-} from "@/schemas/mail-schema.ts";
-import z from "zod";
+} from "@/schemas/mail-schema.js";
 
 export type BaseMailData = z.infer<typeof baseMailSchema>;
 

@@ -1,20 +1,21 @@
-import { makeCreateAddressService } from "@/factories/services/address/make-create-address-service.ts";
-import { makeDeleteAddressService } from "@/factories/services/address/make-delete-address-service.ts";
-import { makeFindAddressService } from "@/factories/services/address/make-find-address-service.ts";
-import { makeListAddressService } from "@/factories/services/address/make-list-address-service.ts";
-import { makeUpdateAddressService } from "@/factories/services/address/make-update-address-service.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
+
+import { makeCreateAddressService } from "@/factories/services/address/make-create-address-service.js";
+import { makeDeleteAddressService } from "@/factories/services/address/make-delete-address-service.js";
+import { makeFindAddressService } from "@/factories/services/address/make-find-address-service.js";
+import { makeListAddressService } from "@/factories/services/address/make-list-address-service.js";
+import { makeUpdateAddressService } from "@/factories/services/address/make-update-address-service.js";
+import { ApiResponse } from "@/helpers/api.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import {
 	addressParamsSchema,
 	createAddressBodySchema,
 	updateAddressBodySchema
-} from "@/schemas/address-schema.ts";
+} from "@/schemas/address-schema.js";
 import {
 	listCursorQueryParamsSchema,
 	userIdSchema
-} from "@/schemas/generic-schema.ts";
-import type { FastifyReply, FastifyRequest } from "fastify";
+} from "@/schemas/generic-schema.js";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const {

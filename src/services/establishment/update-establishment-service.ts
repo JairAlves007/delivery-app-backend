@@ -1,10 +1,11 @@
-import { Prisma } from "@/generated/prisma/client.ts";
-import { slugify } from "@/helpers/utils.ts";
-import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import { updateEstablishmentBodySchema } from "@/schemas/establishment-schema.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
+
+import { Prisma } from "@/generated/prisma/client.js";
+import { slugify } from "@/helpers/utils.js";
+import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { updateEstablishmentBodySchema } from "@/schemas/establishment-schema.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 interface UpdateEstablishmentRequest
 	extends

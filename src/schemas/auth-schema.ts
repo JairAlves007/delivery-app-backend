@@ -1,5 +1,6 @@
 import z from "zod";
-import { userEmailSchema } from "./generic-schema.ts";
+
+import { userEmailSchema } from "./generic-schema.js";
 
 export const signInBodySchema = z.object({
 	email: userEmailSchema,

@@ -1,17 +1,18 @@
-import { makeCreateEstablishmentService } from "@/factories/services/establishment/make-create-establishment-service.ts";
-import { makeDeleteEstablishmentService } from "@/factories/services/establishment/make-delete-establishment-service.ts";
-import { makeFindEstablishmentByIdService } from "@/factories/services/establishment/make-find-establishment-by-id-service.ts";
-import { makeListEstablishmentService } from "@/factories/services/establishment/make-list-establishment-service.ts";
-import { makeUpdateEstablishmentService } from "@/factories/services/establishment/make-update-establishment-service.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
+
+import { makeCreateEstablishmentService } from "@/factories/services/establishment/make-create-establishment-service.js";
+import { makeDeleteEstablishmentService } from "@/factories/services/establishment/make-delete-establishment-service.js";
+import { makeFindEstablishmentByIdService } from "@/factories/services/establishment/make-find-establishment-by-id-service.js";
+import { makeListEstablishmentService } from "@/factories/services/establishment/make-list-establishment-service.js";
+import { makeUpdateEstablishmentService } from "@/factories/services/establishment/make-update-establishment-service.js";
+import { ApiResponse } from "@/helpers/api.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import {
 	createEstablishmentBodySchema,
 	establishmentParamsSchema,
 	updateEstablishmentBodySchema
-} from "@/schemas/establishment-schema.ts";
-import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import type { FastifyReply, FastifyRequest } from "fastify";
+} from "@/schemas/establishment-schema.js";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const query = listQueryParamsSchema.parse(request.query);

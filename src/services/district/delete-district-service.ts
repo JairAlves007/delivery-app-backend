@@ -1,6 +1,6 @@
-import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type DeleteDistrictParams = {
 	id: string;

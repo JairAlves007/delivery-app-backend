@@ -1,5 +1,6 @@
-import type { District, Prisma } from "@/generated/prisma/client.ts";
-import type { ICRUDBase } from "../crud-base.ts";
+import type { District, Prisma } from "@/generated/prisma/client.js";
+
+import type { ICRUDBase } from "../crud-base.js";
 
 export interface IDistrictRepository extends ICRUDBase<
 	District,

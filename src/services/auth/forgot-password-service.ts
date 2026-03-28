@@ -1,11 +1,13 @@
-import { env } from "@/env.ts";
-import { InvalidCredentials } from "@/errors/user/invalid-credentials-error.ts";
-import Constants from "@/helpers/constants.ts";
-import type { IPasswordResetTokenRepository } from "@/interfaces/repositories/password-reset-token-repository.ts";
-import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
-import { sendResetPasswordMailQueue } from "@/queues/mail-queue.ts";
-import { hash } from "bcrypt-ts";
 import { randomBytes } from "node:crypto";
+
+import { hash } from "bcrypt-ts";
+
+import { env } from "@/env.js";
+import { InvalidCredentials } from "@/errors/user/invalid-credentials-error.js";
+import Constants from "@/helpers/constants.js";
+import type { IPasswordResetTokenRepository } from "@/interfaces/repositories/password-reset-token-repository.js";
+import type { IUserRepository } from "@/interfaces/repositories/user-repository.js";
+import { sendResetPasswordMailQueue } from "@/queues/mail-queue.js";
 
 export class ForgotPasswordService {
 	private userRepository: IUserRepository;

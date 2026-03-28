@@ -3,7 +3,7 @@ import type {
 	Prisma,
 	Resource,
 	ResourceType
-} from "@/generated/prisma/client.ts";
+} from "@/generated/prisma/client.js";
 
 export const fileMimeTypeValues = {
 	PNG: "image/png",

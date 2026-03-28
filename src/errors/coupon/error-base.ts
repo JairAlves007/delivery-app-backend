@@ -1,6 +1,7 @@
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
-import type { ValidationReason } from "@/types/coupon.ts";
-import { ErrorBase } from "../error-base.ts";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import type { ValidationReason } from "@/types/coupon.js";
+
+import { ErrorBase } from "../error-base.js";
 
 export class CouponErrorBase extends ErrorBase {
 	constructor(message: string, reason: ValidationReason) {

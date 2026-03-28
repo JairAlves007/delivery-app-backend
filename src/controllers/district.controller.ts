@@ -1,17 +1,18 @@
-import { makeCreateDistrictService } from "@/factories/services/district/make-create-district-service.ts";
-import { makeDeleteDistrictService } from "@/factories/services/district/make-delete-district-service.ts";
-import { makeFindDistrictService } from "@/factories/services/district/make-find-district-service.ts";
-import { makeListDistrictService } from "@/factories/services/district/make-list-district-service.ts";
-import { makeUpdateDistrictService } from "@/factories/services/district/make-update-district-service.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
+
+import { makeCreateDistrictService } from "@/factories/services/district/make-create-district-service.js";
+import { makeDeleteDistrictService } from "@/factories/services/district/make-delete-district-service.js";
+import { makeFindDistrictService } from "@/factories/services/district/make-find-district-service.js";
+import { makeListDistrictService } from "@/factories/services/district/make-list-district-service.js";
+import { makeUpdateDistrictService } from "@/factories/services/district/make-update-district-service.js";
+import { ApiResponse } from "@/helpers/api.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import {
 	createDistrictBodySchema,
 	districtParamsSchema,
 	updateDistrictBodySchema
-} from "@/schemas/district-schema.ts";
-import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import type { FastifyReply, FastifyRequest } from "fastify";
+} from "@/schemas/district-schema.js";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const { search, sortField, sortDirection, ...query } =

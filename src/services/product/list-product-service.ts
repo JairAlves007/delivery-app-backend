@@ -1,19 +1,22 @@
-import { InvalidPage } from "@/errors/pagination/invalid-page.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import { transformPriceFromDatabase } from "@/helpers/price.ts";
-import { mapObjectResourcesList } from "@/helpers/resource.ts";
-import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
-import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import type { FilterField } from "@/types/crud.ts";
-import type { ProductFromRepository, ProductList } from "@/types/product.ts";
 import z from "zod";
+
+import { InvalidPage } from "@/errors/pagination/invalid-page.js";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import { transformPriceFromDatabase } from "@/helpers/price.js";
+import { mapObjectResourcesList } from "@/helpers/resource.js";
+import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
+import type { FilterField } from "@/types/crud.js";
+import type { ProductFromRepository, ProductList } from "@/types/product.js";
 
 type ListProductServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;
 
-interface ListProductServiceResponse
-	extends Pick<ListProductServiceRequest, "page"> {
+interface ListProductServiceResponse extends Pick<
+	ListProductServiceRequest,
+	"page"
+> {
 	products: ProductList[];
 	total: number;
 	perPage?: number;

@@ -1,6 +1,8 @@
-import { checkIfCNPJIsValid } from "@/helpers/validation-errors.ts";
 import z from "zod";
-import { addressLocationSchema } from "./generic-schema.ts";
+
+import { checkIfCNPJIsValid } from "@/helpers/validation-errors.js";
+
+import { addressLocationSchema } from "./generic-schema.js";
 
 export const createEstablishmentBodySchema = z.object({
 	name: z.string().min(1, "O nome deve ser preenchido"),

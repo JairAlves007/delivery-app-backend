@@ -1,7 +1,8 @@
-import type { Coupon, Prisma } from "@/generated/prisma/client.ts";
-import type { CouponWithUserCoupons } from "@/types/coupon.ts";
-import type { EstablishmentID } from "@/types/establishment.ts";
-import type { ICRUDBase } from "../crud-base.ts";
+import type { Coupon, Prisma } from "@/generated/prisma/client.js";
+import type { CouponWithUserCoupons } from "@/types/coupon.js";
+import type { EstablishmentID } from "@/types/establishment.js";
+
+import type { ICRUDBase } from "../crud-base.js";
 
 export interface ICouponRepository extends ICRUDBase<
 	Coupon,

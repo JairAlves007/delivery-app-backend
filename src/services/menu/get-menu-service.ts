@@ -1,9 +1,9 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import type { RoleType } from "@/generated/prisma/client.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import type { IMenuRepository } from "@/interfaces/repositories/menu-repository.ts";
-import type { EstablishmentID } from "@/types/establishment.ts";
-import type { MenuWithSubmenus } from "@/types/menu.ts";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import type { RoleType } from "@/generated/prisma/client.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import type { IMenuRepository } from "@/interfaces/repositories/menu-repository.js";
+import type { EstablishmentID } from "@/types/establishment.js";
+import type { MenuWithSubmenus } from "@/types/menu.js";
 
 type GetMenuServiceResponse = {
 	items: MenuWithSubmenus[] | null;

@@ -1,11 +1,11 @@
-import type { Prisma, Resource } from "@/generated/prisma/client.ts";
-import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.ts";
-import prisma from "@/lib/prisma.ts";
+import type { Prisma, Resource } from "@/generated/prisma/client.js";
+import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.js";
+import prisma from "@/lib/prisma.js";
 import type {
 	ResourceRuleFromRepository,
 	UploadResourceRulesParams,
 	ValidateResourceRuleParams
-} from "@/types/resource-rule.ts";
+} from "@/types/resource-rule.js";
 
 export class ResourcePrismaRepository implements IResourceRepository {
 	async validateResourceRule({

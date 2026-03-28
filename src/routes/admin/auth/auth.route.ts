@@ -1,8 +1,9 @@
-import { signIn, signUp } from "@/controllers/user.controller.ts";
-import { RoleType } from "@/generated/prisma/client.ts";
-import { ensureUserHasRoles } from "@/middlewares/ensure-user-has-roles.ts";
-import { isAuthenticated } from "@/middlewares/is-auth.ts";
 import type { FastifyInstance } from "fastify";
+
+import { signIn, signUp } from "@/controllers/user.controller.js";
+import { RoleType } from "@/generated/prisma/client.js";
+import { ensureUserHasRoles } from "@/middlewares/ensure-user-has-roles.js";
+import { isAuthenticated } from "@/middlewares/is-auth.js";
 
 const authMiddlewares = {
 	onRequest: [isAuthenticated, ensureUserHasRoles([RoleType.ADMIN])]

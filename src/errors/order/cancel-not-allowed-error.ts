@@ -1,5 +1,5 @@
-import { ErrorBase } from "@/errors/error-base.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import { ErrorBase } from "@/errors/error-base.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 
 export class CancelOrderNotAllowed extends ErrorBase {
 	constructor() {

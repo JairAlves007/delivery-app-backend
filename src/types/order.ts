@@ -5,13 +5,14 @@ import type {
 	OrderStatusType,
 	PaymentMethodType,
 	Prisma
-} from "@/generated/prisma/client.ts";
-import type { AddonFromRepository } from "./addon.ts";
-import type { UserAddressWithDefault } from "./address.ts";
-import type { ForgetAllListingCacheKeysParams } from "./cache.ts";
-import type { EstablishmentID } from "./establishment.ts";
-import type { ProductFromRepository } from "./product.ts";
-import type { UserID, UserWithRole } from "./user.ts";
+} from "@/generated/prisma/client.js";
+
+import type { AddonFromRepository } from "./addon.js";
+import type { UserAddressWithDefault } from "./address.js";
+import type { ForgetAllListingCacheKeysParams } from "./cache.js";
+import type { EstablishmentID } from "./establishment.js";
+import type { ProductFromRepository } from "./product.js";
+import type { UserID, UserWithRole } from "./user.js";
 
 export type OrderFromRepository = Prisma.OrderGetPayload<{
 	include: {

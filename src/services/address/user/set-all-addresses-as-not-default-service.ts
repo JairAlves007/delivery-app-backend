@@ -1,5 +1,5 @@
-import type { IUserAddressRepository } from "@/interfaces/repositories/user-address-repository.ts";
-import type { UserID } from "@/types/user.ts";
+import type { IUserAddressRepository } from "@/interfaces/repositories/user-address-repository.js";
+import type { UserID } from "@/types/user.js";
 
 export class SetAllAddressesAsNotDefaultService {
 	private userAddressRepository: IUserAddressRepository;

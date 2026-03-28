@@ -1,8 +1,9 @@
-import { find, index, update } from "@/controllers/order.controller.ts";
-import { PermissionType } from "@/generated/prisma/client.ts";
-import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.ts";
-import { isAuthenticated } from "@/middlewares/is-auth.ts";
 import type { FastifyInstance } from "fastify";
+
+import { find, index, update } from "@/controllers/order.controller.js";
+import { PermissionType } from "@/generated/prisma/client.js";
+import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
+import { isAuthenticated } from "@/middlewares/is-auth.js";
 
 const orderMiddlewares = {
 	onRequest: [

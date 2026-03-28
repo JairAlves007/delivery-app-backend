@@ -1,6 +1,7 @@
-// types/fastify.d.ts
-import { RoleType } from "@/generated/prisma/client.ts";
+// types/fastify.d.js
 import "fastify";
+
+import { RoleType } from "@/generated/prisma/client.js";
 
 declare module "fastify" {
 	interface FastifyRequest {

@@ -1,34 +1,34 @@
-import { UserNotFound } from "@/errors/user/user-not-found.ts";
-import { makeCalculateCouponDiscountFromOrderService } from "@/factories/services/order/validations/make-calculate-coupon-discount-from-order-service.ts";
-import { makeValidateAddonsFromOrderService } from "@/factories/services/order/validations/make-validate-addons-from-order-service.ts";
-import { makeValidateDeliveryFromOrderService } from "@/factories/services/order/validations/make-validate-delivery-from-order-service.ts";
-import { makeValidateEstablishmentFromOrderService } from "@/factories/services/order/validations/make-validate-establishment-from-order-service.ts";
-import { makeValidateProductFromOrderService } from "@/factories/services/order/validations/make-validate-product-from-order-service.ts";
-import { makeFindUserService } from "@/factories/services/user/make-find-user-service.ts";
+import { UserNotFound } from "@/errors/user/user-not-found.js";
+import { makeCalculateCouponDiscountFromOrderService } from "@/factories/services/order/validations/make-calculate-coupon-discount-from-order-service.js";
+import { makeValidateAddonsFromOrderService } from "@/factories/services/order/validations/make-validate-addons-from-order-service.js";
+import { makeValidateDeliveryFromOrderService } from "@/factories/services/order/validations/make-validate-delivery-from-order-service.js";
+import { makeValidateEstablishmentFromOrderService } from "@/factories/services/order/validations/make-validate-establishment-from-order-service.js";
+import { makeValidateProductFromOrderService } from "@/factories/services/order/validations/make-validate-product-from-order-service.js";
+import { makeFindUserService } from "@/factories/services/user/make-find-user-service.js";
 import {
-	DiscountType,
-	OrderStatusType,
 	type Coupon,
+	DiscountType,
 	type District,
+	OrderStatusType,
 	type Prisma
-} from "@/generated/prisma/client.ts";
-import { getStatusLabel } from "@/helpers/order.ts";
+} from "@/generated/prisma/client.js";
+import { getStatusLabel } from "@/helpers/order.js";
 import {
 	getValueDiscounted,
 	transformPriceFromDatabase
-} from "@/helpers/price.ts";
-import { removeDuplicateItems } from "@/helpers/utils.ts";
-import type { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import { sendOrderConfirmationMessageQueue } from "@/queues/mail-queue.ts";
-import type { UserAddressWithDefault } from "@/types/address.ts";
+} from "@/helpers/price.js";
+import { removeDuplicateItems } from "@/helpers/utils.js";
+import type { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { sendOrderConfirmationMessageQueue } from "@/queues/mail-queue.js";
+import type { UserAddressWithDefault } from "@/types/address.js";
 import type {
 	BuildOrderItemsParams,
 	CreateOrderParams,
 	OrderAddonsToProcess,
 	OrderItems,
 	OrderItemsToProcess
-} from "@/types/order.ts";
+} from "@/types/order.js";
 
 export class CreateOrderService {
 	private orderRepository: IOrderRepository;
@@ -40,7 +40,7 @@ export class CreateOrderService {
 	private getOrderCouponInputData(
 		coupon: Coupon | null
 	): Partial<Prisma.OrderCreateInput> | undefined {
-		if (!!!coupon) return undefined;
+		if (!coupon) return undefined;
 
 		return {
 			coupon: {
@@ -62,7 +62,7 @@ export class CreateOrderService {
 		address: UserAddressWithDefault | null,
 		district: District | null
 	): Partial<Prisma.OrderCreateInput> | undefined {
-		if (!!!address || !!!district) return undefined;
+		if (!address || !district) return undefined;
 
 		const { address_id, city, street, number, postal_code, state } = address;
 		const { id: district_id, name: district_name, shipping_cost } = district;
@@ -116,7 +116,7 @@ export class CreateOrderService {
 
 		return {
 			customer_name: user.name,
-			customer_phone: !!address ? address.phone : (contactPhone ?? "S/N"),
+			customer_phone: address ? address.phone : (contactPhone ?? "S/N"),
 			delivery_type: deliveryType,
 			payment_method: paymentMethod,
 			shipping_fee: shippingCost,

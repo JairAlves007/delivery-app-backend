@@ -1,17 +1,18 @@
-import { makeCreateAddonService } from "@/factories/services/addon/make-create-addon-service.ts";
-import { makeDeleteAddonService } from "@/factories/services/addon/make-delete-addon-service.ts";
-import { makeFindAddonService } from "@/factories/services/addon/make-find-addon-service.ts";
-import { makeListAddonService } from "@/factories/services/addon/make-list-addon-service.ts";
-import { makeUpdateAddonService } from "@/factories/services/addon/make-update-addon-service.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
+
+import { makeCreateAddonService } from "@/factories/services/addon/make-create-addon-service.js";
+import { makeDeleteAddonService } from "@/factories/services/addon/make-delete-addon-service.js";
+import { makeFindAddonService } from "@/factories/services/addon/make-find-addon-service.js";
+import { makeListAddonService } from "@/factories/services/addon/make-list-addon-service.js";
+import { makeUpdateAddonService } from "@/factories/services/addon/make-update-addon-service.js";
+import { ApiResponse } from "@/helpers/api.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import {
 	addonParamsSchema,
 	createAddonBodySchema,
 	updateAddonBodySchema
-} from "@/schemas/addon-schema.ts";
-import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import type { FastifyReply, FastifyRequest } from "fastify";
+} from "@/schemas/addon-schema.js";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const { search, sortField, sortDirection, ...query } =

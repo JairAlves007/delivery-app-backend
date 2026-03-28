@@ -1,14 +1,15 @@
-import { makeListBannerService } from "@/factories/services/banner/make-list-banner-service.ts";
-import { makeListProductCategoriesCatalogService } from "@/factories/services/product/category/make-list-product-categories-catalog-service.ts";
-import { makeListProductsFromCategoryCatalogService } from "@/factories/services/product/make-list-products-from-category-catalog-service.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
+
+import { makeListBannerService } from "@/factories/services/banner/make-list-banner-service.js";
+import { makeListProductCategoriesCatalogService } from "@/factories/services/product/category/make-list-product-categories-catalog-service.js";
+import { makeListProductsFromCategoryCatalogService } from "@/factories/services/product/make-list-products-from-category-catalog-service.js";
+import { ApiResponse } from "@/helpers/api.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import {
 	establishmentParamsSchema,
 	listCursorQueryParamsSchema
-} from "@/schemas/generic-schema.ts";
-import { listProductsFromCategorySchema } from "@/schemas/main-schema.ts";
-import type { FastifyReply, FastifyRequest } from "fastify";
+} from "@/schemas/generic-schema.js";
+import { listProductsFromCategorySchema } from "@/schemas/main-schema.js";
 
 export const listBannersCatalog = async (
 	request: FastifyRequest,

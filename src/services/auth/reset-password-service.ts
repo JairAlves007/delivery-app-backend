@@ -1,6 +1,7 @@
-import { InvalidToken } from "@/errors/user/password/invalid-token-error.ts";
-import type { IPasswordResetTokenRepository } from "@/interfaces/repositories/password-reset-token-repository.ts";
 import { compare } from "bcrypt-ts";
+
+import { InvalidToken } from "@/errors/user/password/invalid-token-error.js";
+import type { IPasswordResetTokenRepository } from "@/interfaces/repositories/password-reset-token-repository.js";
 
 type ResetPasswordServiceParams = {
 	token: string;

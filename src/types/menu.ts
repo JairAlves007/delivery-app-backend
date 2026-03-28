@@ -1,4 +1,4 @@
-import type { Prisma } from "@/generated/prisma/client.ts";
+import type { Prisma } from "@/generated/prisma/client.js";
 
 export type MenuWithSubmenus = Prisma.MenuGetPayload<{
 	select: {

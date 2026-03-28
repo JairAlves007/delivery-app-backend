@@ -1,8 +1,8 @@
-import { EstablishmentNotFound } from "@/errors/establishment/not-found-error.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import type { EstablishmentFromRepository } from "@/types/establishment.ts";
+import { EstablishmentNotFound } from "@/errors/establishment/not-found-error.js";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
+import type { EstablishmentFromRepository } from "@/types/establishment.js";
 
 export class FindEstablishmentBySlugService {
 	private establishmentRepository: IEstablishmentRepository;

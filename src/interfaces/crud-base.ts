@@ -4,7 +4,7 @@ import {
 	FindByIdParams,
 	PaginationParams,
 	UpdateContentParams
-} from "@/types/crud.ts";
+} from "@/types/crud.js";
 
 export interface ICRUDBase<
 	Model,

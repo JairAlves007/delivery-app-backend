@@ -1,5 +1,6 @@
-import { transformPriceToDatabase } from "@/helpers/price.ts";
 import z from "zod";
+
+import { transformPriceToDatabase } from "@/helpers/price.js";
 
 export const createAddonBodySchema = z.object({
 	name: z.string().min(1, "O nome deve ser preenchido"),

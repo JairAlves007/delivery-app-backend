@@ -1,6 +1,6 @@
-import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+import type { IAddressRepository } from "@/interfaces/repositories/address-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type DeleteAddressServiceParams = {
 	id: string;

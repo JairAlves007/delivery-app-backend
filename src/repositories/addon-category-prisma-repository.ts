@@ -1,18 +1,18 @@
-import type { Prisma } from "@/generated/prisma/client.ts";
+import type { Prisma } from "@/generated/prisma/client.js";
 import {
 	buildFilterQueryOptions,
 	transformValidFilterParams
-} from "@/helpers/crud.ts";
-import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.ts";
-import prisma from "@/lib/prisma.ts";
-import type { AddonCategoryFromRepository } from "@/types/addon-category.ts";
+} from "@/helpers/crud.js";
+import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.js";
+import prisma from "@/lib/prisma.js";
+import type { AddonCategoryFromRepository } from "@/types/addon-category.js";
 import type {
 	DeleteContentParams,
 	FilterParams,
 	FindByIdParams,
 	PaginationParams,
 	UpdateContentParams
-} from "@/types/crud.ts";
+} from "@/types/crud.js";
 
 export class AddonCategoryPrismaRepository implements IAddonCategoryRepository {
 	async listAll(

@@ -1,5 +1,5 @@
-import { makeProductRepository } from "@/factories/repositories/make-product-repository.ts";
-import { CreateProductService } from "@/services/product/create-product-service.ts";
+import { makeProductRepository } from "@/factories/repositories/make-product-repository.js";
+import { CreateProductService } from "@/services/product/create-product-service.js";
 
 export const makeCreateProductService = () => {
 	const productRepository = makeProductRepository();

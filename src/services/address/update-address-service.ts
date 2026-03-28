@@ -1,10 +1,11 @@
-import { makeSetAllAddressesAsNotDefaultService } from "@/factories/services/address/user/make-set-all-addresses-as-not-default-service.ts";
-import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import { updateAddressBodySchema } from "@/schemas/address-schema.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
-import type { UserID } from "@/types/user.ts";
 import z from "zod";
+
+import { makeSetAllAddressesAsNotDefaultService } from "@/factories/services/address/user/make-set-all-addresses-as-not-default-service.js";
+import type { IAddressRepository } from "@/interfaces/repositories/address-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { updateAddressBodySchema } from "@/schemas/address-schema.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
+import type { UserID } from "@/types/user.js";
 
 interface UpdateAddressServiceRequest
 	extends

@@ -1,5 +1,5 @@
-import { makeAddonRepository } from "@/factories/repositories/make-addon-repository.ts";
-import { UpdateAddonService } from "@/services/addon/update-addon-service.ts";
+import { makeAddonRepository } from "@/factories/repositories/make-addon-repository.js";
+import { UpdateAddonService } from "@/services/addon/update-addon-service.js";
 
 export const makeUpdateAddonService = () => {
 	const addonRepository = makeAddonRepository();

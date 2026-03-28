@@ -1,10 +1,11 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import type { Address } from "@/generated/prisma/client.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
-import { listCursorQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import type { FilterField } from "@/types/crud.ts";
 import z from "zod";
+
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import type { Address } from "@/generated/prisma/client.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import type { IAddressRepository } from "@/interfaces/repositories/address-repository.js";
+import { listCursorQueryParamsSchema } from "@/schemas/generic-schema.js";
+import type { FilterField } from "@/types/crud.js";
 
 type ListAddressServiceRequest = z.infer<typeof listCursorQueryParamsSchema> &
 	FilterField;

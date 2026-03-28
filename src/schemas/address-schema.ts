@@ -1,5 +1,6 @@
 import z from "zod";
-import { addressLocationSchema } from "./generic-schema.ts";
+
+import { addressLocationSchema } from "./generic-schema.js";
 
 export const createAddressBodySchema = addressLocationSchema.extend({
 	isDefault: z

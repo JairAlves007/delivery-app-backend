@@ -1,6 +1,6 @@
-import { makeQueue } from "@/factories/services/queue/make-queue.ts";
-import type { SendResetPasswordMailEventType } from "@/types/mail.ts";
-import type { BuildOrderItemsParams } from "@/types/order.ts";
+import { makeQueue } from "@/factories/services/queue/make-queue.js";
+import type { SendResetPasswordMailEventType } from "@/types/mail.js";
+import type { BuildOrderItemsParams } from "@/types/order.js";
 
 export const mailQueueName = "mail-queue";
 

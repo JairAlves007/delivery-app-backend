@@ -1,7 +1,7 @@
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import { makeQueue } from "@/factories/services/queue/make-queue.ts";
-import { cacheQueueName } from "@/queues/cache-queue.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import { makeQueue } from "@/factories/services/queue/make-queue.js";
+import { cacheQueueName } from "@/queues/cache-queue.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 export const setupForgetAllListingCacheKeysWorker = async () => {
 	const cacheQueue = makeQueue<ForgetAllListingCacheKeysParams>(cacheQueueName);

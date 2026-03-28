@@ -1,8 +1,9 @@
-import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import { createAddonCategoryBodySchema } from "@/schemas/addon-category-schema.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
+
+import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { createAddonCategoryBodySchema } from "@/schemas/addon-category-schema.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type CreateAddonCategoryServiceRequest = z.infer<
 	typeof createAddonCategoryBodySchema

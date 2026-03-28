@@ -2,10 +2,10 @@ import type {
 	PermissionType,
 	Prisma,
 	User
-} from "@/generated/prisma/client.ts";
-import type { IUserRepository } from "@/interfaces/repositories/user-repository.ts";
-import prisma from "@/lib/prisma.ts";
-import type { UserWithRole } from "@/types/user.ts";
+} from "@/generated/prisma/client.js";
+import type { IUserRepository } from "@/interfaces/repositories/user-repository.js";
+import prisma from "@/lib/prisma.js";
+import type { UserWithRole } from "@/types/user.js";
 
 export class UserPrismaRepository implements IUserRepository {
 	async findById(id: string): Promise<UserWithRole | null> {

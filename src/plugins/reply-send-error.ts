@@ -1,13 +1,14 @@
-import { env } from "@/env.ts";
-import { ErrorBase } from "@/errors/error-base.ts";
-import { Prisma } from "@/generated/prisma/client.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
-import { beautifyValidationErrors } from "@/helpers/validation-errors.ts";
-import type { DefaultErrorResponse } from "@/types/response.ts";
 import type { FastifyPluginAsync } from "fastify";
 import fp from "fastify-plugin";
 import { ZodError } from "zod";
+
+import { env } from "@/env.js";
+import { ErrorBase } from "@/errors/error-base.js";
+import { Prisma } from "@/generated/prisma/client.js";
+import { ApiResponse } from "@/helpers/api.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { beautifyValidationErrors } from "@/helpers/validation-errors.js";
+import type { DefaultErrorResponse } from "@/types/response.js";
 
 declare module "fastify" {
 	interface FastifyReply {
@@ -47,7 +48,7 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 			errorResponse.code = "DATABASE_ERROR";
 
 			switch (error.code) {
-				case "P2002":
+				case "P2002": {
 					const target = error.meta?.target as string[];
 					const fields = target.join(", ");
 
@@ -58,6 +59,7 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 						}
 					};
 					break;
+				}
 				case "P2025":
 					errorCode = HTTPStatusCodes.NOT_FOUND;
 

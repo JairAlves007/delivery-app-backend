@@ -1,12 +1,12 @@
-import Constants from "@/helpers/constants.ts";
-import { formatDateToHumanReadable } from "@/helpers/date.ts";
+import Constants from "@/helpers/constants.js";
+import { formatDateToHumanReadable } from "@/helpers/date.js";
 import {
 	getCouponAppliedLabel,
 	getDeliveryTypeLabel,
 	getPaymentMethodLabel
-} from "@/helpers/order.ts";
-import { transformPriceToHumanReadable } from "@/helpers/price.ts";
-import type { BuildOrderItemsParams } from "@/types/order.ts";
+} from "@/helpers/order.js";
+import { transformPriceToHumanReadable } from "@/helpers/price.js";
+import type { BuildOrderItemsParams } from "@/types/order.js";
 
 export class SendOrderConfirmationMessageService {
 	private generateMessage({
@@ -25,9 +25,9 @@ export class SendOrderConfirmationMessageService {
 		orderItemsToProcess
 	}: BuildOrderItemsParams): string {
 		const subSectionsTemplates = Constants.ORDER_SUB_SECTIONS_MESSAGE_TEMPLATES;
-		let template = Constants.ORDER_MESSAGE_TEMPLATE;
+		const template = Constants.ORDER_MESSAGE_TEMPLATE;
 
-		if (!!address?.reference_point) {
+		if (address?.reference_point) {
 			subSectionsTemplates.address = subSectionsTemplates.address.replaceAll(
 				"{reference_point_section}",
 				subSectionsTemplates.referencePoint.replaceAll(
@@ -81,7 +81,7 @@ export class SendOrderConfirmationMessageService {
 			.replaceAll("{customer_name}", user.name)
 			.replaceAll(
 				"{customer_phone}",
-				this.applyPhoneMask(!!address ? address.phone : contactPhone ?? "")
+				this.applyPhoneMask(address ? address.phone : (contactPhone ?? ""))
 			)
 			.replaceAll("{delivery_type}", getDeliveryTypeLabel(deliveryType))
 			.replaceAll("{payment_method}", getPaymentMethodLabel(paymentMethod))
@@ -112,7 +112,7 @@ export class SendOrderConfirmationMessageService {
 			)
 			.replaceAll(
 				"{coupon}",
-				!!coupon
+				coupon
 					? subSectionsTemplates.coupon
 							.replaceAll("{coupon_code}", coupon.code)
 							.replaceAll(
@@ -127,11 +127,11 @@ export class SendOrderConfirmationMessageService {
 			)
 			.replaceAll(
 				"{discount}",
-				!!coupon
+				coupon
 					? subSectionsTemplates.discount.replaceAll(
 							"{discount_value}",
 							transformPriceToHumanReadable(couponDiscount)
-					  )
+						)
 					: ""
 			)
 			.replaceAll(
@@ -140,7 +140,7 @@ export class SendOrderConfirmationMessageService {
 					? subSectionsTemplates.changeAmount.replaceAll(
 							"{change_amount_value}",
 							transformPriceToHumanReadable(changeAmount)
-					  )
+						)
 					: ""
 			)
 			.replaceAll(

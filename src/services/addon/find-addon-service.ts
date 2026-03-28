@@ -1,11 +1,12 @@
-import { AddonNotFound } from "@/errors/addon/not-found-error.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.ts";
-import { addonParamsSchema } from "@/schemas/addon-schema.ts";
-import type { AddonFromRepository } from "@/types/addon.ts";
-import type { FilterField } from "@/types/crud.ts";
 import z from "zod";
+
+import { AddonNotFound } from "@/errors/addon/not-found-error.js";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.js";
+import { addonParamsSchema } from "@/schemas/addon-schema.js";
+import type { AddonFromRepository } from "@/types/addon.js";
+import type { FilterField } from "@/types/crud.js";
 
 type FindAddonServiceRequest = z.infer<typeof addonParamsSchema> & FilterField;
 

@@ -1,5 +1,5 @@
-import { makeAddressRepository } from "@/factories/repositories/make-address-repository.ts";
-import { DeleteAddressService } from "@/services/address/delete-address-service.ts";
+import { makeAddressRepository } from "@/factories/repositories/make-address-repository.js";
+import { DeleteAddressService } from "@/services/address/delete-address-service.js";
 
 export const makeDeleteAddressService = () => {
 	const addressRepository = makeAddressRepository();

@@ -1,5 +1,5 @@
-import { makeQueue } from "@/factories/services/queue/make-queue.ts";
-import type { CreateMenuForNewEstablishmentType } from "@/types/establishment.ts";
+import { makeQueue } from "@/factories/services/queue/make-queue.js";
+import type { CreateMenuForNewEstablishmentType } from "@/types/establishment.js";
 
 export const establishmentQueueName = "establishment-queue";
 

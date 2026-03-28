@@ -1,12 +1,13 @@
-import { makeSetAllAddressesAsNotDefaultService } from "@/factories/services/address/user/make-set-all-addresses-as-not-default-service.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import type { IAddressRepository } from "@/interfaces/repositories/address-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import { createAddressBodySchema } from "@/schemas/address-schema.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
-import type { UserID } from "@/types/user.ts";
 import z from "zod";
+
+import { makeSetAllAddressesAsNotDefaultService } from "@/factories/services/address/user/make-set-all-addresses-as-not-default-service.js";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import type { IAddressRepository } from "@/interfaces/repositories/address-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { createAddressBodySchema } from "@/schemas/address-schema.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
+import type { UserID } from "@/types/user.js";
 
 type CreateAddressServiceRequest = z.infer<typeof createAddressBodySchema> & {
 	userId: UserID;

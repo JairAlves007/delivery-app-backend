@@ -1,5 +1,6 @@
-import Constants from "@/helpers/constants.ts";
 import z from "zod";
+
+import Constants from "@/helpers/constants.js";
 
 export const establishmentIdSchema = z
 	.ulid("O id do estabelecimento deve ser preenchido")

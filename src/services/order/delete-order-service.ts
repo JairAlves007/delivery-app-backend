@@ -1,6 +1,6 @@
-import { IOrderRepository } from "@/interfaces/repositories/order-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
+import { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type DeleteOrderServiceParams = {
 	id: string;

@@ -1,4 +1,7 @@
+import { hash } from "bcrypt-ts";
+
 import {
+	type AddonCategory,
 	AddonType,
 	BannerLinkType,
 	CouponType,
@@ -6,20 +9,17 @@ import {
 	FileFormatType,
 	PermissionType,
 	Prisma,
+	type Product,
+	type ProductCategory,
 	RoleType,
 	SocialPlatform,
 	TagType,
 	ViewType,
-	WeekDay,
-	type AddonCategory,
-	type Product,
-	type ProductCategory
-} from "@/generated/prisma/client.ts";
-import Constants from "@/helpers/constants.ts";
-import { transformPriceToDatabase } from "@/helpers/price.ts";
-import { slugify } from "@/helpers/utils.ts";
-import prisma from "@/lib/prisma.ts";
-import { hash } from "bcrypt-ts";
+	WeekDay} from "@/generated/prisma/client.js";
+import Constants from "@/helpers/constants.js";
+import { transformPriceToDatabase } from "@/helpers/price.js";
+import { slugify } from "@/helpers/utils.js";
+import prisma from "@/lib/prisma.js";
 
 async function main() {
 	console.log("🔄 Seeding database...");

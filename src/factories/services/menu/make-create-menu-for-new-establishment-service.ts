@@ -1,5 +1,5 @@
-import { makeMenuRepository } from "@/factories/repositories/make-menu-repository.ts";
-import { CreateMenuForNewEstablishmentService } from "@/services/menu/create-menu-for-new-establishment-service.ts";
+import { makeMenuRepository } from "@/factories/repositories/make-menu-repository.js";
+import { CreateMenuForNewEstablishmentService } from "@/services/menu/create-menu-for-new-establishment-service.js";
 
 export const makeCreateMenuForNewEstablishmentService = () => {
 	const menuRepository = makeMenuRepository();

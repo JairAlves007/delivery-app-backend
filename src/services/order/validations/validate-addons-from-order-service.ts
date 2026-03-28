@@ -1,14 +1,14 @@
-import { AddonNotFound } from "@/errors/addon/not-found-error.ts";
-import { makeFindAddonService } from "@/factories/services/addon/make-find-addon-service.ts";
-import { makeValidateAddonCategoriesFromOrderService } from "@/factories/services/order/validations/make-validate-addon-categories-from-order-service.ts";
-import { AddonType } from "@/generated/prisma/client.ts";
-import { transformPriceFromDatabase } from "@/helpers/price.ts";
-import { removeDuplicateItems } from "@/helpers/utils.ts";
-import type { EstablishmentID } from "@/types/establishment.ts";
+import { AddonNotFound } from "@/errors/addon/not-found-error.js";
+import { makeFindAddonService } from "@/factories/services/addon/make-find-addon-service.js";
+import { makeValidateAddonCategoriesFromOrderService } from "@/factories/services/order/validations/make-validate-addon-categories-from-order-service.js";
+import { AddonType } from "@/generated/prisma/client.js";
+import { transformPriceFromDatabase } from "@/helpers/price.js";
+import { removeDuplicateItems } from "@/helpers/utils.js";
+import type { EstablishmentID } from "@/types/establishment.js";
 import type {
 	OrderAddonsToProcess,
 	OrderCategoryAddons
-} from "@/types/order.ts";
+} from "@/types/order.js";
 
 type ValidateAddonsFromOrderServiceRequest = {
 	establishmentId: EstablishmentID;
@@ -22,7 +22,7 @@ export class ValidateAddonsFromOrderService {
 	}: ValidateAddonsFromOrderServiceRequest): Promise<OrderAddonsToProcess[]> {
 		const addons: OrderAddonsToProcess[] = [];
 
-		if (!!!orderAddons || orderAddons.length <= 0) return addons;
+		if (!orderAddons || orderAddons.length <= 0) return addons;
 
 		const findAddonService = makeFindAddonService();
 		const validateAddonCategoriesService =

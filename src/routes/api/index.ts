@@ -1,9 +1,10 @@
 import type { FastifyInstance } from "fastify";
-import { addressRoutes } from "./address/address.route.ts";
-import { authRoutes } from "./auth/auth.route.ts";
-import { couponRoutes } from "./coupon/coupon.route.ts";
-import { mainRoutes } from "./main/main.route.ts";
-import { orderRoutes } from "./order/order.route.ts";
+
+import { addressRoutes } from "./address/address.route.js";
+import { authRoutes } from "./auth/auth.route.js";
+import { couponRoutes } from "./coupon/coupon.route.js";
+import { mainRoutes } from "./main/main.route.js";
+import { orderRoutes } from "./order/order.route.js";
 
 export const apiRoutes = (app: FastifyInstance) => {
 	app.register(async api => {

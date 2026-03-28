@@ -1,21 +1,22 @@
-import { makeCheckCouponService } from "@/factories/services/coupon/make-check-coupon-service.ts";
-import { makeCreateCouponService } from "@/factories/services/coupon/make-create-coupon-service.ts";
-import { makeDeleteCouponService } from "@/factories/services/coupon/make-delete-coupon-service.ts";
-import { makeFindCouponService } from "@/factories/services/coupon/make-find-coupon-service.ts";
-import { makeListCouponService } from "@/factories/services/coupon/make-list-coupon-service.ts";
-import { makeUpdateCouponService } from "@/factories/services/coupon/make-update-coupon-service.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
+
+import { makeCheckCouponService } from "@/factories/services/coupon/make-check-coupon-service.js";
+import { makeCreateCouponService } from "@/factories/services/coupon/make-create-coupon-service.js";
+import { makeDeleteCouponService } from "@/factories/services/coupon/make-delete-coupon-service.js";
+import { makeFindCouponService } from "@/factories/services/coupon/make-find-coupon-service.js";
+import { makeListCouponService } from "@/factories/services/coupon/make-list-coupon-service.js";
+import { makeUpdateCouponService } from "@/factories/services/coupon/make-update-coupon-service.js";
+import { ApiResponse } from "@/helpers/api.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import {
 	checkCouponBodySchema,
 	couponParamsSchema,
 	createCouponBodySchema
-} from "@/schemas/coupon-schema.ts";
+} from "@/schemas/coupon-schema.js";
 import {
 	listQueryParamsSchema,
 	userIdSchema
-} from "@/schemas/generic-schema.ts";
-import type { FastifyReply, FastifyRequest } from "fastify";
+} from "@/schemas/generic-schema.js";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const { search, sortField, sortDirection, ...query } =

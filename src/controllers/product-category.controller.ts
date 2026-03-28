@@ -1,17 +1,18 @@
-import { makeCreateProductCategoryService } from "@/factories/services/product/category/make-create-product-category-service.ts";
-import { makeDeleteProductCategoryService } from "@/factories/services/product/category/make-delete-product-category-service.ts";
-import { makeFindProductCategoryService } from "@/factories/services/product/category/make-find-product-category-service.ts";
-import { makeListProductCategoryService } from "@/factories/services/product/category/make-list-product-category-service.ts";
-import { makeUpdateProductCategoryService } from "@/factories/services/product/category/make-update-product-category-service.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
-import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
+
+import { makeCreateProductCategoryService } from "@/factories/services/product/category/make-create-product-category-service.js";
+import { makeDeleteProductCategoryService } from "@/factories/services/product/category/make-delete-product-category-service.js";
+import { makeFindProductCategoryService } from "@/factories/services/product/category/make-find-product-category-service.js";
+import { makeListProductCategoryService } from "@/factories/services/product/category/make-list-product-category-service.js";
+import { makeUpdateProductCategoryService } from "@/factories/services/product/category/make-update-product-category-service.js";
+import { ApiResponse } from "@/helpers/api.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
 import {
 	createProductCategoryBodySchema,
 	productCategoryParamsSchema,
 	updateProductCategoryBodySchema
-} from "@/schemas/product-category-schema.ts";
-import type { FastifyReply, FastifyRequest } from "fastify";
+} from "@/schemas/product-category-schema.js";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const query = listQueryParamsSchema.parse(request.query);

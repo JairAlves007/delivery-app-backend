@@ -1,11 +1,12 @@
+import type { FastifyInstance } from "fastify";
+
 import {
 	forgotPassword,
 	resetPassword,
 	signIn,
 	signUp
-} from "@/controllers/user.controller.ts";
-import { RoleType } from "@/generated/prisma/client.ts";
-import type { FastifyInstance } from "fastify";
+} from "@/controllers/user.controller.js";
+import { RoleType } from "@/generated/prisma/client.js";
 
 export const authRoutes = async (app: FastifyInstance) => {
 	app.post("/sign-in", signIn([RoleType.CUSTOMER]));

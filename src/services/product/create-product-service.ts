@@ -1,9 +1,10 @@
-import { slugify } from "@/helpers/utils.ts";
-import type { IProductRepository } from "@/interfaces/repositories/product-repository.ts";
-import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.ts";
-import { createProductBodySchema } from "@/schemas/product-schema.ts";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.ts";
 import z from "zod";
+
+import { slugify } from "@/helpers/utils.js";
+import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { createProductBodySchema } from "@/schemas/product-schema.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type CreateProductServiceRequest = z.infer<typeof createProductBodySchema> &
 	Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
@@ -23,7 +24,7 @@ export class CreateProductService {
 		paramsToForget,
 		...data
 	}: CreateProductServiceRequest): Promise<void> {
-		const banners = !!bannerIds
+		const banners = bannerIds
 			? {
 					connect: bannerIds.map(bannerId => ({ id: bannerId }))
 				}

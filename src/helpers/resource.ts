@@ -1,17 +1,17 @@
-import { env } from "@/env.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
+import { env } from "@/env.js";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
 import {
 	FileFormatType,
 	ForObjectResourceType
-} from "@/generated/prisma/client.ts";
+} from "@/generated/prisma/client.js";
 import {
-	fileMimeTypeValues,
 	type FileMimeType,
+	fileMimeTypeValues,
 	type ObjectResources,
 	type ResourceInfo,
 	type ResourceIntent,
 	type ResourceItem
-} from "@/types/resource.ts";
+} from "@/types/resource.js";
 
 export const mapMimeTypeToFileFormat = (
 	mimeType: FileMimeType

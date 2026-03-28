@@ -1,17 +1,18 @@
-import { makeCreateAddonCategoryService } from "@/factories/services/addon/category/make-create-addon-category-service.ts";
-import { makeDeleteAddonCategoryService } from "@/factories/services/addon/category/make-delete-addon-category-service.ts";
-import { makeFindAddonCategoryService } from "@/factories/services/addon/category/make-find-addon-category-service.ts";
-import { makeListAddonCategoryService } from "@/factories/services/addon/category/make-list-addon-category-service.ts";
-import { makeUpdateAddonCategoryService } from "@/factories/services/addon/category/make-update-addon-category-service.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
+
+import { makeCreateAddonCategoryService } from "@/factories/services/addon/category/make-create-addon-category-service.js";
+import { makeDeleteAddonCategoryService } from "@/factories/services/addon/category/make-delete-addon-category-service.js";
+import { makeFindAddonCategoryService } from "@/factories/services/addon/category/make-find-addon-category-service.js";
+import { makeListAddonCategoryService } from "@/factories/services/addon/category/make-list-addon-category-service.js";
+import { makeUpdateAddonCategoryService } from "@/factories/services/addon/category/make-update-addon-category-service.js";
+import { ApiResponse } from "@/helpers/api.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import {
 	addonCategoryParamsSchema,
 	createAddonCategoryBodySchema,
 	updateAddonCategoryBodySchema
-} from "@/schemas/addon-category-schema.ts";
-import { listQueryParamsSchema } from "@/schemas/generic-schema.ts";
-import type { FastifyReply, FastifyRequest } from "fastify";
+} from "@/schemas/addon-category-schema.js";
+import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
 	const { search, sortField, sortDirection, ...query } =

@@ -1,21 +1,22 @@
-import { makeForgotPasswordService } from "@/factories/services/auth/make-forgot-password-service.ts";
-import { makeResetPasswordService } from "@/factories/services/auth/make-reset-password-service.ts";
-import { makeSignInService } from "@/factories/services/auth/make-sign-in-service.ts";
-import { makeSignUpService } from "@/factories/services/auth/make-sign-up-service.ts";
-import { makeFindEstablishmentByIdService } from "@/factories/services/establishment/make-find-establishment-by-id-service.ts";
-import { makeGetMenuService } from "@/factories/services/menu/make-get-menu-service.ts";
-import { RoleType } from "@/generated/prisma/client.ts";
-import { ApiResponse } from "@/helpers/api.ts";
-import Constants from "@/helpers/constants.ts";
-import { isEstablishmentOpen } from "@/helpers/establishment.ts";
-import { HTTPStatusCodes } from "@/helpers/http-request-codes.ts";
+import type { FastifyReply, FastifyRequest } from "fastify";
+
+import { makeForgotPasswordService } from "@/factories/services/auth/make-forgot-password-service.js";
+import { makeResetPasswordService } from "@/factories/services/auth/make-reset-password-service.js";
+import { makeSignInService } from "@/factories/services/auth/make-sign-in-service.js";
+import { makeSignUpService } from "@/factories/services/auth/make-sign-up-service.js";
+import { makeFindEstablishmentByIdService } from "@/factories/services/establishment/make-find-establishment-by-id-service.js";
+import { makeGetMenuService } from "@/factories/services/menu/make-get-menu-service.js";
+import { RoleType } from "@/generated/prisma/client.js";
+import { ApiResponse } from "@/helpers/api.js";
+import Constants from "@/helpers/constants.js";
+import { isEstablishmentOpen } from "@/helpers/establishment.js";
+import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import {
 	forgotPasswordBodySchema,
 	resetPasswordBodySchema,
 	signInBodySchema,
 	signUpBodySchema
-} from "@/schemas/auth-schema.ts";
-import type { FastifyReply, FastifyRequest } from "fastify";
+} from "@/schemas/auth-schema.js";
 
 export const signIn = (allowedRoles: RoleType[]) => {
 	return async (request: FastifyRequest, reply: FastifyReply) => {

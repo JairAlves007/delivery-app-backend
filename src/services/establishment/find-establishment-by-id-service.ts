@@ -1,10 +1,11 @@
-import { EstablishmentNotFound } from "@/errors/establishment/not-found-error.ts";
-import { makeCache } from "@/factories/services/cache/make-cache.ts";
-import { getFilterParamsCacheKey } from "@/helpers/crud.ts";
-import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.ts";
-import { establishmentParamsSchema } from "@/schemas/establishment-schema.ts";
-import type { EstablishmentFromRepository } from "@/types/establishment.ts";
 import z from "zod";
+
+import { EstablishmentNotFound } from "@/errors/establishment/not-found-error.js";
+import { makeCache } from "@/factories/services/cache/make-cache.js";
+import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
+import { establishmentParamsSchema } from "@/schemas/establishment-schema.js";
+import type { EstablishmentFromRepository } from "@/types/establishment.js";
 
 type FindEstablishmentByIdServiceRequest = z.infer<
 	typeof establishmentParamsSchema
