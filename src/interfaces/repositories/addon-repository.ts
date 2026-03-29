@@ -3,9 +3,9 @@ import type { AddonFromRepository } from "@/types/addon.js";
 
 import type { ICRUDBase } from "../crud-base.js";
 
-export interface IAddonRepository extends ICRUDBase<
+export type IAddonRepository = ICRUDBase<
 	AddonFromRepository,
 	Prisma.AddonCreateInput,
 	Prisma.AddonUpdateInput,
 	number
-> {}
+>;

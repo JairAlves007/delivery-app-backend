@@ -43,7 +43,7 @@ export class ValidateAddonCategoriesFromOrderService {
 
 		if (addonCategory.max_quantity) {
 			const quantity = orderAddonsValidated.reduce((acc, addon) => {
-				return (acc += addon.quantity);
+				return acc + addon.quantity;
 			}, 0);
 
 			if (quantity > addonCategory.max_quantity)

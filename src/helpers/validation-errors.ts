@@ -1,7 +1,7 @@
 import type { ZodError } from "zod";
 
 export const beautifyValidationErrors = (error: ZodError) => {
-	const result: Record<string, any> = {};
+	const result: Record<string, unknown> = {};
 
 	for (const issue of error.issues) {
 		const path = issue.path;
@@ -23,7 +23,7 @@ export const beautifyValidationErrors = (error: ZodError) => {
 			} else {
 				if (!current[stringKey]) current[stringKey] = {};
 
-				current = current[stringKey];
+				current = current[stringKey] as Record<string, unknown>;
 			}
 		});
 	}

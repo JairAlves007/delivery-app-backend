@@ -9,7 +9,7 @@ export class ApiResponse {
 		};
 	}
 
-	static error(error: Error, details?: any): ErrorResponse {
+	static error(error: Error, details?: unknown): ErrorResponse {
 		if (!details) {
 			details = {
 				error: {

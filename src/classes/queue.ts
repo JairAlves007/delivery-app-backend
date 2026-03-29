@@ -40,7 +40,7 @@ class BullMQProvider implements IQueueProvider {
 		});
 	}
 
-	async add<T = any>({ name, data, options }: IJob<T>): Promise<void> {
+	async add<T = unknown>({ name, data, options }: IJob<T>): Promise<void> {
 		await this.queue.add(name, data, options);
 	}
 
@@ -61,8 +61,8 @@ class BullMQProvider implements IQueueProvider {
 	}
 }
 
-export class BaseQueue<T = any> {
-	private static instances: Map<string, BaseQueue<any>> = new Map();
+export class BaseQueue<T = unknown> {
+	private static instances: Map<string, BaseQueue<unknown>> = new Map();
 	private provider: IQueueProvider;
 
 	private constructor(queueName: string) {

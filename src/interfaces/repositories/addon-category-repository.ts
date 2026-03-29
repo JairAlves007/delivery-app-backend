@@ -3,9 +3,9 @@ import type { AddonCategoryFromRepository } from "@/types/addon-category.js";
 
 import type { ICRUDBase } from "../crud-base.js";
 
-export interface IAddonCategoryRepository extends ICRUDBase<
+export type IAddonCategoryRepository = ICRUDBase<
 	AddonCategoryFromRepository,
 	Prisma.AddonCategoryCreateInput,
 	Prisma.AddonCategoryUpdateInput,
 	number
-> {}
+>;

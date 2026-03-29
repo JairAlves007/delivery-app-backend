@@ -33,34 +33,30 @@ export class GenerateSignedUrlForUploadService {
 	private async validateResourceRule({
 		resourceIntent
 	}: ValidateResourceRuleParams) {
-		try {
-			const cache = makeCache();
-			const key = `${cache.keys.resourceRules}_${resourceIntent.type}_${resourceIntent.for}_${resourceIntent.width}_${resourceIntent.height}_${resourceIntent.mimeType}`;
+		const cache = makeCache();
+		const key = `${cache.keys.resourceRules}_${resourceIntent.type}_${resourceIntent.for}_${resourceIntent.width}_${resourceIntent.height}_${resourceIntent.mimeType}`;
 
-			const resourceRule = await cache.rememberForever(
-				key,
-				async () =>
-					await this.resourceRepository.validateResourceRule({
-						resourceIntent
-					})
-			);
+		const resourceRule = await cache.rememberForever(
+			key,
+			async () =>
+				await this.resourceRepository.validateResourceRule({
+					resourceIntent
+				})
+		);
 
-			if (!resourceRule) throw new InvalidResource();
+		if (!resourceRule) throw new InvalidResource();
 
-			if (resourceRule.width !== resourceIntent.width)
-				throw new IncorrectResourceSize("width");
+		if (resourceRule.width !== resourceIntent.width)
+			throw new IncorrectResourceSize("width");
 
-			if (resourceRule.height !== resourceIntent.height)
-				throw new IncorrectResourceSize("height");
+		if (resourceRule.height !== resourceIntent.height)
+			throw new IncorrectResourceSize("height");
 
-			const isMimeTypeValid = resourceRule.availableFormats.some(
-				({ type }) => type === mapMimeTypeToFileFormat(resourceIntent.mimeType)
-			);
+		const isMimeTypeValid = resourceRule.availableFormats.some(
+			({ type }) => type === mapMimeTypeToFileFormat(resourceIntent.mimeType)
+		);
 
-			if (!isMimeTypeValid) throw new UnavailableResourceMimeType();
-		} catch (error) {
-			throw error;
-		}
+		if (!isMimeTypeValid) throw new UnavailableResourceMimeType();
 	}
 
 	async handle({
@@ -75,66 +71,59 @@ export class GenerateSignedUrlForUploadService {
 
 		const resourceIntent: ResourceIntent = resource;
 
-		try {
-			const resourcePromises = [];
+		const resourcePromises = [];
 
-			await this.validateResourceRule({
-				resourceIntent
-			});
+		await this.validateResourceRule({
+			resourceIntent
+		});
 
-			const { path, attachData } = getInfoByForResource(
-				resourceIntent,
-				objectId
-			);
+		const { path, attachData } = getInfoByForResource(resourceIntent, objectId);
 
-			const { signedUrl, fileKey } = await SignedUrl.createUploadSignedUrl(
-				path,
-				resourceIntent.mimeType
-			);
+		const { signedUrl, fileKey } = await SignedUrl.createUploadSignedUrl(
+			path,
+			resourceIntent.mimeType
+		);
 
-			const resourceInput = {
-				type: resourceIntent.type,
-				path,
-				file_key: fileKey,
-				establishment: {
-					connect: {
-						id: establishmentId
-					}
+		const resourceInput = {
+			type: resourceIntent.type,
+			path,
+			file_key: fileKey,
+			establishment: {
+				connect: {
+					id: establishmentId
 				}
-			};
+			}
+		};
 
-			const where = resourceId
-				? { id: resourceId }
-				: {
-						establishment_id_file_key: {
-							establishment_id: establishmentId,
-							file_key: fileKey
-						}
-					};
+		const where = resourceId
+			? { id: resourceId }
+			: {
+					establishment_id_file_key: {
+						establishment_id: establishmentId,
+						file_key: fileKey
+					}
+				};
 
-			resourcePromises.push(
-				this.resourceRepository.storeResource({
-					create: {
-						...resourceInput,
-						...attachData
-					},
-					update: {
-						...resourceInput
-					},
-					where
-				})
-			);
+		resourcePromises.push(
+			this.resourceRepository.storeResource({
+				create: {
+					...resourceInput,
+					...attachData
+				},
+				update: {
+					...resourceInput
+				},
+				where
+			})
+		);
 
-			resourcePromises.push(forgetCacheByForResource(resourceIntent.for));
+		resourcePromises.push(forgetCacheByForResource(resourceIntent.for));
 
-			await Promise.all(resourcePromises);
+		await Promise.all(resourcePromises);
 
-			return {
-				signedUrl,
-				fileKey
-			};
-		} catch (error) {
-			throw error;
-		}
+		return {
+			signedUrl,
+			fileKey
+		};
 	}
 }

@@ -18,12 +18,7 @@ import {
 } from "@/schemas/generic-schema.js";
 
 export const index = async (request: FastifyRequest, reply: FastifyReply) => {
-	const {
-		search = undefined,
-		sortField = undefined,
-		sortDirection = undefined,
-		...query
-	} = listCursorQueryParamsSchema.parse(request.query);
+	const query = listCursorQueryParamsSchema.parse(request.query);
 	const userId = userIdSchema.parse(request.user.sub);
 
 	try {

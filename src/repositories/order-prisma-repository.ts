@@ -175,8 +175,6 @@ export class OrderPrismaRepository implements IOrderRepository {
 		id,
 		filterParams
 	}: DeleteContentParams<string>): Promise<void> {
-		const params = transformValidFilterParams(filterParams);
-
 		await this.update({
 			id,
 			filterParams,

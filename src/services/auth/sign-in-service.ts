@@ -37,35 +37,29 @@ export class SignInService {
 		origin,
 		allowedRoles
 	}: SignInServiceRequest): Promise<SignInServiceResponse> {
-		try {
-			const user = await this.userRepository.findByEmail(email);
+		const user = await this.userRepository.findByEmail(email);
 
-			if (!user) throw new InvalidCredentials();
+		if (!user) throw new InvalidCredentials();
 
-			if (
-				user.role.name === RoleType.ESTABLISHMENT_OWNER &&
-				(!user.establishment || user.establishment.slug !== origin)
-			)
-				throw new InvalidEstablishment();
+		if (
+			user.role.name === RoleType.ESTABLISHMENT_OWNER &&
+			(!user.establishment || user.establishment.slug !== origin)
+		)
+			throw new InvalidEstablishment();
 
-			if (!allowedRoles.includes(user.role.name))
-				throw new InvalidCredentials();
+		if (!allowedRoles.includes(user.role.name)) throw new InvalidCredentials();
 
-			const doesPasswordMatches = await compare(password, user.password);
+		const doesPasswordMatches = await compare(password, user.password);
 
-			if (!doesPasswordMatches) throw new InvalidCredentials();
+		if (!doesPasswordMatches) throw new InvalidCredentials();
 
-			const establishment =
-				await this.establishmentRepository.findBySlug(origin);
+		const establishment = await this.establishmentRepository.findBySlug(origin);
 
-			if (!establishment) throw new InvalidEstablishment();
+		if (!establishment) throw new InvalidEstablishment();
 
-			return {
-				user,
-				establishmentId: establishment.id
-			};
-		} catch (error) {
-			throw error;
-		}
+		return {
+			user,
+			establishmentId: establishment.id
+		};
 	}
 }

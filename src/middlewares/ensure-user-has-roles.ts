@@ -6,14 +6,10 @@ import type { RoleType } from "@/generated/prisma/client.js";
 
 export const ensureUserHasRoles = (roles: RoleType[]) => {
 	return async (request: FastifyRequest) => {
-		try {
-			const user = request.user;
+		const user = request.user;
 
-			if (!user) throw new UserUnauthenticated();
+		if (!user) throw new UserUnauthenticated();
 
-			if (!roles.includes(user.role)) throw new UserUnauthorized();
-		} catch (error) {
-			throw error;
-		}
+		if (!roles.includes(user.role)) throw new UserUnauthorized();
 	};
 };

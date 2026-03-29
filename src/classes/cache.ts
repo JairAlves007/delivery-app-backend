@@ -14,7 +14,7 @@ export class Cache implements ICacheBase {
 		return this.instance;
 	}
 
-	async set(key: string, value: any, duration?: number) {
+	async set(key: string, value: unknown, duration?: number) {
 		try {
 			if (duration) {
 				await redis.set(key, JSON.stringify(value), "EX", duration);

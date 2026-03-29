@@ -15,19 +15,15 @@ export class GetUploadResourceRulesService {
 	async handle({
 		forObject
 	}: UploadResourceRulesParams): Promise<ResourceRuleFromRepository[]> {
-		try {
-			const cache = makeCache();
-			const key = `${cache.keys.resourceRules}_${forObject}`;
+		const cache = makeCache();
+		const key = `${cache.keys.resourceRules}_${forObject}`;
 
-			return await cache.rememberForever(
-				key,
-				async () =>
-					await this.resourceRepository.getUploadResourceRules({
-						forObject
-					})
-			);
-		} catch (error) {
-			throw error;
-		}
+		return await cache.rememberForever(
+			key,
+			async () =>
+				await this.resourceRepository.getUploadResourceRules({
+					forObject
+				})
+		);
 	}
 }

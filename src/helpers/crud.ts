@@ -10,7 +10,7 @@ export const transformValidFilterParams = (
 ): Partial<ValidFilterParams> => {
 	return Object.fromEntries(
 		Object.entries(filterParams || {}).filter(
-			([_, v]) => v !== null && v !== undefined
+			([, v]) => v !== null && v !== undefined
 		)
 	);
 };

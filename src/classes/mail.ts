@@ -26,27 +26,23 @@ export class Mail implements IMail {
 		to,
 		...data
 	}: ResetPasswordMailData): Promise<void> {
-		try {
-			const resetPasswordMail = join(
-				this.TEMPLATES_PATH,
-				"reset-password-mail.ejs"
-			);
+		const resetPasswordMail = join(
+			this.TEMPLATES_PATH,
+			"reset-password-mail.ejs"
+		);
 
-			const html = await renderFile(resetPasswordMail, data);
+		const html = await renderFile(resetPasswordMail, data);
 
-			const { error } = await mail.emails.send({
-				from,
-				subject: "Recuperação de senha",
-				to: "ajair2550@gmail.com",
-				html
-			});
+		const { error } = await mail.emails.send({
+			from,
+			subject: "Recuperação de senha",
+			to,
+			html
+		});
 
-			if (!error) return;
+		if (!error) return;
 
-			console.error(error);
-			throw new FailedToSendMail("Reset Password");
-		} catch (error) {
-			throw error;
-		}
+		console.error(error);
+		throw new FailedToSendMail("Reset Password");
 	}
 }

@@ -30,10 +30,10 @@ export class CalculateCouponDiscountFromOrderService {
 		let shippingCost = transformPriceFromDatabase(district?.shipping_cost ?? 0);
 		let subtotal = orderItemsToProcess.reduce((acc, item) => {
 			const addonsTotal = item.addons.reduce((acc, addon) => {
-				return (acc += addon.price * addon.quantity);
+				return acc + addon.price * addon.quantity;
 			}, 0);
 
-			return (acc += item.product.price * item.product.quantity + addonsTotal);
+			return acc + item.product.price * item.product.quantity + addonsTotal;
 		}, 0);
 		let couponDiscount = 0;
 
