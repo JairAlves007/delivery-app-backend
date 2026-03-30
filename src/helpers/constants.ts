@@ -40,6 +40,36 @@ export default class Constants {
 		orders: "orders"
 	};
 
+	/** Cache TTL em segundos, por domínio */
+	public static readonly CACHE_TTL = {
+		/** Pedidos mudam de status frequentemente — 2 min */
+		orders: 60 * 2,
+		/** Cupons podem expirar ou atingir limite de uso — 5 min */
+		coupons: 60 * 5,
+		/** Dados de usuário mudam moderadamente — 10 min */
+		users: 60 * 10,
+		/** Endereços pessoais — 15 min */
+		addresses: 60 * 15,
+		/** Produtos (preço/estoque) — 15 min */
+		products: 60 * 15,
+		/** Categorias de produto — 30 min */
+		productCategories: 60 * 30,
+		/** Banners de marketing — 30 min */
+		banners: 60 * 30,
+		/** Adicionais — 30 min */
+		addons: 60 * 30,
+		/** Categorias de adicionais — 30 min */
+		addonCategories: 60 * 30,
+		/** Dados de estabelecimento — 1 h */
+		establishments: 60 * 60,
+		/** Distritos/áreas de entrega — 1 h */
+		districts: 60 * 60,
+		/** Menus estruturais — 12 h */
+		menus: 60 * 60 * 12,
+		/** Regras de upload (schema) — 24 h */
+		resourceRules: 60 * 60 * 24
+	};
+
 	// Order
 	public static readonly ORDER_SUB_SECTIONS_MESSAGE_TEMPLATES: OrderSubSectionMessage =
 		{

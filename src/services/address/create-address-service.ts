@@ -2,6 +2,7 @@ import z from "zod";
 
 import { makeSetAllAddressesAsNotDefaultService } from "@/factories/services/address/user/make-set-all-addresses-as-not-default-service.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IAddressRepository } from "@/interfaces/repositories/address-repository.js";
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
@@ -32,8 +33,9 @@ export class CreateAddressService {
 		const prefixKey = getFilterParamsCacheKey({ user_id: userId });
 		const countKey = `${prefixKey}${cache.keys.addresses}`;
 
-		const count = await cache.rememberForever(
+		const count = await cache.remember(
 			countKey,
+			Constants.CACHE_TTL.addresses,
 			async () => await this.addressRepository.count({ user_id: userId })
 		);
 

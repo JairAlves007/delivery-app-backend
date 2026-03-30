@@ -2,6 +2,7 @@ import z from "zod";
 
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import type { Address } from "@/generated/prisma/client.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IAddressRepository } from "@/interfaces/repositories/address-repository.js";
 import { listCursorQueryParamsSchema } from "@/schemas/generic-schema.js";
@@ -35,8 +36,9 @@ export class ListAddressService {
 		const prefixKey = getFilterParamsCacheKey(filterParams);
 		const key = `${prefixKey}${cache.keys.addresses}_limit_${limit}${cursorSuffix}`;
 
-		const raw = await cache.rememberForever(
+		const raw = await cache.remember(
 			key,
+			Constants.CACHE_TTL.addresses,
 			async () =>
 				await this.addressRepository.cursorPaginate({
 					limit,

@@ -2,6 +2,7 @@ import z from "zod";
 
 import { AddonCategoryNotFound } from "@/errors/addon/category/not-found-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.js";
 import { addonParamsSchema } from "@/schemas/addon-schema.js";
@@ -27,8 +28,9 @@ export class FindAddonCategoryService {
 
 		const key = `${filterPrefixKey}${cache.keys.addonCategories}_${id}`;
 
-		const addonCategory = await cache.rememberForever(
+		const addonCategory = await cache.remember(
 			key,
+			Constants.CACHE_TTL.addonCategories,
 			async () =>
 				await this.addonCategoryRepository.findById({ id, filterParams })
 		);

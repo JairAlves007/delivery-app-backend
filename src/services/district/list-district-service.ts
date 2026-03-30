@@ -3,6 +3,7 @@ import z from "zod";
 import { InvalidPage } from "@/errors/pagination/invalid-page.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import type { District } from "@/generated/prisma/client.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { transformPriceFromDatabase } from "@/helpers/price.js";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.js";
@@ -45,8 +46,9 @@ export class ListDistrictService {
 		const prefixKey = getFilterParamsCacheKey(filterParams);
 
 		const isPaging = !!page;
-		const totalPromise = cache.rememberForever(
+		const totalPromise = cache.remember(
 			`${prefixKey}total_${cache.keys.districts}`,
+			Constants.CACHE_TTL.districts,
 			async () => await this.districtRepository.count(filterParams)
 		);
 
@@ -55,8 +57,9 @@ export class ListDistrictService {
 
 			const [total, districts] = await Promise.all([
 				totalPromise,
-				cache.rememberForever(
+				cache.remember(
 					key,
+					Constants.CACHE_TTL.districts,
 					async () =>
 						await this.districtRepository.paginate({
 							page,
@@ -84,8 +87,9 @@ export class ListDistrictService {
 
 		const [total, districts] = await Promise.all([
 			totalPromise,
-			cache.rememberForever(
+			cache.remember(
 				`${prefixKey}all_${cache.keys.districts}`,
+				Constants.CACHE_TTL.districts,
 				async () => await this.districtRepository.listAll(filterParams)
 			)
 		]);

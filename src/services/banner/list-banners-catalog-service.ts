@@ -1,6 +1,7 @@
 import z from "zod";
 
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.js";
@@ -40,8 +41,9 @@ export class ListBannersCatalogService {
 		});
 		const key = `${prefixKey}all_${cache.keys.banners}`;
 
-		const banners = await cache.rememberForever(
+		const banners = await cache.remember(
 			key,
+			Constants.CACHE_TTL.banners,
 			async () =>
 				await this.bannerRepository.listAll({
 					establishment_id: establishmentId

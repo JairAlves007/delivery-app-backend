@@ -3,6 +3,7 @@ import z from "zod";
 import { InvalidPage } from "@/errors/pagination/invalid-page.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import type { Coupon } from "@/generated/prisma/client.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
@@ -37,8 +38,9 @@ export class ListCouponService {
 		const prefixKey = getFilterParamsCacheKey(filterParams);
 
 		const isPaging = !!page;
-		const totalPromise = cache.rememberForever(
+		const totalPromise = cache.remember(
 			`${prefixKey}total_${cache.keys.coupons}`,
+			Constants.CACHE_TTL.coupons,
 			async () => await this.couponRepository.count(filterParams)
 		);
 
@@ -47,8 +49,9 @@ export class ListCouponService {
 
 			const [total, coupons] = await Promise.all([
 				totalPromise,
-				cache.rememberForever(
+				cache.remember(
 					key,
+					Constants.CACHE_TTL.coupons,
 					async () =>
 						await this.couponRepository.paginate({
 							page,
@@ -76,8 +79,9 @@ export class ListCouponService {
 
 		const [total, coupons] = await Promise.all([
 			totalPromise,
-			cache.rememberForever(
+			cache.remember(
 				`${prefixKey}all_${cache.keys.coupons}`,
+				Constants.CACHE_TTL.coupons,
 				async () => await this.couponRepository.listAll(filterParams)
 			)
 		]);

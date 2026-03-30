@@ -2,6 +2,7 @@ import z from "zod";
 
 import { AddressNotFound } from "@/errors/address/not-found-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IAddressRepository } from "@/interfaces/repositories/address-repository.js";
 import { addressParamsSchema } from "@/schemas/address-schema.js";
@@ -26,8 +27,9 @@ export class FindAddressService {
 		const filterPrefixKey = getFilterParamsCacheKey(filterParams);
 		const key = `${filterPrefixKey}${cache.keys.addresses}_${id}`;
 
-		const address = await cache.rememberForever(
+		const address = await cache.remember(
 			key,
+			Constants.CACHE_TTL.addresses,
 			async () => await this.addressRepository.findById({ id, filterParams })
 		);
 

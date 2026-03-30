@@ -2,6 +2,7 @@ import z from "zod";
 
 import { AddonNotFound } from "@/errors/addon/not-found-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.js";
 import { addonParamsSchema } from "@/schemas/addon-schema.js";
@@ -26,8 +27,9 @@ export class FindAddonService {
 
 		const key = `${filterPrefixKey}${cache.keys.addons}_${id}`;
 
-		const addon = await cache.rememberForever(
+		const addon = await cache.remember(
 			key,
+			Constants.CACHE_TTL.addons,
 			async () => await this.addonRepository.findById({ id, filterParams })
 		);
 

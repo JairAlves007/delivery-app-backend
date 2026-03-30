@@ -2,6 +2,7 @@ import z from "zod";
 
 import { InvalidPage } from "@/errors/pagination/invalid-page.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.js";
@@ -47,8 +48,9 @@ export class ListBannerService {
 		const prefixKey = getFilterParamsCacheKey(filterParams);
 
 		const isPaging = !!page;
-		const totalPromise = cache.rememberForever(
+		const totalPromise = cache.remember(
 			`${prefixKey}total_${cache.keys.banners}`,
+			Constants.CACHE_TTL.banners,
 			async () => await this.bannerRepository.count(filterParams)
 		);
 
@@ -57,8 +59,9 @@ export class ListBannerService {
 
 			const [total, banners] = await Promise.all([
 				totalPromise,
-				cache.rememberForever(
+				cache.remember(
 					key,
+					Constants.CACHE_TTL.banners,
 					async () =>
 						await this.bannerRepository.paginate({
 							page,
@@ -86,8 +89,9 @@ export class ListBannerService {
 
 		const [total, banners] = await Promise.all([
 			totalPromise,
-			cache.rememberForever(
+			cache.remember(
 				`${prefixKey}all_${cache.keys.banners}`,
+				Constants.CACHE_TTL.banners,
 				async () => await this.bannerRepository.listAll()
 			)
 		]);

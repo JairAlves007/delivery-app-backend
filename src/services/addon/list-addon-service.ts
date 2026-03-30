@@ -3,6 +3,7 @@ import z from "zod";
 import { InvalidPage } from "@/errors/pagination/invalid-page.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import type { Addon } from "@/generated/prisma/client.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { transformPriceFromDatabase } from "@/helpers/price.js";
 import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.js";
@@ -45,8 +46,9 @@ export class ListAddonService {
 		const prefixKey = getFilterParamsCacheKey(filterParams);
 
 		const isPaging = !!page;
-		const totalPromise = cache.rememberForever(
+		const totalPromise = cache.remember(
 			`${prefixKey}total_${cache.keys.addons}`,
+			Constants.CACHE_TTL.addons,
 			async () => await this.addonRepository.count(filterParams)
 		);
 
@@ -54,8 +56,9 @@ export class ListAddonService {
 			const key = `${prefixKey}${cache.keys.addons}_page_${page}_per_page_${perPage}`;
 			const [total, addons] = await Promise.all([
 				totalPromise,
-				cache.rememberForever(
+				cache.remember(
 					key,
+					Constants.CACHE_TTL.addons,
 					async () =>
 						await this.addonRepository.paginate({
 							page,
@@ -83,8 +86,9 @@ export class ListAddonService {
 
 		const [total, addons] = await Promise.all([
 			totalPromise,
-			cache.rememberForever(
+			cache.remember(
 				`${prefixKey}all_${cache.keys.addons}`,
+				Constants.CACHE_TTL.addons,
 				async () => await this.addonRepository.listAll(filterParams)
 			)
 		]);
