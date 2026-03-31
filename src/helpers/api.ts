@@ -1,7 +1,7 @@
 import type { ErrorResponse, SuccessResponse } from "@/types/response.js";
 
 export class ApiResponse {
-	static success<T>(message: string, details?: T): SuccessResponse {
+	static success<T>(message: string, details?: T): SuccessResponse<T> {
 		return {
 			success: true,
 			message,

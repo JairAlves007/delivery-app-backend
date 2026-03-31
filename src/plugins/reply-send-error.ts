@@ -1,5 +1,6 @@
 import type { FastifyPluginAsync } from "fastify";
 import fp from "fastify-plugin";
+import { hasZodFastifySchemaValidationErrors } from "fastify-type-provider-zod";
 import { ZodError } from "zod";
 
 import { env } from "@/env.js";
@@ -27,6 +28,19 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 			return this.status(HTTPStatusCodes.UNPROCESSABLE_ENTITY).send(
 				ApiResponse.error(error, beautifyValidationErrors(error))
 			);
+		}
+
+		if (hasZodFastifySchemaValidationErrors(error)) {
+			return this.status(HTTPStatusCodes.UNPROCESSABLE_ENTITY).send({
+				success: false,
+				code: "VALIDATION_ERROR",
+				details: {
+					error: {
+						message: "Erro de validação dos dados",
+						issues: error.validation
+					}
+				}
+			});
 		}
 
 		if (error instanceof ErrorBase) {

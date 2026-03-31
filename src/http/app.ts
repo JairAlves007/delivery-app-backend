@@ -1,6 +1,13 @@
 import fastifyCors from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
+import fastifySwagger from "@fastify/swagger";
+import fastifySwaggerUi from "@fastify/swagger-ui";
 import fastify from "fastify";
+import {
+	jsonSchemaTransform,
+	serializerCompiler,
+	validatorCompiler
+} from "fastify-type-provider-zod";
 
 import { env } from "@/env.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
@@ -19,6 +26,33 @@ const app = fastify({
 			}
 		}
 	}
+});
+
+app.setValidatorCompiler(validatorCompiler);
+app.setSerializerCompiler(serializerCompiler);
+
+app.register(fastifySwagger, {
+	openapi: {
+		info: {
+			title: "Food Delivery API",
+			description: "Documentação da API do micro serviço de Delivery",
+			version: "1.0.0"
+		},
+		components: {
+			securitySchemes: {
+				bearerAuth: {
+					type: "http",
+					scheme: "bearer",
+					bearerFormat: "JWT"
+				}
+			}
+		}
+	},
+	transform: jsonSchemaTransform
+});
+
+app.register(fastifySwaggerUi, {
+	routePrefix: "/docs"
 });
 
 app.register(fastifyCors, {

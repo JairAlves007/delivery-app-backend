@@ -1,16 +1,16 @@
 import type { FastifyInstance } from "fastify";
 
-import { adminAddonRoutes } from "./addon/addon.route.js";
-import { adminAddonCategoryRoutes } from "./addon/category/addon-category.route.js";
-import { adminAuthRoutes } from "./auth/auth.route.js";
-import { adminBannerRoutes } from "./banner/banner.route.js";
-import { adminCouponRoutes } from "./coupon/coupon.route.js";
-import { adminDistrictRoutes } from "./district/district.route.js";
-import { establishmentRoutes } from "./establishment/establishment.route.js";
-import { adminOrderRoutes } from "./order/order.route.js";
-import { adminProductCategoryRoutes } from "./product/category/category.route.js";
-import { adminProductRoutes } from "./product/product.route.js";
-import { uploadRoutes } from "./upload/upload.route.js";
+import { adminAddonCategoryRoutes } from "./addon/category/index.js";
+import { adminAddonRoutes } from "./addon/index.js";
+import { adminAuthRoutes } from "./auth/index.js";
+import { adminBannerRoutes } from "./banner/index.js";
+import { adminCouponRoutes } from "./coupon/index.js";
+import { adminDistrictRoutes } from "./district/index.js";
+import { establishmentRoutes } from "./establishment/index.js";
+import { adminOrderRoutes } from "./order/index.js";
+import { adminProductCategoryRoutes } from "./product/category/index.js";
+import { adminProductRoutes } from "./product/index.js";
+import { uploadRoutes } from "./upload/index.js";
 
 export const adminRoutes = (app: FastifyInstance) => {
 	app.register(
