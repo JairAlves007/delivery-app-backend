@@ -6,21 +6,31 @@ export const signInBodySchema = z.object({
 	email: userEmailSchema,
 	password: z
 		.string("A senha deve ser preenchida")
-		.min(6, "A senha deve ter no mínimo 6 caracteres"),
+		.min(6, "A senha deve ter no mínimo 6 caracteres")
+		.max(128, "A senha deve ter no máximo 128 caracteres"),
 	origin: z
 		.string("A origem deve ser preenchida")
+		.trim()
 		.min(1, "A origem deve ser preenchida")
+		.max(255)
 });
 
 export const signUpBodySchema = z.object({
-	name: z.string("O nome deve ser preenchido"),
+	name: z
+		.string("O nome deve ser preenchido")
+		.trim()
+		.min(1, "O nome deve ser preenchido")
+		.max(255),
 	email: userEmailSchema,
 	origin: z
 		.string("A origem deve ser preenchida")
-		.min(1, "A origem deve ser preenchida"),
+		.trim()
+		.min(1, "A origem deve ser preenchida")
+		.max(255),
 	password: z
 		.string("A senha deve ser preenchida")
 		.min(6, "A senha deve ter no mínimo 6 caracteres")
+		.max(128, "A senha deve ter no máximo 128 caracteres")
 });
 
 export const forgotPasswordBodySchema = z.object({
@@ -30,6 +40,10 @@ export const forgotPasswordBodySchema = z.object({
 export const resetPasswordBodySchema = z.object({
 	newPassword: z
 		.string("A senha deve ser preenchida")
-		.min(6, "A senha deve ter no mínimo 6 caracteres"),
-	token: z.string("O token deve ser preenchido")
+		.min(6, "A senha deve ter no mínimo 6 caracteres")
+		.max(128, "A senha deve ter no máximo 128 caracteres"),
+	token: z
+		.string("O token deve ser preenchido")
+		.min(1, "O token deve ser preenchido")
+		.max(255)
 });

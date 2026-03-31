@@ -202,6 +202,7 @@ export class BannerPrismaRepository implements IBannerRepository {
 					...params
 				}
 			});
+			return;
 		}
 
 		await this.update({

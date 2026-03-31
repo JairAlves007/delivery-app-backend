@@ -5,7 +5,7 @@ import { BannerLinkType } from "@/generated/prisma/client.js";
 import { establishmentIdSchema } from "./generic-schema.js";
 
 const createBannerBodyBaseSchema = z.object({
-	name: z.string().min(1, "O nome deve ser preenchido"),
+	name: z.string().trim().min(1, "O nome deve ser preenchido").max(255),
 	linkType: z.enum(BannerLinkType, "Tipo de link inválido"),
 	productId: z.ulid("ID do produto inválido").nullable().optional(),
 	categoryId: z.ulid("ID da categoria inválido").nullable().optional(),
@@ -41,5 +41,6 @@ export const updateBannerBodySchema = createBannerBodyBaseSchema
 export const bannerParamsSchema = z.object({
 	id: z.coerce
 		.number("O id deve ser preenchido")
+		.int()
 		.min(1, "O id deve ser maior que zero")
 });

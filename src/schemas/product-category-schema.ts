@@ -3,13 +3,14 @@ import z from "zod";
 import { establishmentIdSchema } from "./generic-schema.js";
 
 export const createProductCategoryBodySchema = z.object({
-	name: z.string().min(1, "O nome deve ser preenchido"),
+	name: z.string().trim().min(1, "O nome deve ser preenchido").max(255),
 	order: z.coerce
 		.number()
-		.min(0, "A ordem deve ser maior que zero")
+		.int("A ordem deve ser um número inteiro")
+		.min(0, "A ordem deve ser maior ou igual a zero")
 		.optional()
 		.nullable(),
-	bannerIds: z.array(z.coerce.number()).optional(),
+	bannerIds: z.array(z.coerce.number().int().positive()).optional(),
 	establishmentId: establishmentIdSchema
 });
 
@@ -20,5 +21,5 @@ export const updateProductCategoryBodySchema = createProductCategoryBodySchema
 	});
 
 export const productCategoryParamsSchema = z.object({
-	id: z.ulid().min(1, "O id do estabelecimento deve ser preenchido")
+	id: z.ulid().min(1, "O id da categoria deve ser preenchido")
 });

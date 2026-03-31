@@ -6,6 +6,7 @@ import { makeCancelOrderFromCustomerService } from "@/factories/services/order/m
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { ensureIsResourceOwner } from "@/middlewares/ensure-is-resource-owner.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
@@ -39,7 +40,8 @@ export const cancelOrderRoute = async (app: FastifyInstance) => {
 			},
 			onRequest: [
 				isAuthenticated,
-				ensureUserHasPermission([PermissionType.MANAGE_OWN_ORDERS])
+				ensureUserHasPermission([PermissionType.MANAGE_OWN_ORDERS]),
+				ensureIsResourceOwner("order")
 			]
 		},
 		async (request, reply) => {

@@ -11,19 +11,21 @@ export const establishmentParamsSchema = z.object({
 });
 
 export const establishmentSlugSchema = z.object({
-	slug: z.string().min(1, "O slug deve ser preenchido")
+	slug: z.string().trim().min(1, "O slug deve ser preenchido").max(255)
 });
 
 export const searchAndOrderBySchema = z.object({
 	search: z
 		.string()
-		// .min(1, "O filtro de busca deve ser preenchido")
+		.trim()
+		.max(255)
 		.transform(val => val.toLowerCase())
 		.optional()
 		.nullable(),
 	sortField: z
 		.string()
-		// .min(1, "O campo de ordenação deve ser preenchido")
+		.trim()
+		.max(100)
 		.transform(val => val.toLowerCase())
 		.optional()
 		.nullable(),
@@ -35,12 +37,12 @@ export const searchAndOrderBySchema = z.object({
 });
 
 export const listQueryParamsSchema = searchAndOrderBySchema.extend({
-	page: z.coerce.number().min(1, "Pagina inválida").optional(),
-	perPage: z.coerce.number().min(1, "Limite inválido").default(12)
+	page: z.coerce.number().int().min(1, "Pagina inválida").optional(),
+	perPage: z.coerce.number().int().min(1, "Limite inválido").default(12)
 });
 
 export const listCursorQueryParamsSchema = searchAndOrderBySchema.extend({
-	limit: z.coerce.number().min(1, "Limite inválido").default(12),
+	limit: z.coerce.number().int().min(1, "Limite inválido").default(12),
 	cursor: z.ulid("Cursor inválido").nullable().optional()
 });
 
@@ -50,38 +52,51 @@ export const userIdSchema = z
 
 export const userEmailSchema = z
 	.email("Endereço de e-mail inválido")
-	.min(1, "Endereço de e-mail inválido");
+	.min(1, "Endereço de e-mail inválido")
+	.max(320);
 
 export const phoneSchema = z
 	.string()
 	.min(1, "O telefone deve ser preenchido")
+	.max(20, "Telefone inválido")
 	.regex(Constants.PHONE_REGEX, "Telefone inválido")
 	.transform(val => val.replace(/\D/g, ""));
 
 export const addressLocationSchema = z.object({
-	city: z.string().min(1, "A cidade deve ser preenchida"),
-	state: z.string().min(1, "O estado deve ser preenchido"),
-	neighborhood: z.string().min(1, "O bairro deve ser preenchido"),
-	street: z.string().min(1, "A rua deve ser preenchida"),
+	city: z.string().trim().min(1, "A cidade deve ser preenchida").max(255),
+	state: z.string().trim().min(1, "O estado deve ser preenchido").max(255),
+	neighborhood: z
+		.string()
+		.trim()
+		.min(1, "O bairro deve ser preenchido")
+		.max(255),
+	street: z.string().trim().min(1, "A rua deve ser preenchida").max(255),
 	phone: phoneSchema,
 	number: z
 		.string()
+		.trim()
 		.min(1, "O número deve ser preenchido")
+		.max(20)
 		.default("N/A")
 		.optional()
 		.nullable(),
 	postalCode: z
 		.string()
+		.max(10, "CEP inválido")
 		.regex(Constants.POSTAL_CODE_REGEX, "CEP inválido")
 		.transform(val => val.replace(/\D/g, "")),
 	complement: z
 		.string()
+		.trim()
 		.min(1, "O complemento deve ser preenchido")
+		.max(500)
 		.optional()
 		.nullable(),
 	referencePoint: z
 		.string()
+		.trim()
 		.min(1, "O ponto de referência deve ser preenchido")
+		.max(500)
 		.optional()
 		.nullable(),
 	latitude: z.number("A latitude deve ser preenchida").optional().nullable(),

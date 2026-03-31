@@ -6,7 +6,9 @@ const envSchema = z.object({
 	NODE_ENV: z.enum(["development", "production"]).default("development"),
 	PORT: z.coerce.number().default(3333),
 	BASE_URL: z.url("Base url is required").default("http://localhost:3333"),
-	CORS_ORIGIN: z.string().default("*"),
+	ALLOWED_ORIGINS: z
+		.string()
+		.default("https://app.delivery.com.br,https://admin.delivery.com.br"),
 	PUBLIC_BUCKET_URL: z
 		.url("Public bucket url is required")
 		.min(1, "Public bucket url is required"),
@@ -15,7 +17,7 @@ const envSchema = z.object({
 	DATABASE_USER: z.string().min(1, "Database user is required"),
 	DATABASE_PASSWORD: z.string().min(1, "Database password is required"),
 	DATABASE_NAME: z.string().min(1, "Database name is required"),
-	JWT_SECRET: z.string().min(1, "JWT secret is required"),
+	JWT_SECRET: z.string().min(32, "JWT secret must be at least 32 characters"),
 	CLOUDFLARE_ENDPOINT: z.url("Cloudflare endpoint is required"),
 	CLOUDFLARE_ACCESS_KEY_ID: z
 		.string()

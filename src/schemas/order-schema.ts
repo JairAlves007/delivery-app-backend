@@ -24,12 +24,15 @@ export const createOrderBodySchema = z
 			.nullable(),
 		couponId: z.coerce
 			.number("O cupom deve ser preenchido")
+			.int()
 			.min(1, "O cupom deve ser preenchido")
 			.optional()
 			.nullable(),
 		comment: z
 			.string("O comentário deve ser preenchido")
+			.trim()
 			.min(1, "O comentário deve ser preenchido")
+			.max(500, "O comentário deve ter no máximo 500 caracteres")
 			.optional()
 			.nullable(),
 		paymentMethod: z.enum(
@@ -39,7 +42,8 @@ export const createOrderBodySchema = z
 		deliveryType: z.enum(DeliveryType, "O tipo de entrega deve ser preenchido"),
 		changeAmount: z.coerce
 			.number()
-			.min(0, "O troco deve ser maior que zero")
+			.int()
+			.min(0, "O troco deve ser maior ou igual a zero")
 			.optional()
 			.nullable(),
 		items: z.array(
@@ -49,20 +53,24 @@ export const createOrderBodySchema = z
 					.min(1, "O id deve ser maior que zero"),
 				quantity: z
 					.number("A quantidade deve ser preenchida")
+					.int("A quantidade deve ser um número inteiro")
 					.min(1, "A quantidade deve ser maior que zero"),
 				addonCategories: z
 					.array(
 						z.object({
 							id: z.coerce
 								.number("O id deve ser preenchido")
+								.int()
 								.min(1, "O id deve ser maior que zero"),
 							addons: z.array(
 								z.object({
 									id: z.coerce
 										.number("O id deve ser preenchido")
+										.int()
 										.min(1, "O id deve ser maior que zero"),
 									quantity: z
 										.number("A quantidade deve ser preenchida")
+										.int()
 										.min(1, "A quantidade deve ser maior que zero")
 										.default(1)
 								})

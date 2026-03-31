@@ -5,14 +5,20 @@ import { checkIfCNPJIsValid } from "@/helpers/validation-errors.js";
 import { addressLocationSchema } from "./generic-schema.js";
 
 export const createEstablishmentBodySchema = z.object({
-	name: z.string().min(1, "O nome deve ser preenchido"),
+	name: z.string().trim().min(1, "O nome deve ser preenchido").max(255),
 	address: addressLocationSchema,
-	description: z.string().min(1, "A descrição deve ser preenchida"),
+	description: z
+		.string()
+		.trim()
+		.min(1, "A descrição deve ser preenchida")
+		.max(1000, "A descrição deve ter no máximo 1000 caracteres"),
 	email: z
 		.email("Endereço de e-mail inválido")
-		.min(1, "O e-mail deve ser preenchido"),
+		.min(1, "O e-mail deve ser preenchido")
+		.max(320),
 	cnpj: z
 		.string()
+		.max(18, "CNPJ inválido")
 		.transform(val => val.replace(/\D/g, ""))
 		.refine(val => checkIfCNPJIsValid(val), {
 			message: "CNPJ inválido"

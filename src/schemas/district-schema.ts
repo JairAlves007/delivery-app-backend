@@ -5,10 +5,11 @@ import { transformPriceToDatabase } from "@/helpers/price.js";
 import { establishmentIdSchema } from "./generic-schema.js";
 
 export const createDistrictBodySchema = z.object({
-	name: z.string().min(1, "O nome deve ser preenchido"),
+	name: z.string().trim().min(1, "O nome deve ser preenchido").max(255),
 	shippingCost: z.coerce
 		.number("O custo de entrega deve ser preenchido")
-		.min(0, "O custo de entrega deve ser maior que zero")
+		.min(0, "O custo de entrega deve ser maior ou igual a zero")
+		.finite()
 		.transform(val => transformPriceToDatabase(val)),
 	establishmentId: establishmentIdSchema
 });

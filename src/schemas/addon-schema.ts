@@ -3,11 +3,11 @@ import z from "zod";
 import { transformPriceToDatabase } from "@/helpers/price.js";
 
 export const createAddonBodySchema = z.object({
-	name: z.string().min(1, "O nome deve ser preenchido"),
-	categoryId: z.coerce.number("O id da categoria deve ser preenchido"),
+	name: z.string().trim().min(1, "O nome deve ser preenchido").max(255),
+	categoryId: z.coerce.number("O id da categoria deve ser preenchido").int(),
 	price: z.coerce
 		.number("O preço deve ser preenchido")
-		.min(0, "O preço deve ser maior que zero")
+		.min(0, "O preço deve ser maior ou igual a zero")
 		.transform(val => transformPriceToDatabase(val))
 });
 

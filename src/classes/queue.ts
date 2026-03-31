@@ -7,6 +7,7 @@ import {
 } from "bullmq";
 
 import { env } from "@/env.js";
+import { app } from "@/http/app.js";
 import type { IJob, IQueueProvider } from "@/interfaces/queue/queue-base.js";
 
 class BullMQProvider implements IQueueProvider {
@@ -24,7 +25,7 @@ class BullMQProvider implements IQueueProvider {
 	private defaultJobOptions: DefaultJobOptions = {
 		attempts: 3,
 		removeOnComplete: true,
-		removeOnFail: true,
+		removeOnFail: { count: 30 },
 		backoff: {
 			type: "exponential",
 			delay: 1000
@@ -50,13 +51,14 @@ class BullMQProvider implements IQueueProvider {
 		});
 
 		this.worker.on("failed", (job, error) => {
-			console.error(
+			app.log.error(
+				{ error },
 				`[Queue] Job ${job?.id} failed with message: ${error.message}`
 			);
 		});
 
 		this.worker.on("error", error => {
-			console.error("[Queue] Worker error:", error);
+			app.log.error({ error }, "[Queue] Worker error:");
 		});
 	}
 }

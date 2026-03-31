@@ -21,6 +21,7 @@ export class OrderPrismaRepository implements IOrderRepository {
 				deleted_at: null,
 				...params
 			},
+			take: 200,
 			include: {
 				coupon: true,
 				items: true,

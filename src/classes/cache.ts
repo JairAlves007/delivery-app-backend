@@ -1,5 +1,6 @@
 import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import { app } from "@/http/app.js";
 import type { ICacheBase } from "@/interfaces/cache/cache-base.js";
 import { redis } from "@/lib/redis.js";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
@@ -23,7 +24,7 @@ export class Cache implements ICacheBase {
 
 			await redis.set(key, JSON.stringify(value));
 		} catch (error) {
-			console.error(`Error setting ${key} in cache:`, error);
+			app.log.error({ error }, `Error setting ${key} in cache`);
 			throw error;
 		}
 	}
@@ -36,7 +37,7 @@ export class Cache implements ICacheBase {
 
 			return JSON.parse(value) as T;
 		} catch (error) {
-			console.error(`Error getting ${key} from cache:`, error);
+			app.log.error({ error }, `Error getting ${key} from cache`);
 			throw error;
 		}
 	}
@@ -45,7 +46,7 @@ export class Cache implements ICacheBase {
 		try {
 			await redis.del(key);
 		} catch (error) {
-			console.error(`Error forgetting ${key} from cache:`, error);
+			app.log.error({ error }, `Error forgetting ${key} from cache`);
 			throw error;
 		}
 	}
@@ -54,7 +55,7 @@ export class Cache implements ICacheBase {
 		try {
 			await redis.flushall();
 		} catch (error) {
-			console.error("Error flushing cache:", error);
+			app.log.error({ error }, "Error flushing cache");
 			throw error;
 		}
 	}
@@ -76,9 +77,9 @@ export class Cache implements ICacheBase {
 				if (keys.length > 0) await redis.del(...keys);
 			} while (cursor !== "0");
 		} catch (error) {
-			console.error(
-				`Error forgetting keys containing ${key} from cache:`,
-				error
+			app.log.error(
+				{ error },
+				`Error forgetting keys containing ${key} from cache`
 			);
 			throw error;
 		}
@@ -98,7 +99,7 @@ export class Cache implements ICacheBase {
 
 			return value;
 		} catch (error) {
-			console.error(`Error setting ${key} in cache:`, error);
+			app.log.error({ error }, `Error setting ${key} in cache`);
 			throw error;
 		}
 	}
@@ -118,9 +119,9 @@ export class Cache implements ICacheBase {
 
 			return value;
 		} catch (error) {
-			console.error(
-				`Error setting ${key} in cache with duration ${duration}:`,
-				error
+			app.log.error(
+				{ error },
+				`Error setting ${key} in cache with duration ${duration}`
 			);
 			throw error;
 		}

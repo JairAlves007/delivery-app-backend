@@ -5,6 +5,7 @@ import { makeFindAddressService } from "@/factories/services/address/make-find-a
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { ensureIsResourceOwner } from "@/middlewares/ensure-is-resource-owner.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import { addressParamsSchema } from "@/schemas/address-schema.js";
@@ -34,7 +35,8 @@ export const findAddressRoute = async (app: FastifyInstance) => {
 			},
 			onRequest: [
 				isAuthenticated,
-				ensureUserHasPermission([PermissionType.MANAGE_OWN_ADDRESSES])
+				ensureUserHasPermission([PermissionType.MANAGE_OWN_ADDRESSES]),
+				ensureIsResourceOwner("address")
 			]
 		},
 		async (request, reply) => {

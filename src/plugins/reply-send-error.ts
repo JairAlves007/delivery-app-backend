@@ -20,7 +20,7 @@ declare module "fastify" {
 const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 	fastify.decorateReply("sendError", function (error: unknown) {
 		if (env.NODE_ENV !== "production")
-			console.error("Unexpected error:", error);
+			fastify.log.error(error, "Unexpected error");
 
 		if (error instanceof ZodError) {
 			error.name = "VALIDATION_ERROR";
@@ -53,7 +53,7 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 			code: "UNKNOWN_ERROR",
 			details: {
 				error: {
-					message: "A unexpected error has occurred"
+					message: "Ocorreu um erro inesperado. Tente novamente mais tarde."
 				}
 			}
 		};
@@ -63,13 +63,11 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 
 			switch (error.code) {
 				case "P2002": {
-					const target = error.meta?.target as string[];
-					const fields = target.join(", ");
-
 					errorCode = HTTPStatusCodes.CONFLICT;
 					errorResponse.details = {
 						error: {
-							message: `Já existe dados com este(s) campo(s): ${fields}`
+							message:
+								"Este registro já existe. Verifique os dados e tente novamente."
 						}
 					};
 					break;
@@ -91,8 +89,15 @@ const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
 		if (error instanceof Error) {
 			error.name = "INTERNAL_SERVER";
 
+			const safeError =
+				env.NODE_ENV === "production"
+					? new Error("Ocorreu um erro inesperado. Tente novamente mais tarde.")
+					: error;
+
+			safeError.name = "INTERNAL_SERVER";
+
 			return this.status(HTTPStatusCodes.INTERNAL_SERVER_ERROR).send(
-				ApiResponse.error(error)
+				ApiResponse.error(safeError)
 			);
 		}
 

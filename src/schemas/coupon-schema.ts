@@ -6,10 +6,12 @@ import { establishmentIdSchema } from "./generic-schema.js";
 
 const createCouponBodyBaseSchema = z.object({
 	type: z.enum(CouponType, "Tipo de cupom inválido"),
-	value: z.coerce.number().min(1, "O valor deve ser maior que zero"),
+	value: z.coerce.number().positive("O valor deve ser maior que zero").finite(),
 	code: z
 		.string()
+		.trim()
 		.min(1, "O código deve ser preenchido")
+		.max(50, "O código deve ter no máximo 50 caracteres")
 		.transform(val => val.toUpperCase()),
 	discountType: z.enum(DiscountType, "Tipo de desconto inválido"),
 	startsAt: z.coerce
@@ -22,10 +24,12 @@ const createCouponBodyBaseSchema = z.object({
 		.nullable(),
 	maxUses: z.coerce
 		.number()
+		.int("O uso máximo deve ser um número inteiro")
 		.min(1, "O uso máximo deve ser maior que zero")
 		.nullable(),
 	usesPerUser: z.coerce
 		.number()
+		.int("O uso por usuário deve ser um número inteiro")
 		.min(1, "O uso por usuário deve ser maior que zero")
 		.nullable(),
 	establishmentId: establishmentIdSchema
@@ -74,7 +78,9 @@ export const updateCouponBodySchema = createCouponBodyBaseSchema
 export const checkCouponBodySchema = z.object({
 	code: z
 		.string()
+		.trim()
 		.min(1, "O código deve ser preenchido")
+		.max(50, "O código deve ter no máximo 50 caracteres")
 		.transform(val => val.toUpperCase()),
 	establishmentId: establishmentIdSchema
 });
@@ -82,5 +88,6 @@ export const checkCouponBodySchema = z.object({
 export const couponParamsSchema = z.object({
 	id: z.coerce
 		.number("O id deve ser preenchido")
+		.int()
 		.min(1, "O id deve ser maior que zero")
 });
