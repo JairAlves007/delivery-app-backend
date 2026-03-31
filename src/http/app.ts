@@ -1,12 +1,13 @@
 import fastifyCors from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
 import fastifySwagger from "@fastify/swagger";
-import fastifySwaggerUi from "@fastify/swagger-ui";
+import scalarApiReference from "@scalar/fastify-api-reference";
 import fastify from "fastify";
 import {
 	jsonSchemaTransform,
 	serializerCompiler,
-	validatorCompiler
+	validatorCompiler,
+	type ZodTypeProvider
 } from "fastify-type-provider-zod";
 
 import { env } from "@/env.js";
@@ -35,7 +36,7 @@ app.register(fastifySwagger, {
 	openapi: {
 		info: {
 			title: "Food Delivery API",
-			description: "Documentação da API do micro serviço de Delivery",
+			description: "Documentação da API de um SaaS de Delivery",
 			version: "1.0.0"
 		},
 		components: {
@@ -51,8 +52,30 @@ app.register(fastifySwagger, {
 	transform: jsonSchemaTransform
 });
 
-app.register(fastifySwaggerUi, {
-	routePrefix: "/docs"
+app.register(scalarApiReference, {
+	routePrefix: "/docs",
+	configuration: {
+		title: "Food Delivery API",
+		theme: "deepSpace",
+		sources: [
+			{
+				url: "/swagger.json",
+				title: "Documentação da API de um SaaS de Delivery",
+				slug: "documentacao-da-api-de-um-saas-de-delivery"
+			}
+		]
+	}
+});
+
+app.withTypeProvider<ZodTypeProvider>().route({
+	method: "GET",
+	url: "/swagger.json",
+	schema: {
+		hide: true
+	},
+	handler: async () => {
+		return app.swagger();
+	}
 });
 
 app.register(fastifyCors, {
