@@ -13,6 +13,7 @@ import {
 	ResourceType,
 	RoleType,
 	SocialPlatform,
+	ViewType,
 	WeekDay
 } from "@/generated/prisma/client.js";
 
@@ -417,11 +418,13 @@ const menuItemSchema = z.object({
 	label: z.string(),
 	slug: z.string(),
 	order: z.number(),
+	view_type: z.enum(ViewType),
 	submenus: z.array(
 		z.object({
 			label: z.string(),
 			slug: z.string(),
-			order: z.number()
+			order: z.number(),
+			view_type: z.enum(ViewType)
 		})
 	)
 });
