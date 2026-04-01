@@ -5,6 +5,9 @@ export type MenuWithSubmenus = Prisma.MenuGetPayload<{
 		label: true;
 		slug: true;
 		order: true;
-		submenus: { select: { label: true; slug: true; order: true } };
+		view_type: true;
+		submenus: {
+			select: { label: true; slug: true; order: true; view_type: true };
+		};
 	};
 }>;

@@ -418,7 +418,7 @@ const menuItemSchema = z.object({
 	label: z.string(),
 	slug: z.string(),
 	order: z.number(),
-	view_type: z.enum(ViewType),
+	view_type: z.enum(ViewType).nullable(),
 	submenus: z.array(
 		z.object({
 			label: z.string(),
@@ -435,17 +435,46 @@ const authUserSchema = z.object({
 	email: z.string()
 });
 
-const authEstablishmentSchema = establishmentResponseSchema.extend({
-	isOpen: z.boolean()
+const authEstablishmentAdminSchema = establishmentResponseSchema
+	.omit({
+		owner_id: true,
+		next_billing_date: true,
+		deleted_at: true
+	})
+	.extend({
+		isOpen: z.boolean()
+	});
+
+const authEstablishmentCustomerSchema = establishmentResponseSchema
+	.omit({
+		owner_id: true,
+		cnpj: true,
+		email: true,
+		next_billing_date: true,
+		deleted_at: true
+	})
+	.extend({
+		isOpen: z.boolean()
+	});
+
+const authMenuSchema = z.object({
+	items: z.array(menuItemSchema).nullable(),
+	forRole: z.enum(RoleType)
 });
 
-export const signInResponseSchema = z.object({
+export const signInAdminResponseSchema = z.object({
 	user: authUserSchema,
-	establishment: authEstablishmentSchema,
-	menu: z.object({
-		items: z.array(menuItemSchema).nullable(),
-		forRole: z.enum(RoleType)
-	}),
+	establishment: authEstablishmentAdminSchema,
+	menu: authMenuSchema,
+	type: z.string(),
+	expiresIn: z.number(),
+	token: z.string()
+});
+
+export const signInCustomerResponseSchema = z.object({
+	user: authUserSchema,
+	establishment: authEstablishmentCustomerSchema,
+	menu: authMenuSchema,
 	type: z.string(),
 	expiresIn: z.number(),
 	token: z.string()
