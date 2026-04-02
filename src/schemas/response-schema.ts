@@ -33,7 +33,6 @@ export const resourceResponseSchema = z.object({
 	type: z.enum(ResourceType),
 	path: z.string(),
 	file_key: z.string(),
-	establishment_id: z.string(),
 	created_at: dateStringSchema,
 	updated_at: dateStringSchema
 });
@@ -68,15 +67,12 @@ export const addonResponseSchema = z.object({
 	category_id: z.number(),
 	name: z.string(),
 	price: z.number(),
-	deleted_at: nullableDateStringSchema,
 	category: z
 		.object({
 			id: z.number(),
-			establishment_id: z.string(),
 			name: z.string(),
 			type: z.enum(AddonType),
-			max_quantity: z.number().nullable(),
-			deleted_at: nullableDateStringSchema
+			max_quantity: z.number().nullable()
 		})
 		.optional()
 });
@@ -87,19 +83,15 @@ export const addonResponseSchema = z.object({
 
 export const addonCategoryResponseSchema = z.object({
 	id: z.number(),
-	establishment_id: z.string(),
 	name: z.string(),
 	type: z.enum(AddonType),
 	max_quantity: z.number().nullable(),
-	deleted_at: nullableDateStringSchema,
 	addons: z
 		.array(
 			z.object({
 				id: z.number(),
-				category_id: z.number(),
 				name: z.string(),
-				price: z.number(),
-				deleted_at: nullableDateStringSchema
+				price: z.number()
 			})
 		)
 		.optional()
@@ -128,13 +120,9 @@ export const addonListResponseSchema = z.object({
 export const bannerResponseSchema = z.object({
 	id: z.number(),
 	name: z.string(),
-	establishment_id: z.string(),
 	link_type: z.enum(BannerLinkType),
 	product_id: z.string().nullable(),
 	category_id: z.string().nullable(),
-	created_at: dateStringSchema,
-	updated_at: dateStringSchema,
-	deleted_at: nullableDateStringSchema,
 	resources: resourceItemSchema
 });
 
@@ -152,14 +140,12 @@ export const bannerListResponseSchema = z.object({
 
 export const couponResponseSchema = z.object({
 	id: z.number(),
-	establishment_id: z.string(),
 	code: z.string(),
 	type: z.enum(CouponType),
 	discount_type: z.enum(DiscountType),
 	value: z.number(),
 	starts_at: nullableDateStringSchema,
 	ends_at: nullableDateStringSchema,
-	deleted_at: nullableDateStringSchema,
 	max_uses: z.number().nullable(),
 	uses_per_user: z.number().nullable()
 });
@@ -183,10 +169,8 @@ export const checkCouponResponseSchema = z.object({
 
 export const districtResponseSchema = z.object({
 	id: z.string(),
-	establishment_id: z.string(),
 	name: z.string(),
-	shipping_cost: z.number(),
-	deleted_at: nullableDateStringSchema
+	shipping_cost: z.number()
 });
 
 export const districtListResponseSchema = z.object({
@@ -203,7 +187,6 @@ export const districtListResponseSchema = z.object({
 
 const openingHourSchema = z.object({
 	id: z.number(),
-	establishment_id: z.string(),
 	day_of_week: z.enum(WeekDay),
 	opens_at: z.string(),
 	closes_at: z.string(),
@@ -212,14 +195,12 @@ const openingHourSchema = z.object({
 
 const socialLinkSchema = z.object({
 	id: z.number(),
-	establishment_id: z.string(),
 	platform: z.enum(SocialPlatform),
 	url: z.string()
 });
 
 const closureSchema = z.object({
 	id: z.number(),
-	establishment_id: z.string(),
 	starts_at: dateStringSchema,
 	ends_at: nullableDateStringSchema,
 	reason: z.string().nullable()
@@ -236,9 +217,6 @@ export const establishmentResponseSchema = z.object({
 	accepts_credit_card: z.boolean(),
 	is_manually_closed: z.boolean(),
 	next_billing_date: dateStringSchema,
-	owner_id: z.string().nullable(),
-	created_at: dateStringSchema,
-	deleted_at: nullableDateStringSchema,
 	resources: resourceItemSchema,
 	socialLinks: z.array(socialLinkSchema),
 	openingHours: z.array(openingHourSchema),
@@ -259,11 +237,9 @@ export const establishmentListResponseSchema = z.object({
 
 export const productCategoryResponseSchema = z.object({
 	id: z.string(),
-	establishment_id: z.string(),
 	name: z.string(),
 	slug: z.string(),
 	order: z.number().nullable(),
-	deleted_at: nullableDateStringSchema,
 	resources: resourceItemSchema
 });
 
@@ -281,7 +257,6 @@ export const productCategoryListResponseSchema = z.object({
 
 export const productResponseSchema = z.object({
 	id: z.string(),
-	establishment_id: z.string(),
 	category_id: z.string(),
 	name: z.string(),
 	description: z.string(),
@@ -290,9 +265,6 @@ export const productResponseSchema = z.object({
 	discount_percentage: z.number().nullable(),
 	stock: z.number().nullable(),
 	valid_until: nullableDateStringSchema,
-	created_at: dateStringSchema,
-	updated_at: dateStringSchema,
-	deleted_at: nullableDateStringSchema,
 	resources: resourceItemSchema
 });
 
@@ -310,7 +282,6 @@ export const productListResponseSchema = z.object({
 
 const orderItemAddonSchema = z.object({
 	id: z.number(),
-	order_item_id: z.number(),
 	addon_price: z.number(),
 	addon_name: z.string(),
 	addon_id: z.number(),
@@ -319,27 +290,18 @@ const orderItemAddonSchema = z.object({
 
 const orderItemSchema = z.object({
 	id: z.number(),
-	order_id: z.string(),
 	product_id: z.string(),
 	product_name: z.string(),
 	product_price: z.number(),
 	quantity: z.number(),
-	created_at: dateStringSchema,
 	addons: z.array(orderItemAddonSchema).optional()
 });
 
 const orderCouponSchema = z.object({
-	id: z.number(),
-	establishment_id: z.string(),
 	code: z.string(),
 	type: z.enum(CouponType),
 	discount_type: z.enum(DiscountType),
-	value: z.number(),
-	starts_at: nullableDateStringSchema,
-	ends_at: nullableDateStringSchema,
-	deleted_at: nullableDateStringSchema,
-	max_uses: z.number().nullable(),
-	uses_per_user: z.number().nullable()
+	value: z.number()
 });
 
 const orderStatusSchema = z.object({
@@ -357,12 +319,8 @@ export const orderPayloadSchema = z.object({
 	subtotal: z.number(),
 	customer_name: z.string(),
 	customer_phone: z.string(),
-	user_id: z.string(),
-	establishment_id: z.string(),
-	coupon_id: z.number().nullable(),
 	created_at: dateStringSchema,
 	updated_at: dateStringSchema,
-	deleted_at: nullableDateStringSchema,
 	items: z.array(orderItemSchema),
 	coupon: orderCouponSchema.nullable(),
 	status: orderStatusSchema
@@ -390,10 +348,7 @@ export const myOrdersResponseSchema = z.object({
 
 const fileFormatSchema = z.object({
 	id: z.number(),
-	type: z.enum(FileFormatType),
-	resource_rule_id: z.number(),
-	created_at: dateStringSchema,
-	updated_at: dateStringSchema
+	type: z.enum(FileFormatType)
 });
 
 export const resourceRuleResponseSchema = z.object({
@@ -437,9 +392,7 @@ const authUserSchema = z.object({
 
 const authEstablishmentAdminSchema = establishmentResponseSchema
 	.omit({
-		owner_id: true,
-		next_billing_date: true,
-		deleted_at: true
+		next_billing_date: true
 	})
 	.extend({
 		isOpen: z.boolean()
@@ -447,11 +400,9 @@ const authEstablishmentAdminSchema = establishmentResponseSchema
 
 const authEstablishmentCustomerSchema = establishmentResponseSchema
 	.omit({
-		owner_id: true,
 		cnpj: true,
 		email: true,
-		next_billing_date: true,
-		deleted_at: true
+		next_billing_date: true
 	})
 	.extend({
 		isOpen: z.boolean()
@@ -524,10 +475,7 @@ const baseAddressSchema = z.object({
 	reference_point: z.string().nullable(),
 	phone: z.string(),
 	latitude: z.number().nullable(),
-	longitude: z.number().nullable(),
-	created_at: dateStringSchema,
-	updated_at: dateStringSchema,
-	deleted_at: nullableDateStringSchema
+	longitude: z.number().nullable()
 });
 
 export const addressResponseSchema = baseAddressSchema.extend({
