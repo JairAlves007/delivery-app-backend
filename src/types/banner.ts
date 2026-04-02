@@ -1,6 +1,7 @@
-import type { Prisma } from "@/generated/prisma/client.js";
+import type { z } from "zod";
 
-import type { ResourceItem } from "./resource.js";
+import type { Prisma } from "@/generated/prisma/client.js";
+import type { bannerResponseSchema } from "@/schemas/response-schema.js";
 
 export type BannerFromRepository = Prisma.BannerGetPayload<{
 	include: {
@@ -12,6 +13,4 @@ export type BannerFromRepository = Prisma.BannerGetPayload<{
 	};
 }>;
 
-export type BannerList = Omit<BannerFromRepository, "resources"> & {
-	resources: ResourceItem;
-};
+export type BannerList = z.infer<typeof bannerResponseSchema>;

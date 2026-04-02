@@ -1,11 +1,13 @@
+import type { z } from "zod";
+
 import type {
 	Coupon,
 	DeliveryType,
 	District,
-	OrderStatusType,
 	PaymentMethodType,
 	Prisma
 } from "@/generated/prisma/client.js";
+import type { orderPayloadSchema } from "@/schemas/response-schema.js";
 
 import type { AddonFromRepository } from "./addon.js";
 import type { UserAddressWithDefault } from "./address.js";
@@ -31,12 +33,7 @@ export type OrderFromRepository = Prisma.OrderGetPayload<{
 	};
 }>;
 
-export interface OrderPayload extends Omit<OrderFromRepository, "statuses"> {
-	status: {
-		label: string;
-		value: OrderStatusType;
-	};
-}
+export type OrderPayload = z.infer<typeof orderPayloadSchema>;
 
 export interface OrderAddonsToProcess extends AddonFromRepository {
 	quantity: number;
