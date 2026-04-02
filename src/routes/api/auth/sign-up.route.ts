@@ -20,11 +20,14 @@ export const signUpRoute = async (app: FastifyInstance) => {
 		"/sign-up",
 		{
 			schema: {
+				operationId: "signUp",
 				tags: ["Auth"],
 				summary: "Registrar um novo usuário",
 				body: signUpBodySchema,
 				response: {
-					201: apiSuccessResponseSchema(signUpTokenResponseSchema.or(z.object({}))),
+					201: apiSuccessResponseSchema(
+						signUpTokenResponseSchema.or(z.object({}))
+					),
 					409: apiDefaultErrorResponseSchema,
 					422: apiValidationErrorResponseSchema,
 					500: apiDefaultErrorResponseSchema

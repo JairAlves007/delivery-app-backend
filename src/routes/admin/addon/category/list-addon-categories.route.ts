@@ -20,6 +20,7 @@ export const listAddonCategoriesRoute = async (app: FastifyInstance) => {
 		"/",
 		{
 			schema: {
+				operationId: "listAddonCategories",
 				tags: ["Addon Categories"],
 				summary: "Listar categorias de adicionais",
 				querystring: listQueryParamsSchema,

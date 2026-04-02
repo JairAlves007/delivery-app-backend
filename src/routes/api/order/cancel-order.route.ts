@@ -25,6 +25,7 @@ export const cancelOrderRoute = async (app: FastifyInstance) => {
 		"/cancel/:id",
 		{
 			schema: {
+				operationId: "cancelOrder",
 				tags: ["Orders"],
 				summary: "Cancelar pedido do cliente",
 				params: orderParamsSchema,

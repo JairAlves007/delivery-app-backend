@@ -23,6 +23,7 @@ export const updateAddonRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "updateAddon",
 				tags: ["Addons"],
 				summary: "Atualizar adicional",
 				params: addonParamsSchema,

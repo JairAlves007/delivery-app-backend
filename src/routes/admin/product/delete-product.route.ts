@@ -20,6 +20,7 @@ export const deleteProductRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "deleteProduct",
 				tags: ["Products"],
 				summary: "Deletar produto",
 				params: productParamsSchema,

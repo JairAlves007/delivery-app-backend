@@ -23,6 +23,7 @@ export const updateDistrictRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "updateDistrict",
 				tags: ["Districts"],
 				summary: "Atualizar bairro",
 				params: districtParamsSchema,

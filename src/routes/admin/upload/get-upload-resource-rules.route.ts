@@ -21,6 +21,7 @@ export const getUploadResourceRulesRoute = async (app: FastifyInstance) => {
 		"/rules",
 		{
 			schema: {
+				operationId: "getUploadResourceRules",
 				tags: ["Uploads"],
 				summary: "Obter regras para recursos enviados por upload",
 				querystring: uploadResourceRulesQuerySchema,

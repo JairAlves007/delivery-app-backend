@@ -20,6 +20,7 @@ export const deleteAddonRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "deleteAddon",
 				tags: ["Addons"],
 				summary: "Deletar adicional",
 				params: addonParamsSchema,

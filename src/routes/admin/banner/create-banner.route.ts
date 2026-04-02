@@ -20,6 +20,7 @@ export const createBannerRoute = async (app: FastifyInstance) => {
 		"/",
 		{
 			schema: {
+				operationId: "createBanner",
 				tags: ["Banners"],
 				summary: "Criar banner",
 				body: createBannerBodySchema,

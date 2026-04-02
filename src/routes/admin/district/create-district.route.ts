@@ -20,6 +20,7 @@ export const createDistrictRoute = async (app: FastifyInstance) => {
 		"/",
 		{
 			schema: {
+				operationId: "createDistrict",
 				tags: ["Districts"],
 				summary: "Criar bairro",
 				body: createDistrictBodySchema,

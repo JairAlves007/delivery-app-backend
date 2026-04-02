@@ -20,6 +20,7 @@ export const findAddonRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "findAddon",
 				tags: ["Addons"],
 				summary: "Encontrar adicional pelo ID",
 				params: addonParamsSchema,

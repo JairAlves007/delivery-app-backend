@@ -20,6 +20,7 @@ export const createAddonCategoryRoute = async (app: FastifyInstance) => {
 		"/",
 		{
 			schema: {
+				operationId: "createAddonCategory",
 				tags: ["Addon Categories"],
 				summary: "Criar categoria de adicionais",
 				body: createAddonCategoryBodySchema,

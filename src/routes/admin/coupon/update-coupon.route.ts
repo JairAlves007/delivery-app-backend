@@ -23,6 +23,7 @@ export const updateCouponRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "updateCoupon",
 				tags: ["Coupons"],
 				summary: "Atualizar um cupom",
 				params: couponParamsSchema,

@@ -24,6 +24,7 @@ export const myOrdersRoute = async (app: FastifyInstance) => {
 		"/:establishmentId/my",
 		{
 			schema: {
+				operationId: "myOrders",
 				tags: ["Orders"],
 				summary: "Listar meus pedidos",
 				params: establishmentParamsSchema,

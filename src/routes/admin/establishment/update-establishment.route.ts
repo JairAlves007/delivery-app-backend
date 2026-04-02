@@ -23,6 +23,7 @@ export const updateEstablishmentRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "updateEstablishment",
 				tags: ["Establishments"],
 				summary: "Atualizar estabelecimento",
 				params: establishmentParamsSchema,

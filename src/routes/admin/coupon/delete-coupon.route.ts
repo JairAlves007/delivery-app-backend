@@ -20,6 +20,7 @@ export const deleteCouponRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "deleteCoupon",
 				tags: ["Coupons"],
 				summary: "Deletar um cupom",
 				params: couponParamsSchema,

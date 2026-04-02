@@ -25,6 +25,7 @@ export const findOrderRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "findOrder",
 				tags: ["Orders"],
 				summary: "Buscar pedido pelo ID (Admin)",
 				params: orderParamsSchema,

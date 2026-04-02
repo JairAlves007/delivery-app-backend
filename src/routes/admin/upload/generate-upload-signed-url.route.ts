@@ -20,6 +20,7 @@ export const generateUploadSignedUrlRoute = async (app: FastifyInstance) => {
 		"/",
 		{
 			schema: {
+				operationId: "generateUploadSignedUrl",
 				tags: ["Uploads"],
 				summary: "Gerar URL pré-assinada para upload de arquivo",
 				body: uploadSignedUrlBodySchema,

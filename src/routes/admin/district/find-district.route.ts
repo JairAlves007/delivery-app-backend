@@ -20,6 +20,7 @@ export const findDistrictRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "findDistrict",
 				tags: ["Districts"],
 				summary: "Encontrar bairro pelo ID",
 				params: districtParamsSchema,

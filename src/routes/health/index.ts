@@ -13,6 +13,7 @@ export const healthRoutes = async (app: FastifyInstance) => {
 		"/ping",
 		{
 			schema: {
+				operationId: "healthPing",
 				tags: ["Health"],
 				summary: "Verificar integridade da API",
 				response: {

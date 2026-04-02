@@ -20,6 +20,7 @@ export const createAddonRoute = async (app: FastifyInstance) => {
 		"/",
 		{
 			schema: {
+				operationId: "createAddon",
 				tags: ["Addons"],
 				summary: "Criar adicional",
 				body: createAddonBodySchema,

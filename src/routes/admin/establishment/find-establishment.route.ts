@@ -20,6 +20,7 @@ export const findEstablishmentRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "findEstablishment",
 				tags: ["Establishments"],
 				summary: "Encontrar estabelecimento pelo ID",
 				params: establishmentParamsSchema,

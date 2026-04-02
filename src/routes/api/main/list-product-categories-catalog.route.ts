@@ -25,6 +25,7 @@ export const listProductCategoriesCatalogRoute = async (
 		"/product/categories",
 		{
 			schema: {
+				operationId: "listProductCategoriesCatalog",
 				tags: ["Main (Home)"],
 				summary: "Listar categorias de produtos na home",
 				params: establishmentParamsSchema,

@@ -20,6 +20,7 @@ export const deleteBannerRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "deleteBanner",
 				tags: ["Banners"],
 				summary: "Deletar banner",
 				params: bannerParamsSchema,

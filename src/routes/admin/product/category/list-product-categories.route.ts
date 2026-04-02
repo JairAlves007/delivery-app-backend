@@ -20,6 +20,7 @@ export const listProductCategoriesRoute = async (app: FastifyInstance) => {
 		"/",
 		{
 			schema: {
+				operationId: "listProductCategories",
 				tags: ["Product Categories"],
 				summary: "Listar categorias de produtos",
 				querystring: listQueryParamsSchema,

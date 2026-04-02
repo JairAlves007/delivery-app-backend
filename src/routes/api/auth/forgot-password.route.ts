@@ -17,6 +17,7 @@ export const forgotPasswordRoute = async (app: FastifyInstance) => {
 		"/forgot-password",
 		{
 			schema: {
+				operationId: "forgotPassword",
 				tags: ["Auth"],
 				summary: "Solicitar redefinição de senha",
 				body: forgotPasswordBodySchema,

@@ -21,6 +21,7 @@ export const findAddressRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "findAddress",
 				tags: ["Addresses"],
 				summary: "Encontrar um endereço",
 				params: addressParamsSchema,

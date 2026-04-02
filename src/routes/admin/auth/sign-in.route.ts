@@ -22,6 +22,7 @@ export const signInRoute = async (app: FastifyInstance) => {
 		"/sign-in",
 		{
 			schema: {
+				operationId: "adminSignIn",
 				tags: ["Admin Auth"],
 				summary: "Autenticar administrador",
 				body: signInBodySchema,

@@ -20,6 +20,7 @@ export const deleteDistrictRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "deleteDistrict",
 				tags: ["Districts"],
 				summary: "Deletar bairro",
 				params: districtParamsSchema,

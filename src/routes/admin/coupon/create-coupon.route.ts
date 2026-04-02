@@ -20,6 +20,7 @@ export const createCouponRoute = async (app: FastifyInstance) => {
 		"/",
 		{
 			schema: {
+				operationId: "createCoupon",
 				tags: ["Coupons"],
 				summary: "Criar um cupom",
 				body: createCouponBodySchema,

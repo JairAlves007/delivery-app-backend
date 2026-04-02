@@ -20,6 +20,7 @@ export const findProductCategoryRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "findProductCategory",
 				tags: ["Product Categories"],
 				summary: "Encontrar categoria de produtos pelo ID",
 				params: productCategoryParamsSchema,

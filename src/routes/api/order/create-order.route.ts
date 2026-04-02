@@ -21,6 +21,7 @@ export const createOrderRoute = async (app: FastifyInstance) => {
 		"/",
 		{
 			schema: {
+				operationId: "createOrder",
 				tags: ["Orders"],
 				summary: "Criar um pedido",
 				body: createOrderBodySchema,

@@ -21,6 +21,7 @@ export const createAddressRoute = async (app: FastifyInstance) => {
 		"/",
 		{
 			schema: {
+				operationId: "createAddress",
 				tags: ["Addresses"],
 				summary: "Criar um novo endereço",
 				body: createAddressBodySchema,

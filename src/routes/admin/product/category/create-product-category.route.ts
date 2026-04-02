@@ -20,6 +20,7 @@ export const createProductCategoryRoute = async (app: FastifyInstance) => {
 		"/",
 		{
 			schema: {
+				operationId: "createProductCategory",
 				tags: ["Product Categories"],
 				summary: "Criar categoria de produtos",
 				body: createProductCategoryBodySchema,
@@ -49,7 +50,9 @@ export const createProductCategoryRoute = async (app: FastifyInstance) => {
 
 			return reply
 				.status(HTTPStatusCodes.CREATED)
-				.send(ApiResponse.success("Categoria de produto criada com sucesso", {}));
+				.send(
+					ApiResponse.success("Categoria de produto criada com sucesso", {})
+				);
 		}
 	);
 };

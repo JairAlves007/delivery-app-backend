@@ -20,6 +20,7 @@ export const findBannerRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "findBanner",
 				tags: ["Banners"],
 				summary: "Encontrar banner pelo ID",
 				params: bannerParamsSchema,

@@ -23,6 +23,7 @@ export const updateProductCategoryRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "updateProductCategory",
 				tags: ["Product Categories"],
 				summary: "Atualizar categoria de produtos",
 				params: productCategoryParamsSchema,

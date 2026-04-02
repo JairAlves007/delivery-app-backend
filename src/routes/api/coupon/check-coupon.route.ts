@@ -21,6 +21,7 @@ export const checkCouponRoute = async (app: FastifyInstance) => {
 		"/check",
 		{
 			schema: {
+				operationId: "checkCoupon",
 				tags: ["Coupons"],
 				summary: "Checar validade de um cupom",
 				body: checkCouponBodySchema,

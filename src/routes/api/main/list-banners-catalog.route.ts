@@ -20,6 +20,7 @@ export const listBannersCatalogRoute = async (app: FastifyInstance) => {
 		"/banners",
 		{
 			schema: {
+				operationId: "listBannersCatalog",
 				tags: ["Main (Home)"],
 				summary: "Listar banners na home",
 				params: establishmentParamsSchema,

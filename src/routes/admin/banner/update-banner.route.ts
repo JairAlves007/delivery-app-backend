@@ -23,6 +23,7 @@ export const updateBannerRoute = async (app: FastifyInstance) => {
 		"/:id",
 		{
 			schema: {
+				operationId: "updateBanner",
 				tags: ["Banners"],
 				summary: "Atualizar banner",
 				params: bannerParamsSchema,

@@ -17,6 +17,7 @@ export const resetPasswordRoute = async (app: FastifyInstance) => {
 		"/reset-password",
 		{
 			schema: {
+				operationId: "resetPassword",
 				tags: ["Auth"],
 				summary: "Redefinir senha com token",
 				body: resetPasswordBodySchema,

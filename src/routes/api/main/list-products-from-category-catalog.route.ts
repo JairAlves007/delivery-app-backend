@@ -23,12 +23,15 @@ export const listProductsFromCategoryCatalogRoute = async (
 		"/category/:categoryId/products",
 		{
 			schema: {
+				operationId: "listProductsFromCategoryCatalog",
 				tags: ["Main (Home)"],
 				summary: "Listar produtos de uma categoria na home",
 				params: listProductsFromCategorySchema,
 				querystring: listCursorQueryParamsSchema,
 				response: {
-					200: apiSuccessResponseSchema(productsFromCategoryCatalogResponseSchema),
+					200: apiSuccessResponseSchema(
+						productsFromCategoryCatalogResponseSchema
+					),
 					401: apiDefaultErrorResponseSchema,
 					403: apiDefaultErrorResponseSchema,
 					422: apiValidationErrorResponseSchema,

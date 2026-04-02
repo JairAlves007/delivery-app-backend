@@ -20,6 +20,7 @@ export const listBannersRoute = async (app: FastifyInstance) => {
 		"/",
 		{
 			schema: {
+				operationId: "listBanners",
 				tags: ["Banners"],
 				summary: "Listar banners",
 				querystring: listQueryParamsSchema,
