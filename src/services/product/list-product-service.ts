@@ -7,21 +7,13 @@ import { transformPriceFromDatabase } from "@/helpers/price.js";
 import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
-import type { FilterField } from "@/types/crud.js";
+import type { FilterField, PaginatedResponse } from "@/types/crud.js";
 import type { ProductFromRepository, ProductList } from "@/types/product.js";
 
 type ListProductServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;
 
-interface ListProductServiceResponse extends Pick<
-	ListProductServiceRequest,
-	"page"
-> {
-	products: ProductList[];
-	total: number;
-	perPage?: number;
-	totalPages?: number;
-}
+type ListProductServiceResponse = PaginatedResponse<ProductList>;
 
 export class ListProductService {
 	private productRepository: IProductRepository;
@@ -71,17 +63,19 @@ export class ListProductService {
 
 			const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages) {
+			if (page > totalPages && totalPages > 0) {
 				await cache.forget(key);
 				throw new InvalidPage();
 			}
 
 			return {
-				products: this.mapProducts(products),
-				page,
-				perPage,
-				total,
-				totalPages
+				items: this.mapProducts(products),
+				pagination: {
+					page,
+					perPage,
+					total,
+					totalPages
+				}
 			};
 		}
 
@@ -94,8 +88,13 @@ export class ListProductService {
 		]);
 
 		return {
-			products: this.mapProducts(products),
-			total
+			items: this.mapProducts(products),
+			pagination: {
+				page: 1,
+				perPage: total,
+				total,
+				totalPages: 1
+			}
 		};
 	}
 }

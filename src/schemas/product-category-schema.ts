@@ -20,6 +20,10 @@ export const updateProductCategoryBodySchema = createProductCategoryBodySchema
 		establishmentId: createProductCategoryBodySchema.shape.establishmentId
 	});
 
+z.globalRegistry.add(updateProductCategoryBodySchema, {
+	id: "UpdateProductCategoryBody"
+});
+
 export const productCategoryParamsSchema = z.object({
 	id: z.ulid().min(1, "O id da categoria deve ser preenchido")
 });

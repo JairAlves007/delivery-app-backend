@@ -32,11 +32,15 @@ export const createBannerBodySchema = createBannerBodyBaseSchema.superRefine(
 	}
 );
 
+z.globalRegistry.add(createBannerBodySchema, { id: "CreateBannerBody" });
+
 export const updateBannerBodySchema = createBannerBodyBaseSchema
 	.partial()
 	.extend({
 		establishmentId: createBannerBodyBaseSchema.shape.establishmentId
 	});
+
+z.globalRegistry.add(updateBannerBodySchema, { id: "UpdateBannerBody" });
 
 export const bannerParamsSchema = z.object({
 	id: z.coerce

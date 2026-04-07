@@ -8,20 +8,12 @@ import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
 import type { BannerFromRepository, BannerList } from "@/types/banner.js";
-import type { FilterField } from "@/types/crud.js";
+import type { FilterField, PaginatedResponse } from "@/types/crud.js";
 
 type ListBannerServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;
 
-interface ListBannerServiceResponse extends Pick<
-	ListBannerServiceRequest,
-	"page"
-> {
-	banners: BannerList[];
-	total: number;
-	perPage?: number;
-	totalPages?: number;
-}
+type ListBannerServiceResponse = PaginatedResponse<BannerList>;
 
 export class ListBannerService {
 	private bannerRepository: IBannerRepository;
@@ -73,17 +65,19 @@ export class ListBannerService {
 
 			const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages) {
+			if (page > totalPages && totalPages > 0) {
 				await cache.forget(key);
 				throw new InvalidPage();
 			}
 
 			return {
-				banners: this.mapBanners(banners),
-				page,
-				perPage,
-				total,
-				totalPages
+				items: this.mapBanners(banners),
+				pagination: {
+					page,
+					perPage,
+					total,
+					totalPages
+				}
 			};
 		}
 
@@ -97,8 +91,13 @@ export class ListBannerService {
 		]);
 
 		return {
-			banners: this.mapBanners(banners),
-			total
+			items: this.mapBanners(banners),
+			pagination: {
+				page: 1,
+				perPage: total,
+				total,
+				totalPages: 1
+			}
 		};
 	}
 }

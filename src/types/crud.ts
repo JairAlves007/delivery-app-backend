@@ -1,6 +1,10 @@
 import z from "zod";
 
-import { searchAndOrderBySchema } from "@/schemas/generic-schema.js";
+import {
+	cursorPaginationResponseSchema,
+	paginationResponseSchema,
+	searchAndOrderBySchema
+} from "@/schemas/generic-schema.js";
 
 import type { UserID } from "./user.js";
 
@@ -47,4 +51,24 @@ export type DeleteContentParams<Id> = FindByIdParams<Id> & {
 export type CursorPaginationParams<CursorType> = FilterField & {
 	limit: number;
 	cursor?: CursorType | null;
+};
+
+export type PaginationResponse = z.infer<typeof paginationResponseSchema>;
+
+export type CursorPaginationResponse = z.infer<
+	typeof cursorPaginationResponseSchema
+>;
+
+export type PaginatedResponse<T> = {
+	items: T[];
+	pagination: PaginationResponse;
+};
+
+export type CursorPaginatedResponse<T> = {
+	items: T[];
+	pagination: CursorPaginationResponse;
+};
+
+export type ListResponse<T> = {
+	items: T[];
 };

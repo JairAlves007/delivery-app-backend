@@ -7,14 +7,13 @@ import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.js";
 import { establishmentParamsSchema } from "@/schemas/generic-schema.js";
 import type { BannerFromRepository, BannerList } from "@/types/banner.js";
+import type { ListResponse } from "@/types/crud.js";
 
 type ListBannersCatalogServiceRequest = z.infer<
 	typeof establishmentParamsSchema
 >;
 
-interface ListBannersCatalogServiceResponse {
-	banners: BannerList[];
-}
+type ListBannersCatalogServiceResponse = ListResponse<BannerList>;
 
 export class ListBannersCatalogService {
 	private bannerRepository: IBannerRepository;
@@ -53,7 +52,7 @@ export class ListBannersCatalogService {
 		if (banners.length <= 0) await cache.forget(key);
 
 		return {
-			banners: this.mapBanners(banners)
+			items: this.mapBanners(banners)
 		};
 	}
 }

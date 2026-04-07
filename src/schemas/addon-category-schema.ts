@@ -15,6 +15,10 @@ export const createAddonCategoryBodySchema = z.object({
 	establishmentId: establishmentIdSchema
 });
 
+z.globalRegistry.add(createAddonCategoryBodySchema, {
+	id: "CreateAddonCategoryBody"
+});
+
 export const updateAddonCategoryBodySchema = createAddonCategoryBodySchema
 	.partial()
 	.extend({
@@ -22,6 +26,10 @@ export const updateAddonCategoryBodySchema = createAddonCategoryBodySchema
 		addonIds: z.array(z.coerce.number().int().positive()).optional(),
 		status: z.boolean("Precisamos saber se o adicional está ativo")
 	});
+
+z.globalRegistry.add(updateAddonCategoryBodySchema, {
+	id: "UpdateAddonCategoryBody"
+});
 
 export const addonCategoryParamsSchema = z.object({
 	id: z.coerce

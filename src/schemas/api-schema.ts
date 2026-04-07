@@ -58,3 +58,19 @@ export const apiNoContentResponseSchema = apiSuccessResponseSchema(
 export const apiEmptyDetailsResponseSchema = apiSuccessResponseSchema(
 	z.object({})
 );
+
+z.globalRegistry.add(apiDefaultErrorResponseSchema, {
+	id: "ApiDefaultErrorResponse"
+});
+
+z.globalRegistry.add(apiValidationErrorResponseSchema, {
+	id: "ApiValidationErrorResponse"
+});
+
+z.globalRegistry.add(apiNoContentResponseSchema, {
+	id: "ApiNoContentResponse"
+});
+
+z.globalRegistry.add(apiEmptyDetailsResponseSchema, {
+	id: "ApiEmptyDetailsResponse"
+});

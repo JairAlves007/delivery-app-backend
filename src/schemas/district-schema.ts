@@ -14,11 +14,15 @@ export const createDistrictBodySchema = z.object({
 	establishmentId: establishmentIdSchema
 });
 
+z.globalRegistry.add(createDistrictBodySchema, { id: "CreateDistrictBody" });
+
 export const updateDistrictBodySchema = createDistrictBodySchema
 	.partial()
 	.extend({
 		establishmentId: createDistrictBodySchema.shape.establishmentId
 	});
+
+z.globalRegistry.add(updateDistrictBodySchema, { id: "UpdateDistrictBody" });
 
 export const districtParamsSchema = z.object({
 	id: z.ulid("O id deve ser preenchido").min(1, "O id deve ser maior que zero")

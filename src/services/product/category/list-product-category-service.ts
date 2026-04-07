@@ -6,7 +6,7 @@ import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
-import type { FilterField } from "@/types/crud.js";
+import type { FilterField, PaginatedResponse } from "@/types/crud.js";
 import type {
 	ProductCategoryFromRepository,
 	ProductCategoryList
@@ -15,15 +15,8 @@ import type {
 type ListProductCategoryServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;
 
-interface ListProductCategoryServiceResponse extends Pick<
-	ListProductCategoryServiceRequest,
-	"page"
-> {
-	productCategories: ProductCategoryList[];
-	total: number;
-	perPage?: number;
-	totalPages?: number;
-}
+type ListProductCategoryServiceResponse =
+	PaginatedResponse<ProductCategoryList>;
 
 export class ListProductCategoryService {
 	private productCategoryRepository: IProductCategoryRepository;
@@ -74,17 +67,19 @@ export class ListProductCategoryService {
 
 			const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages) {
+			if (page > totalPages && totalPages > 0) {
 				await cache.forget(key);
 				throw new InvalidPage();
 			}
 
 			return {
-				productCategories: this.mapProductCategories(productCategories),
-				page,
-				perPage,
-				total,
-				totalPages
+				items: this.mapProductCategories(productCategories),
+				pagination: {
+					page,
+					perPage,
+					total,
+					totalPages
+				}
 			};
 		}
 
@@ -97,8 +92,13 @@ export class ListProductCategoryService {
 		]);
 
 		return {
-			productCategories: this.mapProductCategories(productCategories),
-			total
+			items: this.mapProductCategories(productCategories),
+			pagination: {
+				page: 1,
+				perPage: total,
+				total,
+				totalPages: 1
+			}
 		};
 	}
 }

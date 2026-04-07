@@ -17,6 +17,12 @@ import {
 	WeekDay
 } from "@/generated/prisma/client.js";
 
+import {
+	cursorPaginatedResponseSchema,
+	listResponseSchema,
+	paginatedResponseSchema
+} from "./generic-schema.js";
+
 // ──────────────────────────────────────────────
 // Reusable primitives
 // ──────────────────────────────────────────────
@@ -97,21 +103,12 @@ export const addonCategoryResponseSchema = z.object({
 		.optional()
 });
 
-export const addonCategoryListResponseSchema = z.object({
-	addonCategories: z.array(addonCategoryResponseSchema),
-	total: z.number(),
-	page: z.number().optional(),
-	perPage: z.number().optional(),
-	totalPages: z.number().optional()
-});
+export const addonCategoryListResponseSchema = paginatedResponseSchema(
+	addonCategoryResponseSchema
+);
 
-export const addonListResponseSchema = z.object({
-	addons: z.array(addonResponseSchema),
-	total: z.number(),
-	page: z.number().optional(),
-	perPage: z.number().optional(),
-	totalPages: z.number().optional()
-});
+export const addonListResponseSchema =
+	paginatedResponseSchema(addonResponseSchema);
 
 // ──────────────────────────────────────────────
 // Banner
@@ -126,13 +123,8 @@ export const bannerResponseSchema = z.object({
 	resources: resourceItemSchema
 });
 
-export const bannerListResponseSchema = z.object({
-	banners: z.array(bannerResponseSchema),
-	total: z.number(),
-	page: z.number().optional(),
-	perPage: z.number().optional(),
-	totalPages: z.number().optional()
-});
+export const bannerListResponseSchema =
+	paginatedResponseSchema(bannerResponseSchema);
 
 // ──────────────────────────────────────────────
 // Coupon
@@ -150,13 +142,8 @@ export const couponResponseSchema = z.object({
 	uses_per_user: z.number().nullable()
 });
 
-export const couponListResponseSchema = z.object({
-	coupons: z.array(couponResponseSchema),
-	total: z.number(),
-	page: z.number().optional(),
-	perPage: z.number().optional(),
-	totalPages: z.number().optional()
-});
+export const couponListResponseSchema =
+	paginatedResponseSchema(couponResponseSchema);
 
 export const checkCouponResponseSchema = z.object({
 	isValid: z.boolean(),
@@ -173,13 +160,9 @@ export const districtResponseSchema = z.object({
 	shipping_cost: z.number()
 });
 
-export const districtListResponseSchema = z.object({
-	districts: z.array(districtResponseSchema),
-	total: z.number(),
-	page: z.number().optional(),
-	perPage: z.number().optional(),
-	totalPages: z.number().optional()
-});
+export const districtListResponseSchema = paginatedResponseSchema(
+	districtResponseSchema
+);
 
 // ──────────────────────────────────────────────
 // Establishment
@@ -223,13 +206,9 @@ export const establishmentResponseSchema = z.object({
 	closures: z.array(closureSchema)
 });
 
-export const establishmentListResponseSchema = z.object({
-	establishments: z.array(establishmentResponseSchema),
-	total: z.number(),
-	page: z.number().optional(),
-	perPage: z.number().optional(),
-	totalPages: z.number().optional()
-});
+export const establishmentListResponseSchema = paginatedResponseSchema(
+	establishmentResponseSchema
+);
 
 // ──────────────────────────────────────────────
 // Product Category
@@ -243,13 +222,9 @@ export const productCategoryResponseSchema = z.object({
 	resources: resourceItemSchema
 });
 
-export const productCategoryListResponseSchema = z.object({
-	productCategories: z.array(productCategoryResponseSchema),
-	total: z.number(),
-	page: z.number().optional(),
-	perPage: z.number().optional(),
-	totalPages: z.number().optional()
-});
+export const productCategoryListResponseSchema = paginatedResponseSchema(
+	productCategoryResponseSchema
+);
 
 // ──────────────────────────────────────────────
 // Product
@@ -268,13 +243,9 @@ export const productResponseSchema = z.object({
 	resources: resourceItemSchema
 });
 
-export const productListResponseSchema = z.object({
-	products: z.array(productResponseSchema),
-	total: z.number(),
-	page: z.number().optional(),
-	perPage: z.number().optional(),
-	totalPages: z.number().optional()
-});
+export const productListResponseSchema = paginatedResponseSchema(
+	productResponseSchema
+);
 
 // ──────────────────────────────────────────────
 // Order
@@ -326,21 +297,11 @@ export const orderPayloadSchema = z.object({
 	status: orderStatusSchema
 });
 
-export const orderListResponseSchema = z.object({
-	orders: z.array(orderPayloadSchema),
-	total: z.number(),
-	page: z.number().optional(),
-	perPage: z.number().optional(),
-	totalPages: z.number().optional()
-});
+export const orderListResponseSchema =
+	paginatedResponseSchema(orderPayloadSchema);
 
-export const myOrdersResponseSchema = z.object({
-	orders: z.array(orderPayloadSchema),
-	pagination: z.object({
-		nextCursor: z.string().nullable(),
-		hasNextPage: z.boolean()
-	})
-});
+export const myOrdersResponseSchema =
+	cursorPaginatedResponseSchema(orderPayloadSchema);
 
 // ──────────────────────────────────────────────
 // Upload / Resource Rules
@@ -441,23 +402,14 @@ export const signUpTokenResponseSchema = z.object({
 // Main (Catalog)
 // ──────────────────────────────────────────────
 
-export const bannersCatalogResponseSchema = z.array(bannerResponseSchema);
+export const bannersCatalogResponseSchema =
+	listResponseSchema(bannerResponseSchema);
 
-export const productCategoriesCatalogResponseSchema = z.object({
-	productCategories: z.array(productCategoryResponseSchema),
-	pagination: z.object({
-		nextCursor: z.string().nullable(),
-		hasNextPage: z.boolean()
-	})
-});
+export const productCategoriesCatalogResponseSchema =
+	cursorPaginatedResponseSchema(productCategoryResponseSchema);
 
-export const productsFromCategoryCatalogResponseSchema = z.object({
-	products: z.array(productResponseSchema),
-	pagination: z.object({
-		nextCursor: z.string().nullable(),
-		hasNextPage: z.boolean()
-	})
-});
+export const productsFromCategoryCatalogResponseSchema =
+	cursorPaginatedResponseSchema(productResponseSchema);
 
 // ──────────────────────────────────────────────
 // Address
@@ -483,13 +435,8 @@ export const addressResponseSchema = baseAddressSchema.extend({
 	is_default: z.boolean()
 });
 
-export const addressListResponseSchema = z.object({
-	addresses: z.array(baseAddressSchema),
-	pagination: z.object({
-		nextCursor: z.string().nullable(),
-		hasNextPage: z.boolean()
-	})
-});
+export const addressListResponseSchema =
+	cursorPaginatedResponseSchema(baseAddressSchema);
 
 // ──────────────────────────────────────────────
 // Health
@@ -498,3 +445,108 @@ export const addressListResponseSchema = z.object({
 export const healthResponseSchema = z.object({
 	status: z.string()
 });
+
+const registryItems = [
+	{ schema: resourceResponseSchema, id: "ResourceResponse" },
+	{ schema: resourceItemSchema, id: "ResourceItem" },
+	{ schema: addonResponseSchema, id: "AddonResponse" },
+	{ schema: addonCategoryResponseSchema, id: "AddonCategoryResponse" },
+	{ schema: addonCategoryListResponseSchema, id: "AddonCategoryListResponse" },
+	{ schema: addonListResponseSchema, id: "AddonListResponse" },
+	{ schema: bannerResponseSchema, id: "BannerResponse" },
+	{ schema: bannerListResponseSchema, id: "BannerListResponse" },
+	{ schema: couponResponseSchema, id: "CouponResponse" },
+	{ schema: couponListResponseSchema, id: "CouponListResponse" },
+	{ schema: checkCouponResponseSchema, id: "CheckCouponResponse" },
+	{ schema: districtResponseSchema, id: "DistrictResponse" },
+	{ schema: districtListResponseSchema, id: "DistrictListResponse" },
+	{ schema: establishmentResponseSchema, id: "EstablishmentResponse" },
+	{ schema: establishmentListResponseSchema, id: "EstablishmentListResponse" },
+	{ schema: productCategoryResponseSchema, id: "ProductCategoryResponse" },
+	{
+		schema: productCategoryListResponseSchema,
+		id: "ProductCategoryListResponse"
+	},
+	{ schema: productResponseSchema, id: "ProductResponse" },
+	{ schema: productListResponseSchema, id: "ProductListResponse" },
+	{ schema: orderPayloadSchema, id: "OrderPayload" },
+	{ schema: orderListResponseSchema, id: "OrderListResponse" },
+	{ schema: myOrdersResponseSchema, id: "MyOrdersResponse" },
+	{ schema: resourceRuleResponseSchema, id: "ResourceRuleResponse" },
+	{ schema: signedUrlResponseSchema, id: "SignedUrlResponse" },
+	{ schema: signInAdminResponseSchema, id: "SignInAdminResponse" },
+	{ schema: signInCustomerResponseSchema, id: "SignInCustomerResponse" },
+	{ schema: signUpTokenResponseSchema, id: "SignUpTokenResponse" },
+	{ schema: bannersCatalogResponseSchema, id: "BannersCatalogResponse" },
+	{
+		schema: productCategoriesCatalogResponseSchema,
+		id: "ProductCategoriesCatalogResponse"
+	},
+	{
+		schema: productsFromCategoryCatalogResponseSchema,
+		id: "ProductsFromCategoryCatalogResponse"
+	},
+	{ schema: addressResponseSchema, id: "AddressResponse" },
+	{ schema: addressListResponseSchema, id: "AddressListResponse" },
+	{ schema: healthResponseSchema, id: "HealthResponse" },
+	{
+		schema: z.enum(AddonType),
+		id: "AddonType"
+	},
+	{
+		schema: z.enum(BannerLinkType),
+		id: "BannerLinkType"
+	},
+	{
+		schema: z.enum(CouponType),
+		id: "CouponType"
+	},
+	{
+		schema: z.enum(DeliveryType),
+		id: "DeliveryType"
+	},
+	{
+		schema: z.enum(DiscountType),
+		id: "DiscountType"
+	},
+	{
+		schema: z.enum(FileFormatType),
+		id: "FileFormatType"
+	},
+	{
+		schema: z.enum(ForObjectResourceType),
+		id: "ForObjectResourceType"
+	},
+	{
+		schema: z.enum(OrderStatusType),
+		id: "OrderStatusType"
+	},
+	{
+		schema: z.enum(PaymentMethodType),
+		id: "PaymentMethodType"
+	},
+	{
+		schema: z.enum(ResourceType),
+		id: "ResourceType"
+	},
+	{
+		schema: z.enum(RoleType),
+		id: "RoleType"
+	},
+	{
+		schema: z.enum(SocialPlatform),
+		id: "SocialPlatform"
+	},
+	{
+		schema: z.enum(ViewType),
+		id: "ViewType"
+	},
+	{
+		schema: z.enum(WeekDay),
+		id: "WeekDay"
+	}
+];
+
+for (const { schema, id } of registryItems) {
+	z.globalRegistry.add(schema, { id });
+}

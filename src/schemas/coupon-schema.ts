@@ -6,7 +6,7 @@ import { establishmentIdSchema } from "./generic-schema.js";
 
 const createCouponBodyBaseSchema = z.object({
 	type: z.enum(CouponType, "Tipo de cupom inválido"),
-	value: z.coerce.number().positive("O valor deve ser maior que zero").finite(),
+	value: z.coerce.number().positive("O valor deve ser maior que zero"),
 	code: z
 		.string()
 		.trim()
@@ -69,11 +69,15 @@ export const createCouponBodySchema = createCouponBodyBaseSchema.superRefine(
 	}
 );
 
+z.globalRegistry.add(createCouponBodySchema, { id: "CreateCouponBody" });
+
 export const updateCouponBodySchema = createCouponBodyBaseSchema
 	.partial()
 	.extend({
 		establishmentId: createCouponBodyBaseSchema.shape.establishmentId
 	});
+
+z.globalRegistry.add(updateCouponBodySchema, { id: "UpdateCouponBody" });
 
 export const checkCouponBodySchema = z.object({
 	code: z
@@ -84,6 +88,8 @@ export const checkCouponBodySchema = z.object({
 		.transform(val => val.toUpperCase()),
 	establishmentId: establishmentIdSchema
 });
+
+z.globalRegistry.add(checkCouponBodySchema, { id: "CheckCouponBody" });
 
 export const couponParamsSchema = z.object({
 	id: z.coerce

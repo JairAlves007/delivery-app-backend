@@ -7,20 +7,12 @@ import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
-import type { FilterField } from "@/types/crud.js";
+import type { FilterField, PaginatedResponse } from "@/types/crud.js";
 
 type ListCouponServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;
 
-interface ListCouponServiceResponse extends Pick<
-	ListCouponServiceRequest,
-	"page"
-> {
-	coupons: Coupon[];
-	total: number;
-	perPage?: number;
-	totalPages?: number;
-}
+type ListCouponServiceResponse = PaginatedResponse<Coupon>;
 
 export class ListCouponService {
 	private couponRepository: ICouponRepository;
@@ -63,17 +55,19 @@ export class ListCouponService {
 
 			const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages) {
+			if (page > totalPages && totalPages > 0) {
 				await cache.forget(key);
 				throw new InvalidPage();
 			}
 
 			return {
-				coupons,
-				page,
-				perPage,
-				total,
-				totalPages
+				items: coupons,
+				pagination: {
+					page,
+					perPage,
+					total,
+					totalPages
+				}
 			};
 		}
 
@@ -87,8 +81,13 @@ export class ListCouponService {
 		]);
 
 		return {
-			coupons,
-			total
+			items: coupons,
+			pagination: {
+				page: 1,
+				perPage: total,
+				total,
+				totalPages: 1
+			}
 		};
 	}
 }

@@ -1,4 +1,3 @@
-// fastify-jwt.d.js
 import "@fastify/jwt";
 
 import type { RoleType } from "@/generated/prisma/client.js";

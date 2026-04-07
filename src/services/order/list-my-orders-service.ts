@@ -5,19 +5,13 @@ import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { transformOrderByStatus } from "@/helpers/order.js";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
 import { listCursorQueryParamsSchema } from "@/schemas/generic-schema.js";
-import type { FilterField } from "@/types/crud.js";
+import type { CursorPaginatedResponse, FilterField } from "@/types/crud.js";
 import type { OrderPayload } from "@/types/order.js";
 
 type ListMyOrdersServiceRequest = z.infer<typeof listCursorQueryParamsSchema> &
 	FilterField;
 
-interface ListMyOrdersServiceResponse {
-	orders: OrderPayload[];
-	pagination: {
-		nextCursor: string | null;
-		hasNextPage: boolean;
-	};
-}
+type ListMyOrdersServiceResponse = CursorPaginatedResponse<OrderPayload>;
 
 export class ListMyOrdersService {
 	private orderRepository: IOrderRepository;
@@ -56,7 +50,7 @@ export class ListMyOrdersService {
 		});
 
 		return {
-			orders,
+			items: orders,
 			pagination: {
 				nextCursor,
 				hasNextPage: !!nextCursor

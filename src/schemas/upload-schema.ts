@@ -33,6 +33,8 @@ export const uploadSignedUrlBodySchema = z.object({
 	})
 });
 
+z.globalRegistry.add(uploadSignedUrlBodySchema, { id: "UploadSignedUrlBody" });
+
 export const uploadResourceRulesQuerySchema = z.object({
 	establishmentId: establishmentIdSchema,
 	forObject: z.enum(

@@ -133,12 +133,20 @@ export const createOrderBodySchema = z
 		return data;
 	});
 
+z.globalRegistry.add(createOrderBodySchema, { id: "CreateOrderBody" });
+
 export const cancelOrderBodySchema = z.object({
 	establishmentId: establishmentIdSchema
 });
 
+z.globalRegistry.add(cancelOrderBodySchema, { id: "CancelOrderBody" });
+
 export const updateOrderStatusBodySchema = cancelOrderBodySchema.extend({
 	status: z.enum(OrderStatusType, "O status do pedido deve ser preenchido")
+});
+
+z.globalRegistry.add(updateOrderStatusBodySchema, {
+	id: "UpdateOrderStatusBody"
 });
 
 export const orderParamsSchema = z.object({

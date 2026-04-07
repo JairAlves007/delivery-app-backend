@@ -8,10 +8,10 @@ import fastifySwagger from "@fastify/swagger";
 import scalarApiReference from "@scalar/fastify-api-reference";
 import fastify from "fastify";
 import {
-	jsonSchemaTransform,
+	createJsonSchemaTransform,
+	createJsonSchemaTransformObject,
 	serializerCompiler,
-	validatorCompiler,
-	type ZodTypeProvider
+	validatorCompiler
 } from "fastify-type-provider-zod";
 
 import { env } from "@/env.js";
@@ -40,8 +40,6 @@ const app = fastify({
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
-// ─── Swagger / Scalar ───────────────────────────────────────────────
-
 app.register(fastifySwagger, {
 	openapi: {
 		info: {
@@ -59,7 +57,16 @@ app.register(fastifySwagger, {
 			}
 		}
 	},
-	transform: jsonSchemaTransform
+	transform: createJsonSchemaTransform({
+		zodToJsonConfig: {
+			target: "openapi-3.0"
+		}
+	}),
+	transformObject: createJsonSchemaTransformObject({
+		zodToJsonConfig: {
+			target: "openapi-3.0"
+		}
+	})
 });
 
 app.register(scalarApiReference, {
@@ -76,20 +83,6 @@ app.register(scalarApiReference, {
 		]
 	}
 });
-
-app.withTypeProvider<ZodTypeProvider>().route({
-	method: "GET",
-	url: "/swagger.json",
-	schema: {
-		hide: true
-	},
-	handler: async () => {
-		return app.swagger();
-	}
-});
-
-// ─── Security: Helmet ───────────────────────────────────────────────
-// Security headers via @fastify/helmet. More restrictive in production.
 
 app.register(fastifyHelmet, {
 	global: true,
@@ -115,10 +108,6 @@ app.register(fastifyHelmet, {
 	xFrameOptions: { action: "deny" }
 });
 
-// ─── Security: CORS ─────────────────────────────────────────────────
-// Em production, ALLOWED_ORIGINS define a whitelist de origens permitidas.
-// Em development, permite qualquer origem para facilitar o desenvolvimento.
-
 app.register(fastifyCors, {
 	origin: isProduction
 		? env.ALLOWED_ORIGINS.split(",").map(o => o.trim())
@@ -128,17 +117,6 @@ app.register(fastifyCors, {
 	credentials: false,
 	maxAge: 86400
 });
-
-// ─── Security: CSRF ─────────────────────────────────────────────────
-// CSRF protection is NOT needed for this API because:
-// - Authentication uses exclusively JWT via "Authorization: Bearer" header
-// - No cookies are used for session management
-// - CSRF attacks exploit automatic cookie inclusion by browsers,
-//   which does not apply to Bearer token authentication
-
-// ─── Security: Rate Limiting ────────────────────────────────────────
-// Global rate limit with Redis store for multi-instance support.
-// Category-specific limits are applied per-route via `config.rateLimit`.
 
 app.register(fastifyRateLimit, {
 	global: true,
@@ -161,8 +139,6 @@ app.register(fastifyRateLimit, {
 	})
 });
 
-// ─── Auth: JWT ──────────────────────────────────────────────────────
-
 app.register(fastifyJwt, {
 	secret: env.JWT_SECRET,
 	sign: {
@@ -175,12 +151,8 @@ app.register(fastifyJwt, {
 	}
 });
 
-// ─── Plugins & Routes ───────────────────────────────────────────────
-
 app.register(replySendErrorPlugin);
 app.register(routes);
-
-// ─── Workers ────────────────────────────────────────────────────────
 
 app.addHook("onReady", () => {
 	try {
@@ -190,8 +162,6 @@ app.addHook("onReady", () => {
 		app.log.error({ error }, "❌ Failed to initialize BullMQ Workers");
 	}
 });
-
-// ─── Error Handling ─────────────────────────────────────────────────
 
 app.setErrorHandler((error, _request, reply) => {
 	if (!isProduction) app.log.error(error);

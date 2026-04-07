@@ -6,6 +6,7 @@ import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
+import type { PaginatedResponse } from "@/types/crud.js";
 import type {
 	EstablishmentFromRepository,
 	EstablishmentsList
@@ -13,15 +14,7 @@ import type {
 
 type ListEstablishmentServiceRequest = z.infer<typeof listQueryParamsSchema>;
 
-interface ListEstablishmentServiceResponse extends Pick<
-	ListEstablishmentServiceRequest,
-	"page"
-> {
-	establishments: EstablishmentsList[];
-	total: number;
-	perPage?: number;
-	totalPages?: number;
-}
+type ListEstablishmentServiceResponse = PaginatedResponse<EstablishmentsList>;
 
 export class ListEstablishmentService {
 	private establishmentRepository: IEstablishmentRepository;
@@ -72,17 +65,19 @@ export class ListEstablishmentService {
 
 			const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages) {
+			if (page > totalPages && totalPages > 0) {
 				await cache.forget(key);
 				throw new InvalidPage();
 			}
 
 			return {
-				establishments: this.mapEstablishments(establishments),
-				page,
-				perPage,
-				total,
-				totalPages
+				items: this.mapEstablishments(establishments),
+				pagination: {
+					page,
+					perPage,
+					total,
+					totalPages
+				}
 			};
 		}
 
@@ -96,8 +91,13 @@ export class ListEstablishmentService {
 		]);
 
 		return {
-			establishments: this.mapEstablishments(establishments),
-			total
+			items: this.mapEstablishments(establishments),
+			pagination: {
+				page: 1,
+				perPage: total,
+				total,
+				totalPages: 1
+			}
 		};
 	}
 }

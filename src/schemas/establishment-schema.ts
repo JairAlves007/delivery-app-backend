@@ -2,7 +2,7 @@ import z from "zod";
 
 import { checkIfCNPJIsValid } from "@/helpers/validation-errors.js";
 
-import { addressLocationSchema } from "./generic-schema.js";
+import { addressLocationSchema, userEmailSchema } from "./generic-schema.js";
 
 export const createEstablishmentBodySchema = z.object({
 	name: z.string().trim().min(1, "O nome deve ser preenchido").max(255),
@@ -12,10 +12,7 @@ export const createEstablishmentBodySchema = z.object({
 		.trim()
 		.min(1, "A descrição deve ser preenchida")
 		.max(1000, "A descrição deve ter no máximo 1000 caracteres"),
-	email: z
-		.email("Endereço de e-mail inválido")
-		.min(1, "O e-mail deve ser preenchido")
-		.max(320),
+	email: userEmailSchema,
 	cnpj: z
 		.string()
 		.max(18, "CNPJ inválido")
@@ -37,8 +34,16 @@ export const createEstablishmentBodySchema = z.object({
 		})
 });
 
+z.globalRegistry.add(createEstablishmentBodySchema, {
+	id: "CreateEstablishmentBody"
+});
+
 export const updateEstablishmentBodySchema =
 	createEstablishmentBodySchema.partial();
+
+z.globalRegistry.add(updateEstablishmentBodySchema, {
+	id: "UpdateEstablishmentBody"
+});
 
 export const establishmentParamsSchema = z.object({
 	id: z.ulid().min(1, "O id do estabelecimento deve ser preenchido")

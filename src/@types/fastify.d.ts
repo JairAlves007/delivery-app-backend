@@ -1,4 +1,3 @@
-// types/fastify.d.js
 import "fastify";
 
 import { RoleType } from "@/generated/prisma/client.js";

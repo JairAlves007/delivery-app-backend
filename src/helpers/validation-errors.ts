@@ -11,11 +11,13 @@ export const beautifyValidationErrors = (error: ZodError) => {
 			const stringKey = String(key);
 
 			if (index === path.length - 1) {
-				if (current[stringKey]) {
-					if (Array.isArray(current[stringKey])) {
-						current[stringKey].push(issue.message);
+				const existing = current[stringKey];
+
+				if (existing) {
+					if (Array.isArray(existing)) {
+						(existing as unknown[]).push(issue.message);
 					} else {
-						current[stringKey] = [current[stringKey], issue.message];
+						current[stringKey] = [existing, issue.message];
 					}
 				} else {
 					current[stringKey] = issue.message;

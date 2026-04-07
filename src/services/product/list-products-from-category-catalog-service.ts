@@ -7,6 +7,7 @@ import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
 import { listCursorQueryParamsSchema } from "@/schemas/generic-schema.js";
 import { listProductsFromCategorySchema } from "@/schemas/main-schema.js";
+import type { CursorPaginatedResponse } from "@/types/crud.js";
 import type { ProductFromRepository, ProductList } from "@/types/product.js";
 
 type ListProductsFromCategoryCatalogServiceRequest = z.infer<
@@ -14,13 +15,8 @@ type ListProductsFromCategoryCatalogServiceRequest = z.infer<
 > &
 	z.infer<typeof listProductsFromCategorySchema>;
 
-interface ListProductsFromCategoryCatalogServiceResponse {
-	products: ProductList[];
-	pagination: {
-		nextCursor: string | null;
-		hasNextPage: boolean;
-	};
-}
+type ListProductsFromCategoryCatalogServiceResponse =
+	CursorPaginatedResponse<ProductList>;
 
 export class ListProductsFromCategoryCatalogService {
 	private productRepository: IProductRepository;
@@ -75,7 +71,7 @@ export class ListProductsFromCategoryCatalogService {
 		if (products.length <= 0) await cache.forget(key);
 
 		return {
-			products: this.mapProducts(products),
+			items: this.mapProducts(products),
 			pagination: {
 				nextCursor,
 				hasNextPage: !!nextCursor

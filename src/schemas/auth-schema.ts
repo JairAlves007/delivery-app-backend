@@ -15,6 +15,8 @@ export const signInBodySchema = z.object({
 		.max(255)
 });
 
+z.globalRegistry.add(signInBodySchema, { id: "SignInBody" });
+
 export const signUpBodySchema = z.object({
 	name: z
 		.string("O nome deve ser preenchido")
@@ -33,9 +35,13 @@ export const signUpBodySchema = z.object({
 		.max(128, "A senha deve ter no máximo 128 caracteres")
 });
 
+z.globalRegistry.add(signUpBodySchema, { id: "SignUpBody" });
+
 export const forgotPasswordBodySchema = z.object({
 	email: userEmailSchema
 });
+
+z.globalRegistry.add(forgotPasswordBodySchema, { id: "ForgotPasswordBody" });
 
 export const resetPasswordBodySchema = z.object({
 	newPassword: z
@@ -47,3 +53,5 @@ export const resetPasswordBodySchema = z.object({
 		.min(1, "O token deve ser preenchido")
 		.max(255)
 });
+
+z.globalRegistry.add(resetPasswordBodySchema, { id: "ResetPasswordBody" });

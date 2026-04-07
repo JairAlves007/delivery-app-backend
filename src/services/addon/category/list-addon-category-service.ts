@@ -7,20 +7,12 @@ import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
-import type { FilterField } from "@/types/crud.js";
+import type { FilterField, PaginatedResponse } from "@/types/crud.js";
 
 type ListAddonCategoryServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;
 
-interface ListAddonCategoryServiceResponse extends Pick<
-	ListAddonCategoryServiceRequest,
-	"page"
-> {
-	addonCategories: AddonCategory[];
-	total: number;
-	perPage?: number;
-	totalPages?: number;
-}
+type ListAddonCategoryServiceResponse = PaginatedResponse<AddonCategory>;
 
 export class ListAddonCategoryService {
 	private addonCategoryRepository: IAddonCategoryRepository;
@@ -62,17 +54,19 @@ export class ListAddonCategoryService {
 
 			const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages) {
+			if (page > totalPages && totalPages > 0) {
 				await cache.forget(key);
 				throw new InvalidPage();
 			}
 
 			return {
-				addonCategories,
-				page,
-				perPage,
-				total,
-				totalPages
+				items: addonCategories,
+				pagination: {
+					page,
+					perPage,
+					total,
+					totalPages
+				}
 			};
 		}
 
@@ -86,9 +80,13 @@ export class ListAddonCategoryService {
 		]);
 
 		return {
-			addonCategories,
-			page,
-			total
+			items: addonCategories,
+			pagination: {
+				page: 1,
+				perPage: total,
+				total,
+				totalPages: 1
+			}
 		};
 	}
 }

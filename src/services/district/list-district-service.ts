@@ -8,20 +8,12 @@ import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { transformPriceFromDatabase } from "@/helpers/price.js";
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
-import type { FilterField } from "@/types/crud.js";
+import type { FilterField, PaginatedResponse } from "@/types/crud.js";
 
 type ListDistrictServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;
 
-interface ListDistrictServiceResponse extends Pick<
-	ListDistrictServiceRequest,
-	"page"
-> {
-	districts: District[];
-	total: number;
-	perPage?: number;
-	totalPages?: number;
-}
+type ListDistrictServiceResponse = PaginatedResponse<District>;
 
 export class ListDistrictService {
 	private districtRepository: IDistrictRepository;
@@ -71,17 +63,19 @@ export class ListDistrictService {
 
 			const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages) {
+			if (page > totalPages && totalPages > 0) {
 				await cache.forget(key);
 				throw new InvalidPage();
 			}
 
 			return {
-				districts: this.mapDistricts(districts),
-				page,
-				perPage,
-				total,
-				totalPages
+				items: this.mapDistricts(districts),
+				pagination: {
+					page,
+					perPage,
+					total,
+					totalPages
+				}
 			};
 		}
 
@@ -95,8 +89,13 @@ export class ListDistrictService {
 		]);
 
 		return {
-			districts: this.mapDistricts(districts),
-			total
+			items: this.mapDistricts(districts),
+			pagination: {
+				page: 1,
+				perPage: total,
+				total,
+				totalPages: 1
+			}
 		};
 	}
 }

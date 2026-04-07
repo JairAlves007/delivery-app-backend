@@ -8,20 +8,12 @@ import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { transformPriceFromDatabase } from "@/helpers/price.js";
 import type { IAddonRepository } from "@/interfaces/repositories/addon-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
-import type { FilterField } from "@/types/crud.js";
+import type { FilterField, PaginatedResponse } from "@/types/crud.js";
 
 type ListAddonServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;
 
-interface ListAddonServiceResponse extends Pick<
-	ListAddonServiceRequest,
-	"page"
-> {
-	addons: Addon[];
-	total: number;
-	perPage?: number;
-	totalPages?: number;
-}
+type ListAddonServiceResponse = PaginatedResponse<Addon>;
 
 export class ListAddonService {
 	private addonRepository: IAddonRepository;
@@ -55,7 +47,7 @@ export class ListAddonService {
 		if (isPaging) {
 			const key = `${prefixKey}${cache.keys.addons}_page_${page}_per_page_${perPage}`;
 			const [total, addons] = await Promise.all([
-				totalPromise,
+					totalPromise,
 				cache.remember(
 					key,
 					Constants.CACHE_TTL.addons,
@@ -70,17 +62,19 @@ export class ListAddonService {
 
 			const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages) {
+			if (page > totalPages && totalPages > 0) {
 				await cache.forget(key);
 				throw new InvalidPage();
 			}
 
 			return {
-				addons: this.mapAddons(addons),
-				page,
-				perPage,
-				total,
-				totalPages
+				items: this.mapAddons(addons),
+				pagination: {
+					page,
+					perPage,
+					total,
+					totalPages
+				}
 			};
 		}
 
@@ -94,8 +88,13 @@ export class ListAddonService {
 		]);
 
 		return {
-			addons: this.mapAddons(addons),
-			total
+			items: this.mapAddons(addons),
+			pagination: {
+				page: 1,
+				perPage: total,
+				total,
+				totalPages: 1
+			}
 		};
 	}
 }

@@ -6,18 +6,12 @@ import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IAddressRepository } from "@/interfaces/repositories/address-repository.js";
 import { listCursorQueryParamsSchema } from "@/schemas/generic-schema.js";
-import type { FilterField } from "@/types/crud.js";
+import type { CursorPaginatedResponse, FilterField } from "@/types/crud.js";
 
 type ListAddressServiceRequest = z.infer<typeof listCursorQueryParamsSchema> &
 	FilterField;
 
-interface ListAddressServiceResponse {
-	addresses: Address[];
-	pagination: {
-		nextCursor: string | null;
-		hasNextPage: boolean;
-	};
-}
+type ListAddressServiceResponse = CursorPaginatedResponse<Address>;
 
 export class ListAddressService {
 	private addressRepository: IAddressRepository;
@@ -53,7 +47,7 @@ export class ListAddressService {
 		if (addresses.length <= 0) await cache.forget(key);
 
 		return {
-			addresses,
+			items: addresses,
 			pagination: {
 				nextCursor,
 				hasNextPage: !!nextCursor

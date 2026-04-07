@@ -14,27 +14,20 @@ export const establishmentSlugSchema = z.object({
 	slug: z.string().trim().min(1, "O slug deve ser preenchido").max(255)
 });
 
+export const sortDirectionSchema = z.enum(
+	["asc", "desc"],
+	"Ordenação inválida"
+);
+
+z.globalRegistry.add(sortDirectionSchema, { id: "SortDirection" });
+
 export const searchAndOrderBySchema = z.object({
-	search: z
-		.string()
-		.trim()
-		.max(255)
-		.transform(val => val.toLowerCase())
-		.optional()
-		.nullable(),
-	sortField: z
-		.string()
-		.trim()
-		.max(100)
-		.transform(val => val.toLowerCase())
-		.optional()
-		.nullable(),
-	sortDirection: z
-		.enum(["asc", "desc"], "Ordenação inválida")
-		.transform(val => val.toLowerCase())
-		.optional()
-		.nullable()
+	search: z.string().trim().max(255).optional().nullable(),
+	sortField: z.string().trim().max(100).optional().nullable(),
+	sortDirection: sortDirectionSchema.optional().nullable()
 });
+
+z.globalRegistry.add(searchAndOrderBySchema, { id: "SearchAndOrderBy" });
 
 export const listQueryParamsSchema = searchAndOrderBySchema.extend({
 	page: z.coerce.number().int().min(1, "Pagina inválida").optional(),
@@ -45,6 +38,45 @@ export const listCursorQueryParamsSchema = searchAndOrderBySchema.extend({
 	limit: z.coerce.number().int().min(1, "Limite inválido").default(12),
 	cursor: z.ulid("Cursor inválido").nullable().optional()
 });
+
+export const paginationResponseSchema = z.object({
+	total: z.number(),
+	page: z.number(),
+	perPage: z.number(),
+	totalPages: z.number()
+});
+
+z.globalRegistry.add(paginationResponseSchema, { id: "PaginationResponse" });
+
+export const cursorPaginationResponseSchema = z.object({
+	nextCursor: z.string().nullable(),
+	hasNextPage: z.boolean()
+});
+
+z.globalRegistry.add(cursorPaginationResponseSchema, {
+	id: "CursorPaginationResponse"
+});
+
+export const paginatedResponseSchema = <T extends z.ZodTypeAny>(
+	itemSchema: T
+) =>
+	z.object({
+		items: z.array(itemSchema),
+		pagination: paginationResponseSchema
+	});
+
+export const cursorPaginatedResponseSchema = <T extends z.ZodTypeAny>(
+	itemSchema: T
+) =>
+	z.object({
+		items: z.array(itemSchema),
+		pagination: cursorPaginationResponseSchema
+	});
+
+export const listResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
+	z.object({
+		items: z.array(itemSchema)
+	});
 
 export const userIdSchema = z
 	.ulid("Usuário inválido")
@@ -102,3 +134,5 @@ export const addressLocationSchema = z.object({
 	latitude: z.number("A latitude deve ser preenchida").optional().nullable(),
 	longitude: z.number("A longitude deve ser preenchida").optional().nullable()
 });
+
+z.globalRegistry.add(addressLocationSchema, { id: "AddressLocation" });

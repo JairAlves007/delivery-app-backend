@@ -11,9 +11,13 @@ export const createAddonBodySchema = z.object({
 		.transform(val => transformPriceToDatabase(val))
 });
 
+z.globalRegistry.add(createAddonBodySchema, { id: "CreateAddonBody" });
+
 export const updateAddonBodySchema = createAddonBodySchema.partial().extend({
 	categoryId: createAddonBodySchema.shape.categoryId
 });
+
+z.globalRegistry.add(updateAddonBodySchema, { id: "UpdateAddonBody" });
 
 export const addonParamsSchema = z.object({
 	id: z.coerce

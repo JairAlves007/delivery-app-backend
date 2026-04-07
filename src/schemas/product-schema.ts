@@ -53,11 +53,15 @@ export const createProductBodySchema = createProductBodyBaseSchema.superRefine(
 	}
 );
 
+z.globalRegistry.add(createProductBodySchema, { id: "CreateProductBody" });
+
 export const updateProductBodySchema = createProductBodyBaseSchema
 	.partial()
 	.extend({
 		establishmentId: createProductBodyBaseSchema.shape.establishmentId
 	});
+
+z.globalRegistry.add(updateProductBodySchema, { id: "UpdateProductBody" });
 
 export const productParamsSchema = z.object({
 	id: z.ulid().min(1, "O id do produto deve ser preenchido")

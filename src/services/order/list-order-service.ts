@@ -6,21 +6,13 @@ import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { transformOrderByStatus } from "@/helpers/order.js";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
-import type { FilterField } from "@/types/crud.js";
+import type { FilterField, PaginatedResponse } from "@/types/crud.js";
 import type { OrderFromRepository, OrderPayload } from "@/types/order.js";
 
 type ListOrderServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;
 
-interface ListOrderServiceResponse extends Pick<
-	ListOrderServiceRequest,
-	"page"
-> {
-	orders: OrderPayload[];
-	total: number;
-	perPage?: number;
-	totalPages?: number;
-}
+type ListOrderServiceResponse = PaginatedResponse<OrderPayload>;
 
 export class ListOrderService {
 	private orderRepository: IOrderRepository;
@@ -66,17 +58,19 @@ export class ListOrderService {
 
 			const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages) {
+			if (page > totalPages && totalPages > 0) {
 				await cache.forget(key);
 				throw new InvalidPage();
 			}
 
 			return {
-				orders: this.mapOrders(orders),
-				total,
-				page,
-				perPage,
-				totalPages
+				items: this.mapOrders(orders),
+				pagination: {
+					page,
+					perPage,
+					total,
+					totalPages
+				}
 			};
 		}
 
@@ -89,8 +83,13 @@ export class ListOrderService {
 		]);
 
 		return {
-			orders: this.mapOrders(orders),
-			total
+			items: this.mapOrders(orders),
+			pagination: {
+				page: 1,
+				perPage: total,
+				total,
+				totalPages: 1
+			}
 		};
 	}
 }

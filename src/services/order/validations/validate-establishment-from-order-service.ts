@@ -33,6 +33,5 @@ export class ValidateEstablishmentFromOrderService {
 		if (establishment.only_delivery && deliveryType !== DeliveryType.DELIVERY)
 			throw new EstablishmentIsOnlyDeliveryError();
 
-		// if (!isEstablishmentOpen(establishment)) throw new EstablishmentIsClosed();
 	}
 }

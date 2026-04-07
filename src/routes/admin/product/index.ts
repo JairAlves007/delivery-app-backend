@@ -1,6 +1,5 @@
 import type { FastifyInstance } from "fastify";
 
-import { adminProductCategoryRoutes } from "./category/index.js";
 import { createProductRoute } from "./create-product.route.js";
 import { deleteProductRoute } from "./delete-product.route.js";
 import { findProductRoute } from "./find-product.route.js";
@@ -13,6 +12,4 @@ export const adminProductRoutes = async (app: FastifyInstance) => {
 	app.register(createProductRoute);
 	app.register(updateProductRoute);
 	app.register(deleteProductRoute);
-
-	app.register(adminProductCategoryRoutes, { prefix: "/categories" });
 };

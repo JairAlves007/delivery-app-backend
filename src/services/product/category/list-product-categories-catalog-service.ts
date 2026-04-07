@@ -8,6 +8,7 @@ import {
 	establishmentParamsSchema,
 	listCursorQueryParamsSchema
 } from "@/schemas/generic-schema.js";
+import type { CursorPaginatedResponse } from "@/types/crud.js";
 import type {
 	ProductCategoryFromRepository,
 	ProductCategoryList
@@ -18,13 +19,8 @@ type ListProductCategoriesCatalogServiceRequest = z.infer<
 > &
 	z.infer<typeof establishmentParamsSchema>;
 
-interface ListProductCategoriesCatalogServiceResponse {
-	productCategories: ProductCategoryList[];
-	pagination: {
-		nextCursor: string | null;
-		hasNextPage: boolean;
-	};
-}
+type ListProductCategoriesCatalogServiceResponse =
+	CursorPaginatedResponse<ProductCategoryList>;
 
 export class ListProductCategoriesCatalogService {
 	private productCategoryRepository: IProductCategoryRepository;
@@ -74,7 +70,7 @@ export class ListProductCategoriesCatalogService {
 		if (productCategories.length <= 0) await cache.forget(key);
 
 		return {
-			productCategories: this.mapProductCategories(productCategories),
+			items: this.mapProductCategories(productCategories),
 			pagination: {
 				nextCursor,
 				hasNextPage: !!nextCursor
