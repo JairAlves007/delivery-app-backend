@@ -76,7 +76,7 @@ app.register(scalarApiReference, {
 		theme: "deepSpace",
 		sources: [
 			{
-				url: "/swagger.json",
+				url: "/api/swagger.json",
 				title: "Documentação da API de um SaaS de Delivery",
 				slug: "documentacao-da-api-de-um-saas-de-delivery"
 			}
