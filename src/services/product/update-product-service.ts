@@ -28,6 +28,8 @@ export class UpdateProductService {
 		bannerIds,
 		tagIds,
 		paramsToForget,
+		discountPercentage: discount_percentage,
+		validUntil: valid_until,
 		...data
 	}: UpdateProductRequest) {
 		await this.productRepository.deleteOldTags(id);
@@ -36,6 +38,8 @@ export class UpdateProductService {
 			id,
 			data: {
 				...data,
+				discount_percentage,
+				valid_until,
 				name,
 				...(!!name && { slug: slugify(name) }),
 				establishment: {

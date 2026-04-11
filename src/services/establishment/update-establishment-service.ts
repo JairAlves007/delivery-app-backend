@@ -1,7 +1,6 @@
 import z from "zod";
 
 import { Prisma } from "@/generated/prisma/client.js";
-import { slugify } from "@/helpers/utils.js";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import { updateEstablishmentBodySchema } from "@/schemas/establishment-schema.js";
@@ -23,16 +22,18 @@ export class UpdateEstablishmentService {
 
 	async handle({
 		id,
-		name,
 		address,
 		nextBillingDate: next_billing_date,
+		acceptsCreditCard: accepts_credit_card,
+		onlyDelivery: only_delivery,
 		paramsToForget,
 		...data
 	}: UpdateEstablishmentRequest) {
 		const updateInput: Prisma.EstablishmentUpdateInput = {
 			...data,
 			next_billing_date,
-			...(!!name && { slug: slugify(name) })
+			accepts_credit_card,
+			only_delivery
 		};
 
 		if (address) {

@@ -21,6 +21,8 @@ export class CreateProductService {
 		categoryId,
 		bannerIds,
 		tagIds,
+		discountPercentage: discount_percentage,
+		validUntil: valid_until,
 		paramsToForget,
 		...data
 	}: CreateProductServiceRequest): Promise<void> {
@@ -33,6 +35,8 @@ export class CreateProductService {
 		await this.productRepository.create({
 			...data,
 			slug: slugify(data.name),
+			discount_percentage,
+			valid_until,
 			establishment: {
 				connect: {
 					id: establishmentId
