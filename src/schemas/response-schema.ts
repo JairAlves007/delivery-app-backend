@@ -43,26 +43,16 @@ export const resourceResponseSchema = z.object({
 	updated_at: dateStringSchema
 });
 
-const rawResourceArraySchema = z.array(
-	z.object({
-		resource: resourceResponseSchema
-	})
-);
-
 const mappedResourceRecordSchema = z.record(
-	z.string(),
+	z.enum(ResourceType),
 	z
 		.object({
 			id: z.string(),
-			path: z.string()
+			path: z.string(),
+			fileKey: z.string()
 		})
 		.optional()
 );
-
-export const resourceItemSchema = z.union([
-	rawResourceArraySchema,
-	mappedResourceRecordSchema
-]);
 
 // ──────────────────────────────────────────────
 // Addon
@@ -120,7 +110,7 @@ export const bannerResponseSchema = z.object({
 	link_type: z.enum(BannerLinkType),
 	product_id: z.string().nullable(),
 	category_id: z.string().nullable(),
-	resources: resourceItemSchema
+	resources: mappedResourceRecordSchema
 });
 
 export const bannerListResponseSchema =
@@ -218,7 +208,7 @@ export const establishmentResponseSchema = z.object({
 	is_manually_closed: z.boolean(),
 	next_billing_date: dateStringSchema,
 	address: establishmentAddressSchema,
-	resources: resourceItemSchema,
+	resources: mappedResourceRecordSchema,
 	socialLinks: z.array(socialLinkSchema),
 	openingHours: z.array(openingHourSchema),
 	closures: z.array(closureSchema)
@@ -237,7 +227,7 @@ export const productCategoryResponseSchema = z.object({
 	name: z.string(),
 	slug: z.string(),
 	order: z.number().nullable(),
-	resources: resourceItemSchema
+	resources: mappedResourceRecordSchema
 });
 
 export const productCategoryListResponseSchema = paginatedResponseSchema(
@@ -258,7 +248,7 @@ export const productResponseSchema = z.object({
 	discount_percentage: z.number().nullable(),
 	stock: z.number().nullable(),
 	valid_until: nullableDateStringSchema,
-	resources: resourceItemSchema
+	resources: mappedResourceRecordSchema
 });
 
 export const productListResponseSchema = paginatedResponseSchema(
@@ -466,7 +456,7 @@ export const healthResponseSchema = z.object({
 
 const registryItems = [
 	{ schema: resourceResponseSchema, id: "ResourceResponse" },
-	{ schema: resourceItemSchema, id: "ResourceItem" },
+	{ schema: mappedResourceRecordSchema, id: "ResourceItem" },
 	{ schema: addonResponseSchema, id: "AddonResponse" },
 	{ schema: addonCategoryResponseSchema, id: "AddonCategoryResponse" },
 	{ schema: addonCategoryListResponseSchema, id: "AddonCategoryListResponse" },

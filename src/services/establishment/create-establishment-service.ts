@@ -20,7 +20,11 @@ export class CreateEstablishmentService {
 
 	async handle({
 		name,
-		address: { postalCode: postal_code, ...address },
+		address: {
+			postalCode: postal_code,
+			referencePoint: reference_point,
+			...address
+		},
 		acceptsCreditCard: accepts_credit_card,
 		onlyDelivery: only_delivery,
 		nextBillingDate: next_billing_date,
@@ -39,6 +43,7 @@ export class CreateEstablishmentService {
 					address: {
 						create: {
 							...address,
+							reference_point,
 							postal_code
 						}
 					}

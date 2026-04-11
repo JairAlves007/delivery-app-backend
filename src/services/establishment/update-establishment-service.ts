@@ -37,14 +37,15 @@ export class UpdateEstablishmentService {
 		};
 
 		if (address) {
-			const { postalCode, ...rest } = address;
+			const { postalCode, referencePoint, ...rest } = address;
 
 			updateInput.address = {
 				update: {
 					address: {
 						update: {
 							...rest,
-							postal_code: postalCode
+							postal_code: postalCode,
+							reference_point: referencePoint
 						}
 					}
 				}

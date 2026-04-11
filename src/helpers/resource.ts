@@ -38,9 +38,10 @@ export const mapObjectResourcesList = (
 			resource: { id, type, path, file_key }
 		} = currentItem;
 
-		acc[type.toLowerCase()] = {
+		acc[type] = {
 			id,
-			path: env.PUBLIC_BUCKET_URL + `${path}/${file_key}`
+			path: env.PUBLIC_BUCKET_URL + `/${path}/${file_key}`,
+			fileKey: file_key
 		};
 
 		return acc;
