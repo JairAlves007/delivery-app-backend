@@ -29,6 +29,7 @@ export class ListEstablishmentService {
 		return establishments.map(establishment => {
 			return {
 				...establishment,
+				address: establishment.address?.address ?? null,
 				resources: mapObjectResourcesList(establishment.resources)
 			};
 		});

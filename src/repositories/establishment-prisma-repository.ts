@@ -36,6 +36,11 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 				...where
 			},
 			include: {
+				address: {
+					select: {
+						address: true
+					}
+				},
 				resources: {
 					select: {
 						resource: true
@@ -94,6 +99,11 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 				...where
 			},
 			include: {
+				address: {
+					select: {
+						address: true
+					}
+				},
 				resources: {
 					select: {
 						resource: true
@@ -117,6 +127,11 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 				OR: [{ next_billing_date: { gt: new Date() } }]
 			},
 			include: {
+				address: {
+					select: {
+						address: true
+					}
+				},
 				resources: {
 					select: {
 						resource: true
@@ -137,6 +152,11 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 				OR: [{ next_billing_date: { gt: new Date() } }]
 			},
 			include: {
+				address: {
+					select: {
+						address: true
+					}
+				},
 				resources: {
 					select: {
 						resource: true

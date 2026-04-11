@@ -8,6 +8,11 @@ import type { FilterParams } from "./crud.js";
 
 export type EstablishmentFromRepository = Prisma.EstablishmentGetPayload<{
 	include: {
+		address: {
+			select: {
+				address: true;
+			};
+		};
 		resources: {
 			select: {
 				resource: true;

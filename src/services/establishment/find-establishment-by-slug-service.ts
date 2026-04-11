@@ -1,8 +1,12 @@
 import { EstablishmentNotFound } from "@/errors/establishment/not-found-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
-import type { EstablishmentFromRepository } from "@/types/establishment.js";
+import type {
+	EstablishmentFromRepository,
+	EstablishmentsList
+} from "@/types/establishment.js";
 
 export class FindEstablishmentBySlugService {
 	private establishmentRepository: IEstablishmentRepository;
@@ -11,7 +15,17 @@ export class FindEstablishmentBySlugService {
 		this.establishmentRepository = establishmentRepository;
 	}
 
-	async handle(slug: string): Promise<EstablishmentFromRepository> {
+	private mapEstablishment(
+		establishment: EstablishmentFromRepository
+	): EstablishmentsList {
+		return {
+			...establishment,
+			address: establishment.address?.address ?? null,
+			resources: mapObjectResourcesList(establishment.resources)
+		};
+	}
+
+	async handle(slug: string): Promise<EstablishmentsList> {
 		const cache = makeCache();
 		const prefixKey = getFilterParamsCacheKey({
 			establishment_slug: slug
@@ -25,6 +39,6 @@ export class FindEstablishmentBySlugService {
 
 		if (!establishment) throw new EstablishmentNotFound();
 
-		return establishment;
+		return this.mapEstablishment(establishment);
 	}
 }

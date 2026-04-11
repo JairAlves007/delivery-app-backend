@@ -189,6 +189,23 @@ const closureSchema = z.object({
 	reason: z.string().nullable()
 });
 
+const establishmentAddressSchema = z
+	.object({
+		id: z.string(),
+		street: z.string(),
+		number: z.string().nullable(),
+		neighborhood: z.string(),
+		city: z.string(),
+		state: z.string(),
+		postal_code: z.string(),
+		complement: z.string().nullable(),
+		reference_point: z.string().nullable(),
+		phone: z.string(),
+		latitude: z.number().nullable(),
+		longitude: z.number().nullable()
+	})
+	.nullable();
+
 export const establishmentResponseSchema = z.object({
 	id: z.string(),
 	name: z.string(),
@@ -200,6 +217,7 @@ export const establishmentResponseSchema = z.object({
 	accepts_credit_card: z.boolean(),
 	is_manually_closed: z.boolean(),
 	next_billing_date: dateStringSchema,
+	address: establishmentAddressSchema,
 	resources: resourceItemSchema,
 	socialLinks: z.array(socialLinkSchema),
 	openingHours: z.array(openingHourSchema),
