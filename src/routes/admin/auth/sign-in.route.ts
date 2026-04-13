@@ -72,20 +72,7 @@ export const signInRoute = async (app: FastifyInstance) => {
 						email: user.email
 					},
 					establishment: {
-						id: establishmentData.id,
-						name: establishmentData.name,
-						slug: establishmentData.slug,
-						description: establishmentData.description,
-						email: establishmentData.email,
-						cnpj: establishmentData.cnpj,
-						only_delivery: establishmentData.only_delivery,
-						accepts_credit_card: establishmentData.accepts_credit_card,
-						is_manually_closed: establishmentData.is_manually_closed,
-						created_at: establishmentData.created_at,
-						resources: establishmentData.resources,
-						socialLinks: establishmentData.socialLinks,
-						openingHours: establishmentData.openingHours,
-						closures: establishmentData.closures,
+						...establishmentData,
 						isOpen: isEstablishmentOpen(establishmentData)
 					},
 					menu,

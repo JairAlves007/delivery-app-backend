@@ -1,10 +1,13 @@
 import { WeekDay } from "@/generated/prisma/client.js";
-import type { EstablishmentFromRepository } from "@/types/establishment.js";
+import type { EstablishmentsList } from "@/types/establishment.js";
 
 import { parseHourToToday } from "./date.js";
 
 export function isEstablishmentOpen(
-	establishment: EstablishmentFromRepository
+	establishment: Pick<
+		EstablishmentsList,
+		"is_manually_closed" | "closures" | "openingHours"
+	>
 ): boolean {
 	const now = new Date();
 

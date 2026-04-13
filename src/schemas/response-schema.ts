@@ -44,7 +44,7 @@ export const resourceResponseSchema = z.object({
 });
 
 const mappedResourceRecordSchema = z.record(
-	z.enum(ResourceType),
+	z.string(),
 	z
 		.object({
 			id: z.string(),
