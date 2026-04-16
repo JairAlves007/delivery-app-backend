@@ -4,9 +4,10 @@ import { BannerNotFound } from "@/errors/banner/not-found-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.js";
 import { bannerParamsSchema } from "@/schemas/banner-schema.js";
-import type { BannerFromRepository } from "@/types/banner.js";
+import type { BannerList } from "@/types/banner.js";
 import type { FilterField } from "@/types/crud.js";
 
 type FindBannerServiceRequest = z.infer<typeof bannerParamsSchema> &
@@ -22,7 +23,7 @@ export class FindBannerService {
 	async handle({
 		id,
 		filterParams
-	}: FindBannerServiceRequest): Promise<BannerFromRepository> {
+	}: FindBannerServiceRequest): Promise<BannerList> {
 		const cache = makeCache();
 		const filterPrefixKey = getFilterParamsCacheKey(filterParams);
 		const key = `${filterPrefixKey}${cache.keys.banners}_${id}`;
@@ -35,6 +36,9 @@ export class FindBannerService {
 
 		if (!banner) throw new BannerNotFound();
 
-		return banner;
+		return {
+			...banner,
+			resources: mapObjectResourcesList(banner.resources)
+		};
 	}
 }

@@ -2,7 +2,7 @@ import { ProductNotFound } from "@/errors/product/not-found-error.js";
 import { ProductOutOfStockError } from "@/errors/product/out-of-stock-error.js";
 import { makeFindProductService } from "@/factories/services/product/make-find-product-service.js";
 import type { EstablishmentID } from "@/types/establishment.js";
-import type { ProductFromRepository } from "@/types/product.js";
+import type { ProductList } from "@/types/product.js";
 
 type ValidateProductFromOrderServiceRequest = {
 	establishmentId: EstablishmentID;
@@ -15,7 +15,7 @@ export class ValidateProductFromOrderService {
 		establishmentId,
 		productId,
 		productQuantity
-	}: ValidateProductFromOrderServiceRequest): Promise<ProductFromRepository> {
+	}: ValidateProductFromOrderServiceRequest): Promise<ProductList> {
 		const filterParams = { establishment_id: establishmentId };
 		const findProductService = makeFindProductService();
 

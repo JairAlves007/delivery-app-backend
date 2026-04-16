@@ -13,7 +13,7 @@ import type { AddonFromRepository } from "./addon.js";
 import type { UserAddressWithDefault } from "./address.js";
 import type { ForgetAllListingCacheKeysParams } from "./cache.js";
 import type { EstablishmentID } from "./establishment.js";
-import type { ProductFromRepository } from "./product.js";
+import type { ProductList } from "./product.js";
 import type { UserID, UserWithRole } from "./user.js";
 
 export type OrderFromRepository = Prisma.OrderGetPayload<{
@@ -69,7 +69,7 @@ export type OrderItems = {
 };
 
 export type OrderItemsToProcess = {
-	product: ProductFromRepository & {
+	product: ProductList & {
 		quantity: number;
 	};
 	addons: OrderAddonsToProcess[];

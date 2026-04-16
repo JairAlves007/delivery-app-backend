@@ -3,10 +3,11 @@ import z from "zod";
 import { ProductNotFound } from "@/errors/product/not-found-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
+import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
 import { productParamsSchema } from "@/schemas/product-schema.js";
 import type { FilterField } from "@/types/crud.js";
-import type { ProductFromRepository } from "@/types/product.js";
+import type { ProductList } from "@/types/product.js";
 
 type FindProductServiceRequest = z.infer<typeof productParamsSchema> &
 	FilterField;
@@ -21,7 +22,7 @@ export class FindProductService {
 	public async handle({
 		id,
 		filterParams
-	}: FindProductServiceRequest): Promise<ProductFromRepository> {
+	}: FindProductServiceRequest): Promise<ProductList> {
 		const cache = makeCache();
 		const filterPrefixKey = getFilterParamsCacheKey(filterParams);
 		const key = `${filterPrefixKey}${cache.keys.products}_${id}`;
@@ -33,6 +34,9 @@ export class FindProductService {
 
 		if (!product) throw new ProductNotFound();
 
-		return product;
+		return {
+			...product,
+			resources: mapObjectResourcesList(product.resources)
+		};
 	}
 }
