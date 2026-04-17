@@ -8,16 +8,12 @@ export const dashboardGranularitySchema = z.enum(
 	"Granularidade inválida"
 );
 
-z.globalRegistry.add(dashboardGranularitySchema, { id: "DashboardGranularity" });
-
 export const dashboardQuerySchema = z
 	.object({
-		from: z.coerce.date("Data inicial inválida").optional(),
-		to: z.coerce.date("Data final inválida").optional(),
+		from: z.coerce.date().optional(),
+		to: z.coerce.date().optional(),
 		granularity: dashboardGranularitySchema.default("day"),
-		establishmentId: z
-			.ulid("O id do estabelecimento deve ser um ULID válido")
-			.optional()
+		establishmentId: z.ulid().optional()
 	})
 	.superRefine((data, ctx) => {
 		if (data.from && data.to && data.from > data.to) {
@@ -39,5 +35,3 @@ export const dashboardQuerySchema = z
 			}
 		}
 	});
-
-z.globalRegistry.add(dashboardQuerySchema, { id: "DashboardQuery" });

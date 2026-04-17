@@ -17,6 +17,7 @@ import {
 	WeekDay
 } from "@/generated/prisma/client.js";
 
+import { dashboardGranularitySchema } from "./dashboard-schema.js";
 import {
 	cursorPaginatedResponseSchema,
 	listResponseSchema,
@@ -390,7 +391,7 @@ export const dashboardResponseSchema = z.object({
 	range: z.object({
 		from: z.string(),
 		to: z.string(),
-		granularity: z.enum(["day", "week", "month"]),
+		granularity: dashboardGranularitySchema,
 		timezone: z.string()
 	}),
 	scope: z.object({
