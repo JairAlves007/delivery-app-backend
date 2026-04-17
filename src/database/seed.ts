@@ -35,7 +35,8 @@ async function main() {
 		PermissionType.MANAGE_OWN_ESTABLISHMENT,
 		PermissionType.MANAGE_BANNERS,
 		PermissionType.MANAGE_COUPONS,
-		PermissionType.VIEW_CUSTOMERS
+		PermissionType.VIEW_CUSTOMERS,
+		PermissionType.VIEW_DASHBOARD
 	];
 	const customerPermissions: PermissionType[] = [
 		PermissionType.VIEW_CATALOG,

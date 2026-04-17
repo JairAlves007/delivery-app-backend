@@ -13,6 +13,8 @@ export default class Constants {
 	public static readonly PASSWORD_RESET_TOKEN_EXPIRES_IN_SECONDS: number =
 		60 * 60;
 	public static readonly MAX_LISTING_LIMIT: number = 200;
+	public static readonly DASHBOARD_TOP_N: number = 10;
+	public static readonly DASHBOARD_TIMEZONE: string = "America/Fortaleza";
 
 	// Regex
 	public static readonly PHONE_REGEX: RegExp = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
@@ -38,11 +40,14 @@ export default class Constants {
 		menus: "menus",
 		addresses: "addresses",
 		resourceRules: "resource_rules",
-		orders: "orders"
+		orders: "orders",
+		dashboard: "dashboard"
 	};
 
 	/** Cache TTL em segundos, por domínio */
 	public static readonly CACHE_TTL = {
+		/** Dashboard agregado — 1 min (leituras frequentes, freshness moderada) */
+		dashboard: 60,
 		/** Pedidos mudam de status frequentemente — 2 min */
 		orders: 60 * 2,
 		/** Cupons podem expirar ou atingir limite de uso — 5 min */

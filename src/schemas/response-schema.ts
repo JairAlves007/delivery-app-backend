@@ -312,6 +312,106 @@ export const myOrdersResponseSchema =
 	cursorPaginatedResponseSchema(orderPayloadSchema);
 
 // ──────────────────────────────────────────────
+// Dashboard
+// ──────────────────────────────────────────────
+
+const dashboardSummarySchema = z.object({
+	totalOrders: z.number(),
+	paidOrders: z.number(),
+	cancelledOrders: z.number(),
+	grossRevenue: z.number(),
+	discountsTotal: z.number(),
+	shippingTotal: z.number(),
+	netRevenue: z.number(),
+	averageOrderValue: z.number(),
+	distinctCustomers: z.number()
+});
+
+const dashboardBucketSchema = z.object({
+	bucket: z.string(),
+	orders: z.number(),
+	revenue: z.number()
+});
+
+const dashboardStatusSchema = z.object({
+	status: z.enum(OrderStatusType),
+	count: z.number(),
+	revenue: z.number()
+});
+
+const dashboardPaymentMethodSchema = z.object({
+	method: z.enum(PaymentMethodType),
+	count: z.number(),
+	revenue: z.number()
+});
+
+const dashboardDeliveryTypeSchema = z.object({
+	type: z.enum(DeliveryType),
+	count: z.number(),
+	revenue: z.number()
+});
+
+const dashboardTopProductSchema = z.object({
+	productId: z.string(),
+	name: z.string(),
+	unitsSold: z.number(),
+	revenue: z.number()
+});
+
+const dashboardTopCategorySchema = z.object({
+	categoryId: z.string(),
+	name: z.string(),
+	unitsSold: z.number(),
+	revenue: z.number()
+});
+
+const dashboardTopCustomerSchema = z.object({
+	userId: z.string(),
+	name: z.string(),
+	orders: z.number(),
+	spent: z.number()
+});
+
+const dashboardCouponUsageSchema = z.object({
+	code: z.string(),
+	ordersWithCoupon: z.number(),
+	discountTotal: z.number()
+});
+
+const dashboardTopEstablishmentSchema = z.object({
+	establishmentId: z.string(),
+	name: z.string(),
+	orders: z.number(),
+	revenue: z.number()
+});
+
+export const dashboardResponseSchema = z.object({
+	currency: z.literal("BRL"),
+	range: z.object({
+		from: z.string(),
+		to: z.string(),
+		granularity: z.enum(["day", "week", "month"]),
+		timezone: z.string()
+	}),
+	scope: z.object({
+		type: z.enum(["GLOBAL", "ESTABLISHMENT"]),
+		establishmentId: z.string().nullable()
+	}),
+	summary: dashboardSummarySchema,
+	ordersOverTime: z.array(dashboardBucketSchema),
+	ordersByStatus: z.array(dashboardStatusSchema),
+	ordersByPaymentMethod: z.array(dashboardPaymentMethodSchema),
+	ordersByDeliveryType: z.array(dashboardDeliveryTypeSchema),
+	topProducts: z.array(dashboardTopProductSchema),
+	topCategories: z.array(dashboardTopCategorySchema),
+	topCustomers: z.array(dashboardTopCustomerSchema).nullable(),
+	couponsUsage: z.array(dashboardCouponUsageSchema),
+	topEstablishments: z.array(dashboardTopEstablishmentSchema).nullable(),
+	establishmentsCount: z.number().nullable(),
+	usersCount: z.number().nullable()
+});
+
+// ──────────────────────────────────────────────
 // Upload / Resource Rules
 // ──────────────────────────────────────────────
 
@@ -476,6 +576,7 @@ const registryItems = [
 	{ schema: orderPayloadSchema, id: "OrderPayload" },
 	{ schema: orderListResponseSchema, id: "OrderListResponse" },
 	{ schema: myOrdersResponseSchema, id: "MyOrdersResponse" },
+	{ schema: dashboardResponseSchema, id: "DashboardResponse" },
 	{ schema: resourceRuleResponseSchema, id: "ResourceRuleResponse" },
 	{ schema: signedUrlResponseSchema, id: "SignedUrlResponse" },
 	{ schema: signInAdminResponseSchema, id: "SignInAdminResponse" },

@@ -1,3 +1,5 @@
+import Constants from "./constants.js";
+
 export function parseHourToToday(hour: string): Date {
 	const [hours, minutes] = hour.split(":").map(Number);
 
@@ -22,7 +24,7 @@ export const formatDateToHumanReadable = (date: Date): string => {
 		hour: "2-digit",
 		minute: "2-digit",
 		hour12: false,
-		timeZone: "America/Sao_Paulo"
+		timeZone: Constants.DASHBOARD_TIMEZONE
 	};
 
 	const formatter = new Intl.DateTimeFormat("pt-BR", options);

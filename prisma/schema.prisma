@@ -91,6 +91,7 @@ enum PermissionType {
   // Admin
   MANAGE_ESTABLISHMENTS
   MANAGE_USERS
+  VIEW_DASHBOARD
 }
 
 enum TagType {
