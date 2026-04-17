@@ -8,11 +8,6 @@ export const setupCreateOrderWorker = () => {
 
 	orderQueue.registerProcessor(async payload => {
 		const createOrderService = makeCreateOrderService();
-
-		try {
-			await createOrderService.handle({ ...payload });
-		} catch (error) {
-			console.log("[Event] Error creating order:", error);
-		}
+		await createOrderService.handle({ ...payload });
 	});
 };

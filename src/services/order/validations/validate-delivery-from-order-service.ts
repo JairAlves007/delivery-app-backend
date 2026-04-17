@@ -23,27 +23,20 @@ export class ValidateDeliveryFromOrderService {
 		couponId,
 		addressId,
 		districtId
-	}: ValidateDeliveryFromOrderServiceRequest) {
+	}: ValidateDeliveryFromOrderServiceRequest): Promise<OrderInfo> {
 		const orderInfos: OrderInfo = {
 			coupon: null,
 			address: null,
 			district: null
 		};
 
-		if (!couponId || deliveryType != DeliveryType.DELIVERY) return orderInfos;
-
-		const validateCoupon = makeValidateCouponFromOrderService();
-
-		orderInfos.coupon = await validateCoupon.handle({
-			couponId: couponId,
-			establishmentId,
-			userId
-		});
+		if (deliveryType !== DeliveryType.DELIVERY) return orderInfos;
 
 		const findAddressService = makeFindAddressService();
 		const findDistrictService = makeFindDistrictService();
+		const validateCouponService = makeValidateCouponFromOrderService();
 
-		const [address, district] = await Promise.all([
+		const [address, district, coupon] = await Promise.all([
 			addressId
 				? findAddressService.handle({
 						id: addressId,
@@ -55,12 +48,15 @@ export class ValidateDeliveryFromOrderService {
 						id: districtId,
 						filterParams: { establishment_id: establishmentId }
 					})
+				: null,
+			couponId
+				? validateCouponService.handle({ couponId, establishmentId, userId })
 				: null
 		]);
 
 		if (address) orderInfos.address = address;
-
 		if (district) orderInfos.district = district;
+		if (coupon) orderInfos.coupon = coupon;
 
 		return orderInfos;
 	}

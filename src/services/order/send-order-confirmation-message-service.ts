@@ -6,6 +6,7 @@ import {
 	getPaymentMethodLabel
 } from "@/helpers/order.js";
 import { transformPriceToHumanReadable } from "@/helpers/price.js";
+import { app } from "@/http/app.js";
 import type { BuildOrderItemsParams } from "@/types/order.js";
 
 export class SendOrderConfirmationMessageService {
@@ -164,9 +165,8 @@ export class SendOrderConfirmationMessageService {
 	}
 
 	async handle(params: BuildOrderItemsParams) {
-		// TODO: Implement message sending via WhatsApp Business API
 		const message = this.generateMessage(params);
 
-		console.log({ message });
+		app.log.info({ message }, "[Order] confirmation message built");
 	}
 }

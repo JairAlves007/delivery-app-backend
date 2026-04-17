@@ -1,7 +1,7 @@
 import { CancelOrderNotAllowed } from "@/errors/order/cancel-not-allowed-error.js";
 import { OrderNotFound } from "@/errors/order/not-found-error.js";
 import { OrderStatusType } from "@/generated/prisma/client.js";
-import { getStatusLabel, transformOrderByStatus } from "@/helpers/order.js";
+import { getStatusLabel } from "@/helpers/order.js";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import type { FilterField } from "@/types/crud.js";
@@ -25,9 +25,9 @@ export class CancelOrderFromCustomerService {
 
 		if (!orderFromRepository) throw new OrderNotFound();
 
-		const order = transformOrderByStatus(orderFromRepository);
+		const latestStatus = orderFromRepository.statuses[0]?.value;
 
-		if (order.status.value !== OrderStatusType.PREPARING)
+		if (latestStatus !== OrderStatusType.PREPARING)
 			throw new CancelOrderNotAllowed();
 
 		const cancelStatus: OrderStatusType = OrderStatusType.CANCELLED;

@@ -2,6 +2,7 @@ import {
 	type ConnectionOptions,
 	type DefaultJobOptions,
 	Job,
+	type JobsOptions,
 	Queue,
 	Worker
 } from "bullmq";
@@ -78,8 +79,8 @@ export class BaseQueue<T = unknown> {
 		return this.instances.get(queueName) as BaseQueue<T>;
 	}
 
-	async enqueue(name: string, data: T): Promise<void> {
-		await this.provider.add({ name, data });
+	async enqueue(name: string, data: T, options?: JobsOptions): Promise<void> {
+		await this.provider.add({ name, data, options });
 	}
 
 	registerProcessor(handler: (data: T) => Promise<void>): void {

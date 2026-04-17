@@ -1,6 +1,11 @@
+import { ProductOutOfStockError } from "@/errors/product/out-of-stock-error.js";
 import type { Prisma } from "@/generated/prisma/client.js";
+import Constants from "@/helpers/constants.js";
 import { transformValidFilterParams } from "@/helpers/crud.js";
-import type { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
+import type {
+	CreateOrderRepositoryOptions,
+	IOrderRepository
+} from "@/interfaces/repositories/order-repository.js";
 import prisma from "@/lib/prisma.js";
 import type {
 	CursorPaginationParams,
@@ -12,6 +17,18 @@ import type {
 } from "@/types/crud.js";
 import type { OrderFromRepository } from "@/types/order.js";
 
+const orderInclude = {
+	coupon: true,
+	items: { include: { addons: true } },
+	orderCoupon: true,
+	orderDeliveryAddress: true,
+	statuses: {
+		select: { label: true, value: true },
+		orderBy: { created_at: "desc" },
+		take: 1
+	}
+} satisfies Prisma.OrderInclude;
+
 export class OrderPrismaRepository implements IOrderRepository {
 	async listAll(filterParams?: FilterParams): Promise<OrderFromRepository[]> {
 		const params = transformValidFilterParams(filterParams);
@@ -21,21 +38,8 @@ export class OrderPrismaRepository implements IOrderRepository {
 				deleted_at: null,
 				...params
 			},
-			take: 200,
-			include: {
-				coupon: true,
-				items: true,
-				statuses: {
-					select: {
-						label: true,
-						value: true
-					},
-					orderBy: {
-						created_at: "desc"
-					},
-					take: 1
-				}
-			},
+			take: Constants.MAX_LISTING_LIMIT,
+			include: orderInclude,
 			orderBy: {
 				created_at: "desc"
 			}
@@ -67,20 +71,7 @@ export class OrderPrismaRepository implements IOrderRepository {
 				deleted_at: null,
 				...params
 			},
-			include: {
-				coupon: true,
-				items: true,
-				statuses: {
-					select: {
-						label: true,
-						value: true
-					},
-					orderBy: {
-						created_at: "desc"
-					},
-					take: 1
-				}
-			},
+			include: orderInclude,
 			orderBy: {
 				created_at: "desc"
 			}
@@ -99,20 +90,7 @@ export class OrderPrismaRepository implements IOrderRepository {
 				deleted_at: null,
 				...params
 			},
-			include: {
-				coupon: true,
-				items: true,
-				statuses: {
-					select: {
-						label: true,
-						value: true
-					},
-					orderBy: {
-						created_at: "desc"
-					},
-					take: 1
-				}
-			},
+			include: orderInclude,
 			orderBy: {
 				created_at: "desc"
 			},
@@ -128,31 +106,43 @@ export class OrderPrismaRepository implements IOrderRepository {
 	}: FindByIdParams<string>): Promise<OrderFromRepository | null> {
 		const params = transformValidFilterParams(filterParams);
 
-		return await prisma.order.findUnique({
+		return await prisma.order.findFirst({
 			where: {
 				id,
 				deleted_at: null,
 				...params
 			},
-			include: {
-				coupon: true,
-				items: true,
-				statuses: {
-					select: {
-						label: true,
-						value: true
-					},
-					orderBy: {
-						created_at: "desc"
-					},
-					take: 1
-				}
-			}
+			include: orderInclude
 		});
 	}
 
-	async create(data: Prisma.OrderCreateInput): Promise<void> {
-		await prisma.order.create({ data });
+	async create(
+		data: Prisma.OrderCreateInput,
+		options?: CreateOrderRepositoryOptions
+	): Promise<void> {
+		const stockDecrements = options?.stockDecrements ?? [];
+
+		if (stockDecrements.length === 0) {
+			await prisma.order.create({ data });
+			return;
+		}
+
+		await prisma.$transaction(async tx => {
+			for (const { productId, quantity } of stockDecrements) {
+				const { count } = await tx.product.updateMany({
+					where: {
+						id: productId,
+						deleted_at: null,
+						stock: { gte: quantity }
+					},
+					data: { stock: { decrement: quantity } }
+				});
+
+				if (count === 0) throw new ProductOutOfStockError();
+			}
+
+			await tx.order.create({ data });
+		});
 	}
 
 	async update({

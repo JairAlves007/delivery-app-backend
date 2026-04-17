@@ -26,9 +26,9 @@ export const getFilterParamsCacheKey = (
 
 	const orderedEntries = [
 		...primaryKeys.map(key => [key, params[key]] as const),
-		...Object.entries(params).filter(
-			([key]) => !primaryKeys.includes(key as keyof FilterParams)
-		)
+		...Object.entries(params)
+			.filter(([key]) => !primaryKeys.includes(key as keyof FilterParams))
+			.sort(([a], [b]) => a.localeCompare(b))
 	];
 
 	const validEntries = orderedEntries.filter(

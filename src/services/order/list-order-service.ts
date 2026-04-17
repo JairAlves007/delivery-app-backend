@@ -2,6 +2,7 @@ import z from "zod";
 
 import { InvalidPage } from "@/errors/pagination/invalid-page.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { transformOrderByStatus } from "@/helpers/order.js";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
@@ -36,8 +37,10 @@ export class ListOrderService {
 		const prefixKey = getFilterParamsCacheKey(filterParams);
 
 		const isPaging = !!page;
-		const totalPromise = cache.rememberForever(
+		const ttl = Constants.CACHE_TTL.orders;
+		const totalPromise = cache.remember(
 			`${prefixKey}total_${cache.keys.orders}`,
+			ttl,
 			async () => await this.orderRepository.count(filterParams)
 		);
 
@@ -45,8 +48,9 @@ export class ListOrderService {
 			const key = `${prefixKey}${cache.keys.orders}_page_${page}_per_page_${perPage}`;
 			const [total, orders] = await Promise.all([
 				totalPromise,
-				cache.rememberForever(
+				cache.remember(
 					key,
+					ttl,
 					async () =>
 						await this.orderRepository.paginate({
 							page,
@@ -76,8 +80,9 @@ export class ListOrderService {
 
 		const [total, orders] = await Promise.all([
 			totalPromise,
-			cache.rememberForever(
+			cache.remember(
 				`${prefixKey}${cache.keys.orders}`,
+				ttl,
 				async () => await this.orderRepository.listAll(filterParams)
 			)
 		]);

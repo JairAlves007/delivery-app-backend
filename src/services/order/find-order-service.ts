@@ -2,6 +2,7 @@ import z from "zod";
 
 import { OrderNotFound } from "@/errors/order/not-found-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { transformOrderByStatus } from "@/helpers/order.js";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
@@ -22,8 +23,9 @@ export class FindOrderService {
 		const prefixKey = getFilterParamsCacheKey(filterParams);
 
 		const key = `${prefixKey}${cache.keys.orders}_${id}`;
-		const order = await cache.rememberForever(
+		const order = await cache.remember(
 			key,
+			Constants.CACHE_TTL.orders,
 			async () => await this.orderRepository.findById({ id, filterParams })
 		);
 

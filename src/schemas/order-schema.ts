@@ -46,41 +46,43 @@ export const createOrderBodySchema = z
 			.min(0, "O troco deve ser maior ou igual a zero")
 			.optional()
 			.nullable(),
-		items: z.array(
-			z.object({
-				id: z
-					.string("O id deve ser preenchido")
-					.min(1, "O id deve ser maior que zero"),
-				quantity: z
-					.number("A quantidade deve ser preenchida")
-					.int("A quantidade deve ser um número inteiro")
-					.min(1, "A quantidade deve ser maior que zero"),
-				addonCategories: z
-					.array(
-						z.object({
-							id: z.coerce
-								.number("O id deve ser preenchido")
-								.int()
-								.min(1, "O id deve ser maior que zero"),
-							addons: z.array(
-								z.object({
-									id: z.coerce
-										.number("O id deve ser preenchido")
-										.int()
-										.min(1, "O id deve ser maior que zero"),
-									quantity: z
-										.number("A quantidade deve ser preenchida")
-										.int()
-										.min(1, "A quantidade deve ser maior que zero")
-										.default(1)
-								})
-							)
-						})
-					)
-					.optional()
-					.nullable()
-			})
-		)
+		items: z
+			.array(
+				z.object({
+					id: z
+						.string("O id deve ser preenchido")
+						.min(1, "O id deve ser maior que zero"),
+					quantity: z
+						.number("A quantidade deve ser preenchida")
+						.int("A quantidade deve ser um número inteiro")
+						.min(1, "A quantidade deve ser maior que zero"),
+					addonCategories: z
+						.array(
+							z.object({
+								id: z.coerce
+									.number("O id deve ser preenchido")
+									.int()
+									.min(1, "O id deve ser maior que zero"),
+								addons: z.array(
+									z.object({
+										id: z.coerce
+											.number("O id deve ser preenchido")
+											.int()
+											.min(1, "O id deve ser maior que zero"),
+										quantity: z
+											.number("A quantidade deve ser preenchida")
+											.int()
+											.min(1, "A quantidade deve ser maior que zero")
+											.default(1)
+									})
+								)
+							})
+						)
+						.optional()
+						.nullable()
+				})
+			)
+			.min(1, "O pedido deve ter ao menos um item")
 	})
 	.superRefine((data, ctx) => {
 		if (

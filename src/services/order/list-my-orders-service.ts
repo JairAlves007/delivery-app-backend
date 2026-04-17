@@ -1,6 +1,7 @@
 import z from "zod";
 
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { transformOrderByStatus } from "@/helpers/order.js";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
@@ -30,8 +31,9 @@ export class ListMyOrdersService {
 		const prefixKey = getFilterParamsCacheKey(filterParams);
 		const key = `${prefixKey}${cache.keys.orders}_limit_${limit}${cursorSuffix}`;
 
-		const raw = await cache.rememberForever(
+		const raw = await cache.remember(
 			key,
+			Constants.CACHE_TTL.orders,
 			async () =>
 				await this.orderRepository.cursorPaginate({
 					limit,

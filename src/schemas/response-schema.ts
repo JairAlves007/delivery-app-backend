@@ -400,11 +400,7 @@ export const signInCustomerResponseSchema = z.object({
 	token: z.string()
 });
 
-export const signUpTokenResponseSchema = z.object({
-	type: z.string(),
-	expiresIn: z.number(),
-	token: z.string()
-});
+export const signUpTokenResponseSchema = signInCustomerResponseSchema;
 
 // ──────────────────────────────────────────────
 // Main (Catalog)

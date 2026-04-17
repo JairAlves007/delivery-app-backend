@@ -12,6 +12,7 @@ export default class Constants {
 	public static readonly SIGNED_URL_EXPIRES_IN_MINUTES: number = 60 * 4;
 	public static readonly PASSWORD_RESET_TOKEN_EXPIRES_IN_SECONDS: number =
 		60 * 60;
+	public static readonly MAX_LISTING_LIMIT: number = 200;
 
 	// Regex
 	public static readonly PHONE_REGEX: RegExp = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;

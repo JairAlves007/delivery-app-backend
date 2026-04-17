@@ -19,7 +19,9 @@ import type { UserID, UserWithRole } from "./user.js";
 export type OrderFromRepository = Prisma.OrderGetPayload<{
 	include: {
 		coupon: true;
-		items: true;
+		items: { include: { addons: true } };
+		orderCoupon: true;
+		orderDeliveryAddress: true;
 		statuses: {
 			select: {
 				label: true;

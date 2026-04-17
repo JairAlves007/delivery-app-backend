@@ -25,7 +25,6 @@ import type { UserAddressWithDefault } from "@/types/address.js";
 import type {
 	BuildOrderItemsParams,
 	CreateOrderParams,
-	OrderAddonsToProcess,
 	OrderItems,
 	OrderItemsToProcess
 } from "@/types/order.js";
@@ -108,7 +107,6 @@ export class CreateOrderService {
 		orderItemsToProcess
 	}: BuildOrderItemsParams): Prisma.OrderCreateInput {
 		const couponData = this.getOrderCouponInputData(coupon);
-
 		const orderAddress = this.getOrderAddressDistrictInputData(
 			address,
 			district
@@ -134,14 +132,20 @@ export class CreateOrderService {
 				}
 			},
 			items: {
-				createMany: {
-					data: orderItemsToProcess.map(item => ({
-						product_id: item.product.id,
-						product_name: item.product.name,
-						product_price: item.product.price,
-						quantity: item.product.quantity
-					}))
-				}
+				create: orderItemsToProcess.map(item => ({
+					product_id: item.product.id,
+					product_name: item.product.name,
+					product_price: item.product.price,
+					quantity: item.product.quantity,
+					addons: {
+						create: item.addons.map(addon => ({
+							addon_id: addon.id,
+							addon_name: addon.name,
+							addon_price: addon.price,
+							quantity: addon.quantity
+						}))
+					}
+				}))
 			},
 			statuses: {
 				create: {
@@ -165,70 +169,72 @@ export class CreateOrderService {
 			districtId,
 			userId,
 			comment,
+			contactPhone,
 			items
 		} = order;
+
 		const findUserService = makeFindUserService();
-
-		const user = await findUserService.handle(userId);
-
-		if (!user) throw new UserNotFound();
-
 		const validateEstablishment = makeValidateEstablishmentFromOrderService();
-
-		await validateEstablishment.handle({
-			establishmentId,
-			deliveryType,
-			paymentMethod
-		});
-
 		const validateDeliveryService = makeValidateDeliveryFromOrderService();
 		const validateProductService = makeValidateProductFromOrderService();
 		const validateAddonsService = makeValidateAddonsFromOrderService();
 		const calculateCouponDiscountService =
 			makeCalculateCouponDiscountFromOrderService();
 
-		const { address, coupon, district } = await validateDeliveryService.handle({
-			deliveryType,
-			establishmentId,
-			userId,
-			addressId,
-			couponId,
-			districtId
-		});
-
 		const itemsValidated: OrderItems[] = removeDuplicateItems(items);
-		const orderItemsToProcess: OrderItemsToProcess[] = [];
 
-		for (const item of itemsValidated) {
-			const product = await validateProductService.handle({
+		const [user, , delivery] = await Promise.all([
+			findUserService.handle(userId),
+			validateEstablishment.handle({
 				establishmentId,
-				productId: item.id,
-				productQuantity: item.quantity
-			});
+				deliveryType,
+				paymentMethod
+			}),
+			validateDeliveryService.handle({
+				deliveryType,
+				establishmentId,
+				userId,
+				addressId,
+				couponId,
+				districtId
+			})
+		]);
 
-			const addons: OrderAddonsToProcess[] = await validateAddonsService.handle(
-				{
-					establishmentId,
-					orderAddons: item.addonCategories
-				}
-			);
+		if (!user) throw new UserNotFound();
 
-			const discount = getValueDiscounted(
-				DiscountType.PERCENTAGE,
-				product?.discount_percentage ?? 0,
-				product.price
-			);
-			const price = transformPriceFromDatabase(product.price - discount);
+		const { address, coupon, district } = delivery;
 
-			orderItemsToProcess.push({
-				product: {
-					...product,
-					quantity: item.quantity,
-					price
-				},
-				addons
-			});
-		}
+		const orderItemsToProcess: OrderItemsToProcess[] = await Promise.all(
+			itemsValidated.map(async item => {
+				const [product, addons] = await Promise.all([
+					validateProductService.handle({
+						establishmentId,
+						productId: item.id,
+						productQuantity: item.quantity
+					}),
+					validateAddonsService.handle({
+						establishmentId,
+						orderAddons: item.addonCategories
+					})
+				]);
+
+				const discount = getValueDiscounted(
+					DiscountType.PERCENTAGE,
+					product.discount_percentage ?? 0,
+					product.price
+				);
+				const price = transformPriceFromDatabase(product.price - discount);
+
+				return {
+					product: {
+						...product,
+						quantity: item.quantity,
+						price
+					},
+					addons
+				};
+			})
+		);
 
 		const { shippingCost, subtotal, couponDiscount } =
 			calculateCouponDiscountService.handle({
@@ -236,6 +242,13 @@ export class CreateOrderService {
 				district,
 				orderItemsToProcess
 			});
+
+		const stockDecrements = orderItemsToProcess
+			.filter(item => item.product.stock !== null)
+			.map(item => ({
+				productId: item.product.id,
+				quantity: item.product.quantity
+			}));
 
 		await this.orderRepository.create(
 			this.buildOrderItems({
@@ -251,8 +264,10 @@ export class CreateOrderService {
 				user,
 				changeAmount,
 				comment,
+				contactPhone,
 				orderItemsToProcess
-			})
+			}),
+			{ stockDecrements }
 		);
 
 		await forgetAllListingCacheKeysQueue({

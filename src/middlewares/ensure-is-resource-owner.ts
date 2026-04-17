@@ -12,7 +12,7 @@ export const ensureIsResourceOwner = (resource: ResourceType) => {
 		if (!user) throw new UserUnauthenticated();
 
 		const { id } = request.params as { id?: string };
-		if (!id) return; // If there is no ID in the params, skip ownership block
+		if (!id) return;
 
 		let isOwner = false;
 
