@@ -97,6 +97,22 @@ export class MenuPrismaRepository implements IMenuRepository {
 				for_role: RoleType.ESTABLISHMENT_OWNER
 			},
 			{
+				label: "Adicionais",
+				slug: "addons",
+				establishment_id: establishmentId,
+				view_type: ViewType.VIEW_ADDONS,
+				order: 5,
+				for_role: RoleType.ESTABLISHMENT_OWNER
+			},
+			{
+				label: "Categorias dos Adicionais",
+				slug: "addon-categories",
+				establishment_id: establishmentId,
+				view_type: ViewType.VIEW_ADDON_CATEGORIES,
+				order: 5,
+				for_role: RoleType.ESTABLISHMENT_OWNER
+			},
+			{
 				label: "Pedidos",
 				slug: "orders",
 				establishment_id: establishmentId,
