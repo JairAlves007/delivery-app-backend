@@ -79,98 +79,195 @@ export class MenuPrismaRepository implements IMenuRepository {
 			}
 		];
 
-		const establishmentOwnerMenuItems: Prisma.MenuCreateManyInput[] = [
-			{
-				label: "Produtos",
-				slug: "products",
-				establishment_id: establishmentId,
-				view_type: ViewType.VIEW_PRODUCTS,
-				order: 4,
-				for_role: RoleType.ESTABLISHMENT_OWNER
-			},
-			{
-				label: "Categorias dos Produtos",
-				slug: "product-categories",
-				establishment_id: establishmentId,
-				view_type: ViewType.VIEW_PRODUCT_CATEGORIES,
-				order: 5,
-				for_role: RoleType.ESTABLISHMENT_OWNER
-			},
-			{
-				label: "Adicionais",
-				slug: "addons",
-				establishment_id: establishmentId,
-				view_type: ViewType.VIEW_ADDONS,
-				order: 5,
-				for_role: RoleType.ESTABLISHMENT_OWNER
-			},
-			{
-				label: "Categorias dos Adicionais",
-				slug: "addon-categories",
-				establishment_id: establishmentId,
-				view_type: ViewType.VIEW_ADDON_CATEGORIES,
-				order: 5,
-				for_role: RoleType.ESTABLISHMENT_OWNER
-			},
-			{
-				label: "Pedidos",
-				slug: "orders",
-				establishment_id: establishmentId,
-				view_type: ViewType.VIEW_ORDERS,
-				order: 6,
-				for_role: RoleType.ESTABLISHMENT_OWNER
-			},
-			{
-				label: "Cupons",
-				slug: "coupons",
-				establishment_id: establishmentId,
-				view_type: ViewType.VIEW_COUPONS,
-				order: 7,
-				for_role: RoleType.ESTABLISHMENT_OWNER
-			}
-		];
+		const createEstablishmentOwnerMenus = async () => {
+			await prisma.menu.create({
+				data: {
+					label: "Produtos",
+					slug: "products",
+					establishment_id: establishmentId,
+					view_type: ViewType.VIEW_PRODUCTS,
+					order: 4,
+					for_role: RoleType.ESTABLISHMENT_OWNER,
+					submenus: {
+						create: [
+							{
+								label: "Ver produtos",
+								slug: "view-products",
+								view_type: ViewType.VIEW_PRODUCTS,
+								order: 1
+							},
+							{
+								label: "Categorias dos Produtos",
+								slug: "product-categories",
+								view_type: ViewType.VIEW_PRODUCT_CATEGORIES,
+								order: 2
+							}
+						]
+					}
+				}
+			});
 
-		const adminMenuItems: Prisma.MenuCreateManyInput[] = [
-			{
-				label: "Dashboard",
-				slug: "dashboard",
-				establishment_id: establishmentId,
-				view_type: ViewType.VIEW_DASHBOARD,
-				order: 1,
-				for_role: RoleType.ADMIN
-			},
-			{
-				label: "Estabelecimentos",
-				slug: "establishments",
-				establishment_id: establishmentId,
-				view_type: ViewType.VIEW_ESTABLISHMENTS,
-				order: 2,
-				for_role: RoleType.ADMIN
-			},
-			{
-				label: "Clientes",
-				slug: "customers",
-				establishment_id: establishmentId,
-				view_type: ViewType.VIEW_CUSTOMERS,
-				order: 3,
-				for_role: RoleType.ADMIN
-			},
-			...establishmentOwnerMenuItems.map(menu => ({
-				...menu,
-				for_role: RoleType.ADMIN
-			}))
-		];
+			await prisma.menu.create({
+				data: {
+					label: "Adicionais",
+					slug: "addons",
+					establishment_id: establishmentId,
+					view_type: ViewType.VIEW_ADDONS,
+					order: 5,
+					for_role: RoleType.ESTABLISHMENT_OWNER,
+					submenus: {
+						create: [
+							{
+								label: "Ver Adicionais",
+								slug: "view-addons",
+								view_type: ViewType.VIEW_ADDONS,
+								order: 1
+							},
+							{
+								label: "Categorias dos Adicionais",
+								slug: "addon-categories",
+								view_type: ViewType.VIEW_ADDON_CATEGORIES,
+								order: 2
+							}
+						]
+					}
+				}
+			});
+
+			await prisma.menu.createMany({
+				data: [
+					{
+						label: "Pedidos",
+						slug: "orders",
+						establishment_id: establishmentId,
+						view_type: ViewType.VIEW_ORDERS,
+						order: 6,
+						for_role: RoleType.ESTABLISHMENT_OWNER
+					},
+					{
+						label: "Cupons",
+						slug: "coupons",
+						establishment_id: establishmentId,
+						view_type: ViewType.VIEW_COUPONS,
+						order: 7,
+						for_role: RoleType.ESTABLISHMENT_OWNER
+					}
+				]
+			});
+		};
+
+		const createAdminMenus = async () => {
+			await prisma.menu.create({
+				data: {
+					label: "Produtos",
+					slug: "products",
+					establishment_id: establishmentId,
+					view_type: ViewType.VIEW_PRODUCTS,
+					order: 4,
+					for_role: RoleType.ADMIN,
+					submenus: {
+						create: [
+							{
+								label: "Ver produtos",
+								slug: "view-products",
+								view_type: ViewType.VIEW_PRODUCTS,
+								order: 1
+							},
+							{
+								label: "Categorias dos Produtos",
+								slug: "product-categories",
+								view_type: ViewType.VIEW_PRODUCT_CATEGORIES,
+								order: 2
+							}
+						]
+					}
+				}
+			});
+
+			await prisma.menu.create({
+				data: {
+					label: "Adicionais",
+					slug: "addons",
+					establishment_id: establishmentId,
+					view_type: ViewType.VIEW_ADDONS,
+					order: 5,
+					for_role: RoleType.ADMIN,
+					submenus: {
+						create: [
+							{
+								label: "Ver Adicionais",
+								slug: "view-addons",
+								view_type: ViewType.VIEW_ADDONS,
+								order: 1
+							},
+							{
+								label: "Categorias dos Adicionais",
+								slug: "addon-categories",
+								view_type: ViewType.VIEW_ADDON_CATEGORIES,
+								order: 2
+							}
+						]
+					}
+				}
+			});
+
+			await prisma.menu.createMany({
+				data: [
+					{
+						label: "Pedidos",
+						slug: "orders",
+						establishment_id: establishmentId,
+						view_type: ViewType.VIEW_ORDERS,
+						order: 6,
+						for_role: RoleType.ADMIN
+					},
+					{
+						label: "Cupons",
+						slug: "coupons",
+						establishment_id: establishmentId,
+						view_type: ViewType.VIEW_COUPONS,
+						order: 7,
+						for_role: RoleType.ADMIN
+					}
+				]
+			});
+		};
 
 		await prisma.menu.createMany({
 			data: customerMenuItems
 		});
 
-		await prisma.menu.createMany({
-			data: establishmentOwnerMenuItems
-		});
+		await createEstablishmentOwnerMenus();
 
 		await prisma.menu.createMany({
-			data: adminMenuItems
+			data: [
+				{
+					label: "Dashboard",
+					slug: "dashboard",
+					establishment_id: establishmentId,
+					view_type: ViewType.VIEW_DASHBOARD,
+					order: 1,
+					for_role: RoleType.ADMIN
+				},
+				{
+					label: "Estabelecimentos",
+					slug: "establishments",
+					establishment_id: establishmentId,
+					view_type: ViewType.VIEW_ESTABLISHMENTS,
+					order: 2,
+					for_role: RoleType.ADMIN
+				},
+				{
+					label: "Clientes",
+					slug: "customers",
+					establishment_id: establishmentId,
+					view_type: ViewType.VIEW_CUSTOMERS,
+					order: 3,
+					for_role: RoleType.ADMIN
+				}
+			]
 		});
+
+		await createAdminMenus();
 	}
 }
