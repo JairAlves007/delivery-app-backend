@@ -259,7 +259,7 @@ export class MenuPrismaRepository implements IMenuRepository {
 						establishment_id: establishmentId,
 						view_type: ViewType.VIEW_BANNERS,
 						order: 8,
-						for_role: RoleType.ESTABLISHMENT_OWNER
+						for_role: RoleType.ADMIN
 					},
 					{
 						label: "Distritos",
@@ -267,7 +267,7 @@ export class MenuPrismaRepository implements IMenuRepository {
 						establishment_id: establishmentId,
 						view_type: ViewType.VIEW_DISTRICTS,
 						order: 9,
-						for_role: RoleType.ESTABLISHMENT_OWNER
+						for_role: RoleType.ADMIN
 					}
 				]
 			});
