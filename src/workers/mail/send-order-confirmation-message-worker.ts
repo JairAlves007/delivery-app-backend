@@ -1,10 +1,10 @@
 import { makeSendOrderConfirmationMessageService } from "@/factories/services/order/make-send-order-confirmation-message.js";
 import { makeQueue } from "@/factories/services/queue/make-queue.js";
-import { mailQueueName } from "@/queues/mail-queue.js";
+import { orderConfirmationQueueName } from "@/queues/mail-queue.js";
 import type { BuildOrderItemsParams } from "@/types/order.js";
 
 export const setupSendOrderConfirmationMessageWorker = async () => {
-	const mailQueue = makeQueue<BuildOrderItemsParams>(mailQueueName);
+	const mailQueue = makeQueue<BuildOrderItemsParams>(orderConfirmationQueueName);
 
 	mailQueue.registerProcessor(async payload => {
 		const sendOrderConfirmationMessageService =

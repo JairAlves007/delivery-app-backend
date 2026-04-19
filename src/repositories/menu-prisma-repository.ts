@@ -91,15 +91,15 @@ export class MenuPrismaRepository implements IMenuRepository {
 					submenus: {
 						create: [
 							{
-								label: "Ver produtos",
-								slug: "view-products",
-								view_type: ViewType.VIEW_PRODUCTS,
+								label: "Ver Categorias dos Produtos",
+								slug: "view-product-categories",
+								view_type: ViewType.VIEW_PRODUCT_CATEGORIES,
 								order: 1
 							},
 							{
-								label: "Categorias dos Produtos",
-								slug: "product-categories",
-								view_type: ViewType.VIEW_PRODUCT_CATEGORIES,
+								label: "Ver produtos",
+								slug: "view-products",
+								view_type: ViewType.VIEW_PRODUCTS,
 								order: 2
 							}
 						]
@@ -118,15 +118,15 @@ export class MenuPrismaRepository implements IMenuRepository {
 					submenus: {
 						create: [
 							{
-								label: "Ver Adicionais",
-								slug: "view-addons",
-								view_type: ViewType.VIEW_ADDONS,
+								label: "Ver Categorias dos Adicionais",
+								slug: "view-addon-categories",
+								view_type: ViewType.VIEW_ADDON_CATEGORIES,
 								order: 1
 							},
 							{
-								label: "Categorias dos Adicionais",
-								slug: "addon-categories",
-								view_type: ViewType.VIEW_ADDON_CATEGORIES,
+								label: "Ver Adicionais",
+								slug: "view-addons",
+								view_type: ViewType.VIEW_ADDONS,
 								order: 2
 							}
 						]
@@ -136,6 +136,14 @@ export class MenuPrismaRepository implements IMenuRepository {
 
 			await prisma.menu.createMany({
 				data: [
+					{
+						label: "Dashboard",
+						slug: "dashboard",
+						establishment_id: establishmentId,
+						view_type: ViewType.VIEW_DASHBOARD,
+						order: 1,
+						for_role: RoleType.ESTABLISHMENT_OWNER
+					},
 					{
 						label: "Pedidos",
 						slug: "orders",
@@ -150,6 +158,22 @@ export class MenuPrismaRepository implements IMenuRepository {
 						establishment_id: establishmentId,
 						view_type: ViewType.VIEW_COUPONS,
 						order: 7,
+						for_role: RoleType.ESTABLISHMENT_OWNER
+					},
+					{
+						label: "Banners",
+						slug: "banners",
+						establishment_id: establishmentId,
+						view_type: ViewType.VIEW_BANNERS,
+						order: 8,
+						for_role: RoleType.ESTABLISHMENT_OWNER
+					},
+					{
+						label: "Distritos",
+						slug: "districts",
+						establishment_id: establishmentId,
+						view_type: ViewType.VIEW_DISTRICTS,
+						order: 9,
 						for_role: RoleType.ESTABLISHMENT_OWNER
 					}
 				]
@@ -168,15 +192,15 @@ export class MenuPrismaRepository implements IMenuRepository {
 					submenus: {
 						create: [
 							{
-								label: "Ver produtos",
-								slug: "view-products",
-								view_type: ViewType.VIEW_PRODUCTS,
+								label: "Ver Categorias dos Produtos",
+								slug: "view-product-categories",
+								view_type: ViewType.VIEW_PRODUCT_CATEGORIES,
 								order: 1
 							},
 							{
-								label: "Categorias dos Produtos",
-								slug: "product-categories",
-								view_type: ViewType.VIEW_PRODUCT_CATEGORIES,
+								label: "Ver produtos",
+								slug: "view-products",
+								view_type: ViewType.VIEW_PRODUCTS,
 								order: 2
 							}
 						]
@@ -195,15 +219,15 @@ export class MenuPrismaRepository implements IMenuRepository {
 					submenus: {
 						create: [
 							{
-								label: "Ver Adicionais",
-								slug: "view-addons",
-								view_type: ViewType.VIEW_ADDONS,
+								label: "Ver Categorias dos Adicionais",
+								slug: "view-addon-categories",
+								view_type: ViewType.VIEW_ADDON_CATEGORIES,
 								order: 1
 							},
 							{
-								label: "Categorias dos Adicionais",
-								slug: "addon-categories",
-								view_type: ViewType.VIEW_ADDON_CATEGORIES,
+								label: "Ver Adicionais",
+								slug: "view-addons",
+								view_type: ViewType.VIEW_ADDONS,
 								order: 2
 							}
 						]

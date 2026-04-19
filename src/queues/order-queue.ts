@@ -34,7 +34,7 @@ const buildOrderJobId = ({ order }: CreateOrderParams): string => {
 		items
 	});
 
-	return `create-order:${createHash("sha1").update(payload).digest("hex")}`;
+	return `create-order-${createHash("sha1").update(payload).digest("hex")}`;
 };
 
 export const createOrderQueue = async (payload: CreateOrderParams) => {
