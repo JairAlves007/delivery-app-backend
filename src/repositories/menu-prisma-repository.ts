@@ -252,6 +252,22 @@ export class MenuPrismaRepository implements IMenuRepository {
 						view_type: ViewType.VIEW_COUPONS,
 						order: 7,
 						for_role: RoleType.ADMIN
+					},
+					{
+						label: "Banners",
+						slug: "banners",
+						establishment_id: establishmentId,
+						view_type: ViewType.VIEW_BANNERS,
+						order: 8,
+						for_role: RoleType.ESTABLISHMENT_OWNER
+					},
+					{
+						label: "Distritos",
+						slug: "districts",
+						establishment_id: establishmentId,
+						view_type: ViewType.VIEW_DISTRICTS,
+						order: 9,
+						for_role: RoleType.ESTABLISHMENT_OWNER
 					}
 				]
 			});
