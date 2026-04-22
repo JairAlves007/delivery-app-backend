@@ -5,11 +5,6 @@ import type { IMenuRepository } from "@/interfaces/repositories/menu-repository.
 import type { EstablishmentID } from "@/types/establishment.js";
 import type { MenuWithSubmenus } from "@/types/menu.js";
 
-type GetMenuServiceResponse = {
-	items: MenuWithSubmenus[] | null;
-	forRole: RoleType;
-};
-
 export class GetMenuService {
 	private menuRepository: IMenuRepository;
 
@@ -20,20 +15,15 @@ export class GetMenuService {
 	async handle(
 		forRole: RoleType,
 		establishmentId: EstablishmentID
-	): Promise<GetMenuServiceResponse> {
+	): Promise<MenuWithSubmenus[] | null> {
 		const cache = makeCache();
 		const prefixKey = getFilterParamsCacheKey({
 			establishment_id: establishmentId
 		});
 
-		const menu = await cache.rememberForever(
+		return await cache.rememberForever(
 			`${prefixKey}${cache.keys.menus}_${forRole.toLowerCase()}`,
 			async () => await this.menuRepository.get(forRole, establishmentId)
 		);
-
-		return {
-			items: menu,
-			forRole
-		};
 	}
 }

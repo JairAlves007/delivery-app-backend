@@ -460,14 +460,6 @@ const authUserSchema = z.object({
 	email: z.string()
 });
 
-const authEstablishmentAdminSchema = establishmentResponseSchema
-	.omit({
-		next_billing_date: true
-	})
-	.extend({
-		isOpen: z.boolean()
-	});
-
 const authEstablishmentCustomerSchema = establishmentResponseSchema
 	.omit({
 		cnpj: true,
@@ -478,30 +470,27 @@ const authEstablishmentCustomerSchema = establishmentResponseSchema
 		isOpen: z.boolean()
 	});
 
-const authMenuSchema = z.object({
-	items: z.array(menuItemSchema).nullable(),
-	forRole: z.enum(RoleType)
-});
+const authMenuSchema = z.array(menuItemSchema).nullable();
 
 export const signInAdminResponseSchema = z.object({
-	user: authUserSchema,
-	establishment: authEstablishmentAdminSchema,
-	menu: authMenuSchema,
 	type: z.string(),
 	expiresIn: z.number(),
 	token: z.string()
 });
 
 export const signInCustomerResponseSchema = z.object({
-	user: authUserSchema,
-	establishment: authEstablishmentCustomerSchema,
-	menu: authMenuSchema,
 	type: z.string(),
 	expiresIn: z.number(),
 	token: z.string()
 });
 
 export const signUpTokenResponseSchema = signInCustomerResponseSchema;
+
+export const meResponseSchema = z.object({
+	user: authUserSchema,
+	establishment: authEstablishmentCustomerSchema,
+	menu: authMenuSchema
+});
 
 // ──────────────────────────────────────────────
 // Main (Catalog)
@@ -583,6 +572,7 @@ const registryItems = [
 	{ schema: signInAdminResponseSchema, id: "SignInAdminResponse" },
 	{ schema: signInCustomerResponseSchema, id: "SignInCustomerResponse" },
 	{ schema: signUpTokenResponseSchema, id: "SignUpTokenResponse" },
+	{ schema: meResponseSchema, id: "MeResponse" },
 	{ schema: bannersCatalogResponseSchema, id: "BannersCatalogResponse" },
 	{
 		schema: productCategoriesCatalogResponseSchema,

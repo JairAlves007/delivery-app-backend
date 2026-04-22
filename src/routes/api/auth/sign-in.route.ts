@@ -2,12 +2,9 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 
 import { makeSignInService } from "@/factories/services/auth/make-sign-in-service.js";
-import { makeFindEstablishmentByIdService } from "@/factories/services/establishment/make-find-establishment-by-id-service.js";
-import { makeGetMenuService } from "@/factories/services/menu/make-get-menu-service.js";
 import { RoleType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import Constants from "@/helpers/constants.js";
-import { isEstablishmentOpen } from "@/helpers/establishment.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import {
 	apiDefaultErrorResponseSchema,
@@ -39,18 +36,11 @@ export const signInRoute = async (app: FastifyInstance) => {
 			const body = request.body;
 
 			const signInService = makeSignInService();
-			const menuService = makeGetMenuService();
-			const findEstablishmentByIdService = makeFindEstablishmentByIdService();
 
 			const { user, establishmentId } = await signInService.handle({
 				...body,
 				allowedRoles: [RoleType.CUSTOMER]
 			});
-
-			const [establishmentData, menu] = await Promise.all([
-				findEstablishmentByIdService.handle({ id: establishmentId }),
-				menuService.handle(user.role.name, establishmentId)
-			]);
 
 			const token = await reply.jwtSign(
 				{
@@ -66,16 +56,6 @@ export const signInRoute = async (app: FastifyInstance) => {
 
 			return reply.status(HTTPStatusCodes.OK).send(
 				ApiResponse.success("Usuário autenticado com sucesso", {
-					user: {
-						id: user.id,
-						name: user.name,
-						email: user.email
-					},
-					establishment: {
-						...establishmentData,
-						isOpen: isEstablishmentOpen(establishmentData)
-					},
-					menu,
 					type: Constants.TOKEN_TYPE,
 					expiresIn: Constants.ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
 					token
