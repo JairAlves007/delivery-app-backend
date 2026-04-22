@@ -36,7 +36,6 @@ export const uploadSignedUrlBodySchema = z.object({
 z.globalRegistry.add(uploadSignedUrlBodySchema, { id: "UploadSignedUrlBody" });
 
 export const uploadResourceRulesQuerySchema = z.object({
-	establishmentId: establishmentIdSchema,
 	forObject: z.enum(
 		ForObjectResourceType,
 		"Precisamos saber para qual recurso pertencem as imagens"
