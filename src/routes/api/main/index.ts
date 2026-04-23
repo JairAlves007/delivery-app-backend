@@ -3,6 +3,7 @@ import type { FastifyInstance } from "fastify";
 import { listBannersCatalogRoute } from "./list-banners-catalog.route.js";
 import { listProductCategoriesCatalogRoute } from "./list-product-categories-catalog.route.js";
 import { listProductsFromCategoryCatalogRoute } from "./list-products-from-category-catalog.route.js";
+import { listSuggestedProductsCatalogRoute } from "./list-suggested-products-catalog.route.js";
 
 export const mainRoutes = async (app: FastifyInstance) => {
 	app.register(
@@ -10,6 +11,7 @@ export const mainRoutes = async (app: FastifyInstance) => {
 			api.register(listBannersCatalogRoute);
 			api.register(listProductCategoriesCatalogRoute);
 			api.register(listProductsFromCategoryCatalogRoute);
+			api.register(listSuggestedProductsCatalogRoute);
 		},
 		{ prefix: "/home" }
 	);

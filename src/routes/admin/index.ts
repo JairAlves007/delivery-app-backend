@@ -11,6 +11,7 @@ import { establishmentRoutes } from "./establishment/index.js";
 import { adminOrderRoutes } from "./order/index.js";
 import { adminProductCategoryRoutes } from "./product/category/index.js";
 import { adminProductRoutes } from "./product/index.js";
+import { adminTagRoutes } from "./tag/index.js";
 import { uploadRoutes } from "./upload/index.js";
 
 export const adminRoutes = (app: FastifyInstance) => {
@@ -28,6 +29,7 @@ export const adminRoutes = (app: FastifyInstance) => {
 			api.register(adminCouponRoutes, { prefix: "/coupon" });
 			api.register(adminOrderRoutes, { prefix: "/order" });
 			api.register(adminDashboardRoutes, { prefix: "/dashboard" });
+			api.register(adminTagRoutes, { prefix: "/tag" });
 		},
 		{ prefix: "/admin" }
 	);

@@ -13,6 +13,7 @@ import {
 	ResourceType,
 	RoleType,
 	SocialPlatform,
+	TagType,
 	ViewType,
 	WeekDay
 } from "@/generated/prisma/client.js";
@@ -234,6 +235,18 @@ export const productCategoryResponseSchema = z.object({
 export const productCategoryListResponseSchema = paginatedResponseSchema(
 	productCategoryResponseSchema
 );
+
+// ──────────────────────────────────────────────
+// Tag
+// ──────────────────────────────────────────────
+
+export const tagResponseSchema = z.object({
+	id: z.number(),
+	label: z.string(),
+	type: z.enum(TagType)
+});
+
+export const tagListResponseSchema = listResponseSchema(tagResponseSchema);
 
 // ──────────────────────────────────────────────
 // Product
@@ -506,6 +519,9 @@ export const productCategoriesCatalogResponseSchema =
 export const productsFromCategoryCatalogResponseSchema =
 	cursorPaginatedResponseSchema(productResponseSchema);
 
+export const suggestedProductsCatalogResponseSchema =
+	listResponseSchema(productResponseSchema);
+
 // ──────────────────────────────────────────────
 // Address
 // ──────────────────────────────────────────────
@@ -564,6 +580,9 @@ const registryItems = [
 	},
 	{ schema: productResponseSchema, id: "ProductResponse" },
 	{ schema: productListResponseSchema, id: "ProductListResponse" },
+	{ schema: tagResponseSchema, id: "TagResponse" },
+	{ schema: tagListResponseSchema, id: "TagListResponse" },
+	{ schema: z.enum(TagType), id: "TagType" },
 	{ schema: orderPayloadSchema, id: "OrderPayload" },
 	{ schema: orderListResponseSchema, id: "OrderListResponse" },
 	{ schema: myOrdersResponseSchema, id: "MyOrdersResponse" },
@@ -582,6 +601,10 @@ const registryItems = [
 	{
 		schema: productsFromCategoryCatalogResponseSchema,
 		id: "ProductsFromCategoryCatalogResponse"
+	},
+	{
+		schema: suggestedProductsCatalogResponseSchema,
+		id: "SuggestedProductsCatalogResponse"
 	},
 	{ schema: addressResponseSchema, id: "AddressResponse" },
 	{ schema: addressListResponseSchema, id: "AddressListResponse" },

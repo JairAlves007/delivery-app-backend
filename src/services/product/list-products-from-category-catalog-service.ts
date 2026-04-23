@@ -5,7 +5,10 @@ import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { transformPriceFromDatabase } from "@/helpers/price.js";
 import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
-import { listCursorQueryParamsSchema } from "@/schemas/generic-schema.js";
+import {
+	establishmentParamsSchema,
+	listCursorQueryParamsSchema
+} from "@/schemas/generic-schema.js";
 import { listProductsFromCategorySchema } from "@/schemas/main-schema.js";
 import type { CursorPaginatedResponse } from "@/types/crud.js";
 import type { ProductFromRepository, ProductList } from "@/types/product.js";
@@ -13,6 +16,7 @@ import type { ProductFromRepository, ProductList } from "@/types/product.js";
 type ListProductsFromCategoryCatalogServiceRequest = z.infer<
 	typeof listCursorQueryParamsSchema
 > &
+	z.infer<typeof establishmentParamsSchema> &
 	z.infer<typeof listProductsFromCategorySchema>;
 
 type ListProductsFromCategoryCatalogServiceResponse =

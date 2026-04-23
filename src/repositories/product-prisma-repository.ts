@@ -211,6 +211,54 @@ export class ProductPrismaRepository implements IProductRepository {
 		});
 	}
 
+	async findSuggested({
+		productId,
+		establishmentId,
+		limit
+	}: {
+		productId: string;
+		establishmentId: string;
+		limit: number;
+	}): Promise<ProductFromRepository[]> {
+		const currentTags = await prisma.productTag.findMany({
+			where: { product_id: productId },
+			select: { tag_id: true }
+		});
+
+		const tagIds = currentTags.map(t => t.tag_id);
+
+		if (tagIds.length === 0) return [];
+
+		const combinations = await prisma.tagCombination.findMany({
+			where: { from_tag_id: { in: tagIds } },
+			select: { to_tag_id: true }
+		});
+
+		const suggestedTagIds = Array.from(
+			new Set(combinations.map(c => c.to_tag_id))
+		);
+
+		if (suggestedTagIds.length === 0) return [];
+
+		return await prisma.product.findMany({
+			where: {
+				deleted_at: null,
+				establishment_id: establishmentId,
+				id: { not: productId },
+				tags: { some: { tag_id: { in: suggestedTagIds } } },
+				OR: [{ valid_until: null }, { valid_until: { gt: new Date() } }]
+			},
+			include: {
+				resources: {
+					select: {
+						resource: true
+					}
+				}
+			},
+			take: limit
+		});
+	}
+
 	async deleteOldTags(id: string): Promise<void> {
 		await prisma.productTag.deleteMany({
 			where: {
