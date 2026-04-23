@@ -12,7 +12,6 @@ import {
 	apiSuccessResponseSchema,
 	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
-import { establishmentParamsSchema } from "@/schemas/generic-schema.js";
 import { bannerListResponseSchema } from "@/schemas/response-schema.js";
 
 export const listBannersCatalogRoute = async (app: FastifyInstance) => {
@@ -23,7 +22,6 @@ export const listBannersCatalogRoute = async (app: FastifyInstance) => {
 				operationId: "listBannersCatalog",
 				tags: ["Main (Home)"],
 				summary: "Listar banners na home",
-				params: establishmentParamsSchema,
 				response: {
 					200: apiSuccessResponseSchema(bannerListResponseSchema),
 					401: apiDefaultErrorResponseSchema,
@@ -38,14 +36,14 @@ export const listBannersCatalogRoute = async (app: FastifyInstance) => {
 			]
 		},
 		async (request, reply) => {
-			const { establishmentId } = request.params;
+			const { activeTenantId } = request.user;
 
 			const listBannerService = makeListBannerService();
 
 			const banners = await listBannerService.handle({
 				perPage: 12,
 				filterParams: {
-					establishment_id: establishmentId
+					establishment_id: activeTenantId
 				}
 			});
 

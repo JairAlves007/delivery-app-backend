@@ -11,6 +11,6 @@ export const mainRoutes = async (app: FastifyInstance) => {
 			api.register(listProductCategoriesCatalogRoute);
 			api.register(listProductsFromCategoryCatalogRoute);
 		},
-		{ prefix: "/home/:establishmentId" }
+		{ prefix: "/home" }
 	);
 };

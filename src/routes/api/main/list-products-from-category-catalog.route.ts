@@ -45,13 +45,14 @@ export const listProductsFromCategoryCatalogRoute = async (
 		},
 		async (request, reply) => {
 			const query = request.query;
-			const { categoryId, establishmentId } = request.params;
+			const { categoryId } = request.params;
+			const { activeTenantId } = request.user;
 
 			const listProductsFromCategoryCatalogService =
 				makeListProductsFromCategoryCatalogService();
 
 			const products = await listProductsFromCategoryCatalogService.handle({
-				establishmentId,
+				establishmentId: activeTenantId,
 				categoryId,
 				...query
 			});

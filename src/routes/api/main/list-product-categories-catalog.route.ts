@@ -12,10 +12,7 @@ import {
 	apiSuccessResponseSchema,
 	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
-import {
-	establishmentParamsSchema,
-	listCursorQueryParamsSchema
-} from "@/schemas/generic-schema.js";
+import { listCursorQueryParamsSchema } from "@/schemas/generic-schema.js";
 import { productCategoriesCatalogResponseSchema } from "@/schemas/response-schema.js";
 
 export const listProductCategoriesCatalogRoute = async (
@@ -28,7 +25,6 @@ export const listProductCategoriesCatalogRoute = async (
 				operationId: "listProductCategoriesCatalog",
 				tags: ["Main (Home)"],
 				summary: "Listar categorias de produtos na home",
-				params: establishmentParamsSchema,
 				querystring: listCursorQueryParamsSchema,
 				response: {
 					200: apiSuccessResponseSchema(productCategoriesCatalogResponseSchema),
@@ -44,14 +40,14 @@ export const listProductCategoriesCatalogRoute = async (
 			]
 		},
 		async (request, reply) => {
-			const { establishmentId } = request.params;
+			const { activeTenantId } = request.user;
 			const query = request.query;
 
 			const listProductCategoriesCatalogService =
 				makeListProductCategoriesCatalogService();
 
 			const categories = await listProductCategoriesCatalogService.handle({
-				establishmentId,
+				establishmentId: activeTenantId,
 				...query
 			});
 
