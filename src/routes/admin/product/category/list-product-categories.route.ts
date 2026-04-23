@@ -5,6 +5,7 @@ import { makeListProductCategoryService } from "@/factories/services/product/cat
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { resolveEstablishmentScope } from "@/helpers/resolve-establishment-scope.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
@@ -38,13 +39,19 @@ export const listProductCategoriesRoute = async (app: FastifyInstance) => {
 			]
 		},
 		async (request, reply) => {
-			const query = request.query;
+			const { establishmentId, ...query } = request.query;
 
 			const listProductCategoryService = makeListProductCategoryService();
 
 			const productCategories = await listProductCategoryService.handle({
 				...query,
-				filterParams: { establishment_id: request.user.primaryTenantId }
+				filterParams: {
+					establishment_id: resolveEstablishmentScope({
+						role: request.user.role,
+						primaryTenantId: request.user.primaryTenantId,
+						establishmentId
+					})
+				}
 			});
 
 			return reply

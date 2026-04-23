@@ -56,7 +56,8 @@ export const meRoute = async (app: FastifyInstance) => {
 					user: {
 						id: user.id,
 						name: user.name,
-						email: user.email
+						email: user.email,
+						role
 					},
 					establishment: {
 						...establishmentData,

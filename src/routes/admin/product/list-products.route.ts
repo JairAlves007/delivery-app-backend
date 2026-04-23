@@ -5,6 +5,7 @@ import { makeListProductService } from "@/factories/services/product/make-list-p
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { resolveEstablishmentScope } from "@/helpers/resolve-establishment-scope.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
@@ -38,14 +39,24 @@ export const listProductsRoute = async (app: FastifyInstance) => {
 			]
 		},
 		async (request, reply) => {
-			const { search, sortField, sortDirection, ...query } = request.query;
+			const {
+				search,
+				sortField,
+				sortDirection,
+				establishmentId,
+				...query
+			} = request.query;
 
 			const listProductService = makeListProductService();
 
 			const products = await listProductService.handle({
 				...query,
 				filterParams: {
-					establishment_id: request.user.primaryTenantId,
+					establishment_id: resolveEstablishmentScope({
+						role: request.user.role,
+						primaryTenantId: request.user.primaryTenantId,
+						establishmentId
+					}),
 					search,
 					sortField,
 					sortDirection

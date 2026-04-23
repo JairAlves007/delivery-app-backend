@@ -457,7 +457,8 @@ const menuItemSchema = z.object({
 const authUserSchema = z.object({
 	id: z.string(),
 	name: z.string(),
-	email: z.string()
+	email: z.string(),
+	role: z.enum(RoleType)
 });
 
 const authEstablishmentCustomerSchema = establishmentResponseSchema

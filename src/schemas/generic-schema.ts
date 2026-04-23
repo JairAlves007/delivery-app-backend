@@ -29,10 +29,20 @@ export const searchAndOrderBySchema = z.object({
 
 z.globalRegistry.add(searchAndOrderBySchema, { id: "SearchAndOrderBy" });
 
-export const listQueryParamsSchema = searchAndOrderBySchema.extend({
-	page: z.coerce.number().int().min(1, "Pagina inválida").optional(),
-	perPage: z.coerce.number().int().min(1, "Limite inválido").default(12)
+export const adminEstablishmentFilterSchema = z.object({
+	establishmentId: establishmentIdSchema.optional()
 });
+
+z.globalRegistry.add(adminEstablishmentFilterSchema, {
+	id: "AdminEstablishmentFilter"
+});
+
+export const listQueryParamsSchema = searchAndOrderBySchema
+	.extend({
+		page: z.coerce.number().int().min(1, "Pagina inválida").optional(),
+		perPage: z.coerce.number().int().min(1, "Limite inválido").default(12)
+	})
+	.extend(adminEstablishmentFilterSchema.shape);
 
 export const listCursorQueryParamsSchema = searchAndOrderBySchema.extend({
 	limit: z.coerce.number().int().min(1, "Limite inválido").default(12),
