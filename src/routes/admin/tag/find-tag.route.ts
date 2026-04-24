@@ -1,11 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 
-import { makeListTagService } from "@/factories/services/tag/make-list-tag-service.js";
+import { makeFindTagService } from "@/factories/services/tag/make-find-tag-service.js";
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
-import { resolveEstablishmentScope } from "@/helpers/resolve-establishment-scope.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
@@ -13,22 +12,23 @@ import {
 	apiSuccessResponseSchema,
 	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
-import { tagListResponseSchema } from "@/schemas/response-schema.js";
-import { listTagsQueryParamsSchema } from "@/schemas/tag-schema.js";
+import { tagDetailResponseSchema } from "@/schemas/response-schema.js";
+import { tagParamsSchema } from "@/schemas/tag-schema.js";
 
-export const listTagsRoute = async (app: FastifyInstance) => {
+export const findTagRoute = async (app: FastifyInstance) => {
 	app.withTypeProvider<ZodTypeProvider>().get(
-		"/",
+		"/:id",
 		{
 			schema: {
-				operationId: "listTags",
+				operationId: "findTag",
 				tags: ["Tags"],
-				summary: "Listar tags",
-				querystring: listTagsQueryParamsSchema,
+				summary: "Encontrar tag pelo ID",
+				params: tagParamsSchema,
 				response: {
-					200: apiSuccessResponseSchema(tagListResponseSchema),
+					200: apiSuccessResponseSchema(tagDetailResponseSchema),
 					401: apiDefaultErrorResponseSchema,
 					403: apiDefaultErrorResponseSchema,
+					404: apiDefaultErrorResponseSchema,
 					422: apiValidationErrorResponseSchema,
 					500: apiDefaultErrorResponseSchema
 				}
@@ -39,25 +39,18 @@ export const listTagsRoute = async (app: FastifyInstance) => {
 			]
 		},
 		async (request, reply) => {
-			const { establishmentId, type, ...query } = request.query;
+			const { id } = request.params;
 
-			const listTagService = makeListTagService();
+			const findTagService = makeFindTagService();
 
-			const tags = await listTagService.handle({
-				...query,
-				type,
-				filterParams: {
-					establishment_id: resolveEstablishmentScope({
-						role: request.user.role,
-						primaryTenantId: request.user.activeTenantId,
-						establishmentId
-					})
-				}
+			const tag = await findTagService.handle({
+				id,
+				filterParams: { establishment_id: request.user.activeTenantId }
 			});
 
 			return reply
 				.status(HTTPStatusCodes.OK)
-				.send(ApiResponse.success("Tags listadas com sucesso", tags));
+				.send(ApiResponse.success("Tag encontrada com sucesso", tag));
 		}
 	);
 };

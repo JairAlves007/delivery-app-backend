@@ -2,17 +2,14 @@ import z from "zod";
 
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
-import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.js";
 import {
 	establishmentParamsSchema,
 	listCursorQueryParamsSchema
 } from "@/schemas/generic-schema.js";
+import { mapProductCategories } from "@/services/product/category/map-product-category.js";
 import type { CursorPaginatedResponse } from "@/types/crud.js";
-import type {
-	ProductCategoryFromRepository,
-	ProductCategoryList
-} from "@/types/product-category.js";
+import type { ProductCategoryList } from "@/types/product-category.js";
 
 type ListProductCategoriesCatalogServiceRequest = z.infer<
 	typeof listCursorQueryParamsSchema
@@ -27,17 +24,6 @@ export class ListProductCategoriesCatalogService {
 
 	constructor(productCategoryRepository: IProductCategoryRepository) {
 		this.productCategoryRepository = productCategoryRepository;
-	}
-
-	private mapProductCategories(
-		productCategories: ProductCategoryFromRepository[]
-	): ProductCategoryList[] {
-		return productCategories.map(productCategory => {
-			return {
-				...productCategory,
-				resources: mapObjectResourcesList(productCategory.resources)
-			};
-		});
 	}
 
 	public async handle({
@@ -70,7 +56,7 @@ export class ListProductCategoriesCatalogService {
 		if (productCategories.length <= 0) await cache.forget(key);
 
 		return {
-			items: this.mapProductCategories(productCategories),
+			items: mapProductCategories(productCategories),
 			pagination: {
 				nextCursor,
 				hasNextPage: !!nextCursor

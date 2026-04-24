@@ -3,13 +3,10 @@ import z from "zod";
 import { EstablishmentNotFound } from "@/errors/establishment/not-found-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
-import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
 import { establishmentParamsSchema } from "@/schemas/establishment-schema.js";
-import type {
-	EstablishmentFromRepository,
-	EstablishmentsList
-} from "@/types/establishment.js";
+import { mapEstablishment } from "@/services/establishment/map-establishment.js";
+import type { EstablishmentsList } from "@/types/establishment.js";
 
 type FindEstablishmentByIdServiceRequest = z.infer<
 	typeof establishmentParamsSchema
@@ -20,16 +17,6 @@ export class FindEstablishmentByIdService {
 
 	constructor(establishmentRepository: IEstablishmentRepository) {
 		this.establishmentRepository = establishmentRepository;
-	}
-
-	private mapEstablishment(
-		establishment: EstablishmentFromRepository
-	): EstablishmentsList {
-		return {
-			...establishment,
-			address: establishment.address?.address ?? null,
-			resources: mapObjectResourcesList(establishment.resources)
-		};
 	}
 
 	async handle({
@@ -48,6 +35,6 @@ export class FindEstablishmentByIdService {
 
 		if (!establishment) throw new EstablishmentNotFound();
 
-		return this.mapEstablishment(establishment);
+		return mapEstablishment(establishment);
 	}
 }

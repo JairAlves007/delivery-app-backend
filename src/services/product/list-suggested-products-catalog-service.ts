@@ -1,9 +1,8 @@
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import Constants from "@/helpers/constants.js";
-import { transformPriceFromDatabase } from "@/helpers/price.js";
-import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
-import type { ProductFromRepository, ProductList } from "@/types/product.js";
+import { mapProducts } from "@/services/product/map-product.js";
+import type { ProductList } from "@/types/product.js";
 
 type ListSuggestedProductsCatalogServiceRequest = {
 	establishmentId: string;
@@ -20,17 +19,6 @@ export class ListSuggestedProductsCatalogService {
 
 	constructor(productRepository: IProductRepository) {
 		this.productRepository = productRepository;
-	}
-
-	private mapProducts(products: ProductFromRepository[]): ProductList[] {
-		return products.map(product => {
-			return {
-				...product,
-				price: transformPriceFromDatabase(product.price),
-				resources: mapObjectResourcesList(product.resources),
-				tags: product.tags.map(({ tag }) => tag)
-			};
-		});
 	}
 
 	public async handle({
@@ -52,6 +40,6 @@ export class ListSuggestedProductsCatalogService {
 				})
 		);
 
-		return { items: this.mapProducts(products) };
+		return { items: mapProducts(products) };
 	}
 }

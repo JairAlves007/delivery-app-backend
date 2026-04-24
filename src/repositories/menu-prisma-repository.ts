@@ -97,10 +97,16 @@ export class MenuPrismaRepository implements IMenuRepository {
 								order: 1
 							},
 							{
-								label: "Ver produtos",
+								label: "Ver Produtos",
 								slug: "view-products",
 								view_type: ViewType.VIEW_PRODUCTS,
 								order: 2
+							},
+							{
+								label: "Ver Tags",
+								slug: "view-tags",
+								view_type: ViewType.VIEW_TAGS,
+								order: 3
 							}
 						]
 					}
@@ -202,6 +208,12 @@ export class MenuPrismaRepository implements IMenuRepository {
 								slug: "view-products",
 								view_type: ViewType.VIEW_PRODUCTS,
 								order: 2
+							},
+							{
+								label: "Ver Tags",
+								slug: "view-tags",
+								view_type: ViewType.VIEW_TAGS,
+								order: 3
 							}
 						]
 					}

@@ -1,28 +1,15 @@
 import { EstablishmentNotFound } from "@/errors/establishment/not-found-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
-import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
-import type {
-	EstablishmentFromRepository,
-	EstablishmentsList
-} from "@/types/establishment.js";
+import { mapEstablishment } from "@/services/establishment/map-establishment.js";
+import type { EstablishmentsList } from "@/types/establishment.js";
 
 export class FindEstablishmentBySlugService {
 	private establishmentRepository: IEstablishmentRepository;
 
 	constructor(establishmentRepository: IEstablishmentRepository) {
 		this.establishmentRepository = establishmentRepository;
-	}
-
-	private mapEstablishment(
-		establishment: EstablishmentFromRepository
-	): EstablishmentsList {
-		return {
-			...establishment,
-			address: establishment.address?.address ?? null,
-			resources: mapObjectResourcesList(establishment.resources)
-		};
 	}
 
 	async handle(slug: string): Promise<EstablishmentsList> {
@@ -39,6 +26,6 @@ export class FindEstablishmentBySlugService {
 
 		if (!establishment) throw new EstablishmentNotFound();
 
-		return this.mapEstablishment(establishment);
+		return mapEstablishment(establishment);
 	}
 }

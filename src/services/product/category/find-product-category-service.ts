@@ -3,9 +3,9 @@ import z from "zod";
 import { ProductCategoryNotFound } from "@/errors/product/category/not-found-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
-import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.js";
 import { productCategoryParamsSchema } from "@/schemas/product-category-schema.js";
+import { mapProductCategory } from "@/services/product/category/map-product-category.js";
 import type { FilterField } from "@/types/crud.js";
 import type { ProductCategoryList } from "@/types/product-category.js";
 
@@ -37,9 +37,6 @@ export class FindProductCategoryService {
 
 		if (!productCategory) throw new ProductCategoryNotFound();
 
-		return {
-			...productCategory,
-			resources: mapObjectResourcesList(productCategory.resources)
-		};
+		return mapProductCategory(productCategory);
 	}
 }

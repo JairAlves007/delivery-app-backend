@@ -3,12 +3,11 @@ import z from "zod";
 import { InvalidPage } from "@/errors/pagination/invalid-page.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
-import { transformPriceFromDatabase } from "@/helpers/price.js";
-import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
+import { mapProducts } from "@/services/product/map-product.js";
 import type { FilterField, PaginatedResponse } from "@/types/crud.js";
-import type { ProductFromRepository, ProductList } from "@/types/product.js";
+import type { ProductList } from "@/types/product.js";
 
 type ListProductServiceRequest = z.infer<typeof listQueryParamsSchema> &
 	FilterField;
@@ -20,17 +19,6 @@ export class ListProductService {
 
 	constructor(productRepository: IProductRepository) {
 		this.productRepository = productRepository;
-	}
-
-	private mapProducts(products: ProductFromRepository[]): ProductList[] {
-		return products.map(product => {
-			return {
-				...product,
-				price: transformPriceFromDatabase(product.price),
-				resources: mapObjectResourcesList(product.resources),
-				tags: product.tags.map(({ tag }) => tag)
-			};
-		});
 	}
 
 	async handle({
@@ -70,7 +58,7 @@ export class ListProductService {
 			}
 
 			return {
-				items: this.mapProducts(products),
+				items: mapProducts(products),
 				pagination: {
 					page,
 					perPage,
@@ -89,7 +77,7 @@ export class ListProductService {
 		]);
 
 		return {
-			items: this.mapProducts(products),
+			items: mapProducts(products),
 			pagination: {
 				page: 1,
 				perPage: total,

@@ -2,16 +2,15 @@ import z from "zod";
 
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
-import { transformPriceFromDatabase } from "@/helpers/price.js";
-import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
 import {
 	establishmentParamsSchema,
 	listCursorQueryParamsSchema
 } from "@/schemas/generic-schema.js";
 import { listProductsFromCategorySchema } from "@/schemas/main-schema.js";
+import { mapProducts } from "@/services/product/map-product.js";
 import type { CursorPaginatedResponse } from "@/types/crud.js";
-import type { ProductFromRepository, ProductList } from "@/types/product.js";
+import type { ProductList } from "@/types/product.js";
 
 type ListProductsFromCategoryCatalogServiceRequest = z.infer<
 	typeof listCursorQueryParamsSchema
@@ -27,17 +26,6 @@ export class ListProductsFromCategoryCatalogService {
 
 	constructor(productRepository: IProductRepository) {
 		this.productRepository = productRepository;
-	}
-
-	private mapProducts(products: ProductFromRepository[]): ProductList[] {
-		return products.map(product => {
-			return {
-				...product,
-				price: transformPriceFromDatabase(product.price),
-				resources: mapObjectResourcesList(product.resources),
-				tags: product.tags.map(({ tag }) => tag)
-			};
-		});
 	}
 
 	public async handle({
@@ -76,7 +64,7 @@ export class ListProductsFromCategoryCatalogService {
 		if (products.length <= 0) await cache.forget(key);
 
 		return {
-			items: this.mapProducts(products),
+			items: mapProducts(products),
 			pagination: {
 				nextCursor,
 				hasNextPage: !!nextCursor

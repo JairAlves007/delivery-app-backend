@@ -4,10 +4,10 @@ import { InvalidPage } from "@/errors/pagination/invalid-page.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
-import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
-import type { BannerFromRepository, BannerList } from "@/types/banner.js";
+import { mapBanners } from "@/services/banner/map-banner.js";
+import type { BannerList } from "@/types/banner.js";
 import type { FilterField, PaginatedResponse } from "@/types/crud.js";
 
 type ListBannerServiceRequest = z.infer<typeof listQueryParamsSchema> &
@@ -20,15 +20,6 @@ export class ListBannerService {
 
 	constructor(bannerRepository: IBannerRepository) {
 		this.bannerRepository = bannerRepository;
-	}
-
-	private mapBanners(banners: BannerFromRepository[]): BannerList[] {
-		return banners.map(banner => {
-			return {
-				...banner,
-				resources: mapObjectResourcesList(banner.resources)
-			};
-		});
 	}
 
 	async handle({
@@ -71,7 +62,7 @@ export class ListBannerService {
 			}
 
 			return {
-				items: this.mapBanners(banners),
+				items: mapBanners(banners),
 				pagination: {
 					page,
 					perPage,
@@ -91,7 +82,7 @@ export class ListBannerService {
 		]);
 
 		return {
-			items: this.mapBanners(banners),
+			items: mapBanners(banners),
 			pagination: {
 				page: 1,
 				perPage: total,

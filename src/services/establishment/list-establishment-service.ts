@@ -3,14 +3,11 @@ import z from "zod";
 import { InvalidPage } from "@/errors/pagination/invalid-page.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
-import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
+import { mapEstablishments } from "@/services/establishment/map-establishment.js";
 import type { PaginatedResponse } from "@/types/crud.js";
-import type {
-	EstablishmentFromRepository,
-	EstablishmentsList
-} from "@/types/establishment.js";
+import type { EstablishmentsList } from "@/types/establishment.js";
 
 type ListEstablishmentServiceRequest = z.infer<typeof listQueryParamsSchema>;
 
@@ -21,18 +18,6 @@ export class ListEstablishmentService {
 
 	constructor(establishmentRepository: IEstablishmentRepository) {
 		this.establishmentRepository = establishmentRepository;
-	}
-
-	private mapEstablishments(
-		establishments: EstablishmentFromRepository[]
-	): EstablishmentsList[] {
-		return establishments.map(establishment => {
-			return {
-				...establishment,
-				address: establishment.address?.address ?? null,
-				resources: mapObjectResourcesList(establishment.resources)
-			};
-		});
 	}
 
 	async handle({
@@ -72,7 +57,7 @@ export class ListEstablishmentService {
 			}
 
 			return {
-				items: this.mapEstablishments(establishments),
+				items: mapEstablishments(establishments),
 				pagination: {
 					page,
 					perPage,
@@ -92,7 +77,7 @@ export class ListEstablishmentService {
 		]);
 
 		return {
-			items: this.mapEstablishments(establishments),
+			items: mapEstablishments(establishments),
 			pagination: {
 				page: 1,
 				perPage: total,

@@ -176,6 +176,7 @@ enum ViewType {
   VIEW_COUPONS
   VIEW_BANNERS
   VIEW_DISTRICTS
+  VIEW_TAGS
 }
 
 // ─── Core: Auth & RBAC ──────────────────────────────────────────────

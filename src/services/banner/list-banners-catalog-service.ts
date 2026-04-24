@@ -3,10 +3,10 @@ import z from "zod";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
-import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IBannerRepository } from "@/interfaces/repositories/banner-repository.js";
 import { establishmentParamsSchema } from "@/schemas/generic-schema.js";
-import type { BannerFromRepository, BannerList } from "@/types/banner.js";
+import { mapBanners } from "@/services/banner/map-banner.js";
+import type { BannerList } from "@/types/banner.js";
 import type { ListResponse } from "@/types/crud.js";
 
 type ListBannersCatalogServiceRequest = z.infer<
@@ -20,15 +20,6 @@ export class ListBannersCatalogService {
 
 	constructor(bannerRepository: IBannerRepository) {
 		this.bannerRepository = bannerRepository;
-	}
-
-	private mapBanners(banners: BannerFromRepository[]): BannerList[] {
-		return banners.map(banner => {
-			return {
-				...banner,
-				resources: mapObjectResourcesList(banner.resources)
-			};
-		});
 	}
 
 	public async handle({
@@ -52,7 +43,7 @@ export class ListBannersCatalogService {
 		if (banners.length <= 0) await cache.forget(key);
 
 		return {
-			items: this.mapBanners(banners)
+			items: mapBanners(banners)
 		};
 	}
 }

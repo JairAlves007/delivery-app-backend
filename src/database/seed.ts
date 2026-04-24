@@ -14,6 +14,7 @@ import {
 } from "@/generated/prisma/client.js";
 import Constants from "@/helpers/constants.js";
 import { transformPriceToDatabase } from "@/helpers/price.js";
+import { tagLabels } from "@/helpers/tag-labels.js";
 import { slugify } from "@/helpers/utils.js";
 import prisma from "@/lib/prisma.js";
 
@@ -88,47 +89,14 @@ type EstablishmentSeed = {
 	socialLinks: SocialLinkSeed[];
 };
 
-const tagLabel: Record<TagType, string> = {
-	[TagType.ALCOHOLIC_DRINK]: "Bebidas alcoólicas",
-	[TagType.APPETIZER]: "Aperitivos",
-	[TagType.BREAKFAST]: "Café da manhã",
-	[TagType.BURGER]: "Hambúrgueres",
-	[TagType.CAKE]: "Bolos",
-	[TagType.COFFEE]: "Café",
-	[TagType.COLD_DRINK]: "Bebidas frias",
-	[TagType.COMBO]: "Combos",
-	[TagType.COOKIE]: "Biscoitos",
-	[TagType.DESSERT]: "Sobremesas",
-	[TagType.DINNER]: "Jantar",
-	[TagType.DRINK]: "Bebidas",
-	[TagType.FISH]: "Peixes",
-	[TagType.FOOD]: "Alimentos",
-	[TagType.FRUIT]: "Frutas",
-	[TagType.GLUTEN_FREE]: "Sem Glúten",
-	[TagType.GRILL]: "Churrasco",
-	[TagType.HOT_DRINK]: "Bebidas quentes",
-	[TagType.ICE_CREAM]: "Sorvetes",
-	[TagType.JUICE]: "Sucos",
-	[TagType.LUNCH]: "Almoço",
-	[TagType.MEAT]: "Carnes",
-	[TagType.MILK_SHAKE]: "Milk Shakes",
-	[TagType.NON_ALCOHOLIC_DRINK]: "Bebidas não alcoólicas",
-	[TagType.PASTA]: "Massas",
-	[TagType.PASTRY]: "Padarias",
-	[TagType.PIE]: "Tortas",
-	[TagType.PIZZA]: "Pizzas",
-	[TagType.SALAD]: "Saladas",
-	[TagType.SANDWICH]: "Sanduíches",
-	[TagType.SIDE]: "Entradas",
-	[TagType.SMOOTHIE]: "Smoothies",
-	[TagType.SNACK]: "Snacks",
-	[TagType.SODA]: "Refrigerantes",
-	[TagType.SOUP]: "Sopas",
-	[TagType.SUSHI]: "Sushi",
-	[TagType.TEA]: "Chá",
-	[TagType.VEGAN]: "Vegano",
-	[TagType.VEGETABLE]: "Vegetais",
-	[TagType.VEGETARIAN]: "Vegetariano"
+const collectEstablishmentTagTypes = (seed: EstablishmentSeed): TagType[] => {
+	const set = new Set<TagType>();
+	seed.products.forEach(p => p.tags.forEach(t => set.add(t)));
+	seed.tagCombinations.forEach(combo => {
+		set.add(combo.from);
+		combo.to.forEach(t => set.add(t));
+	});
+	return Array.from(set);
 };
 
 const standardWeekHours = (
@@ -1139,10 +1107,12 @@ async function seedEstablishment(seed: EstablishmentSeed, establishmentOwnerRole
 		});
 	}
 
+	const establishmentTagTypes = collectEstablishmentTagTypes(seed);
+
 	const tags = await prisma.tag.createManyAndReturn({
-		data: Object.values(TagType).map(tag => ({
+		data: establishmentTagTypes.map(tag => ({
 			type: tag,
-			label: tagLabel[tag],
+			label: tagLabels[tag],
 			establishment_id: establishment.id
 		}))
 	});

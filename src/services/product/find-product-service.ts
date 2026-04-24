@@ -3,9 +3,9 @@ import z from "zod";
 import { ProductNotFound } from "@/errors/product/not-found-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
-import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
 import { productParamsSchema } from "@/schemas/product-schema.js";
+import { mapProduct } from "@/services/product/map-product.js";
 import type { FilterField } from "@/types/crud.js";
 import type { ProductList } from "@/types/product.js";
 
@@ -34,10 +34,6 @@ export class FindProductService {
 
 		if (!product) throw new ProductNotFound();
 
-		return {
-			...product,
-			resources: mapObjectResourcesList(product.resources),
-			tags: product.tags.map(({ tag }) => tag)
-		};
+		return mapProduct(product);
 	}
 }

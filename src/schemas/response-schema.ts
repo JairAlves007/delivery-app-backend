@@ -246,7 +246,13 @@ export const tagResponseSchema = z.object({
 	type: z.enum(TagType)
 });
 
-export const tagListResponseSchema = listResponseSchema(tagResponseSchema);
+export const tagDetailResponseSchema = tagResponseSchema.extend({
+	combinableTags: z.array(tagResponseSchema)
+});
+
+export const tagListResponseSchema = paginatedResponseSchema(
+	tagDetailResponseSchema
+);
 
 // ──────────────────────────────────────────────
 // Product
@@ -582,6 +588,7 @@ const registryItems = [
 	{ schema: productResponseSchema, id: "ProductResponse" },
 	{ schema: productListResponseSchema, id: "ProductListResponse" },
 	{ schema: tagResponseSchema, id: "TagResponse" },
+	{ schema: tagDetailResponseSchema, id: "TagDetailResponse" },
 	{ schema: tagListResponseSchema, id: "TagListResponse" },
 	{ schema: z.enum(TagType), id: "TagType" },
 	{ schema: orderPayloadSchema, id: "OrderPayload" },
