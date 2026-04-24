@@ -13,10 +13,7 @@ import {
 	apiSuccessResponseSchema,
 	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
-import {
-	tagParamsSchema,
-	updateTagBodySchema
-} from "@/schemas/tag-schema.js";
+import { tagParamsSchema, updateTagBodySchema } from "@/schemas/tag-schema.js";
 
 export const updateTagRoute = async (app: FastifyInstance) => {
 	app.withTypeProvider<ZodTypeProvider>().patch(
@@ -52,7 +49,7 @@ export const updateTagRoute = async (app: FastifyInstance) => {
 			await updateTagService.handle({
 				id,
 				...data,
-				paramsToForget: { establishment_id: data.establishmentId }
+				paramsToForget: { establishment_id: request.user.primaryTenantId }
 			});
 
 			return reply
