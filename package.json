@@ -7,7 +7,8 @@
 		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
 		"start": "node dist/http/server.js",
 		"db:migrate": "prisma migrate",
-		"db:studio": "prisma studio"
+		"db:studio": "prisma studio",
+		"cache:flush": "tsx --env-file .env src/scripts/flush-cache.ts"
 	},
 	"keywords": [],
 	"author": "Jair Alves",

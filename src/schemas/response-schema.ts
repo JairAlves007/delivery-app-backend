@@ -262,7 +262,8 @@ export const productResponseSchema = z.object({
 	discount_percentage: z.number().nullable(),
 	stock: z.number().nullable(),
 	valid_until: nullableDateStringSchema,
-	resources: mappedResourceRecordSchema
+	resources: mappedResourceRecordSchema,
+	tags: z.array(tagResponseSchema)
 });
 
 export const productListResponseSchema = paginatedResponseSchema(

@@ -10,6 +10,11 @@ export type ProductFromRepository = Prisma.ProductGetPayload<{
 				resource: true;
 			};
 		};
+		tags: {
+			select: {
+				tag: true;
+			};
+		};
 	};
 }>;
 

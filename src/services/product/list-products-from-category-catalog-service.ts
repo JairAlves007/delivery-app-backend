@@ -34,7 +34,8 @@ export class ListProductsFromCategoryCatalogService {
 			return {
 				...product,
 				price: transformPriceFromDatabase(product.price),
-				resources: mapObjectResourcesList(product.resources)
+				resources: mapObjectResourcesList(product.resources),
+				tags: product.tags.map(({ tag }) => tag)
 			};
 		});
 	}

@@ -36,7 +36,8 @@ export class FindProductService {
 
 		return {
 			...product,
-			resources: mapObjectResourcesList(product.resources)
+			resources: mapObjectResourcesList(product.resources),
+			tags: product.tags.map(({ tag }) => tag)
 		};
 	}
 }

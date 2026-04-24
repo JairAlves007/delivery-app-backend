@@ -40,6 +40,11 @@ export class ProductPrismaRepository implements IProductRepository {
 					select: {
 						resource: true
 					}
+				},
+				tags: {
+					select: {
+						tag: true
+					}
 				}
 			},
 			orderBy
@@ -102,6 +107,11 @@ export class ProductPrismaRepository implements IProductRepository {
 					select: {
 						resource: true
 					}
+				},
+				tags: {
+					select: {
+						tag: true
+					}
 				}
 			},
 			orderBy
@@ -136,6 +146,11 @@ export class ProductPrismaRepository implements IProductRepository {
 					select: {
 						resource: true
 					}
+				},
+				tags: {
+					select: {
+						tag: true
+					}
 				}
 			},
 			orderBy,
@@ -161,6 +176,11 @@ export class ProductPrismaRepository implements IProductRepository {
 				resources: {
 					select: {
 						resource: true
+					}
+				},
+				tags: {
+					select: {
+						tag: true
 					}
 				}
 			}
@@ -252,6 +272,11 @@ export class ProductPrismaRepository implements IProductRepository {
 				resources: {
 					select: {
 						resource: true
+					}
+				},
+				tags: {
+					select: {
+						tag: true
 					}
 				}
 			},
