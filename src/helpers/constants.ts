@@ -30,6 +30,7 @@ export default class Constants {
 	public static readonly CACHE_KEYS = {
 		products: "products",
 		productCategories: "products_categories",
+		tags: "tags",
 		establishments: "establishments",
 		districts: "districts",
 		coupons: "coupons",

@@ -45,7 +45,7 @@ export const createTagRoute = async (app: FastifyInstance) => {
 
 			await createTagService.handle({
 				...body,
-				establishmentId: request.user.activeTenantId
+				paramsToForget: { establishment_id: body.establishmentId }
 			});
 
 			return reply

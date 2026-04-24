@@ -52,7 +52,7 @@ export const updateTagRoute = async (app: FastifyInstance) => {
 			await updateTagService.handle({
 				id,
 				...data,
-				establishmentId: request.user.activeTenantId
+				paramsToForget: { establishment_id: data.establishmentId }
 			});
 
 			return reply

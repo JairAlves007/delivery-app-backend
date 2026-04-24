@@ -45,7 +45,7 @@ export const findTagRoute = async (app: FastifyInstance) => {
 
 			const tag = await findTagService.handle({
 				id,
-				filterParams: { establishment_id: request.user.activeTenantId }
+				filterParams: { establishment_id: request.user.primaryTenantId }
 			});
 
 			return reply

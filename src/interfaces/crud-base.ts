@@ -21,5 +21,5 @@ export interface ICRUDBase<
 	update(
 		updateParams: UpdateContentParams<Id, UpdateData>
 	): Promise<ReturningModel>;
-	delete(deleteParams: DeleteContentParams<Id>): Promise<ReturningModel>;
+	delete(deleteParams: DeleteContentParams<Id>): Promise<void>;
 }

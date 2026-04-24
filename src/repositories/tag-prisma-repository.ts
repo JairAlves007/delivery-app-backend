@@ -116,24 +116,30 @@ export class TagPrismaRepository implements ITagRepository {
 		});
 	}
 
-	async create(data: Prisma.TagCreateInput): Promise<void> {
-		await prisma.tag.create({ data });
+	async create(
+		data: Prisma.TagCreateInput
+	): Promise<TagWithCombinationsFromRepository> {
+		return await prisma.tag.create({ data, include: tagInclude });
 	}
 
 	async update({
 		id,
 		data,
 		filterParams
-	}: UpdateContentParams<number, Prisma.TagUpdateInput>): Promise<void> {
+	}: UpdateContentParams<
+		number,
+		Prisma.TagUpdateInput
+	>): Promise<TagWithCombinationsFromRepository> {
 		const params = transformValidFilterParams(filterParams);
 
-		await prisma.tag.update({
+		return await prisma.tag.update({
 			where: {
 				id,
 				deleted_at: null,
 				...params
 			},
-			data
+			data,
+			include: tagInclude
 		});
 	}
 

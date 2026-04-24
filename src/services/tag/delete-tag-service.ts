@@ -1,10 +1,10 @@
-import { TagNotFound } from "@/errors/tag/not-found-error.js";
 import type { ITagRepository } from "@/interfaces/repositories/tag-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type DeleteTagServiceRequest = {
 	id: number;
-	establishmentId: string;
-};
+} & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class DeleteTagService {
 	private tagRepository: ITagRepository;
@@ -13,18 +13,15 @@ export class DeleteTagService {
 		this.tagRepository = tagRepository;
 	}
 
-	async handle({ id, establishmentId }: DeleteTagServiceRequest) {
-		const tag = await this.tagRepository.findById({
-			id,
-			filterParams: { establishment_id: establishmentId }
-		});
-
-		if (!tag) throw new TagNotFound();
-
+	async handle({ id, paramsToForget }: DeleteTagServiceRequest) {
 		await this.tagRepository.delete({
 			id,
-			force: false,
-			filterParams: { establishment_id: establishmentId }
+			force: false
+		});
+
+		await forgetAllListingCacheKeysQueue({
+			baseCacheKey: "tags",
+			paramsToForget
 		});
 	}
 }

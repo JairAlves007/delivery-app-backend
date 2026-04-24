@@ -2,12 +2,13 @@ import z from "zod";
 
 import { TagNotFound } from "@/errors/tag/not-found-error.js";
 import type { ITagRepository } from "@/interfaces/repositories/tag-repository.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import { updateTagBodySchema } from "@/schemas/tag-schema.js";
+import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
-interface UpdateTagServiceRequest extends z.infer<typeof updateTagBodySchema> {
+type UpdateTagServiceRequest = z.infer<typeof updateTagBodySchema> & {
 	id: number;
-	establishmentId: string;
-}
+} & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class UpdateTagService {
 	private tagRepository: ITagRepository;
@@ -20,6 +21,7 @@ export class UpdateTagService {
 		id,
 		establishmentId,
 		combinableTagIds,
+		paramsToForget,
 		...data
 	}: UpdateTagServiceRequest) {
 		const tag = await this.tagRepository.findById({
@@ -42,6 +44,13 @@ export class UpdateTagService {
 				tagId: id,
 				combinableTagIds,
 				establishmentId
+			});
+		}
+
+		if (paramsToForget) {
+			await forgetAllListingCacheKeysQueue({
+				baseCacheKey: "tags",
+				paramsToForget
 			});
 		}
 	}

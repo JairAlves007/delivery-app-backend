@@ -45,7 +45,7 @@ export const deleteTagRoute = async (app: FastifyInstance) => {
 
 			await deleteTagService.handle({
 				id,
-				establishmentId: request.user.activeTenantId
+				paramsToForget: { establishment_id: request.user.primaryTenantId! }
 			});
 
 			return reply
