@@ -479,19 +479,18 @@ const authEstablishmentCustomerSchema = establishmentResponseSchema
 
 const authMenuSchema = z.array(menuItemSchema).nullable();
 
-export const signInAdminResponseSchema = z.object({
-  type: z.string(),
-  expiresIn: z.number(),
-  token: z.string(),
-});
-
 export const signInCustomerResponseSchema = z.object({
   type: z.string(),
   expiresIn: z.number(),
   token: z.string(),
+  refreshToken: z.string(),
 });
 
+export const signInAdminResponseSchema = signInCustomerResponseSchema;
+
 export const signUpTokenResponseSchema = signInCustomerResponseSchema;
+
+export const refreshTokenResponseSchema = signInCustomerResponseSchema;
 
 export const meResponseSchema = z.object({
   user: authUserSchema,
@@ -587,6 +586,7 @@ const registryItems = [
   { schema: signInAdminResponseSchema, id: "SignInAdminResponse" },
   { schema: signInCustomerResponseSchema, id: "SignInCustomerResponse" },
   { schema: signUpTokenResponseSchema, id: "SignUpTokenResponse" },
+  { schema: refreshTokenResponseSchema, id: "RefreshTokenResponse" },
   { schema: meResponseSchema, id: "MeResponse" },
   { schema: bannersCatalogResponseSchema, id: "BannersCatalogResponse" },
   {

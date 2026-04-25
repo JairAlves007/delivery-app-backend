@@ -225,10 +225,27 @@ model User {
   userCoupons         UserCoupon[]
   establishment       Establishment?
   passwordResetTokens PasswordResetToken[]
+  refreshTokens       RefreshToken[]
 
   @@index([role_id], name: "idx_users_role_id")
   @@index([deleted_at], name: "idx_users_deleted_at")
   @@map("users")
+}
+
+model RefreshToken {
+  id         Int       @id @default(autoincrement())
+  user_id    String
+  token_hash String    @db.VarChar(255)
+  expires_at DateTime  @db.Timestamptz
+  revoked_at DateTime? @db.Timestamptz
+  created_at DateTime @default(now()) @db.Timestamptz
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([user_id])
+  @@index([token_hash])
+  @@index([expires_at, revoked_at], name: "idx_refresh_tokens_active")
+  @@map("refresh_tokens")
 }
 
 model PasswordResetToken {

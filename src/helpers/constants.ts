@@ -1,108 +1,111 @@
 import type { OrderSubSectionMessage } from "@/types/order.js";
 
 export default class Constants {
-  // Hash
-  public static readonly HASH_SALT_LENGTH: number = 6;
+	// Hash
+	public static readonly HASH_SALT_LENGTH: number = 6;
 
-  // Strings
-  public static readonly TOKEN_TYPE: string = "Bearer";
+	// Strings
+	public static readonly TOKEN_TYPE: string = "Bearer";
 
-  // Numbers
-  public static readonly PRICE_MULTIPLIER: number = 100;
-  public static readonly SIGNED_URL_EXPIRES_IN_MINUTES: number = 60 * 4;
-  public static readonly PASSWORD_RESET_TOKEN_EXPIRES_IN_SECONDS: number =
-    60 * 60;
-  public static readonly MAX_LISTING_LIMIT: number = 200;
-  public static readonly DASHBOARD_TOP_N: number = 10;
-  public static readonly DASHBOARD_TIMEZONE: string = "America/Fortaleza";
+	// Numbers
+	public static readonly PRICE_MULTIPLIER: number = 100;
+	public static readonly SIGNED_URL_EXPIRES_IN_MINUTES: number = 60 * 4;
+	public static readonly PASSWORD_RESET_TOKEN_EXPIRES_IN_SECONDS: number =
+		60 * 60;
+	public static readonly MAX_LISTING_LIMIT: number = 200;
+	public static readonly DASHBOARD_TOP_N: number = 10;
+	public static readonly DASHBOARD_TIMEZONE: string = "America/Fortaleza";
 
-  // Regex
-  public static readonly PHONE_REGEX: RegExp = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
-  public static readonly POSTAL_CODE_REGEX: RegExp = /^\d{5}-?\d{3}$/;
-  public static readonly MIME_TYPE_REGEX: RegExp = /\w+\/[-+.\w]+/;
+	// Regex
+	public static readonly PHONE_REGEX: RegExp = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
+	public static readonly POSTAL_CODE_REGEX: RegExp = /^\d{5}-?\d{3}$/;
+	public static readonly MIME_TYPE_REGEX: RegExp = /\w+\/[-+.\w]+/;
 
-  // Token
-  public static readonly ACCESS_TOKEN_EXPIRATION_IN_SECONDS: number =
-    60 * 60 * 24 * 1;
-  public static readonly ACCESS_TOKEN_EXPIRATION_TIME: string = "1d";
+	// Token
+	public static readonly ACCESS_TOKEN_EXPIRATION_IN_SECONDS: number =
+		60 * 60 * 1;
+	public static readonly ACCESS_TOKEN_EXPIRATION_TIME: string = "1h";
+	public static readonly REFRESH_TOKEN_EXPIRATION_IN_SECONDS: number =
+		60 * 60 * 24 * 7;
+	public static readonly REFRESH_TOKEN_EXPIRATION_TIME: string = "7d";
 
-  // Cache
-  public static readonly CACHE_KEYS = {
-    products: "products",
-    productCategories: "products_categories",
-    tags: "tags",
-    establishments: "establishments",
-    districts: "districts",
-    coupons: "coupons",
-    banners: "banners",
-    addons: "addons",
-    addonCategories: "addon_categories",
-    users: "users",
-    menus: "menus",
-    addresses: "addresses",
-    resourceRules: "resource_rules",
-    orders: "orders",
-    dashboard: "dashboard",
-  };
+	// Cache
+	public static readonly CACHE_KEYS = {
+		products: "products",
+		productCategories: "products_categories",
+		tags: "tags",
+		establishments: "establishments",
+		districts: "districts",
+		coupons: "coupons",
+		banners: "banners",
+		addons: "addons",
+		addonCategories: "addon_categories",
+		users: "users",
+		menus: "menus",
+		addresses: "addresses",
+		resourceRules: "resource_rules",
+		orders: "orders",
+		dashboard: "dashboard"
+	};
 
-  /** Cache TTL em segundos, por domínio */
-  public static readonly CACHE_TTL = {
-    /** Dashboard agregado — 1 min (leituras frequentes, freshness moderada) */
-    dashboard: 60,
-    /** Pedidos mudam de status frequentemente — 2 min */
-    orders: 60 * 2,
-    /** Cupons podem expirar ou atingir limite de uso — 5 min */
-    coupons: 60 * 5,
-    /** Dados de usuário mudam moderadamente — 10 min */
-    users: 60 * 10,
-    /** Endereços pessoais — 15 min */
-    addresses: 60 * 15,
-    /** Produtos (preço/estoque) — 15 min */
-    products: 60 * 15,
-    /** Categorias de produto — 30 min */
-    productCategories: 60 * 30,
-    /** Banners de marketing — 30 min */
-    banners: 60 * 30,
-    /** Adicionais — 30 min */
-    addons: 60 * 30,
-    /** Categorias de adicionais — 30 min */
-    addonCategories: 60 * 30,
-    /** Dados de estabelecimento — 1 h */
-    establishments: 60 * 60,
-    /** Distritos/áreas de entrega — 1 h */
-    districts: 60 * 60,
-    /** Menus estruturais — 12 h */
-    menus: 60 * 60 * 12,
-    /** Regras de upload (schema) — 24 h */
-    resourceRules: 60 * 60 * 24,
-  };
+	/** Cache TTL em segundos, por domínio */
+	public static readonly CACHE_TTL = {
+		/** Dashboard agregado — 1 min (leituras frequentes, freshness moderada) */
+		dashboard: 60,
+		/** Pedidos mudam de status frequentemente — 2 min */
+		orders: 60 * 2,
+		/** Cupons podem expirar ou atingir limite de uso — 5 min */
+		coupons: 60 * 5,
+		/** Dados de usuário mudam moderadamente — 10 min */
+		users: 60 * 10,
+		/** Endereços pessoais — 15 min */
+		addresses: 60 * 15,
+		/** Produtos (preço/estoque) — 15 min */
+		products: 60 * 15,
+		/** Categorias de produto — 30 min */
+		productCategories: 60 * 30,
+		/** Banners de marketing — 30 min */
+		banners: 60 * 30,
+		/** Adicionais — 30 min */
+		addons: 60 * 30,
+		/** Categorias de adicionais — 30 min */
+		addonCategories: 60 * 30,
+		/** Dados de estabelecimento — 1 h */
+		establishments: 60 * 60,
+		/** Distritos/áreas de entrega — 1 h */
+		districts: 60 * 60,
+		/** Menus estruturais — 12 h */
+		menus: 60 * 60 * 12,
+		/** Regras de upload (schema) — 24 h */
+		resourceRules: 60 * 60 * 24
+	};
 
-  // Order
-  public static readonly ORDER_SUB_SECTIONS_MESSAGE_TEMPLATES: OrderSubSectionMessage =
-    {
-      address: `
+	// Order
+	public static readonly ORDER_SUB_SECTIONS_MESSAGE_TEMPLATES: OrderSubSectionMessage =
+		{
+			address: `
 				📍 Entrega em: {address_simplified}
 				🗺️ Distrito: {district_name}
 				{reference_point_section}
 			`,
-      referencePoint: "📌 Ponto de referência: {reference_point}",
-      product: `
+			referencePoint: "📌 Ponto de referência: {reference_point}",
+			product: `
 				🍔 {product_name}
 				• Preço: {product_price}
 				• Quantidade: {product_quantity}
 				• Adicionais: {none_addons}
 				{addons_section}
 			`,
-      addon: `
+			addon: `
 				- {addon_quantity}x {addon_name} ({addon_price})
 			`,
-      coupon: `🏷️ Cupom aplicado: {coupon_code} ({coupon_value})`,
-      changeAmount: `💵 Troco para: {change_amount_value}`,
-      comment: `📝 Observações: {comment_value}`,
-      discount: `🎟️ Desconto: {discount_value}`,
-    };
+			coupon: `🏷️ Cupom aplicado: {coupon_code} ({coupon_value})`,
+			changeAmount: `💵 Troco para: {change_amount_value}`,
+			comment: `📝 Observações: {comment_value}`,
+			discount: `🎟️ Desconto: {discount_value}`
+		};
 
-  public static readonly ORDER_MESSAGE_TEMPLATE = `
+	public static readonly ORDER_MESSAGE_TEMPLATE = `
 		📦 Novo Pedido Recebido!
 
 		🧑‍💼 Cliente: {customer_name}

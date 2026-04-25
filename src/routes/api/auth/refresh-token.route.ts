@@ -2,8 +2,6 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 
 import { makeRefreshTokenService } from "@/factories/services/auth/make-refresh-token-service.js";
-import { makeSignInService } from "@/factories/services/auth/make-sign-in-service.js";
-import { RoleType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import Constants from "@/helpers/constants.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
@@ -12,22 +10,21 @@ import {
 	apiSuccessResponseSchema,
 	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
-import { signInBodySchema } from "@/schemas/auth-schema.js";
-import { signInCustomerResponseSchema } from "@/schemas/response-schema.js";
+import { refreshTokenBodySchema } from "@/schemas/auth-schema.js";
+import { refreshTokenResponseSchema } from "@/schemas/response-schema.js";
 
-export const signInRoute = async (app: FastifyInstance) => {
+export const refreshTokenRoute = async (app: FastifyInstance) => {
 	app.withTypeProvider<ZodTypeProvider>().post(
-		"/sign-in",
+		"/refresh-token",
 		{
 			schema: {
-				operationId: "signIn",
+				operationId: "refreshToken",
 				tags: ["Auth"],
-				summary: "Autenticar usuário",
-				body: signInBodySchema,
+				summary: "Renovar token de acesso",
+				body: refreshTokenBodySchema,
 				response: {
-					200: apiSuccessResponseSchema(signInCustomerResponseSchema),
+					200: apiSuccessResponseSchema(refreshTokenResponseSchema),
 					401: apiDefaultErrorResponseSchema,
-					404: apiDefaultErrorResponseSchema,
 					422: apiValidationErrorResponseSchema,
 					500: apiDefaultErrorResponseSchema
 				}
@@ -35,35 +32,35 @@ export const signInRoute = async (app: FastifyInstance) => {
 		},
 		async (request, reply) => {
 			const body = request.body;
+			const { refreshToken } = body;
 
-			const signInService = makeSignInService();
+			const refreshTokenService = makeRefreshTokenService();
 
-			const { user, establishmentId } = await signInService.handle({
-				...body,
-				allowedRoles: [RoleType.CUSTOMER]
-			});
+			const { activeTenantId, primaryTenantId, role, userId } =
+				await refreshTokenService.validate(refreshToken);
 
 			const token = await reply.jwtSign(
 				{
-					role: user.role.name,
-					activeTenantId: establishmentId,
-					primaryTenantId: user.establishment?.id ?? null
+					role,
+					activeTenantId,
+					primaryTenantId
 				},
 				{
-					sub: user.id,
+					sub: userId,
 					expiresIn: Constants.ACCESS_TOKEN_EXPIRATION_TIME
 				}
 			);
 
-			const refreshTokenService = makeRefreshTokenService();
-			const refreshToken = await refreshTokenService.create(user.id);
+			await refreshTokenService.revoke(refreshToken);
+
+			const newRefreshToken = await refreshTokenService.create(userId);
 
 			return reply.status(HTTPStatusCodes.OK).send(
-				ApiResponse.success("Usuário autenticado com sucesso", {
+				ApiResponse.success("Token renovado com sucesso", {
 					type: Constants.TOKEN_TYPE,
 					expiresIn: Constants.ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
 					token,
-					refreshToken
+					refreshToken: newRefreshToken
 				})
 			);
 		}

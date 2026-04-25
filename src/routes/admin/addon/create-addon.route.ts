@@ -11,51 +11,50 @@ import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permissio
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import { createAddonBodySchema } from "@/schemas/addon-schema.js";
 import {
-  apiDefaultErrorResponseSchema,
-  apiSuccessResponseSchema,
-  apiValidationErrorResponseSchema,
+	apiDefaultErrorResponseSchema,
+	apiSuccessResponseSchema,
+	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
 
 export const createAddonRoute = async (app: FastifyInstance) => {
-  app.withTypeProvider<ZodTypeProvider>().post(
-    "/",
-    {
-      schema: {
-        operationId: "createAddon",
-        tags: ["Addons"],
-        summary: "Criar adicional",
-        body: createAddonBodySchema,
-        response: {
-          201: apiSuccessResponseSchema(z.object({})),
-          401: apiDefaultErrorResponseSchema,
-          403: apiDefaultErrorResponseSchema,
-          409: apiDefaultErrorResponseSchema,
-          422: apiValidationErrorResponseSchema,
-          500: apiDefaultErrorResponseSchema,
-        },
-      },
-      onRequest: [
-        isAuthenticated,
-        ensureUserHasPermission([PermissionType.MANAGE_PRODUCT_OPTIONS]),
-      ],
-    },
-    async (request, reply) => {
-      const body = request.body;
-      const establishmentId = getUserEstablishmentId(request.user);
+	app.withTypeProvider<ZodTypeProvider>().post(
+		"/",
+		{
+			schema: {
+				operationId: "createAddon",
+				tags: ["Addons"],
+				summary: "Criar adicional",
+				body: createAddonBodySchema,
+				response: {
+					201: apiSuccessResponseSchema(z.object({})),
+					401: apiDefaultErrorResponseSchema,
+					403: apiDefaultErrorResponseSchema,
+					409: apiDefaultErrorResponseSchema,
+					422: apiValidationErrorResponseSchema,
+					500: apiDefaultErrorResponseSchema
+				}
+			},
+			onRequest: [
+				isAuthenticated,
+				ensureUserHasPermission([PermissionType.MANAGE_PRODUCT_OPTIONS])
+			]
+		},
+		async (request, reply) => {
+			const body = request.body;
+			const establishmentId = getUserEstablishmentId(request.user);
 
-      const createAddonService = makeCreateAddonService();
+			const createAddonService = makeCreateAddonService();
 
-      await createAddonService.handle({
-        ...body,
-        establishmentId,
-        paramsToForget: { establishment_id: establishmentId },
-      });
+			await createAddonService.handle({
+				...body,
+				paramsToForget: { establishment_id: establishmentId }
+			});
 
-      return reply
-        .status(HTTPStatusCodes.CREATED)
-        .send(
-          ApiResponse.success("Categoria de adicional criada com sucesso", {}),
-        );
-    },
-  );
+			return reply
+				.status(HTTPStatusCodes.CREATED)
+				.send(
+					ApiResponse.success("Categoria de adicional criada com sucesso", {})
+				);
+		}
+	);
 };
