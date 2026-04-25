@@ -56,7 +56,11 @@ export const signInRoute = async (app: FastifyInstance) => {
 			);
 
 			const refreshTokenService = makeRefreshTokenService();
-			const refreshToken = await refreshTokenService.create(user.id);
+			const refreshToken = await refreshTokenService.create({
+				userId: user.id,
+				activeTenantId: establishmentId,
+				primaryTenantId: user.establishment?.id ?? null
+			});
 
 			return reply.status(HTTPStatusCodes.OK).send(
 				ApiResponse.success("Usuário autenticado com sucesso", {

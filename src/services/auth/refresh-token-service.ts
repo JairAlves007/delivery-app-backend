@@ -14,6 +14,12 @@ interface RefreshTokenPayload {
 	primaryTenantId: string | null;
 }
 
+interface CreateRefreshTokenParams {
+	userId: UserID;
+	activeTenantId: string;
+	primaryTenantId: string | null;
+}
+
 export class RefreshTokenService {
 	private refreshTokenRepository: IRefreshTokenRepository;
 
@@ -21,7 +27,11 @@ export class RefreshTokenService {
 		this.refreshTokenRepository = refreshTokenRepository;
 	}
 
-	async create(userId: UserID): Promise<string> {
+	async create({
+		userId,
+		activeTenantId,
+		primaryTenantId
+	}: CreateRefreshTokenParams): Promise<string> {
 		const token = crypto.randomUUID();
 		const tokenHash = await hash(token, Constants.HASH_SALT_LENGTH);
 
@@ -33,6 +43,8 @@ export class RefreshTokenService {
 		await this.refreshTokenRepository.create({
 			user: { connect: { id: userId } },
 			token_hash: tokenHash,
+			active_tenant_id: activeTenantId,
+			primary_tenant_id: primaryTenantId,
 			expires_at: expiresAt
 		});
 
@@ -52,8 +64,8 @@ export class RefreshTokenService {
 		return {
 			userId: user.id,
 			role: user.role.name,
-			activeTenantId: user.establishment?.id ?? user.id,
-			primaryTenantId: user.establishment?.id ?? null
+			activeTenantId: refreshToken.active_tenant_id,
+			primaryTenantId: refreshToken.primary_tenant_id
 		};
 	}
 

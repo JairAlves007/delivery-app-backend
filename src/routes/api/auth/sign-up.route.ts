@@ -64,7 +64,11 @@ export const signUpRoute = async (app: FastifyInstance) => {
 			);
 
 			const refreshTokenService = makeRefreshTokenService();
-			const refreshToken = await refreshTokenService.create(user.id);
+			const refreshToken = await refreshTokenService.create({
+				userId: user.id,
+				activeTenantId: establishmentId,
+				primaryTenantId: null
+			});
 
 			return reply.status(HTTPStatusCodes.CREATED).send(
 				ApiResponse.success("Usuário registrado com sucesso", {

@@ -53,7 +53,11 @@ export const refreshTokenRoute = async (app: FastifyInstance) => {
 
 			await refreshTokenService.revoke(refreshToken);
 
-			const newRefreshToken = await refreshTokenService.create(userId);
+			const newRefreshToken = await refreshTokenService.create({
+				userId,
+				activeTenantId,
+				primaryTenantId
+			});
 
 			return reply.status(HTTPStatusCodes.OK).send(
 				ApiResponse.success("Token renovado com sucesso", {
