@@ -6,26 +6,26 @@ import { mapEstablishment } from "@/services/establishment/map-establishment.js"
 import type { EstablishmentsList } from "@/types/establishment.js";
 
 export class FindEstablishmentBySlugService {
-	private establishmentRepository: IEstablishmentRepository;
+  private establishmentRepository: IEstablishmentRepository;
 
-	constructor(establishmentRepository: IEstablishmentRepository) {
-		this.establishmentRepository = establishmentRepository;
-	}
+  constructor(establishmentRepository: IEstablishmentRepository) {
+    this.establishmentRepository = establishmentRepository;
+  }
 
-	async handle(slug: string): Promise<EstablishmentsList> {
-		const cache = makeCache();
-		const prefixKey = getFilterParamsCacheKey({
-			establishment_slug: slug
-		});
-		const key = `${prefixKey}${cache.keys.establishments}`;
+  async handle(slug: string): Promise<EstablishmentsList> {
+    const cache = makeCache();
+    const prefixKey = getFilterParamsCacheKey({
+      establishment_slug: slug,
+    });
+    const key = `${prefixKey}${cache.keys.establishments}`;
 
-		const establishment = await cache.rememberForever(
-			key,
-			async () => await this.establishmentRepository.findBySlug(slug)
-		);
+    const establishment = await cache.rememberForever(
+      key,
+      async () => await this.establishmentRepository.findBySlug(slug),
+    );
 
-		if (!establishment) throw new EstablishmentNotFound();
+    if (!establishment) throw new EstablishmentNotFound();
 
-		return mapEstablishment(establishment);
-	}
+    return mapEstablishment(establishment);
+  }
 }

@@ -7,47 +7,47 @@ import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import type { FilterField } from "@/types/crud.js";
 
 type CancelOrderFromCustomerServiceParams = {
-	id: string;
+  id: string;
 } & FilterField;
 
 export class CancelOrderFromCustomerService {
-	private orderRepository: IOrderRepository;
+  private orderRepository: IOrderRepository;
 
-	constructor(orderRepository: IOrderRepository) {
-		this.orderRepository = orderRepository;
-	}
+  constructor(orderRepository: IOrderRepository) {
+    this.orderRepository = orderRepository;
+  }
 
-	async handle({ id, filterParams }: CancelOrderFromCustomerServiceParams) {
-		const orderFromRepository = await this.orderRepository.findById({
-			id,
-			filterParams
-		});
+  async handle({ id, filterParams }: CancelOrderFromCustomerServiceParams) {
+    const orderFromRepository = await this.orderRepository.findById({
+      id,
+      filterParams,
+    });
 
-		if (!orderFromRepository) throw new OrderNotFound();
+    if (!orderFromRepository) throw new OrderNotFound();
 
-		const latestStatus = orderFromRepository.statuses[0]?.value;
+    const latestStatus = orderFromRepository.statuses[0]?.value;
 
-		if (latestStatus !== OrderStatusType.PREPARING)
-			throw new CancelOrderNotAllowed();
+    if (latestStatus !== OrderStatusType.PREPARING)
+      throw new CancelOrderNotAllowed();
 
-		const cancelStatus: OrderStatusType = OrderStatusType.CANCELLED;
+    const cancelStatus: OrderStatusType = OrderStatusType.CANCELLED;
 
-		await this.orderRepository.update({
-			id,
-			filterParams,
-			data: {
-				statuses: {
-					create: {
-						label: getStatusLabel(cancelStatus),
-						value: cancelStatus
-					}
-				}
-			}
-		});
+    await this.orderRepository.update({
+      id,
+      filterParams,
+      data: {
+        statuses: {
+          create: {
+            label: getStatusLabel(cancelStatus),
+            value: cancelStatus,
+          },
+        },
+      },
+    });
 
-		await forgetAllListingCacheKeysQueue({
-			baseCacheKey: "orders",
-			paramsToForget: filterParams
-		});
-	}
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "orders",
+      paramsToForget: filterParams,
+    });
+  }
 }

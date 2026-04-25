@@ -6,13 +6,13 @@ import { listProductsFromCategoryCatalogRoute } from "./list-products-from-categ
 import { listSuggestedProductsCatalogRoute } from "./list-suggested-products-catalog.route.js";
 
 export const mainRoutes = async (app: FastifyInstance) => {
-	app.register(
-		async api => {
-			api.register(listBannersCatalogRoute);
-			api.register(listProductCategoriesCatalogRoute);
-			api.register(listProductsFromCategoryCatalogRoute);
-			api.register(listSuggestedProductsCatalogRoute);
-		},
-		{ prefix: "/home" }
-	);
+  app.register(
+    async (api) => {
+      api.register(listBannersCatalogRoute);
+      api.register(listProductCategoriesCatalogRoute);
+      api.register(listProductsFromCategoryCatalogRoute);
+      api.register(listSuggestedProductsCatalogRoute);
+    },
+    { prefix: "/home" },
+  );
 };

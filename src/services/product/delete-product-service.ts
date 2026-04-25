@@ -1,24 +1,34 @@
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
+import type { FilterField } from "@/types/crud.js";
 
 type DeleteProductParams = {
-	id: string;
-} & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
+  id: string;
+} & FilterField &
+  Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class DeleteProductService {
-	private productRepository: IProductRepository;
+  private productRepository: IProductRepository;
 
-	constructor(productRepository: IProductRepository) {
-		this.productRepository = productRepository;
-	}
+  constructor(productRepository: IProductRepository) {
+    this.productRepository = productRepository;
+  }
 
-	public async handle({ id, paramsToForget }: DeleteProductParams) {
-		await this.productRepository.delete({ id, force: false });
+  public async handle({
+    id,
+    filterParams,
+    paramsToForget,
+  }: DeleteProductParams) {
+    await this.productRepository.delete({
+      id,
+      filterParams,
+      force: false,
+    });
 
-		await forgetAllListingCacheKeysQueue({
-			baseCacheKey: "products",
-			paramsToForget
-		});
-	}
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "products",
+      paramsToForget,
+    });
+  }
 }

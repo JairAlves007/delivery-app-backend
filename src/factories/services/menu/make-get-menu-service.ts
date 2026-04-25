@@ -2,6 +2,6 @@ import { makeMenuRepository } from "@/factories/repositories/make-menu-repositor
 import { GetMenuService } from "@/services/menu/get-menu-service.js";
 
 export const makeGetMenuService = () => {
-	const menuRepository = makeMenuRepository();
-	return new GetMenuService(menuRepository);
+  const menuRepository = makeMenuRepository();
+  return new GetMenuService(menuRepository);
 };

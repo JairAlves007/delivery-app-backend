@@ -11,55 +11,55 @@ import type { EstablishmentID } from "@/types/establishment.js";
 import type { UserWithRole } from "@/types/user.js";
 
 type SignInServiceRequest = z.infer<typeof signInBodySchema> & {
-	allowedRoles: RoleType[];
+  allowedRoles: RoleType[];
 };
 
 interface SignInServiceResponse {
-	user: UserWithRole;
-	establishmentId: EstablishmentID;
+  user: UserWithRole;
+  establishmentId: EstablishmentID;
 }
 
 export class SignInService {
-	private userRepository: IUserRepository;
-	private establishmentRepository: IEstablishmentRepository;
+  private userRepository: IUserRepository;
+  private establishmentRepository: IEstablishmentRepository;
 
-	constructor(
-		userRepository: IUserRepository,
-		establishmentRepository: IEstablishmentRepository
-	) {
-		this.userRepository = userRepository;
-		this.establishmentRepository = establishmentRepository;
-	}
+  constructor(
+    userRepository: IUserRepository,
+    establishmentRepository: IEstablishmentRepository,
+  ) {
+    this.userRepository = userRepository;
+    this.establishmentRepository = establishmentRepository;
+  }
 
-	async handle({
-		email,
-		password,
-		origin,
-		allowedRoles
-	}: SignInServiceRequest): Promise<SignInServiceResponse> {
-		const user = await this.userRepository.findByEmail(email);
+  async handle({
+    email,
+    password,
+    origin,
+    allowedRoles,
+  }: SignInServiceRequest): Promise<SignInServiceResponse> {
+    const user = await this.userRepository.findByEmail(email);
 
-		if (!user) throw new InvalidCredentials();
+    if (!user) throw new InvalidCredentials();
 
-		if (
-			user.role.name === RoleType.ESTABLISHMENT_OWNER &&
-			(!user.establishment || user.establishment.slug !== origin)
-		)
-			throw new InvalidEstablishment();
+    if (
+      user.role.name === RoleType.ESTABLISHMENT_OWNER &&
+      (!user.establishment || user.establishment.slug !== origin)
+    )
+      throw new InvalidEstablishment();
 
-		if (!allowedRoles.includes(user.role.name)) throw new InvalidCredentials();
+    if (!allowedRoles.includes(user.role.name)) throw new InvalidCredentials();
 
-		const doesPasswordMatches = await compare(password, user.password);
+    const doesPasswordMatches = await compare(password, user.password);
 
-		if (!doesPasswordMatches) throw new InvalidCredentials();
+    if (!doesPasswordMatches) throw new InvalidCredentials();
 
-		const establishment = await this.establishmentRepository.findBySlug(origin);
+    const establishment = await this.establishmentRepository.findBySlug(origin);
 
-		if (!establishment) throw new InvalidEstablishment();
+    if (!establishment) throw new InvalidEstablishment();
 
-		return {
-			user,
-			establishmentId: establishment.id
-		};
-	}
+    return {
+      user,
+      establishmentId: establishment.id,
+    };
+  }
 }

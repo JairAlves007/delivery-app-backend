@@ -1,24 +1,30 @@
 import type { IDistrictRepository } from "@/interfaces/repositories/district-repository.js";
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
+import type { FilterField } from "@/types/crud.js";
 
 type DeleteDistrictParams = {
-	id: string;
-} & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
+  id: string;
+} & FilterField &
+  Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class DeleteDistrictService {
-	private districtRepository: IDistrictRepository;
+  private districtRepository: IDistrictRepository;
 
-	constructor(districtRepository: IDistrictRepository) {
-		this.districtRepository = districtRepository;
-	}
+  constructor(districtRepository: IDistrictRepository) {
+    this.districtRepository = districtRepository;
+  }
 
-	async handle({ id, paramsToForget }: DeleteDistrictParams) {
-		await this.districtRepository.delete({ id, force: false });
+  async handle({ id, filterParams, paramsToForget }: DeleteDistrictParams) {
+    await this.districtRepository.delete({
+      id,
+      filterParams,
+      force: false,
+    });
 
-		await forgetAllListingCacheKeysQueue({
-			baseCacheKey: "districts",
-			paramsToForget
-		});
-	}
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "districts",
+      paramsToForget,
+    });
+  }
 }

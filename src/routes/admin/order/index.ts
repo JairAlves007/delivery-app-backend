@@ -5,7 +5,7 @@ import { listOrdersRoute } from "./list-orders.route.js";
 import { updateOrderRoute } from "./update-order.route.js";
 
 export const adminOrderRoutes = async (app: FastifyInstance) => {
-	app.register(listOrdersRoute);
-	app.register(findOrderRoute);
-	app.register(updateOrderRoute);
+  app.register(listOrdersRoute);
+  app.register(findOrderRoute);
+  app.register(updateOrderRoute);
 };

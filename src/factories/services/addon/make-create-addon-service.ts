@@ -2,6 +2,6 @@ import { makeAddonRepository } from "@/factories/repositories/make-addon-reposit
 import { CreateAddonService } from "@/services/addon/create-addon-service.js";
 
 export const makeCreateAddonService = () => {
-	const addonRepository = makeAddonRepository();
-	return new CreateAddonService(addonRepository);
+  const addonRepository = makeAddonRepository();
+  return new CreateAddonService(addonRepository);
 };

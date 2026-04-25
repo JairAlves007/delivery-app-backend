@@ -2,6 +2,6 @@ import { makeBannerRepository } from "@/factories/repositories/make-banner-repos
 import { CreateBannerService } from "@/services/banner/create-banner-service.js";
 
 export const makeCreateBannerService = () => {
-	const bannerRepository = makeBannerRepository();
-	return new CreateBannerService(bannerRepository);
+  const bannerRepository = makeBannerRepository();
+  return new CreateBannerService(bannerRepository);
 };

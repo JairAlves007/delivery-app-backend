@@ -11,31 +11,31 @@ import type { BannerList } from "@/types/banner.js";
 import type { FilterField } from "@/types/crud.js";
 
 type FindBannerServiceRequest = z.infer<typeof bannerParamsSchema> &
-	FilterField;
+  FilterField;
 
 export class FindBannerService {
-	private bannerRepository: IBannerRepository;
+  private bannerRepository: IBannerRepository;
 
-	constructor(bannerRepository: IBannerRepository) {
-		this.bannerRepository = bannerRepository;
-	}
+  constructor(bannerRepository: IBannerRepository) {
+    this.bannerRepository = bannerRepository;
+  }
 
-	async handle({
-		id,
-		filterParams
-	}: FindBannerServiceRequest): Promise<BannerList> {
-		const cache = makeCache();
-		const filterPrefixKey = getFilterParamsCacheKey(filterParams);
-		const key = `${filterPrefixKey}${cache.keys.banners}_${id}`;
+  async handle({
+    id,
+    filterParams,
+  }: FindBannerServiceRequest): Promise<BannerList> {
+    const cache = makeCache();
+    const filterPrefixKey = getFilterParamsCacheKey(filterParams);
+    const key = `${filterPrefixKey}${cache.keys.banners}_${id}`;
 
-		const banner = await cache.remember(
-			key,
-			Constants.CACHE_TTL.banners,
-			async () => await this.bannerRepository.findById({ id, filterParams })
-		);
+    const banner = await cache.remember(
+      key,
+      Constants.CACHE_TTL.banners,
+      async () => await this.bannerRepository.findById({ id, filterParams }),
+    );
 
-		if (!banner) throw new BannerNotFound();
+    if (!banner) throw new BannerNotFound();
 
-		return mapBanner(banner);
-	}
+    return mapBanner(banner);
+  }
 }

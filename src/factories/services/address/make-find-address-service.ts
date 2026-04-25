@@ -2,6 +2,6 @@ import { makeAddressRepository } from "@/factories/repositories/make-address-rep
 import { FindAddressService } from "@/services/address/find-address-service.js";
 
 export const makeFindAddressService = () => {
-	const addressRepository = makeAddressRepository();
-	return new FindAddressService(addressRepository);
+  const addressRepository = makeAddressRepository();
+  return new FindAddressService(addressRepository);
 };

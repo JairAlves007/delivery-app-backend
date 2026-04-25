@@ -15,22 +15,22 @@ import { adminTagRoutes } from "./tag/index.js";
 import { uploadRoutes } from "./upload/index.js";
 
 export const adminRoutes = (app: FastifyInstance) => {
-	app.register(
-		async api => {
-			api.register(adminAuthRoutes, { prefix: "/auth" });
-			api.register(uploadRoutes, { prefix: "/upload" });
-			api.register(establishmentRoutes, { prefix: "/establishment" });
-			api.register(adminProductRoutes, { prefix: "/products" });
-			api.register(adminProductCategoryRoutes, { prefix: "/product/category" });
-			api.register(adminDistrictRoutes, { prefix: "/district" });
-			api.register(adminBannerRoutes, { prefix: "/banner" });
-			api.register(adminAddonCategoryRoutes, { prefix: "/addon/category" });
-			api.register(adminAddonRoutes, { prefix: "/addon" });
-			api.register(adminCouponRoutes, { prefix: "/coupon" });
-			api.register(adminOrderRoutes, { prefix: "/order" });
-			api.register(adminDashboardRoutes, { prefix: "/dashboard" });
-			api.register(adminTagRoutes, { prefix: "/tag" });
-		},
-		{ prefix: "/admin" }
-	);
+  app.register(
+    async (api) => {
+      api.register(adminAuthRoutes, { prefix: "/auth" });
+      api.register(uploadRoutes, { prefix: "/upload" });
+      api.register(establishmentRoutes, { prefix: "/establishment" });
+      api.register(adminProductRoutes, { prefix: "/products" });
+      api.register(adminProductCategoryRoutes, { prefix: "/product/category" });
+      api.register(adminDistrictRoutes, { prefix: "/district" });
+      api.register(adminBannerRoutes, { prefix: "/banner" });
+      api.register(adminAddonCategoryRoutes, { prefix: "/addon/category" });
+      api.register(adminAddonRoutes, { prefix: "/addon" });
+      api.register(adminCouponRoutes, { prefix: "/coupon" });
+      api.register(adminOrderRoutes, { prefix: "/order" });
+      api.register(adminDashboardRoutes, { prefix: "/dashboard" });
+      api.register(adminTagRoutes, { prefix: "/tag" });
+    },
+    { prefix: "/admin" },
+  );
 };

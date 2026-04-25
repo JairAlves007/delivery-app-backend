@@ -2,13 +2,13 @@ import type { IUserAddressRepository } from "@/interfaces/repositories/user-addr
 import type { UserID } from "@/types/user.js";
 
 export class SetAllAddressesAsNotDefaultService {
-	private userAddressRepository: IUserAddressRepository;
+  private userAddressRepository: IUserAddressRepository;
 
-	constructor(userAddressRepository: IUserAddressRepository) {
-		this.userAddressRepository = userAddressRepository;
-	}
+  constructor(userAddressRepository: IUserAddressRepository) {
+    this.userAddressRepository = userAddressRepository;
+  }
 
-	async handle(userID: UserID) {
-		await this.userAddressRepository.setAllAsNotDefault(userID);
-	}
+  async handle(userID: UserID) {
+    await this.userAddressRepository.setAllAsNotDefault(userID);
+  }
 }

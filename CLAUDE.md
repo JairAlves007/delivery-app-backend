@@ -26,18 +26,18 @@ Multi-tenant food delivery SaaS backend. Tenancy is by `establishment_id`, carri
 
 ### Key directories (`src/`)
 
-| Layer | Path | Pattern |
-|-------|------|---------|
-| Entrypoint | `http/app.ts`, `http/server.ts` | Plugin registration order matters |
-| Routes | `routes/{admin,api,health}/` | Grouped by domain, prefixed `/api` |
-| Controllers | `controllers/` | Exported arrow functions, not classes. CRUD: `index`, `find`, `store`, `update`, `destroy` |
-| Services | `services/` | Classes with `handle()` method, one per use case, DI via constructor |
-| Repositories | `repositories/` | `XxxPrismaRepository` implements `IXxxRepository`, soft delete (`deleted_at: null`) |
-| Factories | `factories/{repositories,services}/` | `makeXxxRepository()`, `makeXxxService()` — always use these, never instantiate directly |
-| Schemas | `schemas/` | Zod v4 schemas per domain, pt-BR messages |
-| Queues/Workers | `queues/`, `workers/` | BullMQ queues; workers initialized on Fastify `onReady` hook |
-| Classes | `classes/` | Singletons: `Cache` (Redis), `Mail` (Resend+EJS), `BaseQueue` (BullMQ) |
-| Lib | `lib/` | Client singletons: Prisma, Redis, Resend, R2 |
+| Layer          | Path                                 | Pattern                                                                                    |
+| -------------- | ------------------------------------ | ------------------------------------------------------------------------------------------ |
+| Entrypoint     | `http/app.ts`, `http/server.ts`      | Plugin registration order matters                                                          |
+| Routes         | `routes/{admin,api,health}/`         | Grouped by domain, prefixed `/api`                                                         |
+| Controllers    | `controllers/`                       | Exported arrow functions, not classes. CRUD: `index`, `find`, `store`, `update`, `destroy` |
+| Services       | `services/`                          | Classes with `handle()` method, one per use case, DI via constructor                       |
+| Repositories   | `repositories/`                      | `XxxPrismaRepository` implements `IXxxRepository`, soft delete (`deleted_at: null`)        |
+| Factories      | `factories/{repositories,services}/` | `makeXxxRepository()`, `makeXxxService()` — always use these, never instantiate directly   |
+| Schemas        | `schemas/`                           | Zod v4 schemas per domain, pt-BR messages                                                  |
+| Queues/Workers | `queues/`, `workers/`                | BullMQ queues; workers initialized on Fastify `onReady` hook                               |
+| Classes        | `classes/`                           | Singletons: `Cache` (Redis), `Mail` (Resend+EJS), `BaseQueue` (BullMQ)                     |
+| Lib            | `lib/`                               | Client singletons: Prisma, Redis, Resend, R2                                               |
 
 ## Critical Conventions
 

@@ -5,54 +5,57 @@ import { z } from "zod";
 import { makeCreateProductCategoryService } from "@/factories/services/product/category/make-create-product-category-service.js";
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
+import { getUserEstablishmentId } from "@/helpers/get-user-establishment-id.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
-	apiDefaultErrorResponseSchema,
-	apiSuccessResponseSchema,
-	apiValidationErrorResponseSchema
+  apiDefaultErrorResponseSchema,
+  apiSuccessResponseSchema,
+  apiValidationErrorResponseSchema,
 } from "@/schemas/api-schema.js";
 import { createProductCategoryBodySchema } from "@/schemas/product-category-schema.js";
 
 export const createProductCategoryRoute = async (app: FastifyInstance) => {
-	app.withTypeProvider<ZodTypeProvider>().post(
-		"/",
-		{
-			schema: {
-				operationId: "createProductCategory",
-				tags: ["Product Categories"],
-				summary: "Criar categoria de produtos",
-				body: createProductCategoryBodySchema,
-				response: {
-					201: apiSuccessResponseSchema(z.object({})),
-					401: apiDefaultErrorResponseSchema,
-					403: apiDefaultErrorResponseSchema,
-					409: apiDefaultErrorResponseSchema,
-					422: apiValidationErrorResponseSchema,
-					500: apiDefaultErrorResponseSchema
-				}
-			},
-			onRequest: [
-				isAuthenticated,
-				ensureUserHasPermission([PermissionType.MANAGE_CATEGORIES])
-			]
-		},
-		async (request, reply) => {
-			const body = request.body;
+  app.withTypeProvider<ZodTypeProvider>().post(
+    "/",
+    {
+      schema: {
+        operationId: "createProductCategory",
+        tags: ["Product Categories"],
+        summary: "Criar categoria de produtos",
+        body: createProductCategoryBodySchema,
+        response: {
+          201: apiSuccessResponseSchema(z.object({})),
+          401: apiDefaultErrorResponseSchema,
+          403: apiDefaultErrorResponseSchema,
+          409: apiDefaultErrorResponseSchema,
+          422: apiValidationErrorResponseSchema,
+          500: apiDefaultErrorResponseSchema,
+        },
+      },
+      onRequest: [
+        isAuthenticated,
+        ensureUserHasPermission([PermissionType.MANAGE_CATEGORIES]),
+      ],
+    },
+    async (request, reply) => {
+      const body = request.body;
+      const establishmentId = getUserEstablishmentId(request.user);
 
-			const createProductCategoryService = makeCreateProductCategoryService();
+      const createProductCategoryService = makeCreateProductCategoryService();
 
-			await createProductCategoryService.handle({
-				...body,
-				paramsToForget: { establishment_id: request.user.primaryTenantId }
-			});
+      await createProductCategoryService.handle({
+        ...body,
+        establishmentId,
+        paramsToForget: { establishment_id: establishmentId },
+      });
 
-			return reply
-				.status(HTTPStatusCodes.CREATED)
-				.send(
-					ApiResponse.success("Categoria de produto criada com sucesso", {})
-				);
-		}
-	);
+      return reply
+        .status(HTTPStatusCodes.CREATED)
+        .send(
+          ApiResponse.success("Categoria de produto criada com sucesso", {}),
+        );
+    },
+  );
 };

@@ -2,6 +2,6 @@ import { makeTagRepository } from "@/factories/repositories/make-tag-repository.
 import { UpdateTagService } from "@/services/tag/update-tag-service.js";
 
 export const makeUpdateTagService = () => {
-	const tagRepository = makeTagRepository();
-	return new UpdateTagService(tagRepository);
+  const tagRepository = makeTagRepository();
+  return new UpdateTagService(tagRepository);
 };

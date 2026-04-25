@@ -2,6 +2,6 @@ import { makeProductRepository } from "@/factories/repositories/make-product-rep
 import { DeleteProductService } from "@/services/product/delete-product-service.js";
 
 export const makeDeleteProductService = () => {
-	const productRepository = makeProductRepository();
-	return new DeleteProductService(productRepository);
+  const productRepository = makeProductRepository();
+  return new DeleteProductService(productRepository);
 };

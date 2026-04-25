@@ -2,6 +2,6 @@ import { makeProductRepository } from "@/factories/repositories/make-product-rep
 import { FindProductService } from "@/services/product/find-product-service.js";
 
 export const makeFindProductService = () => {
-	const productRepository = makeProductRepository();
-	return new FindProductService(productRepository);
+  const productRepository = makeProductRepository();
+  return new FindProductService(productRepository);
 };

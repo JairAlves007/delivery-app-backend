@@ -11,90 +11,90 @@ import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
 import type { FilterField, PaginatedResponse } from "@/types/crud.js";
 
 type ListAddonServiceRequest = z.infer<typeof listQueryParamsSchema> &
-	FilterField;
+  FilterField;
 
 type ListAddonServiceResponse = PaginatedResponse<Addon>;
 
 export class ListAddonService {
-	private addonRepository: IAddonRepository;
+  private addonRepository: IAddonRepository;
 
-	constructor(addonRepository: IAddonRepository) {
-		this.addonRepository = addonRepository;
-	}
+  constructor(addonRepository: IAddonRepository) {
+    this.addonRepository = addonRepository;
+  }
 
-	private mapAddons(addons: Addon[]) {
-		return addons.map(addon => ({
-			...addon,
-			price: transformPriceFromDatabase(addon.price)
-		}));
-	}
+  private mapAddons(addons: Addon[]) {
+    return addons.map((addon) => ({
+      ...addon,
+      price: transformPriceFromDatabase(addon.price),
+    }));
+  }
 
-	async handle({
-		page,
-		perPage,
-		filterParams
-	}: ListAddonServiceRequest): Promise<ListAddonServiceResponse> {
-		const cache = makeCache();
-		const prefixKey = getFilterParamsCacheKey(filterParams);
+  async handle({
+    page,
+    perPage,
+    filterParams,
+  }: ListAddonServiceRequest): Promise<ListAddonServiceResponse> {
+    const cache = makeCache();
+    const prefixKey = getFilterParamsCacheKey(filterParams);
 
-		const isPaging = !!page;
-		const totalPromise = cache.remember(
-			`${prefixKey}total_${cache.keys.addons}`,
-			Constants.CACHE_TTL.addons,
-			async () => await this.addonRepository.count(filterParams)
-		);
+    const isPaging = !!page;
+    const totalPromise = cache.remember(
+      `${prefixKey}total_${cache.keys.addons}`,
+      Constants.CACHE_TTL.addons,
+      async () => await this.addonRepository.count(filterParams),
+    );
 
-		if (isPaging) {
-			const key = `${prefixKey}${cache.keys.addons}_page_${page}_per_page_${perPage}`;
-			const [total, addons] = await Promise.all([
-					totalPromise,
-				cache.remember(
-					key,
-					Constants.CACHE_TTL.addons,
-					async () =>
-						await this.addonRepository.paginate({
-							page,
-							perPage,
-							filterParams
-						})
-				)
-			]);
+    if (isPaging) {
+      const key = `${prefixKey}${cache.keys.addons}_page_${page}_per_page_${perPage}`;
+      const [total, addons] = await Promise.all([
+        totalPromise,
+        cache.remember(
+          key,
+          Constants.CACHE_TTL.addons,
+          async () =>
+            await this.addonRepository.paginate({
+              page,
+              perPage,
+              filterParams,
+            }),
+        ),
+      ]);
 
-			const totalPages = Math.ceil(total / perPage);
+      const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages && totalPages > 0) {
-				await cache.forget(key);
-				throw new InvalidPage();
-			}
+      if (page > totalPages && totalPages > 0) {
+        await cache.forget(key);
+        throw new InvalidPage();
+      }
 
-			return {
-				items: this.mapAddons(addons),
-				pagination: {
-					page,
-					perPage,
-					total,
-					totalPages
-				}
-			};
-		}
+      return {
+        items: this.mapAddons(addons),
+        pagination: {
+          page,
+          perPage,
+          total,
+          totalPages,
+        },
+      };
+    }
 
-		const [total, addons] = await Promise.all([
-			totalPromise,
-			cache.remember(
-				`${prefixKey}all_${cache.keys.addons}`,
-				Constants.CACHE_TTL.addons,
-				async () => await this.addonRepository.listAll(filterParams)
-			)
-		]);
+    const [total, addons] = await Promise.all([
+      totalPromise,
+      cache.remember(
+        `${prefixKey}all_${cache.keys.addons}`,
+        Constants.CACHE_TTL.addons,
+        async () => await this.addonRepository.listAll(filterParams),
+      ),
+    ]);
 
-		return {
-			items: this.mapAddons(addons),
-			pagination: {
-				page: 1,
-				perPage: total,
-				total,
-				totalPages: 1
-			}
-		};
-	}
+    return {
+      items: this.mapAddons(addons),
+      pagination: {
+        page: 1,
+        perPage: total,
+        total,
+        totalPages: 1,
+      },
+    };
+  }
 }

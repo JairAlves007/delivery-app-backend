@@ -3,22 +3,22 @@ import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type DeleteOrderServiceParams = {
-	id: string;
+  id: string;
 } & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class DeleteOrderService {
-	private orderRepository: IOrderRepository;
+  private orderRepository: IOrderRepository;
 
-	constructor(orderRepository: IOrderRepository) {
-		this.orderRepository = orderRepository;
-	}
+  constructor(orderRepository: IOrderRepository) {
+    this.orderRepository = orderRepository;
+  }
 
-	async handle({ id, paramsToForget }: DeleteOrderServiceParams) {
-		await this.orderRepository.delete({ id, force: false });
+  async handle({ id, paramsToForget }: DeleteOrderServiceParams) {
+    await this.orderRepository.delete({ id, force: false });
 
-		await forgetAllListingCacheKeysQueue({
-			baseCacheKey: "orders",
-			paramsToForget
-		});
-	}
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "orders",
+      paramsToForget,
+    });
+  }
 }

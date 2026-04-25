@@ -2,6 +2,6 @@ import { makeProductCategoryRepository } from "@/factories/repositories/make-pro
 import { DeleteProductCategoryService } from "@/services/product/category/delete-product-category-service.js";
 
 export const makeDeleteProductCategoryService = () => {
-	const productCategoryRepository = makeProductCategoryRepository();
-	return new DeleteProductCategoryService(productCategoryRepository);
+  const productCategoryRepository = makeProductCategoryRepository();
+  return new DeleteProductCategoryService(productCategoryRepository);
 };

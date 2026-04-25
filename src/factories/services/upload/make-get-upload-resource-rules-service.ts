@@ -2,6 +2,6 @@ import { makeResourceRepository } from "@/factories/repositories/make-resource-r
 import { GetUploadResourceRulesService } from "@/services/upload/get-upload-resource-rules.js";
 
 export const makeGetUploadResourceRulesService = () => {
-	const resourceRepository = makeResourceRepository();
-	return new GetUploadResourceRulesService(resourceRepository);
+  const resourceRepository = makeResourceRepository();
+  return new GetUploadResourceRulesService(resourceRepository);
 };

@@ -4,8 +4,8 @@ import type { BannerFromRepository } from "@/types/banner.js";
 import type { ICRUDBase } from "../crud-base.js";
 
 export type IBannerRepository = ICRUDBase<
-	BannerFromRepository,
-	Prisma.BannerCreateInput,
-	Prisma.BannerUpdateInput,
-	number
+  BannerFromRepository,
+  Prisma.BannerCreateInput,
+  Prisma.BannerUpdateInput,
+  number
 >;

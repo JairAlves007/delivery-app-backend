@@ -2,6 +2,6 @@ import { makeUserRepository } from "@/factories/repositories/make-user-repositor
 import { FindUserService } from "@/services/user/find-user-service.js";
 
 export const makeFindUserService = () => {
-	const userRepository = makeUserRepository();
-	return new FindUserService(userRepository);
+  const userRepository = makeUserRepository();
+  return new FindUserService(userRepository);
 };

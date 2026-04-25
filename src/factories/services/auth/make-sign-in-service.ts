@@ -3,8 +3,8 @@ import { makeUserRepository } from "@/factories/repositories/make-user-repositor
 import { SignInService } from "@/services/auth/sign-in-service.js";
 
 export const makeSignInService = () => {
-	const userRepository = makeUserRepository();
-	const establishmentRepository = makeEstablishmentRepository();
+  const userRepository = makeUserRepository();
+  const establishmentRepository = makeEstablishmentRepository();
 
-	return new SignInService(userRepository, establishmentRepository);
+  return new SignInService(userRepository, establishmentRepository);
 };

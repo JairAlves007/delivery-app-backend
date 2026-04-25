@@ -1,225 +1,225 @@
 import type { Prisma } from "@/generated/prisma/client.js";
 import {
-	buildFilterQueryOptions,
-	transformValidFilterParams
+  buildFilterQueryOptions,
+  transformValidFilterParams,
 } from "@/helpers/crud.js";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.js";
 import prisma from "@/lib/prisma.js";
 import type {
-	CursorPaginationParams,
-	DeleteContentParams,
-	FilterParams,
-	FindByIdParams,
-	PaginationParams,
-	UpdateContentParams
+  CursorPaginationParams,
+  DeleteContentParams,
+  FilterParams,
+  FindByIdParams,
+  PaginationParams,
+  UpdateContentParams,
 } from "@/types/crud.js";
 import type { ProductCategoryFromRepository } from "@/types/product-category.js";
 
 export class ProductCategoryPrismaRepository implements IProductCategoryRepository {
-	async listAll(
-		filterParams?: FilterParams
-	): Promise<ProductCategoryFromRepository[]> {
-		const { search, sortField, sortDirection, ...params } =
-			transformValidFilterParams(filterParams);
+  async listAll(
+    filterParams?: FilterParams,
+  ): Promise<ProductCategoryFromRepository[]> {
+    const { search, sortField, sortDirection, ...params } =
+      transformValidFilterParams(filterParams);
 
-		const { where, orderBy } =
-			buildFilterQueryOptions<Prisma.ProductCategoryOrderByWithRelationInput>({
-				search,
-				sortField: sortField ?? "order",
-				sortDirection: sortDirection ?? "asc",
-				searchableFields: ["name", "slug"],
-				defaultSortField: "order"
-			});
+    const { where, orderBy } =
+      buildFilterQueryOptions<Prisma.ProductCategoryOrderByWithRelationInput>({
+        search,
+        sortField: sortField ?? "order",
+        sortDirection: sortDirection ?? "asc",
+        searchableFields: ["name", "slug"],
+        defaultSortField: "order",
+      });
 
-		return await prisma.productCategory.findMany({
-			where: {
-				deleted_at: null,
-				...where,
-				...params
-			},
-			include: {
-				resources: {
-					select: {
-						resource: true
-					}
-				}
-			},
-			orderBy
-		});
-	}
+    return await prisma.productCategory.findMany({
+      where: {
+        deleted_at: null,
+        ...where,
+        ...params,
+      },
+      include: {
+        resources: {
+          select: {
+            resource: true,
+          },
+        },
+      },
+      orderBy,
+    });
+  }
 
-	async count(filterParams?: FilterParams): Promise<number> {
-		const {
-			search,
-			sortField = undefined,
-			sortDirection = undefined,
-			...params
-		} = transformValidFilterParams(filterParams);
+  async count(filterParams?: FilterParams): Promise<number> {
+    const {
+      search,
+      sortField = undefined,
+      sortDirection = undefined,
+      ...params
+    } = transformValidFilterParams(filterParams);
 
-		const { where } =
-			buildFilterQueryOptions<Prisma.ProductCategoryOrderByWithRelationInput>({
-				search,
-				sortField,
-				sortDirection,
-				searchableFields: ["name", "slug"],
-				defaultSortField: "order"
-			});
+    const { where } =
+      buildFilterQueryOptions<Prisma.ProductCategoryOrderByWithRelationInput>({
+        search,
+        sortField,
+        sortDirection,
+        searchableFields: ["name", "slug"],
+        defaultSortField: "order",
+      });
 
-		return await prisma.productCategory.count({
-			where: {
-				deleted_at: null,
-				...where,
-				...params
-			}
-		});
-	}
+    return await prisma.productCategory.count({
+      where: {
+        deleted_at: null,
+        ...where,
+        ...params,
+      },
+    });
+  }
 
-	async paginate({
-		page,
-		perPage,
-		filterParams
-	}: PaginationParams): Promise<ProductCategoryFromRepository[]> {
-		const { search, sortField, sortDirection, ...params } =
-			transformValidFilterParams(filterParams);
+  async paginate({
+    page,
+    perPage,
+    filterParams,
+  }: PaginationParams): Promise<ProductCategoryFromRepository[]> {
+    const { search, sortField, sortDirection, ...params } =
+      transformValidFilterParams(filterParams);
 
-		const { where, orderBy } =
-			buildFilterQueryOptions<Prisma.ProductCategoryOrderByWithRelationInput>({
-				search,
-				sortField: sortField ?? "order",
-				sortDirection: sortDirection ?? "asc",
-				searchableFields: ["name", "slug"],
-				defaultSortField: "order"
-			});
+    const { where, orderBy } =
+      buildFilterQueryOptions<Prisma.ProductCategoryOrderByWithRelationInput>({
+        search,
+        sortField: sortField ?? "order",
+        sortDirection: sortDirection ?? "asc",
+        searchableFields: ["name", "slug"],
+        defaultSortField: "order",
+      });
 
-		return await prisma.productCategory.findMany({
-			skip: (page - 1) * perPage,
-			take: perPage,
-			where: {
-				deleted_at: null,
-				...where,
-				...params
-			},
-			include: {
-				resources: {
-					select: {
-						resource: true
-					}
-				}
-			},
-			orderBy
-		});
-	}
+    return await prisma.productCategory.findMany({
+      skip: (page - 1) * perPage,
+      take: perPage,
+      where: {
+        deleted_at: null,
+        ...where,
+        ...params,
+      },
+      include: {
+        resources: {
+          select: {
+            resource: true,
+          },
+        },
+      },
+      orderBy,
+    });
+  }
 
-	async cursorPaginate({
-		limit,
-		cursor,
-		filterParams
-	}: CursorPaginationParams<string>): Promise<ProductCategoryFromRepository[]> {
-		const { search, sortField, sortDirection, ...params } =
-			transformValidFilterParams(filterParams);
+  async cursorPaginate({
+    limit,
+    cursor,
+    filterParams,
+  }: CursorPaginationParams<string>): Promise<ProductCategoryFromRepository[]> {
+    const { search, sortField, sortDirection, ...params } =
+      transformValidFilterParams(filterParams);
 
-		const { where, orderBy } =
-			buildFilterQueryOptions<Prisma.ProductCategoryOrderByWithRelationInput>({
-				search,
-				sortField: sortField ?? "order",
-				sortDirection: sortDirection ?? "asc",
-				searchableFields: ["name", "slug"],
-				defaultSortField: "order"
-			});
+    const { where, orderBy } =
+      buildFilterQueryOptions<Prisma.ProductCategoryOrderByWithRelationInput>({
+        search,
+        sortField: sortField ?? "order",
+        sortDirection: sortDirection ?? "asc",
+        searchableFields: ["name", "slug"],
+        defaultSortField: "order",
+      });
 
-		return await prisma.productCategory.findMany({
-			where: {
-				deleted_at: null,
-				...where,
-				products: {
-					some: {
-						deleted_at: null,
-						OR: [{ valid_until: null }, { valid_until: { gt: new Date() } }],
-						...params
-					}
-				},
-				...params
-			},
-			include: {
-				resources: {
-					select: {
-						resource: true
-					}
-				}
-			},
-			orderBy,
-			take: limit + 1,
-			skip: cursor ? 1 : 0,
-			cursor: cursor ? { id: cursor } : undefined
-		});
-	}
+    return await prisma.productCategory.findMany({
+      where: {
+        deleted_at: null,
+        ...where,
+        products: {
+          some: {
+            deleted_at: null,
+            OR: [{ valid_until: null }, { valid_until: { gt: new Date() } }],
+            ...params,
+          },
+        },
+        ...params,
+      },
+      include: {
+        resources: {
+          select: {
+            resource: true,
+          },
+        },
+      },
+      orderBy,
+      take: limit + 1,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: cursor } : undefined,
+    });
+  }
 
-	async findById({
-		id,
-		filterParams
-	}: FindByIdParams<string>): Promise<ProductCategoryFromRepository | null> {
-		const params = transformValidFilterParams(filterParams);
+  async findById({
+    id,
+    filterParams,
+  }: FindByIdParams<string>): Promise<ProductCategoryFromRepository | null> {
+    const params = transformValidFilterParams(filterParams);
 
-		return await prisma.productCategory.findUnique({
-			where: {
-				id,
-				deleted_at: null,
-				...params
-			},
-			include: {
-				resources: {
-					select: {
-						resource: true
-					}
-				}
-			}
-		});
-	}
+    return await prisma.productCategory.findUnique({
+      where: {
+        id,
+        deleted_at: null,
+        ...params,
+      },
+      include: {
+        resources: {
+          select: {
+            resource: true,
+          },
+        },
+      },
+    });
+  }
 
-	async create(data: Prisma.ProductCategoryCreateInput): Promise<void> {
-		await prisma.productCategory.create({ data });
-	}
+  async create(data: Prisma.ProductCategoryCreateInput): Promise<void> {
+    await prisma.productCategory.create({ data });
+  }
 
-	async update({
-		id,
-		data,
-		filterParams
-	}: UpdateContentParams<
-		string,
-		Prisma.ProductCategoryUpdateInput
-	>): Promise<void> {
-		const params = transformValidFilterParams(filterParams);
+  async update({
+    id,
+    data,
+    filterParams,
+  }: UpdateContentParams<
+    string,
+    Prisma.ProductCategoryUpdateInput
+  >): Promise<void> {
+    const params = transformValidFilterParams(filterParams);
 
-		await prisma.productCategory.update({
-			where: {
-				id,
-				deleted_at: null,
-				...params
-			},
-			data
-		});
-	}
+    await prisma.productCategory.update({
+      where: {
+        id,
+        deleted_at: null,
+        ...params,
+      },
+      data,
+    });
+  }
 
-	async delete({
-		id,
-		force,
-		filterParams
-	}: DeleteContentParams<string>): Promise<void> {
-		const params = transformValidFilterParams(filterParams);
+  async delete({
+    id,
+    force,
+    filterParams,
+  }: DeleteContentParams<string>): Promise<void> {
+    const params = transformValidFilterParams(filterParams);
 
-		if (force) {
-			await prisma.productCategory.delete({
-				where: {
-					id,
-					...params
-				}
-			});
-		}
+    if (force) {
+      await prisma.productCategory.delete({
+        where: {
+          id,
+          ...params,
+        },
+      });
+    }
 
-		await this.update({
-			id,
-			filterParams,
-			data: { deleted_at: new Date() }
-		});
-	}
+    await this.update({
+      id,
+      filterParams,
+      data: { deleted_at: new Date() },
+    });
+  }
 }

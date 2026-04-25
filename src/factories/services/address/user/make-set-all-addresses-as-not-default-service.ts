@@ -2,6 +2,6 @@ import { makeUserAddressRepository } from "@/factories/repositories/make-user-ad
 import { SetAllAddressesAsNotDefaultService } from "@/services/address/user/set-all-addresses-as-not-default-service.js";
 
 export const makeSetAllAddressesAsNotDefaultService = () => {
-	const userAddressRepository = makeUserAddressRepository();
-	return new SetAllAddressesAsNotDefaultService(userAddressRepository);
+  const userAddressRepository = makeUserAddressRepository();
+  return new SetAllAddressesAsNotDefaultService(userAddressRepository);
 };

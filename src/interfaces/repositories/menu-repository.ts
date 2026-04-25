@@ -3,10 +3,10 @@ import type { EstablishmentID } from "@/types/establishment.js";
 import type { MenuWithSubmenus } from "@/types/menu.js";
 
 export interface IMenuRepository {
-	get(
-		forRole: RoleType,
-		establishmentId: EstablishmentID
-	): Promise<MenuWithSubmenus[] | null>;
+  get(
+    forRole: RoleType,
+    establishmentId: EstablishmentID,
+  ): Promise<MenuWithSubmenus[] | null>;
 
-	createForNewEstablishment(establishmentId: EstablishmentID): Promise<void>;
+  createForNewEstablishment(establishmentId: EstablishmentID): Promise<void>;
 }

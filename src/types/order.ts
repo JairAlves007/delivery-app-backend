@@ -1,11 +1,11 @@
 import type { z } from "zod";
 
 import type {
-	Coupon,
-	DeliveryType,
-	District,
-	PaymentMethodType,
-	Prisma
+  Coupon,
+  DeliveryType,
+  District,
+  PaymentMethodType,
+  Prisma,
 } from "@/generated/prisma/client.js";
 import type { orderPayloadSchema } from "@/schemas/response-schema.js";
 
@@ -17,101 +17,101 @@ import type { ProductList } from "./product.js";
 import type { UserID, UserWithRole } from "./user.js";
 
 export type OrderFromRepository = Prisma.OrderGetPayload<{
-	include: {
-		coupon: true;
-		items: { include: { addons: true } };
-		orderCoupon: true;
-		orderDeliveryAddress: true;
-		statuses: {
-			select: {
-				label: true;
-				value: true;
-			};
-			orderBy: {
-				created_at: "desc";
-			};
-			take: 1;
-		};
-	};
+  include: {
+    coupon: true;
+    items: { include: { addons: true } };
+    orderCoupon: true;
+    orderDeliveryAddress: true;
+    statuses: {
+      select: {
+        label: true;
+        value: true;
+      };
+      orderBy: {
+        created_at: "desc";
+      };
+      take: 1;
+    };
+  };
 }>;
 
 export type OrderPayload = z.infer<typeof orderPayloadSchema>;
 
 export interface OrderAddonsToProcess extends AddonFromRepository {
-	quantity: number;
+  quantity: number;
 }
 
 export type BuildOrderItemsParams = {
-	user: UserWithRole;
-	comment?: string | null;
-	contactPhone?: string | null;
-	deliveryType: DeliveryType;
-	paymentMethod: PaymentMethodType;
-	establishmentId: EstablishmentID;
-	changeAmount?: number | null;
-	couponDiscount: number;
-	coupon: Coupon | null;
-	address: UserAddressWithDefault | null;
-	district: District | null;
-	shippingCost: number;
-	subtotal: number;
-	orderItemsToProcess: OrderItemsToProcess[];
+  user: UserWithRole;
+  comment?: string | null;
+  contactPhone?: string | null;
+  deliveryType: DeliveryType;
+  paymentMethod: PaymentMethodType;
+  establishmentId: EstablishmentID;
+  changeAmount?: number | null;
+  couponDiscount: number;
+  coupon: Coupon | null;
+  address: UserAddressWithDefault | null;
+  district: District | null;
+  shippingCost: number;
+  subtotal: number;
+  orderItemsToProcess: OrderItemsToProcess[];
 };
 
 export type OrderInfo = {
-	coupon: Coupon | null;
-	address: UserAddressWithDefault | null;
-	district: District | null;
+  coupon: Coupon | null;
+  address: UserAddressWithDefault | null;
+  district: District | null;
 };
 
 export type OrderItems = {
-	id: string;
-	quantity: number;
-	addonCategories?: OrderCategoryAddons[] | null;
+  id: string;
+  quantity: number;
+  addonCategories?: OrderCategoryAddons[] | null;
 };
 
 export type OrderItemsToProcess = {
-	product: ProductList & {
-		quantity: number;
-	};
-	addons: OrderAddonsToProcess[];
+  product: ProductList & {
+    quantity: number;
+  };
+  addons: OrderAddonsToProcess[];
 };
 
 export type OrderCategoryAddons = {
-	id: number;
-	addons: OrderAddons[];
+  id: number;
+  addons: OrderAddons[];
 };
 
 export type OrderAddons = {
-	id: number;
-	quantity: number;
+  id: number;
+  quantity: number;
 };
 
 export type OrderIntent = {
-	establishmentId: EstablishmentID;
-	userId: UserID;
-	contactPhone?: string | null;
-	addressId?: string | null;
-	districtId?: string | null;
-	couponId?: number | null;
-	comment?: string | null;
-	paymentMethod: PaymentMethodType;
-	deliveryType: DeliveryType;
-	changeAmount?: number | null;
-	items: OrderItems[];
+  establishmentId: EstablishmentID;
+  userId: UserID;
+  contactPhone?: string | null;
+  addressId?: string | null;
+  districtId?: string | null;
+  couponId?: number | null;
+  comment?: string | null;
+  paymentMethod: PaymentMethodType;
+  deliveryType: DeliveryType;
+  changeAmount?: number | null;
+  items: OrderItems[];
 };
 
 export type OrderSubSectionMessage = {
-	address: string;
-	referencePoint: string;
-	product: string;
-	addon: string;
-	coupon: string;
-	changeAmount: string;
-	comment: string;
-	discount: string;
+  address: string;
+  referencePoint: string;
+  product: string;
+  addon: string;
+  coupon: string;
+  changeAmount: string;
+  comment: string;
+  discount: string;
 };
 
 export type CreateOrderParams = {
-	order: OrderIntent;
+  order: OrderIntent;
 } & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;

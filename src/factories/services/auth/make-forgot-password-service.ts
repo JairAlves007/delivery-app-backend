@@ -3,11 +3,11 @@ import { makeUserRepository } from "@/factories/repositories/make-user-repositor
 import { ForgotPasswordService } from "@/services/auth/forgot-password-service.js";
 
 export const makeForgotPasswordService = () => {
-	const userRepository = makeUserRepository();
-	const passwordResetTokenRepository = makePasswordResetTokenRepository();
+  const userRepository = makeUserRepository();
+  const passwordResetTokenRepository = makePasswordResetTokenRepository();
 
-	return new ForgotPasswordService(
-		userRepository,
-		passwordResetTokenRepository
-	);
+  return new ForgotPasswordService(
+    userRepository,
+    passwordResetTokenRepository,
+  );
 };

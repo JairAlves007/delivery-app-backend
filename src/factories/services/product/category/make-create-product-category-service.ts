@@ -2,6 +2,6 @@ import { makeProductCategoryRepository } from "@/factories/repositories/make-pro
 import { CreateProductCategoryService } from "@/services/product/category/create-product-category-service.js";
 
 export const makeCreateProductCategoryService = () => {
-	const productCategoryRepository = makeProductCategoryRepository();
-	return new CreateProductCategoryService(productCategoryRepository);
+  const productCategoryRepository = makeProductCategoryRepository();
+  return new CreateProductCategoryService(productCategoryRepository);
 };

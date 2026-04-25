@@ -7,51 +7,54 @@ import { updateTagBodySchema } from "@/schemas/tag-schema.js";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type UpdateTagServiceRequest = z.infer<typeof updateTagBodySchema> & {
-	id: number;
-} & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
+  id: number;
+} & { establishmentId: string } & Pick<
+    ForgetAllListingCacheKeysParams,
+    "paramsToForget"
+  >;
 
 export class UpdateTagService {
-	private tagRepository: ITagRepository;
+  private tagRepository: ITagRepository;
 
-	constructor(tagRepository: ITagRepository) {
-		this.tagRepository = tagRepository;
-	}
+  constructor(tagRepository: ITagRepository) {
+    this.tagRepository = tagRepository;
+  }
 
-	async handle({
-		id,
-		establishmentId,
-		combinableTagIds,
-		paramsToForget,
-		...data
-	}: UpdateTagServiceRequest) {
-		const tag = await this.tagRepository.findById({
-			id,
-			filterParams: { establishment_id: establishmentId }
-		});
+  async handle({
+    id,
+    establishmentId,
+    combinableTagIds,
+    paramsToForget,
+    ...data
+  }: UpdateTagServiceRequest) {
+    const tag = await this.tagRepository.findById({
+      id,
+      filterParams: { establishment_id: establishmentId },
+    });
 
-		if (!tag) throw new TagNotFound();
+    if (!tag) throw new TagNotFound();
 
-		if (Object.keys(data).length > 0) {
-			await this.tagRepository.update({
-				id,
-				filterParams: { establishment_id: establishmentId },
-				data
-			});
-		}
+    if (Object.keys(data).length > 0) {
+      await this.tagRepository.update({
+        id,
+        filterParams: { establishment_id: establishmentId },
+        data,
+      });
+    }
 
-		if (combinableTagIds) {
-			await this.tagRepository.syncCombinations({
-				tagId: id,
-				combinableTagIds,
-				establishmentId
-			});
-		}
+    if (combinableTagIds) {
+      await this.tagRepository.syncCombinations({
+        tagId: id,
+        combinableTagIds,
+        establishmentId,
+      });
+    }
 
-		if (paramsToForget) {
-			await forgetAllListingCacheKeysQueue({
-				baseCacheKey: "tags",
-				paramsToForget
-			});
-		}
-	}
+    if (paramsToForget) {
+      await forgetAllListingCacheKeysQueue({
+        baseCacheKey: "tags",
+        paramsToForget,
+      });
+    }
+  }
 }

@@ -10,40 +10,40 @@ import type { BannerList } from "@/types/banner.js";
 import type { ListResponse } from "@/types/crud.js";
 
 type ListBannersCatalogServiceRequest = z.infer<
-	typeof establishmentParamsSchema
+  typeof establishmentParamsSchema
 >;
 
 type ListBannersCatalogServiceResponse = ListResponse<BannerList>;
 
 export class ListBannersCatalogService {
-	private bannerRepository: IBannerRepository;
+  private bannerRepository: IBannerRepository;
 
-	constructor(bannerRepository: IBannerRepository) {
-		this.bannerRepository = bannerRepository;
-	}
+  constructor(bannerRepository: IBannerRepository) {
+    this.bannerRepository = bannerRepository;
+  }
 
-	public async handle({
-		establishmentId
-	}: ListBannersCatalogServiceRequest): Promise<ListBannersCatalogServiceResponse> {
-		const cache = makeCache();
-		const prefixKey = getFilterParamsCacheKey({
-			establishment_id: establishmentId
-		});
-		const key = `${prefixKey}all_${cache.keys.banners}`;
+  public async handle({
+    establishmentId,
+  }: ListBannersCatalogServiceRequest): Promise<ListBannersCatalogServiceResponse> {
+    const cache = makeCache();
+    const prefixKey = getFilterParamsCacheKey({
+      establishment_id: establishmentId,
+    });
+    const key = `${prefixKey}all_${cache.keys.banners}`;
 
-		const banners = await cache.remember(
-			key,
-			Constants.CACHE_TTL.banners,
-			async () =>
-				await this.bannerRepository.listAll({
-					establishment_id: establishmentId
-				})
-		);
+    const banners = await cache.remember(
+      key,
+      Constants.CACHE_TTL.banners,
+      async () =>
+        await this.bannerRepository.listAll({
+          establishment_id: establishmentId,
+        }),
+    );
 
-		if (banners.length <= 0) await cache.forget(key);
+    if (banners.length <= 0) await cache.forget(key);
 
-		return {
-			items: mapBanners(banners)
-		};
-	}
+    return {
+      items: mapBanners(banners),
+    };
+  }
 }

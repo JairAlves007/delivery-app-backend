@@ -6,36 +6,38 @@ import { createAddonCategoryBodySchema } from "@/schemas/addon-category-schema.j
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type CreateAddonCategoryServiceRequest = z.infer<
-	typeof createAddonCategoryBodySchema
+  typeof createAddonCategoryBodySchema
 > &
-	Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
+  Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> & {
+    establishmentId: string;
+  };
 
 export class CreateAddonCategoryService {
-	private addonCategoryRepository: IAddonCategoryRepository;
+  private addonCategoryRepository: IAddonCategoryRepository;
 
-	constructor(addonCategoryRepository: IAddonCategoryRepository) {
-		this.addonCategoryRepository = addonCategoryRepository;
-	}
+  constructor(addonCategoryRepository: IAddonCategoryRepository) {
+    this.addonCategoryRepository = addonCategoryRepository;
+  }
 
-	async handle({
-		establishmentId,
-		maxQuantity: max_quantity,
-		paramsToForget,
-		...data
-	}: CreateAddonCategoryServiceRequest) {
-		await this.addonCategoryRepository.create({
-			...data,
-			max_quantity,
-			establishment: {
-				connect: {
-					id: establishmentId
-				}
-			}
-		});
+  async handle({
+    establishmentId,
+    maxQuantity: max_quantity,
+    paramsToForget,
+    ...data
+  }: CreateAddonCategoryServiceRequest) {
+    await this.addonCategoryRepository.create({
+      ...data,
+      max_quantity,
+      establishment: {
+        connect: {
+          id: establishmentId,
+        },
+      },
+    });
 
-		await forgetAllListingCacheKeysQueue({
-			baseCacheKey: "addonCategories",
-			paramsToForget
-		});
-	}
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "addonCategories",
+      paramsToForget,
+    });
+  }
 }

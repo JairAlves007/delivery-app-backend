@@ -7,9 +7,9 @@ import { listEstablishmentsRoute } from "./list-establishments.route.js";
 import { updateEstablishmentRoute } from "./update-establishment.route.js";
 
 export const establishmentRoutes = async (app: FastifyInstance) => {
-	app.register(listEstablishmentsRoute);
-	app.register(findEstablishmentRoute);
-	app.register(createEstablishmentRoute);
-	app.register(updateEstablishmentRoute);
-	app.register(deleteEstablishmentRoute);
+  app.register(listEstablishmentsRoute);
+  app.register(findEstablishmentRoute);
+  app.register(createEstablishmentRoute);
+  app.register(updateEstablishmentRoute);
+  app.register(deleteEstablishmentRoute);
 };

@@ -7,57 +7,57 @@ import type { OrderInfo } from "@/types/order.js";
 import type { UserID } from "@/types/user.js";
 
 type ValidateDeliveryFromOrderServiceRequest = {
-	establishmentId: EstablishmentID;
-	userId: UserID;
-	deliveryType: DeliveryType;
-	couponId?: number | null;
-	addressId?: string | null;
-	districtId?: string | null;
+  establishmentId: EstablishmentID;
+  userId: UserID;
+  deliveryType: DeliveryType;
+  couponId?: number | null;
+  addressId?: string | null;
+  districtId?: string | null;
 };
 
 export class ValidateDeliveryFromOrderService {
-	async handle({
-		deliveryType,
-		establishmentId,
-		userId,
-		couponId,
-		addressId,
-		districtId
-	}: ValidateDeliveryFromOrderServiceRequest): Promise<OrderInfo> {
-		const orderInfos: OrderInfo = {
-			coupon: null,
-			address: null,
-			district: null
-		};
+  async handle({
+    deliveryType,
+    establishmentId,
+    userId,
+    couponId,
+    addressId,
+    districtId,
+  }: ValidateDeliveryFromOrderServiceRequest): Promise<OrderInfo> {
+    const orderInfos: OrderInfo = {
+      coupon: null,
+      address: null,
+      district: null,
+    };
 
-		if (deliveryType !== DeliveryType.DELIVERY) return orderInfos;
+    if (deliveryType !== DeliveryType.DELIVERY) return orderInfos;
 
-		const findAddressService = makeFindAddressService();
-		const findDistrictService = makeFindDistrictService();
-		const validateCouponService = makeValidateCouponFromOrderService();
+    const findAddressService = makeFindAddressService();
+    const findDistrictService = makeFindDistrictService();
+    const validateCouponService = makeValidateCouponFromOrderService();
 
-		const [address, district, coupon] = await Promise.all([
-			addressId
-				? findAddressService.handle({
-						id: addressId,
-						filterParams: { user_id: userId }
-					})
-				: null,
-			districtId
-				? findDistrictService.handle({
-						id: districtId,
-						filterParams: { establishment_id: establishmentId }
-					})
-				: null,
-			couponId
-				? validateCouponService.handle({ couponId, establishmentId, userId })
-				: null
-		]);
+    const [address, district, coupon] = await Promise.all([
+      addressId
+        ? findAddressService.handle({
+            id: addressId,
+            filterParams: { user_id: userId },
+          })
+        : null,
+      districtId
+        ? findDistrictService.handle({
+            id: districtId,
+            filterParams: { establishment_id: establishmentId },
+          })
+        : null,
+      couponId
+        ? validateCouponService.handle({ couponId, establishmentId, userId })
+        : null,
+    ]);
 
-		if (address) orderInfos.address = address;
-		if (district) orderInfos.district = district;
-		if (coupon) orderInfos.coupon = coupon;
+    if (address) orderInfos.address = address;
+    if (district) orderInfos.district = district;
+    if (coupon) orderInfos.coupon = coupon;
 
-		return orderInfos;
-	}
+    return orderInfos;
+  }
 }

@@ -2,6 +2,6 @@ import { makeDistrictRepository } from "@/factories/repositories/make-district-r
 import { DeleteDistrictService } from "@/services/district/delete-district-service.js";
 
 export const makeDeleteDistrictService = () => {
-	const districtRepository = makeDistrictRepository();
-	return new DeleteDistrictService(districtRepository);
+  const districtRepository = makeDistrictRepository();
+  return new DeleteDistrictService(districtRepository);
 };

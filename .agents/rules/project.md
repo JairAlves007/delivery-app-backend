@@ -23,28 +23,28 @@ Node.js 24.x | TypeScript 5.9 (strict) | Fastify 5.x | Prisma 7.x (`@prisma/adap
 
 ## Arquitetura (`src/`)
 
-| Diretório | Função |
-|---|---|
-| `@types/` | Augmentação de tipos (Fastify, JWT) |
-| `classes/` | Singletons reutilizáveis: `Cache`, `Mail`, `BaseQueue` |
-| `controllers/` | Funções request/reply: validação Zod + chamada de services |
-| `errors/` | Classes de erro por domínio (estendem `ErrorBase`) |
-| `factories/{repositories,services}/` | `makeXxxRepository()` e `makeXxxService()` |
-| `generated/` | Prisma Client gerado |
-| `helpers/` | Utilitários puros (constantes, formatação, validação) |
-| `http/` | Entrypoint: `app.ts` + `server.ts` |
-| `interfaces/` | Contratos: `ICRUDBase`, `ICacheBase`, `IMail`, `IQueueProvider` |
-| `lib/` | Singletons de clients: Prisma, Redis, Resend, Cloudflare R2 |
-| `mails/` | Templates EJS |
-| `middlewares/` | Hooks: `isAuthenticated`, `ensureUserHasRoles`, `ensureUserHasPermission` |
-| `plugins/` | Plugin `replySendError` (tratamento centralizado de erros) |
-| `queues/` | Definição de filas + funções de enqueue |
-| `repositories/` | Implementações Prisma dos repositórios |
-| `routes/{admin,api,health}/` | Rotas agrupadas por domínio com prefixos |
-| `schemas/` | Schemas Zod por domínio |
-| `services/` | Lógica de negócio (um service por caso de uso) |
-| `types/` | Tipos TypeScript por domínio |
-| `workers/` | Workers BullMQ que processam jobs |
+| Diretório                            | Função                                                                    |
+| ------------------------------------ | ------------------------------------------------------------------------- |
+| `@types/`                            | Augmentação de tipos (Fastify, JWT)                                       |
+| `classes/`                           | Singletons reutilizáveis: `Cache`, `Mail`, `BaseQueue`                    |
+| `controllers/`                       | Funções request/reply: validação Zod + chamada de services                |
+| `errors/`                            | Classes de erro por domínio (estendem `ErrorBase`)                        |
+| `factories/{repositories,services}/` | `makeXxxRepository()` e `makeXxxService()`                                |
+| `generated/`                         | Prisma Client gerado                                                      |
+| `helpers/`                           | Utilitários puros (constantes, formatação, validação)                     |
+| `http/`                              | Entrypoint: `app.ts` + `server.ts`                                        |
+| `interfaces/`                        | Contratos: `ICRUDBase`, `ICacheBase`, `IMail`, `IQueueProvider`           |
+| `lib/`                               | Singletons de clients: Prisma, Redis, Resend, Cloudflare R2               |
+| `mails/`                             | Templates EJS                                                             |
+| `middlewares/`                       | Hooks: `isAuthenticated`, `ensureUserHasRoles`, `ensureUserHasPermission` |
+| `plugins/`                           | Plugin `replySendError` (tratamento centralizado de erros)                |
+| `queues/`                            | Definição de filas + funções de enqueue                                   |
+| `repositories/`                      | Implementações Prisma dos repositórios                                    |
+| `routes/{admin,api,health}/`         | Rotas agrupadas por domínio com prefixos                                  |
+| `schemas/`                           | Schemas Zod por domínio                                                   |
+| `services/`                          | Lógica de negócio (um service por caso de uso)                            |
+| `types/`                             | Tipos TypeScript por domínio                                              |
+| `workers/`                           | Workers BullMQ que processam jobs                                         |
 
 ## Fastify (`src/http/app.ts`)
 
@@ -62,7 +62,9 @@ Plugins registrados em ordem: `fastifyCors` → `fastifyJwt` → `replySendError
 Rotas admin usam middlewares `onRequest`:
 
 ```ts
-const middlewares = { onRequest: [isAuthenticated, ensureUserHasPermission([PermissionType.XXX])] };
+const middlewares = {
+  onRequest: [isAuthenticated, ensureUserHasPermission([PermissionType.XXX])],
+};
 app.get("/", middlewares, handler);
 ```
 
@@ -82,10 +84,10 @@ Classe com método `handle()`. Dependências injetadas via construtor usando int
 
 ```ts
 export class SendResetPasswordMailService {
-	constructor(private mail: IMail) {}
-	async handle(data: ResetPasswordMailData) {
-		await this.mail.sendResetPasswordMail(data);
-	}
+  constructor(private mail: IMail) {}
+  async handle(data: ResetPasswordMailData) {
+    await this.mail.sendResetPasswordMail(data);
+  }
 }
 ```
 
@@ -94,7 +96,8 @@ export class SendResetPasswordMailService {
 Factories instanciam repositórios e services: `src/factories/repositories/` → `makeXxxRepository()` | `src/factories/services/` → `makeXxxService()`.
 
 ```ts
-export const makeAddonCategoryRepository = () => new AddonCategoryPrismaRepository();
+export const makeAddonCategoryRepository = () =>
+  new AddonCategoryPrismaRepository();
 ```
 
 ## Repositórios
@@ -115,12 +118,12 @@ Refs: [crud-base.ts](file:///Users/macbookpro/workspace/personal-projects/delive
 
 ## Filas e Workers
 
-| Fila | Jobs |
-|---|---|
-| `cache-queue` | `forget-all-listing-cache-keys` |
-| `mail-queue` | `send-order-confirmation-message`, `send-reset-password-mail` |
-| `establishment-queue` | Criação de menu para novo establishment |
-| `order-queue` | Criação de pedidos |
+| Fila                  | Jobs                                                          |
+| --------------------- | ------------------------------------------------------------- |
+| `cache-queue`         | `forget-all-listing-cache-keys`                               |
+| `mail-queue`          | `send-order-confirmation-message`, `send-reset-password-mail` |
+| `establishment-queue` | Criação de menu para novo establishment                       |
+| `order-queue`         | Criação de pedidos                                            |
 
 Workers: funções `setupXxxWorker()` em `src/workers/`, inicializados no `setupWorkers()` → hook `onReady`. Ref: [send-reset-password-mail-worker.ts](file:///Users/macbookpro/workspace/personal-projects/delivery-saas/delivery-micro-saas-backend/src/workers/mail/send-reset-password-mail-worker.ts)
 
@@ -170,7 +173,7 @@ FastifyReply (plugin): `sendError(error) => FastifyReply`.
 
 Obrigatórias: `PUBLIC_BUCKET_URL`, `APP_URL`, `DATABASE_URL`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME`, `JWT_SECRET`, `CLOUDFLARE_ENDPOINT`, `CLOUDFLARE_ACCESS_KEY_ID`, `CLOUDFLARE_SECRET_ACCESS_KEY`, `CLOUDFLARE_BUCKET_NAME`, `RESEND_API_KEY`.
 
-Com default: `NODE_ENV` (development), `PORT` (3333), `BASE_URL` (http://localhost:3333), `CORS_ORIGIN` (*), `REDIS_HOST` (127.0.0.1), `REDIS_PORT` (6379).
+Com default: `NODE_ENV` (development), `PORT` (3333), `BASE_URL` (http://localhost:3333), `CORS_ORIGIN` (\*), `REDIS_HOST` (127.0.0.1), `REDIS_PORT` (6379).
 
 Opcional: `REDIS_PASSWORD`.
 

@@ -10,31 +10,31 @@ import { districtParamsSchema } from "@/schemas/district-schema.js";
 import type { FilterField } from "@/types/crud.js";
 
 type FindDistrictServiceRequest = z.infer<typeof districtParamsSchema> &
-	FilterField;
+  FilterField;
 
 export class FindDistrictService {
-	private districtRepository: IDistrictRepository;
+  private districtRepository: IDistrictRepository;
 
-	constructor(districtRepository: IDistrictRepository) {
-		this.districtRepository = districtRepository;
-	}
+  constructor(districtRepository: IDistrictRepository) {
+    this.districtRepository = districtRepository;
+  }
 
-	async handle({
-		id,
-		filterParams
-	}: FindDistrictServiceRequest): Promise<District> {
-		const cache = makeCache();
-		const filterPrefixKey = getFilterParamsCacheKey(filterParams);
-		const key = `${filterPrefixKey}${cache.keys.districts}_${id}`;
+  async handle({
+    id,
+    filterParams,
+  }: FindDistrictServiceRequest): Promise<District> {
+    const cache = makeCache();
+    const filterPrefixKey = getFilterParamsCacheKey(filterParams);
+    const key = `${filterPrefixKey}${cache.keys.districts}_${id}`;
 
-		const district = await cache.remember(
-			key,
-			Constants.CACHE_TTL.districts,
-			async () => await this.districtRepository.findById({ id, filterParams })
-		);
+    const district = await cache.remember(
+      key,
+      Constants.CACHE_TTL.districts,
+      async () => await this.districtRepository.findById({ id, filterParams }),
+    );
 
-		if (!district) throw new DistrictNotFound();
+    if (!district) throw new DistrictNotFound();
 
-		return district;
-	}
+    return district;
+  }
 }

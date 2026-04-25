@@ -8,48 +8,48 @@ import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
-	apiDefaultErrorResponseSchema,
-	apiSuccessResponseSchema,
-	apiValidationErrorResponseSchema
+  apiDefaultErrorResponseSchema,
+  apiSuccessResponseSchema,
+  apiValidationErrorResponseSchema,
 } from "@/schemas/api-schema.js";
 import { bannerListResponseSchema } from "@/schemas/response-schema.js";
 
 export const listBannersCatalogRoute = async (app: FastifyInstance) => {
-	app.withTypeProvider<ZodTypeProvider>().get(
-		"/banners",
-		{
-			schema: {
-				operationId: "listBannersCatalog",
-				tags: ["Main (Home)"],
-				summary: "Listar banners na home",
-				response: {
-					200: apiSuccessResponseSchema(bannerListResponseSchema),
-					401: apiDefaultErrorResponseSchema,
-					403: apiDefaultErrorResponseSchema,
-					422: apiValidationErrorResponseSchema,
-					500: apiDefaultErrorResponseSchema
-				}
-			},
-			onRequest: [
-				isAuthenticated,
-				ensureUserHasPermission([PermissionType.VIEW_CATALOG])
-			]
-		},
-		async (request, reply) => {
-			const { activeTenantId } = request.user;
+  app.withTypeProvider<ZodTypeProvider>().get(
+    "/banners",
+    {
+      schema: {
+        operationId: "listBannersCatalog",
+        tags: ["Main (Home)"],
+        summary: "Listar banners na home",
+        response: {
+          200: apiSuccessResponseSchema(bannerListResponseSchema),
+          401: apiDefaultErrorResponseSchema,
+          403: apiDefaultErrorResponseSchema,
+          422: apiValidationErrorResponseSchema,
+          500: apiDefaultErrorResponseSchema,
+        },
+      },
+      onRequest: [
+        isAuthenticated,
+        ensureUserHasPermission([PermissionType.VIEW_CATALOG]),
+      ],
+    },
+    async (request, reply) => {
+      const { activeTenantId } = request.user;
 
-			const listBannerService = makeListBannerService();
+      const listBannerService = makeListBannerService();
 
-			const banners = await listBannerService.handle({
-				perPage: 12,
-				filterParams: {
-					establishment_id: activeTenantId
-				}
-			});
+      const banners = await listBannerService.handle({
+        perPage: 12,
+        filterParams: {
+          establishment_id: activeTenantId,
+        },
+      });
 
-			return reply
-				.status(HTTPStatusCodes.OK)
-				.send(ApiResponse.success("Banners listados com sucesso", banners));
-		}
-	);
+      return reply
+        .status(HTTPStatusCodes.OK)
+        .send(ApiResponse.success("Banners listados com sucesso", banners));
+    },
+  );
 };

@@ -2,6 +2,6 @@ import { makeEstablishmentRepository } from "@/factories/repositories/make-estab
 import { ListEstablishmentService } from "@/services/establishment/list-establishment-service.js";
 
 export const makeListEstablishmentService = () => {
-	const establishmentRepository = makeEstablishmentRepository();
-	return new ListEstablishmentService(establishmentRepository);
+  const establishmentRepository = makeEstablishmentRepository();
+  return new ListEstablishmentService(establishmentRepository);
 };

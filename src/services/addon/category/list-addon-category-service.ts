@@ -10,83 +10,83 @@ import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
 import type { FilterField, PaginatedResponse } from "@/types/crud.js";
 
 type ListAddonCategoryServiceRequest = z.infer<typeof listQueryParamsSchema> &
-	FilterField;
+  FilterField;
 
 type ListAddonCategoryServiceResponse = PaginatedResponse<AddonCategory>;
 
 export class ListAddonCategoryService {
-	private addonCategoryRepository: IAddonCategoryRepository;
+  private addonCategoryRepository: IAddonCategoryRepository;
 
-	constructor(addonCategoryRepository: IAddonCategoryRepository) {
-		this.addonCategoryRepository = addonCategoryRepository;
-	}
+  constructor(addonCategoryRepository: IAddonCategoryRepository) {
+    this.addonCategoryRepository = addonCategoryRepository;
+  }
 
-	async handle({
-		page,
-		perPage,
-		filterParams
-	}: ListAddonCategoryServiceRequest): Promise<ListAddonCategoryServiceResponse> {
-		const cache = makeCache();
-		const prefixKey = getFilterParamsCacheKey(filterParams);
+  async handle({
+    page,
+    perPage,
+    filterParams,
+  }: ListAddonCategoryServiceRequest): Promise<ListAddonCategoryServiceResponse> {
+    const cache = makeCache();
+    const prefixKey = getFilterParamsCacheKey(filterParams);
 
-		const isPaging = !!page;
-		const totalPromise = cache.remember(
-			`${prefixKey}total_${cache.keys.addonCategories}`,
-			Constants.CACHE_TTL.addonCategories,
-			async () => await this.addonCategoryRepository.count(filterParams)
-		);
+    const isPaging = !!page;
+    const totalPromise = cache.remember(
+      `${prefixKey}total_${cache.keys.addonCategories}`,
+      Constants.CACHE_TTL.addonCategories,
+      async () => await this.addonCategoryRepository.count(filterParams),
+    );
 
-		if (isPaging) {
-			const key = `${prefixKey}${cache.keys.addonCategories}_page_${page}_per_page_${perPage}`;
-			const [total, addonCategories] = await Promise.all([
-				totalPromise,
-				cache.remember(
-					key,
-					Constants.CACHE_TTL.addonCategories,
-					async () =>
-						await this.addonCategoryRepository.paginate({
-							page,
-							perPage,
-							filterParams
-						})
-				)
-			]);
+    if (isPaging) {
+      const key = `${prefixKey}${cache.keys.addonCategories}_page_${page}_per_page_${perPage}`;
+      const [total, addonCategories] = await Promise.all([
+        totalPromise,
+        cache.remember(
+          key,
+          Constants.CACHE_TTL.addonCategories,
+          async () =>
+            await this.addonCategoryRepository.paginate({
+              page,
+              perPage,
+              filterParams,
+            }),
+        ),
+      ]);
 
-			const totalPages = Math.ceil(total / perPage);
+      const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages && totalPages > 0) {
-				await cache.forget(key);
-				throw new InvalidPage();
-			}
+      if (page > totalPages && totalPages > 0) {
+        await cache.forget(key);
+        throw new InvalidPage();
+      }
 
-			return {
-				items: addonCategories,
-				pagination: {
-					page,
-					perPage,
-					total,
-					totalPages
-				}
-			};
-		}
+      return {
+        items: addonCategories,
+        pagination: {
+          page,
+          perPage,
+          total,
+          totalPages,
+        },
+      };
+    }
 
-		const [total, addonCategories] = await Promise.all([
-			totalPromise,
-			cache.remember(
-				`${prefixKey}all_${cache.keys.addonCategories}`,
-				Constants.CACHE_TTL.addonCategories,
-				async () => await this.addonCategoryRepository.listAll(filterParams)
-			)
-		]);
+    const [total, addonCategories] = await Promise.all([
+      totalPromise,
+      cache.remember(
+        `${prefixKey}all_${cache.keys.addonCategories}`,
+        Constants.CACHE_TTL.addonCategories,
+        async () => await this.addonCategoryRepository.listAll(filterParams),
+      ),
+    ]);
 
-		return {
-			items: addonCategories,
-			pagination: {
-				page: 1,
-				perPage: total,
-				total,
-				totalPages: 1
-			}
-		};
-	}
+    return {
+      items: addonCategories,
+      pagination: {
+        page: 1,
+        perPage: total,
+        total,
+        totalPages: 1,
+      },
+    };
+  }
 }

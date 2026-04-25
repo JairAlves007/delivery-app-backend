@@ -9,47 +9,47 @@ import type { EstablishmentID } from "@/types/establishment.js";
 import type { OrderAddons } from "@/types/order.js";
 
 type ValidateAddonCategoriesFromOrderServiceRequest = {
-	establishmentId: EstablishmentID;
-	categoryId: number;
-	orderAddons: OrderAddons[];
+  establishmentId: EstablishmentID;
+  categoryId: number;
+  orderAddons: OrderAddons[];
 };
 
 type ValidateAddonCategoriesFromOrderServiceResponse = {
-	addonCategory: AddonCategoryFromRepository;
-	orderAddonsValidated: OrderAddons[];
+  addonCategory: AddonCategoryFromRepository;
+  orderAddonsValidated: OrderAddons[];
 };
 
 export class ValidateAddonCategoriesFromOrderService {
-	async handle({
-		establishmentId,
-		categoryId,
-		orderAddons
-	}: ValidateAddonCategoriesFromOrderServiceRequest): Promise<ValidateAddonCategoriesFromOrderServiceResponse> {
-		const cache = makeCache();
-		const filterParams = { establishment_id: establishmentId };
-		const prefixKey = getFilterParamsCacheKey(filterParams);
+  async handle({
+    establishmentId,
+    categoryId,
+    orderAddons,
+  }: ValidateAddonCategoriesFromOrderServiceRequest): Promise<ValidateAddonCategoriesFromOrderServiceResponse> {
+    const cache = makeCache();
+    const filterParams = { establishment_id: establishmentId };
+    const prefixKey = getFilterParamsCacheKey(filterParams);
 
-		const findAddonCategory = makeFindAddonCategoryService();
+    const findAddonCategory = makeFindAddonCategoryService();
 
-		const addonCategory = await cache.rememberForever(
-			`${prefixKey}${cache.keys.addonCategories}_${categoryId}`,
-			async () =>
-				await findAddonCategory.handle({ id: categoryId, filterParams })
-		);
+    const addonCategory = await cache.rememberForever(
+      `${prefixKey}${cache.keys.addonCategories}_${categoryId}`,
+      async () =>
+        await findAddonCategory.handle({ id: categoryId, filterParams }),
+    );
 
-		if (!addonCategory) throw new AddonCategoryNotFound();
+    if (!addonCategory) throw new AddonCategoryNotFound();
 
-		const orderAddonsValidated = removeDuplicateItems(orderAddons);
+    const orderAddonsValidated = removeDuplicateItems(orderAddons);
 
-		if (addonCategory.max_quantity) {
-			const quantity = orderAddonsValidated.reduce((acc, addon) => {
-				return acc + addon.quantity;
-			}, 0);
+    if (addonCategory.max_quantity) {
+      const quantity = orderAddonsValidated.reduce((acc, addon) => {
+        return acc + addon.quantity;
+      }, 0);
 
-			if (quantity > addonCategory.max_quantity)
-				throw new AddonQuantityExceeded();
-		}
+      if (quantity > addonCategory.max_quantity)
+        throw new AddonQuantityExceeded();
+    }
 
-		return { addonCategory, orderAddonsValidated };
-	}
+    return { addonCategory, orderAddonsValidated };
+  }
 }

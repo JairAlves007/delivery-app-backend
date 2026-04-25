@@ -2,6 +2,6 @@ import { makeAddonCategoryRepository } from "@/factories/repositories/make-addon
 import { FindAddonCategoryService } from "@/services/addon/category/find-addon-category-service.js";
 
 export const makeFindAddonCategoryService = () => {
-	const addonCategoryRepository = makeAddonCategoryRepository();
-	return new FindAddonCategoryService(addonCategoryRepository);
+  const addonCategoryRepository = makeAddonCategoryRepository();
+  return new FindAddonCategoryService(addonCategoryRepository);
 };

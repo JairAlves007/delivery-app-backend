@@ -6,52 +6,49 @@ import { updateAddonCategoryBodySchema } from "@/schemas/addon-category-schema.j
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 interface UpdateAddonCategoryServiceRequest
-	extends
-		z.infer<typeof updateAddonCategoryBodySchema>,
-		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
-	id: number;
+  extends
+    z.infer<typeof updateAddonCategoryBodySchema>,
+    Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
+  id: number;
+  establishmentId: string;
 }
 
 export class UpdateAddonCategoryService {
-	private addonCategoryRepository: IAddonCategoryRepository;
+  private addonCategoryRepository: IAddonCategoryRepository;
 
-	constructor(addonCategoryRepository: IAddonCategoryRepository) {
-		this.addonCategoryRepository = addonCategoryRepository;
-	}
+  constructor(addonCategoryRepository: IAddonCategoryRepository) {
+    this.addonCategoryRepository = addonCategoryRepository;
+  }
 
-	async handle({
-		id,
-		establishmentId,
-		addonIds,
-		maxQuantity: max_quantity,
-		paramsToForget,
-		...data
-	}: UpdateAddonCategoryServiceRequest) {
-		const addons = addonIds
-			? {
-					set: addonIds.map(addonId => ({
-						id: addonId
-					}))
-				}
-			: undefined;
+  async handle({
+    id,
+    establishmentId,
+    addonIds,
+    maxQuantity: max_quantity,
+    paramsToForget,
+    ...data
+  }: UpdateAddonCategoryServiceRequest) {
+    const addons = addonIds
+      ? {
+          set: addonIds.map((addonId) => ({
+            id: addonId,
+          })),
+        }
+      : undefined;
 
-		await this.addonCategoryRepository.update({
-			id,
-			data: {
-				...data,
-				max_quantity,
-				establishment: {
-					connect: {
-						id: establishmentId
-					}
-				},
-				addons
-			}
-		});
+    await this.addonCategoryRepository.update({
+      id,
+      filterParams: { establishment_id: establishmentId },
+      data: {
+        ...data,
+        max_quantity,
+        addons,
+      },
+    });
 
-		await forgetAllListingCacheKeysQueue({
-			baseCacheKey: "addonCategories",
-			paramsToForget
-		});
-	}
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "addonCategories",
+      paramsToForget,
+    });
+  }
 }

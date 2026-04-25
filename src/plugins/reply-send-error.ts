@@ -12,97 +12,97 @@ import { beautifyValidationErrors } from "@/helpers/validation-errors.js";
 import type { DefaultErrorResponse } from "@/types/response.js";
 
 declare module "fastify" {
-	interface FastifyReply {
-		sendError: (error: unknown) => FastifyReply;
-	}
+  interface FastifyReply {
+    sendError: (error: unknown) => FastifyReply;
+  }
 }
 
-const replySendErrorPlugin: FastifyPluginAsync = async fastify => {
-	fastify.decorateReply("sendError", function (error: unknown) {
-		if (env.NODE_ENV !== "production")
-			fastify.log.error(error, "Unexpected error");
+const replySendErrorPlugin: FastifyPluginAsync = async (fastify) => {
+  fastify.decorateReply("sendError", function (error: unknown) {
+    if (env.NODE_ENV !== "production")
+      fastify.log.error(error, "Unexpected error");
 
-		if (error instanceof ZodError) {
-			error.name = "VALIDATION_ERROR";
+    if (error instanceof ZodError) {
+      error.name = "VALIDATION_ERROR";
 
-			return this.status(HTTPStatusCodes.UNPROCESSABLE_ENTITY).send(
-				ApiResponse.error(error, beautifyValidationErrors(error))
-			);
-		}
+      return this.status(HTTPStatusCodes.UNPROCESSABLE_ENTITY).send(
+        ApiResponse.error(error, beautifyValidationErrors(error)),
+      );
+    }
 
-		if (hasZodFastifySchemaValidationErrors(error)) {
-			return this.status(HTTPStatusCodes.UNPROCESSABLE_ENTITY).send({
-				success: false,
-				code: "VALIDATION_ERROR",
-				details: {
-					error: {
-						message: "Erro de validação dos dados",
-						issues: error.validation
-					}
-				}
-			});
-		}
+    if (hasZodFastifySchemaValidationErrors(error)) {
+      return this.status(HTTPStatusCodes.UNPROCESSABLE_ENTITY).send({
+        success: false,
+        code: "VALIDATION_ERROR",
+        details: {
+          error: {
+            message: "Erro de validação dos dados",
+            issues: error.validation,
+          },
+        },
+      });
+    }
 
-		if (error instanceof ErrorBase) {
-			return this.status(error.statusCode).send(ApiResponse.error(error));
-		}
+    if (error instanceof ErrorBase) {
+      return this.status(error.statusCode).send(ApiResponse.error(error));
+    }
 
-		let errorCode: number = HTTPStatusCodes.INTERNAL_SERVER_ERROR;
-		const errorResponse: DefaultErrorResponse = {
-			success: false,
-			code: "UNKNOWN_ERROR",
-			details: {
-				error: {
-					message: "Ocorreu um erro inesperado. Tente novamente mais tarde."
-				}
-			}
-		};
+    let errorCode: number = HTTPStatusCodes.INTERNAL_SERVER_ERROR;
+    const errorResponse: DefaultErrorResponse = {
+      success: false,
+      code: "UNKNOWN_ERROR",
+      details: {
+        error: {
+          message: "Ocorreu um erro inesperado. Tente novamente mais tarde.",
+        },
+      },
+    };
 
-		if (error instanceof Prisma.PrismaClientKnownRequestError) {
-			errorResponse.code = "DATABASE_ERROR";
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      errorResponse.code = "DATABASE_ERROR";
 
-			switch (error.code) {
-				case "P2002": {
-					errorCode = HTTPStatusCodes.CONFLICT;
-					errorResponse.details = {
-						error: {
-							message:
-								"Este registro já existe. Verifique os dados e tente novamente."
-						}
-					};
-					break;
-				}
-				case "P2025":
-					errorCode = HTTPStatusCodes.NOT_FOUND;
+      switch (error.code) {
+        case "P2002": {
+          errorCode = HTTPStatusCodes.CONFLICT;
+          errorResponse.details = {
+            error: {
+              message:
+                "Este registro já existe. Verifique os dados e tente novamente.",
+            },
+          };
+          break;
+        }
+        case "P2025":
+          errorCode = HTTPStatusCodes.NOT_FOUND;
 
-					errorResponse.details = {
-						error: {
-							message: "Nenhuma informação encontrada"
-						}
-					};
-					break;
-			}
+          errorResponse.details = {
+            error: {
+              message: "Nenhuma informação encontrada",
+            },
+          };
+          break;
+      }
 
-			return this.status(errorCode).send(errorResponse);
-		}
+      return this.status(errorCode).send(errorResponse);
+    }
 
-		if (error instanceof Error) {
-			error.name = "INTERNAL_SERVER";
+    if (error instanceof Error) {
+      error.name = "INTERNAL_SERVER";
 
-			const safeError =
-				env.NODE_ENV === "production"
-					? new Error("Ocorreu um erro inesperado. Tente novamente mais tarde.")
-					: error;
+      const safeError =
+        env.NODE_ENV === "production"
+          ? new Error("Ocorreu um erro inesperado. Tente novamente mais tarde.")
+          : error;
 
-			safeError.name = "INTERNAL_SERVER";
+      safeError.name = "INTERNAL_SERVER";
 
-			return this.status(HTTPStatusCodes.INTERNAL_SERVER_ERROR).send(
-				ApiResponse.error(safeError)
-			);
-		}
+      return this.status(HTTPStatusCodes.INTERNAL_SERVER_ERROR).send(
+        ApiResponse.error(safeError),
+      );
+    }
 
-		return this.status(errorCode).send(errorResponse);
-	});
+    return this.status(errorCode).send(errorResponse);
+  });
 };
 
 export default fp(replySendErrorPlugin);

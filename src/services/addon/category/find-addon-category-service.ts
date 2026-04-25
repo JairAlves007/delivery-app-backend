@@ -10,33 +10,33 @@ import type { AddonCategoryFromRepository } from "@/types/addon-category.js";
 import type { FilterField } from "@/types/crud.js";
 
 type FindAddonCategoryServiceRequest = z.infer<typeof addonParamsSchema> &
-	FilterField;
+  FilterField;
 
 export class FindAddonCategoryService {
-	private addonCategoryRepository: IAddonCategoryRepository;
+  private addonCategoryRepository: IAddonCategoryRepository;
 
-	constructor(addonCategoryRepository: IAddonCategoryRepository) {
-		this.addonCategoryRepository = addonCategoryRepository;
-	}
+  constructor(addonCategoryRepository: IAddonCategoryRepository) {
+    this.addonCategoryRepository = addonCategoryRepository;
+  }
 
-	async handle({
-		id,
-		filterParams
-	}: FindAddonCategoryServiceRequest): Promise<AddonCategoryFromRepository> {
-		const cache = makeCache();
-		const filterPrefixKey = getFilterParamsCacheKey(filterParams);
+  async handle({
+    id,
+    filterParams,
+  }: FindAddonCategoryServiceRequest): Promise<AddonCategoryFromRepository> {
+    const cache = makeCache();
+    const filterPrefixKey = getFilterParamsCacheKey(filterParams);
 
-		const key = `${filterPrefixKey}${cache.keys.addonCategories}_${id}`;
+    const key = `${filterPrefixKey}${cache.keys.addonCategories}_${id}`;
 
-		const addonCategory = await cache.remember(
-			key,
-			Constants.CACHE_TTL.addonCategories,
-			async () =>
-				await this.addonCategoryRepository.findById({ id, filterParams })
-		);
+    const addonCategory = await cache.remember(
+      key,
+      Constants.CACHE_TTL.addonCategories,
+      async () =>
+        await this.addonCategoryRepository.findById({ id, filterParams }),
+    );
 
-		if (!addonCategory) throw new AddonCategoryNotFound();
+    if (!addonCategory) throw new AddonCategoryNotFound();
 
-		return addonCategory;
-	}
+    return addonCategory;
+  }
 }

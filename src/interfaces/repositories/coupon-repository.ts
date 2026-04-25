@@ -5,14 +5,14 @@ import type { EstablishmentID } from "@/types/establishment.js";
 import type { ICRUDBase } from "../crud-base.js";
 
 export interface ICouponRepository extends ICRUDBase<
-	Coupon,
-	Prisma.CouponCreateInput,
-	Prisma.CouponUpdateInput,
-	number
+  Coupon,
+  Prisma.CouponCreateInput,
+  Prisma.CouponUpdateInput,
+  number
 > {
-	check(
-		code: string,
-		establishmentId: EstablishmentID,
-		userId: string
-	): Promise<CouponWithUserCoupons | null>;
+  check(
+    code: string,
+    establishmentId: EstablishmentID,
+    userId: string,
+  ): Promise<CouponWithUserCoupons | null>;
 }

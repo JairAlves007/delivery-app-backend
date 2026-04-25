@@ -7,41 +7,42 @@ import { updateOrderStatusBodySchema } from "@/schemas/order-schema.js";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 interface UpdateOrderRequest
-	extends
-		z.infer<typeof updateOrderStatusBodySchema>,
-		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
-	id: string;
+  extends
+    z.infer<typeof updateOrderStatusBodySchema>,
+    Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
+  id: string;
+  establishmentId: string;
 }
 
 export class UpdateOrderService {
-	private orderRepository: IOrderRepository;
+  private orderRepository: IOrderRepository;
 
-	constructor(orderRepository: IOrderRepository) {
-		this.orderRepository = orderRepository;
-	}
+  constructor(orderRepository: IOrderRepository) {
+    this.orderRepository = orderRepository;
+  }
 
-	async handle({
-		id,
-		status,
-		establishmentId,
-		paramsToForget
-	}: UpdateOrderRequest) {
-		await this.orderRepository.update({
-			id,
-			filterParams: { establishment_id: establishmentId },
-			data: {
-				statuses: {
-					create: {
-						label: getStatusLabel(status),
-						value: status
-					}
-				}
-			}
-		});
+  async handle({
+    id,
+    status,
+    establishmentId,
+    paramsToForget,
+  }: UpdateOrderRequest) {
+    await this.orderRepository.update({
+      id,
+      filterParams: { establishment_id: establishmentId },
+      data: {
+        statuses: {
+          create: {
+            label: getStatusLabel(status),
+            value: status,
+          },
+        },
+      },
+    });
 
-		await forgetAllListingCacheKeysQueue({
-			baseCacheKey: "orders",
-			paramsToForget
-		});
-	}
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "orders",
+      paramsToForget,
+    });
+  }
 }

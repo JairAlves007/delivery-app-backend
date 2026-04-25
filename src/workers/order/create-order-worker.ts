@@ -4,10 +4,10 @@ import { orderQueueName } from "@/queues/order-queue.js";
 import type { CreateOrderParams } from "@/types/order.js";
 
 export const setupCreateOrderWorker = () => {
-	const orderQueue = makeQueue<CreateOrderParams>(orderQueueName);
+  const orderQueue = makeQueue<CreateOrderParams>(orderQueueName);
 
-	orderQueue.registerProcessor(async payload => {
-		const createOrderService = makeCreateOrderService();
-		await createOrderService.handle({ ...payload });
-	});
+  orderQueue.registerProcessor(async (payload) => {
+    const createOrderService = makeCreateOrderService();
+    await createOrderService.handle({ ...payload });
+  });
 };

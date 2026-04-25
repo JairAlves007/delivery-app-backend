@@ -10,84 +10,84 @@ import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
 import type { FilterField, PaginatedResponse } from "@/types/crud.js";
 
 type ListCouponServiceRequest = z.infer<typeof listQueryParamsSchema> &
-	FilterField;
+  FilterField;
 
 type ListCouponServiceResponse = PaginatedResponse<Coupon>;
 
 export class ListCouponService {
-	private couponRepository: ICouponRepository;
+  private couponRepository: ICouponRepository;
 
-	constructor(couponRepository: ICouponRepository) {
-		this.couponRepository = couponRepository;
-	}
+  constructor(couponRepository: ICouponRepository) {
+    this.couponRepository = couponRepository;
+  }
 
-	async handle({
-		page,
-		perPage,
-		filterParams
-	}: ListCouponServiceRequest): Promise<ListCouponServiceResponse> {
-		const cache = makeCache();
-		const prefixKey = getFilterParamsCacheKey(filterParams);
+  async handle({
+    page,
+    perPage,
+    filterParams,
+  }: ListCouponServiceRequest): Promise<ListCouponServiceResponse> {
+    const cache = makeCache();
+    const prefixKey = getFilterParamsCacheKey(filterParams);
 
-		const isPaging = !!page;
-		const totalPromise = cache.remember(
-			`${prefixKey}total_${cache.keys.coupons}`,
-			Constants.CACHE_TTL.coupons,
-			async () => await this.couponRepository.count(filterParams)
-		);
+    const isPaging = !!page;
+    const totalPromise = cache.remember(
+      `${prefixKey}total_${cache.keys.coupons}`,
+      Constants.CACHE_TTL.coupons,
+      async () => await this.couponRepository.count(filterParams),
+    );
 
-		if (isPaging) {
-			const key = `${prefixKey}${cache.keys.coupons}_page_${page}_per_page_${perPage}`;
+    if (isPaging) {
+      const key = `${prefixKey}${cache.keys.coupons}_page_${page}_per_page_${perPage}`;
 
-			const [total, coupons] = await Promise.all([
-				totalPromise,
-				cache.remember(
-					key,
-					Constants.CACHE_TTL.coupons,
-					async () =>
-						await this.couponRepository.paginate({
-							page,
-							perPage,
-							filterParams
-						})
-				)
-			]);
+      const [total, coupons] = await Promise.all([
+        totalPromise,
+        cache.remember(
+          key,
+          Constants.CACHE_TTL.coupons,
+          async () =>
+            await this.couponRepository.paginate({
+              page,
+              perPage,
+              filterParams,
+            }),
+        ),
+      ]);
 
-			const totalPages = Math.ceil(total / perPage);
+      const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages && totalPages > 0) {
-				await cache.forget(key);
-				throw new InvalidPage();
-			}
+      if (page > totalPages && totalPages > 0) {
+        await cache.forget(key);
+        throw new InvalidPage();
+      }
 
-			return {
-				items: coupons,
-				pagination: {
-					page,
-					perPage,
-					total,
-					totalPages
-				}
-			};
-		}
+      return {
+        items: coupons,
+        pagination: {
+          page,
+          perPage,
+          total,
+          totalPages,
+        },
+      };
+    }
 
-		const [total, coupons] = await Promise.all([
-			totalPromise,
-			cache.remember(
-				`${prefixKey}all_${cache.keys.coupons}`,
-				Constants.CACHE_TTL.coupons,
-				async () => await this.couponRepository.listAll(filterParams)
-			)
-		]);
+    const [total, coupons] = await Promise.all([
+      totalPromise,
+      cache.remember(
+        `${prefixKey}all_${cache.keys.coupons}`,
+        Constants.CACHE_TTL.coupons,
+        async () => await this.couponRepository.listAll(filterParams),
+      ),
+    ]);
 
-		return {
-			items: coupons,
-			pagination: {
-				page: 1,
-				perPage: total,
-				total,
-				totalPages: 1
-			}
-		};
-	}
+    return {
+      items: coupons,
+      pagination: {
+        page: 1,
+        perPage: total,
+        total,
+        totalPages: 1,
+      },
+    };
+  }
 }

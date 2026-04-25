@@ -5,24 +5,24 @@ import type { FilterField } from "@/types/crud.js";
 import type { TagDetail } from "@/types/tag.js";
 
 type FindTagServiceRequest = {
-	id: number;
+  id: number;
 } & FilterField;
 
 export class FindTagService {
-	private tagRepository: ITagRepository;
+  private tagRepository: ITagRepository;
 
-	constructor(tagRepository: ITagRepository) {
-		this.tagRepository = tagRepository;
-	}
+  constructor(tagRepository: ITagRepository) {
+    this.tagRepository = tagRepository;
+  }
 
-	async handle({
-		id,
-		filterParams
-	}: FindTagServiceRequest): Promise<TagDetail> {
-		const tag = await this.tagRepository.findById({ id, filterParams });
+  async handle({
+    id,
+    filterParams,
+  }: FindTagServiceRequest): Promise<TagDetail> {
+    const tag = await this.tagRepository.findById({ id, filterParams });
 
-		if (!tag) throw new TagNotFound();
+    if (!tag) throw new TagNotFound();
 
-		return mapTagWithCombinations(tag);
-	}
+    return mapTagWithCombinations(tag);
+  }
 }

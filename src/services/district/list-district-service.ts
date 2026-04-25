@@ -11,91 +11,91 @@ import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
 import type { FilterField, PaginatedResponse } from "@/types/crud.js";
 
 type ListDistrictServiceRequest = z.infer<typeof listQueryParamsSchema> &
-	FilterField;
+  FilterField;
 
 type ListDistrictServiceResponse = PaginatedResponse<District>;
 
 export class ListDistrictService {
-	private districtRepository: IDistrictRepository;
+  private districtRepository: IDistrictRepository;
 
-	constructor(districtRepository: IDistrictRepository) {
-		this.districtRepository = districtRepository;
-	}
+  constructor(districtRepository: IDistrictRepository) {
+    this.districtRepository = districtRepository;
+  }
 
-	private mapDistricts(districts: District[]) {
-		return districts.map(district => ({
-			...district,
-			shipping_cost: transformPriceFromDatabase(district.shipping_cost)
-		}));
-	}
+  private mapDistricts(districts: District[]) {
+    return districts.map((district) => ({
+      ...district,
+      shipping_cost: transformPriceFromDatabase(district.shipping_cost),
+    }));
+  }
 
-	async handle({
-		page,
-		perPage,
-		filterParams
-	}: ListDistrictServiceRequest): Promise<ListDistrictServiceResponse> {
-		const cache = makeCache();
-		const prefixKey = getFilterParamsCacheKey(filterParams);
+  async handle({
+    page,
+    perPage,
+    filterParams,
+  }: ListDistrictServiceRequest): Promise<ListDistrictServiceResponse> {
+    const cache = makeCache();
+    const prefixKey = getFilterParamsCacheKey(filterParams);
 
-		const isPaging = !!page;
-		const totalPromise = cache.remember(
-			`${prefixKey}total_${cache.keys.districts}`,
-			Constants.CACHE_TTL.districts,
-			async () => await this.districtRepository.count(filterParams)
-		);
+    const isPaging = !!page;
+    const totalPromise = cache.remember(
+      `${prefixKey}total_${cache.keys.districts}`,
+      Constants.CACHE_TTL.districts,
+      async () => await this.districtRepository.count(filterParams),
+    );
 
-		if (isPaging) {
-			const key = `${prefixKey}${cache.keys.districts}_page_${page}_per_page_${perPage}`;
+    if (isPaging) {
+      const key = `${prefixKey}${cache.keys.districts}_page_${page}_per_page_${perPage}`;
 
-			const [total, districts] = await Promise.all([
-				totalPromise,
-				cache.remember(
-					key,
-					Constants.CACHE_TTL.districts,
-					async () =>
-						await this.districtRepository.paginate({
-							page,
-							perPage,
-							filterParams
-						})
-				)
-			]);
+      const [total, districts] = await Promise.all([
+        totalPromise,
+        cache.remember(
+          key,
+          Constants.CACHE_TTL.districts,
+          async () =>
+            await this.districtRepository.paginate({
+              page,
+              perPage,
+              filterParams,
+            }),
+        ),
+      ]);
 
-			const totalPages = Math.ceil(total / perPage);
+      const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages && totalPages > 0) {
-				await cache.forget(key);
-				throw new InvalidPage();
-			}
+      if (page > totalPages && totalPages > 0) {
+        await cache.forget(key);
+        throw new InvalidPage();
+      }
 
-			return {
-				items: this.mapDistricts(districts),
-				pagination: {
-					page,
-					perPage,
-					total,
-					totalPages
-				}
-			};
-		}
+      return {
+        items: this.mapDistricts(districts),
+        pagination: {
+          page,
+          perPage,
+          total,
+          totalPages,
+        },
+      };
+    }
 
-		const [total, districts] = await Promise.all([
-			totalPromise,
-			cache.remember(
-				`${prefixKey}all_${cache.keys.districts}`,
-				Constants.CACHE_TTL.districts,
-				async () => await this.districtRepository.listAll(filterParams)
-			)
-		]);
+    const [total, districts] = await Promise.all([
+      totalPromise,
+      cache.remember(
+        `${prefixKey}all_${cache.keys.districts}`,
+        Constants.CACHE_TTL.districts,
+        async () => await this.districtRepository.listAll(filterParams),
+      ),
+    ]);
 
-		return {
-			items: this.mapDistricts(districts),
-			pagination: {
-				page: 1,
-				perPage: total,
-				total,
-				totalPages: 1
-			}
-		};
-	}
+    return {
+      items: this.mapDistricts(districts),
+      pagination: {
+        page: 1,
+        perPage: total,
+        total,
+        totalPages: 1,
+      },
+    };
+  }
 }

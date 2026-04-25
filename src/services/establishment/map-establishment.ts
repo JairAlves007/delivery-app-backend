@@ -1,17 +1,17 @@
 import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type {
-	EstablishmentFromRepository,
-	EstablishmentsList
+  EstablishmentFromRepository,
+  EstablishmentsList,
 } from "@/types/establishment.js";
 
 export const mapEstablishment = (
-	establishment: EstablishmentFromRepository
+  establishment: EstablishmentFromRepository,
 ): EstablishmentsList => ({
-	...establishment,
-	address: establishment.address?.address ?? null,
-	resources: mapObjectResourcesList(establishment.resources)
+  ...establishment,
+  address: establishment.address?.address ?? null,
+  resources: mapObjectResourcesList(establishment.resources),
 });
 
 export const mapEstablishments = (
-	establishments: EstablishmentFromRepository[]
+  establishments: EstablishmentFromRepository[],
 ): EstablishmentsList[] => establishments.map(mapEstablishment);

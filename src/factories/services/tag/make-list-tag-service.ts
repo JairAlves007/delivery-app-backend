@@ -2,6 +2,6 @@ import { makeTagRepository } from "@/factories/repositories/make-tag-repository.
 import { ListTagService } from "@/services/tag/list-tag-service.js";
 
 export const makeListTagService = () => {
-	const tagRepository = makeTagRepository();
-	return new ListTagService(tagRepository);
+  const tagRepository = makeTagRepository();
+  return new ListTagService(tagRepository);
 };

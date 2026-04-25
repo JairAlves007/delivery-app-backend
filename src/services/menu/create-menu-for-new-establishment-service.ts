@@ -4,25 +4,25 @@ import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 import type { EstablishmentID } from "@/types/establishment.js";
 
 type CreateMenuForNewEstablishmentParams = {
-	establishmentId: EstablishmentID;
+  establishmentId: EstablishmentID;
 } & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class CreateMenuForNewEstablishmentService {
-	private menuRepository: IMenuRepository;
+  private menuRepository: IMenuRepository;
 
-	constructor(menuRepository: IMenuRepository) {
-		this.menuRepository = menuRepository;
-	}
+  constructor(menuRepository: IMenuRepository) {
+    this.menuRepository = menuRepository;
+  }
 
-	async handle({
-		establishmentId,
-		paramsToForget
-	}: CreateMenuForNewEstablishmentParams) {
-		await this.menuRepository.createForNewEstablishment(establishmentId);
+  async handle({
+    establishmentId,
+    paramsToForget,
+  }: CreateMenuForNewEstablishmentParams) {
+    await this.menuRepository.createForNewEstablishment(establishmentId);
 
-		await forgetAllListingCacheKeysQueue({
-			baseCacheKey: "establishments",
-			paramsToForget
-		});
-	}
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "establishments",
+      paramsToForget,
+    });
+  }
 }

@@ -1,16 +1,16 @@
 import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type {
-	ProductCategoryFromRepository,
-	ProductCategoryList
+  ProductCategoryFromRepository,
+  ProductCategoryList,
 } from "@/types/product-category.js";
 
 export const mapProductCategory = (
-	productCategory: ProductCategoryFromRepository
+  productCategory: ProductCategoryFromRepository,
 ): ProductCategoryList => ({
-	...productCategory,
-	resources: mapObjectResourcesList(productCategory.resources)
+  ...productCategory,
+  resources: mapObjectResourcesList(productCategory.resources),
 });
 
 export const mapProductCategories = (
-	productCategories: ProductCategoryFromRepository[]
+  productCategories: ProductCategoryFromRepository[],
 ): ProductCategoryList[] => productCategories.map(mapProductCategory);

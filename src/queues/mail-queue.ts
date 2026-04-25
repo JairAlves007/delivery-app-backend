@@ -6,17 +6,17 @@ export const mailQueueName = "mail-queue";
 export const orderConfirmationQueueName = "order-confirmation-queue";
 
 export const sendOrderConfirmationMessageQueue = async (
-	payload: BuildOrderItemsParams
+  payload: BuildOrderItemsParams,
 ) => {
-	const queue = makeQueue<BuildOrderItemsParams>(orderConfirmationQueueName);
+  const queue = makeQueue<BuildOrderItemsParams>(orderConfirmationQueueName);
 
-	queue.enqueue("send-order-confirmation-message", payload);
+  queue.enqueue("send-order-confirmation-message", payload);
 };
 
 export const sendResetPasswordMailQueue = async (
-	payload: SendResetPasswordMailEventType
+  payload: SendResetPasswordMailEventType,
 ) => {
-	const queue = makeQueue<SendResetPasswordMailEventType>(mailQueueName);
+  const queue = makeQueue<SendResetPasswordMailEventType>(mailQueueName);
 
-	queue.enqueue("send-reset-password-mail", payload);
+  queue.enqueue("send-reset-password-mail", payload);
 };

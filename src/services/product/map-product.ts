@@ -3,12 +3,11 @@ import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type { ProductFromRepository, ProductList } from "@/types/product.js";
 
 export const mapProduct = (product: ProductFromRepository): ProductList => ({
-	...product,
-	price: transformPriceFromDatabase(product.price),
-	resources: mapObjectResourcesList(product.resources),
-	tags: product.tags.map(({ tag }) => tag)
+  ...product,
+  price: transformPriceFromDatabase(product.price),
+  resources: mapObjectResourcesList(product.resources),
+  tags: product.tags.map(({ tag }) => tag),
 });
 
-export const mapProducts = (
-	products: ProductFromRepository[]
-): ProductList[] => products.map(mapProduct);
+export const mapProducts = (products: ProductFromRepository[]): ProductList[] =>
+  products.map(mapProduct);

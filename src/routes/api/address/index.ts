@@ -7,9 +7,9 @@ import { listAddressesRoute } from "./list-addresses.route.js";
 import { updateAddressRoute } from "./update-address.route.js";
 
 export const addressRoutes = async (app: FastifyInstance) => {
-	app.register(listAddressesRoute);
-	app.register(findAddressRoute);
-	app.register(createAddressRoute);
-	app.register(updateAddressRoute);
-	app.register(deleteAddressRoute);
+  app.register(listAddressesRoute);
+  app.register(findAddressRoute);
+  app.register(createAddressRoute);
+  app.register(updateAddressRoute);
+  app.register(deleteAddressRoute);
 };

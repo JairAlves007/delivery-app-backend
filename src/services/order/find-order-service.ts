@@ -12,25 +12,25 @@ import type { FilterField } from "@/types/crud.js";
 type FindOrderServiceRequest = z.infer<typeof orderParamsSchema> & FilterField;
 
 export class FindOrderService {
-	private orderRepository: IOrderRepository;
+  private orderRepository: IOrderRepository;
 
-	constructor(orderRepository: IOrderRepository) {
-		this.orderRepository = orderRepository;
-	}
+  constructor(orderRepository: IOrderRepository) {
+    this.orderRepository = orderRepository;
+  }
 
-	async handle({ id, filterParams }: FindOrderServiceRequest) {
-		const cache = makeCache();
-		const prefixKey = getFilterParamsCacheKey(filterParams);
+  async handle({ id, filterParams }: FindOrderServiceRequest) {
+    const cache = makeCache();
+    const prefixKey = getFilterParamsCacheKey(filterParams);
 
-		const key = `${prefixKey}${cache.keys.orders}_${id}`;
-		const order = await cache.remember(
-			key,
-			Constants.CACHE_TTL.orders,
-			async () => await this.orderRepository.findById({ id, filterParams })
-		);
+    const key = `${prefixKey}${cache.keys.orders}_${id}`;
+    const order = await cache.remember(
+      key,
+      Constants.CACHE_TTL.orders,
+      async () => await this.orderRepository.findById({ id, filterParams }),
+    );
 
-		if (!order) throw new OrderNotFound();
+    if (!order) throw new OrderNotFound();
 
-		return transformOrderByStatus(order);
-	}
+    return transformOrderByStatus(order);
+  }
 }

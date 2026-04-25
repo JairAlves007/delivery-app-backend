@@ -2,7 +2,7 @@ import { makeResourceRepository } from "@/factories/repositories/make-resource-r
 import { GenerateSignedUrlForUploadService } from "@/services/upload/generate-signed-url-for-upload.js";
 
 export const makeGenerateSignedUrlForUploadService = () => {
-	const resourceRepository = makeResourceRepository();
+  const resourceRepository = makeResourceRepository();
 
-	return new GenerateSignedUrlForUploadService(resourceRepository);
+  return new GenerateSignedUrlForUploadService(resourceRepository);
 };

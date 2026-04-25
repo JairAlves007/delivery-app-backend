@@ -2,6 +2,6 @@ import { makeOrderRepository } from "@/factories/repositories/make-order-reposit
 import { FindOrderService } from "@/services/order/find-order-service.js";
 
 export const makeFindOrderService = () => {
-	const orderRepository = makeOrderRepository();
-	return new FindOrderService(orderRepository);
+  const orderRepository = makeOrderRepository();
+  return new FindOrderService(orderRepository);
 };

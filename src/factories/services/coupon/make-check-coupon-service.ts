@@ -2,6 +2,6 @@ import { makeCouponRepository } from "@/factories/repositories/make-coupon-repos
 import { CheckCouponService } from "@/services/coupon/check-coupon-service.js";
 
 export const makeCheckCouponService = () => {
-	const couponRepository = makeCouponRepository();
-	return new CheckCouponService(couponRepository);
+  const couponRepository = makeCouponRepository();
+  return new CheckCouponService(couponRepository);
 };

@@ -11,90 +11,90 @@ import type { FilterField, PaginatedResponse } from "@/types/crud.js";
 import type { OrderFromRepository, OrderPayload } from "@/types/order.js";
 
 type ListOrderServiceRequest = z.infer<typeof listQueryParamsSchema> &
-	FilterField;
+  FilterField;
 
 type ListOrderServiceResponse = PaginatedResponse<OrderPayload>;
 
 export class ListOrderService {
-	private orderRepository: IOrderRepository;
+  private orderRepository: IOrderRepository;
 
-	constructor(orderRepository: IOrderRepository) {
-		this.orderRepository = orderRepository;
-	}
+  constructor(orderRepository: IOrderRepository) {
+    this.orderRepository = orderRepository;
+  }
 
-	private mapOrders(orders: OrderFromRepository[]): OrderPayload[] {
-		return orders.map(order => {
-			return transformOrderByStatus(order);
-		});
-	}
+  private mapOrders(orders: OrderFromRepository[]): OrderPayload[] {
+    return orders.map((order) => {
+      return transformOrderByStatus(order);
+    });
+  }
 
-	async handle({
-		page,
-		perPage,
-		filterParams
-	}: ListOrderServiceRequest): Promise<ListOrderServiceResponse> {
-		const cache = makeCache();
-		const prefixKey = getFilterParamsCacheKey(filterParams);
+  async handle({
+    page,
+    perPage,
+    filterParams,
+  }: ListOrderServiceRequest): Promise<ListOrderServiceResponse> {
+    const cache = makeCache();
+    const prefixKey = getFilterParamsCacheKey(filterParams);
 
-		const isPaging = !!page;
-		const ttl = Constants.CACHE_TTL.orders;
-		const totalPromise = cache.remember(
-			`${prefixKey}total_${cache.keys.orders}`,
-			ttl,
-			async () => await this.orderRepository.count(filterParams)
-		);
+    const isPaging = !!page;
+    const ttl = Constants.CACHE_TTL.orders;
+    const totalPromise = cache.remember(
+      `${prefixKey}total_${cache.keys.orders}`,
+      ttl,
+      async () => await this.orderRepository.count(filterParams),
+    );
 
-		if (isPaging) {
-			const key = `${prefixKey}${cache.keys.orders}_page_${page}_per_page_${perPage}`;
-			const [total, orders] = await Promise.all([
-				totalPromise,
-				cache.remember(
-					key,
-					ttl,
-					async () =>
-						await this.orderRepository.paginate({
-							page,
-							perPage,
-							filterParams
-						})
-				)
-			]);
+    if (isPaging) {
+      const key = `${prefixKey}${cache.keys.orders}_page_${page}_per_page_${perPage}`;
+      const [total, orders] = await Promise.all([
+        totalPromise,
+        cache.remember(
+          key,
+          ttl,
+          async () =>
+            await this.orderRepository.paginate({
+              page,
+              perPage,
+              filterParams,
+            }),
+        ),
+      ]);
 
-			const totalPages = Math.ceil(total / perPage);
+      const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages && totalPages > 0) {
-				await cache.forget(key);
-				throw new InvalidPage();
-			}
+      if (page > totalPages && totalPages > 0) {
+        await cache.forget(key);
+        throw new InvalidPage();
+      }
 
-			return {
-				items: this.mapOrders(orders),
-				pagination: {
-					page,
-					perPage,
-					total,
-					totalPages
-				}
-			};
-		}
+      return {
+        items: this.mapOrders(orders),
+        pagination: {
+          page,
+          perPage,
+          total,
+          totalPages,
+        },
+      };
+    }
 
-		const [total, orders] = await Promise.all([
-			totalPromise,
-			cache.remember(
-				`${prefixKey}${cache.keys.orders}`,
-				ttl,
-				async () => await this.orderRepository.listAll(filterParams)
-			)
-		]);
+    const [total, orders] = await Promise.all([
+      totalPromise,
+      cache.remember(
+        `${prefixKey}${cache.keys.orders}`,
+        ttl,
+        async () => await this.orderRepository.listAll(filterParams),
+      ),
+    ]);
 
-		return {
-			items: this.mapOrders(orders),
-			pagination: {
-				page: 1,
-				perPage: total,
-				total,
-				totalPages: 1
-			}
-		};
-	}
+    return {
+      items: this.mapOrders(orders),
+      pagination: {
+        page: 1,
+        perPage: total,
+        total,
+        totalPages: 1,
+      },
+    };
+  }
 }

@@ -10,30 +10,30 @@ import type { FilterField } from "@/types/crud.js";
 import type { ProductList } from "@/types/product.js";
 
 type FindProductServiceRequest = z.infer<typeof productParamsSchema> &
-	FilterField;
+  FilterField;
 
 export class FindProductService {
-	private productRepository: IProductRepository;
+  private productRepository: IProductRepository;
 
-	constructor(productRepository: IProductRepository) {
-		this.productRepository = productRepository;
-	}
+  constructor(productRepository: IProductRepository) {
+    this.productRepository = productRepository;
+  }
 
-	public async handle({
-		id,
-		filterParams
-	}: FindProductServiceRequest): Promise<ProductList> {
-		const cache = makeCache();
-		const filterPrefixKey = getFilterParamsCacheKey(filterParams);
-		const key = `${filterPrefixKey}${cache.keys.products}_${id}`;
+  public async handle({
+    id,
+    filterParams,
+  }: FindProductServiceRequest): Promise<ProductList> {
+    const cache = makeCache();
+    const filterPrefixKey = getFilterParamsCacheKey(filterParams);
+    const key = `${filterPrefixKey}${cache.keys.products}_${id}`;
 
-		const product = await cache.rememberForever(
-			key,
-			async () => await this.productRepository.findById({ id, filterParams })
-		);
+    const product = await cache.rememberForever(
+      key,
+      async () => await this.productRepository.findById({ id, filterParams }),
+    );
 
-		if (!product) throw new ProductNotFound();
+    if (!product) throw new ProductNotFound();
 
-		return mapProduct(product);
-	}
+    return mapProduct(product);
+  }
 }

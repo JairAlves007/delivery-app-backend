@@ -2,42 +2,42 @@ import type { Prisma, Resource } from "@/generated/prisma/client.js";
 import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.js";
 import prisma from "@/lib/prisma.js";
 import type {
-	ResourceRuleFromRepository,
-	UploadResourceRulesParams,
-	ValidateResourceRuleParams
+  ResourceRuleFromRepository,
+  UploadResourceRulesParams,
+  ValidateResourceRuleParams,
 } from "@/types/resource-rule.js";
 
 export class ResourcePrismaRepository implements IResourceRepository {
-	async validateResourceRule({
-		resourceIntent: { type, for: forResource }
-	}: ValidateResourceRuleParams): Promise<ResourceRuleFromRepository | null> {
-		return await prisma.resourceRule.findUnique({
-			where: {
-				type_for: {
-					type,
-					for: forResource
-				}
-			},
-			include: {
-				availableFormats: true
-			}
-		});
-	}
+  async validateResourceRule({
+    resourceIntent: { type, for: forResource },
+  }: ValidateResourceRuleParams): Promise<ResourceRuleFromRepository | null> {
+    return await prisma.resourceRule.findUnique({
+      where: {
+        type_for: {
+          type,
+          for: forResource,
+        },
+      },
+      include: {
+        availableFormats: true,
+      },
+    });
+  }
 
-	async getUploadResourceRules({
-		forObject
-	}: UploadResourceRulesParams): Promise<ResourceRuleFromRepository[]> {
-		return await prisma.resourceRule.findMany({
-			where: {
-				for: forObject
-			},
-			include: {
-				availableFormats: true
-			}
-		});
-	}
+  async getUploadResourceRules({
+    forObject,
+  }: UploadResourceRulesParams): Promise<ResourceRuleFromRepository[]> {
+    return await prisma.resourceRule.findMany({
+      where: {
+        for: forObject,
+      },
+      include: {
+        availableFormats: true,
+      },
+    });
+  }
 
-	async storeResource(data: Prisma.ResourceUpsertArgs): Promise<Resource> {
-		return await prisma.resource.upsert(data);
-	}
+  async storeResource(data: Prisma.ResourceUpsertArgs): Promise<Resource> {
+    return await prisma.resource.upsert(data);
+  }
 }

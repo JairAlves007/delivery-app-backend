@@ -7,53 +7,53 @@ import { createEstablishmentBodySchema } from "@/schemas/establishment-schema.js
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type CreateEstablishmentServiceParams = z.infer<
-	typeof createEstablishmentBodySchema
+  typeof createEstablishmentBodySchema
 > &
-	Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
+  Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class CreateEstablishmentService {
-	private establishmentRepository: IEstablishmentRepository;
+  private establishmentRepository: IEstablishmentRepository;
 
-	constructor(establishmentRepository: IEstablishmentRepository) {
-		this.establishmentRepository = establishmentRepository;
-	}
+  constructor(establishmentRepository: IEstablishmentRepository) {
+    this.establishmentRepository = establishmentRepository;
+  }
 
-	async handle({
-		name,
-		address: {
-			postalCode: postal_code,
-			referencePoint: reference_point,
-			...address
-		},
-		acceptsCreditCard: accepts_credit_card,
-		onlyDelivery: only_delivery,
-		nextBillingDate: next_billing_date,
-		paramsToForget,
-		...data
-	}: CreateEstablishmentServiceParams): Promise<void> {
-		const establishment = await this.establishmentRepository.create({
-			...data,
-			name,
-			slug: slugify(name),
-			accepts_credit_card,
-			only_delivery,
-			next_billing_date,
-			address: {
-				create: {
-					address: {
-						create: {
-							...address,
-							reference_point,
-							postal_code
-						}
-					}
-				}
-			}
-		});
+  async handle({
+    name,
+    address: {
+      postalCode: postal_code,
+      referencePoint: reference_point,
+      ...address
+    },
+    acceptsCreditCard: accepts_credit_card,
+    onlyDelivery: only_delivery,
+    nextBillingDate: next_billing_date,
+    paramsToForget,
+    ...data
+  }: CreateEstablishmentServiceParams): Promise<void> {
+    const establishment = await this.establishmentRepository.create({
+      ...data,
+      name,
+      slug: slugify(name),
+      accepts_credit_card,
+      only_delivery,
+      next_billing_date,
+      address: {
+        create: {
+          address: {
+            create: {
+              ...address,
+              reference_point,
+              postal_code,
+            },
+          },
+        },
+      },
+    });
 
-		await createMenuForNewEstablishmentQueue({
-			establishmentId: establishment.id,
-			paramsToForget
-		});
-	}
+    await createMenuForNewEstablishmentQueue({
+      establishmentId: establishment.id,
+      paramsToForget,
+    });
+  }
 }

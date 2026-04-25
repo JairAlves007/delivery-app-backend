@@ -4,60 +4,56 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { makeListTagService } from "@/factories/services/tag/make-list-tag-service.js";
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
+import { getUserEstablishmentId } from "@/helpers/get-user-establishment-id.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
-import { resolveEstablishmentScope } from "@/helpers/resolve-establishment-scope.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
-	apiDefaultErrorResponseSchema,
-	apiSuccessResponseSchema,
-	apiValidationErrorResponseSchema
+  apiDefaultErrorResponseSchema,
+  apiSuccessResponseSchema,
+  apiValidationErrorResponseSchema,
 } from "@/schemas/api-schema.js";
 import { tagListResponseSchema } from "@/schemas/response-schema.js";
 import { listTagsQueryParamsSchema } from "@/schemas/tag-schema.js";
 
 export const listTagsRoute = async (app: FastifyInstance) => {
-	app.withTypeProvider<ZodTypeProvider>().get(
-		"/",
-		{
-			schema: {
-				operationId: "listTags",
-				tags: ["Tags"],
-				summary: "Listar tags",
-				querystring: listTagsQueryParamsSchema,
-				response: {
-					200: apiSuccessResponseSchema(tagListResponseSchema),
-					401: apiDefaultErrorResponseSchema,
-					403: apiDefaultErrorResponseSchema,
-					422: apiValidationErrorResponseSchema,
-					500: apiDefaultErrorResponseSchema
-				}
-			},
-			onRequest: [
-				isAuthenticated,
-				ensureUserHasPermission([PermissionType.MANAGE_PRODUCTS])
-			]
-		},
-		async (request, reply) => {
-			const { establishmentId, type, ...query } = request.query;
+  app.withTypeProvider<ZodTypeProvider>().get(
+    "/",
+    {
+      schema: {
+        operationId: "listTags",
+        tags: ["Tags"],
+        summary: "Listar tags",
+        querystring: listTagsQueryParamsSchema,
+        response: {
+          200: apiSuccessResponseSchema(tagListResponseSchema),
+          401: apiDefaultErrorResponseSchema,
+          403: apiDefaultErrorResponseSchema,
+          422: apiValidationErrorResponseSchema,
+          500: apiDefaultErrorResponseSchema,
+        },
+      },
+      onRequest: [
+        isAuthenticated,
+        ensureUserHasPermission([PermissionType.MANAGE_PRODUCTS]),
+      ],
+    },
+    async (request, reply) => {
+      const { type, ...query } = request.query;
 
-			const listTagService = makeListTagService();
+      const listTagService = makeListTagService();
 
-			const tags = await listTagService.handle({
-				...query,
-				type,
-				filterParams: {
-					establishment_id: resolveEstablishmentScope({
-						role: request.user.role,
-						primaryTenantId: request.user.activeTenantId,
-						establishmentId
-					})
-				}
-			});
+      const tags = await listTagService.handle({
+        ...query,
+        type,
+        filterParams: {
+          establishment_id: getUserEstablishmentId(request.user),
+        },
+      });
 
-			return reply
-				.status(HTTPStatusCodes.OK)
-				.send(ApiResponse.success("Tags listadas com sucesso", tags));
-		}
-	);
+      return reply
+        .status(HTTPStatusCodes.OK)
+        .send(ApiResponse.success("Tags listadas com sucesso", tags));
+    },
+  );
 };

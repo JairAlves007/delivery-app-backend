@@ -3,22 +3,25 @@ import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type DeleteEstablishmentParams = {
-	id: string;
+  id: string;
 } & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 
 export class DeleteEstablishmentService {
-	private establishmentRepository: IEstablishmentRepository;
+  private establishmentRepository: IEstablishmentRepository;
 
-	constructor(establishmentRepository: IEstablishmentRepository) {
-		this.establishmentRepository = establishmentRepository;
-	}
+  constructor(establishmentRepository: IEstablishmentRepository) {
+    this.establishmentRepository = establishmentRepository;
+  }
 
-	public async handle({ id, paramsToForget }: DeleteEstablishmentParams) {
-		await this.establishmentRepository.delete({ id, force: false });
+  public async handle({ id, paramsToForget }: DeleteEstablishmentParams) {
+    await this.establishmentRepository.delete({
+      id,
+      force: false,
+    });
 
-		await forgetAllListingCacheKeysQueue({
-			baseCacheKey: "establishments",
-			paramsToForget
-		});
-	}
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "establishments",
+      paramsToForget,
+    });
+  }
 }

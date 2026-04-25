@@ -7,9 +7,9 @@ import { listProductCategoriesRoute } from "./list-product-categories.route.js";
 import { updateProductCategoryRoute } from "./update-product-category.route.js";
 
 export const adminProductCategoryRoutes = async (app: FastifyInstance) => {
-	app.register(listProductCategoriesRoute);
-	app.register(findProductCategoryRoute);
-	app.register(createProductCategoryRoute);
-	app.register(updateProductCategoryRoute);
-	app.register(deleteProductCategoryRoute);
+  app.register(listProductCategoriesRoute);
+  app.register(findProductCategoryRoute);
+  app.register(createProductCategoryRoute);
+  app.register(updateProductCategoryRoute);
+  app.register(deleteProductCategoryRoute);
 };

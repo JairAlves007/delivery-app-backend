@@ -12,29 +12,29 @@ import type { FilterField } from "@/types/crud.js";
 type FindAddonServiceRequest = z.infer<typeof addonParamsSchema> & FilterField;
 
 export class FindAddonService {
-	private addonRepository: IAddonRepository;
+  private addonRepository: IAddonRepository;
 
-	constructor(addonRepository: IAddonRepository) {
-		this.addonRepository = addonRepository;
-	}
+  constructor(addonRepository: IAddonRepository) {
+    this.addonRepository = addonRepository;
+  }
 
-	async handle({
-		id,
-		filterParams
-	}: FindAddonServiceRequest): Promise<AddonFromRepository> {
-		const cache = makeCache();
-		const filterPrefixKey = getFilterParamsCacheKey(filterParams);
+  async handle({
+    id,
+    filterParams,
+  }: FindAddonServiceRequest): Promise<AddonFromRepository> {
+    const cache = makeCache();
+    const filterPrefixKey = getFilterParamsCacheKey(filterParams);
 
-		const key = `${filterPrefixKey}${cache.keys.addons}_${id}`;
+    const key = `${filterPrefixKey}${cache.keys.addons}_${id}`;
 
-		const addon = await cache.remember(
-			key,
-			Constants.CACHE_TTL.addons,
-			async () => await this.addonRepository.findById({ id, filterParams })
-		);
+    const addon = await cache.remember(
+      key,
+      Constants.CACHE_TTL.addons,
+      async () => await this.addonRepository.findById({ id, filterParams }),
+    );
 
-		if (!addon) throw new AddonNotFound();
+    if (!addon) throw new AddonNotFound();
 
-		return addon;
-	}
+    return addon;
+  }
 }

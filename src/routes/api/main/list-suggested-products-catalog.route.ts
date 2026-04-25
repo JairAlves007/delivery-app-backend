@@ -8,62 +8,62 @@ import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
-	apiDefaultErrorResponseSchema,
-	apiSuccessResponseSchema,
-	apiValidationErrorResponseSchema
+  apiDefaultErrorResponseSchema,
+  apiSuccessResponseSchema,
+  apiValidationErrorResponseSchema,
 } from "@/schemas/api-schema.js";
 import {
-	listSuggestedProductsParamsSchema,
-	listSuggestedProductsQuerySchema
+  listSuggestedProductsParamsSchema,
+  listSuggestedProductsQuerySchema,
 } from "@/schemas/main-schema.js";
 import { suggestedProductsCatalogResponseSchema } from "@/schemas/response-schema.js";
 
 export const listSuggestedProductsCatalogRoute = async (
-	app: FastifyInstance
+  app: FastifyInstance,
 ) => {
-	app.withTypeProvider<ZodTypeProvider>().get(
-		"/product/:productId/suggested",
-		{
-			schema: {
-				operationId: "listSuggestedProductsCatalog",
-				tags: ["Main (Home)"],
-				summary: "Listar produtos sugeridos a partir de um produto",
-				params: listSuggestedProductsParamsSchema,
-				querystring: listSuggestedProductsQuerySchema,
-				response: {
-					200: apiSuccessResponseSchema(suggestedProductsCatalogResponseSchema),
-					401: apiDefaultErrorResponseSchema,
-					403: apiDefaultErrorResponseSchema,
-					422: apiValidationErrorResponseSchema,
-					500: apiDefaultErrorResponseSchema
-				}
-			},
-			onRequest: [
-				isAuthenticated,
-				ensureUserHasPermission([PermissionType.VIEW_CATALOG])
-			]
-		},
-		async (request, reply) => {
-			const { productId } = request.params;
-			const { limit } = request.query;
+  app.withTypeProvider<ZodTypeProvider>().get(
+    "/product/:productId/suggested",
+    {
+      schema: {
+        operationId: "listSuggestedProductsCatalog",
+        tags: ["Main (Home)"],
+        summary: "Listar produtos sugeridos a partir de um produto",
+        params: listSuggestedProductsParamsSchema,
+        querystring: listSuggestedProductsQuerySchema,
+        response: {
+          200: apiSuccessResponseSchema(suggestedProductsCatalogResponseSchema),
+          401: apiDefaultErrorResponseSchema,
+          403: apiDefaultErrorResponseSchema,
+          422: apiValidationErrorResponseSchema,
+          500: apiDefaultErrorResponseSchema,
+        },
+      },
+      onRequest: [
+        isAuthenticated,
+        ensureUserHasPermission([PermissionType.VIEW_CATALOG]),
+      ],
+    },
+    async (request, reply) => {
+      const { productId } = request.params;
+      const { limit } = request.query;
 
-			const listSuggestedProductsCatalogService =
-				makeListSuggestedProductsCatalogService();
+      const listSuggestedProductsCatalogService =
+        makeListSuggestedProductsCatalogService();
 
-			const products = await listSuggestedProductsCatalogService.handle({
-				establishmentId: request.user.activeTenantId,
-				productId,
-				limit
-			});
+      const products = await listSuggestedProductsCatalogService.handle({
+        establishmentId: request.user.activeTenantId,
+        productId,
+        limit,
+      });
 
-			return reply
-				.status(HTTPStatusCodes.OK)
-				.send(
-					ApiResponse.success(
-						"Produtos sugeridos listados com sucesso",
-						products
-					)
-				);
-		}
-	);
+      return reply
+        .status(HTTPStatusCodes.OK)
+        .send(
+          ApiResponse.success(
+            "Produtos sugeridos listados com sucesso",
+            products,
+          ),
+        );
+    },
+  );
 };

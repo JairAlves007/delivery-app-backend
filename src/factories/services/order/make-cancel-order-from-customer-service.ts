@@ -2,6 +2,6 @@ import { makeOrderRepository } from "@/factories/repositories/make-order-reposit
 import { CancelOrderFromCustomerService } from "@/services/order/cancel-order-from-customer-service.js";
 
 export const makeCancelOrderFromCustomerService = () => {
-	const orderRepository = makeOrderRepository();
-	return new CancelOrderFromCustomerService(orderRepository);
+  const orderRepository = makeOrderRepository();
+  return new CancelOrderFromCustomerService(orderRepository);
 };

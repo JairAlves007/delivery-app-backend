@@ -6,35 +6,35 @@ import type { EstablishmentID } from "@/types/establishment.js";
 import type { UserID } from "@/types/user.js";
 
 type ValidateCouponFromOrderServiceRequest = {
-	establishmentId: EstablishmentID;
-	userId: UserID;
-	couponId: number;
+  establishmentId: EstablishmentID;
+  userId: UserID;
+  couponId: number;
 };
 
 export class ValidateCouponFromOrderService {
-	async handle({
-		establishmentId,
-		couponId,
-		userId
-	}: ValidateCouponFromOrderServiceRequest): Promise<Coupon> {
-		const filterParams = { establishment_id: establishmentId };
+  async handle({
+    establishmentId,
+    couponId,
+    userId,
+  }: ValidateCouponFromOrderServiceRequest): Promise<Coupon> {
+    const filterParams = { establishment_id: establishmentId };
 
-		const findCouponService = makeFindCouponService();
-		const coupon = await findCouponService.handle({
-			id: couponId,
-			filterParams
-		});
+    const findCouponService = makeFindCouponService();
+    const coupon = await findCouponService.handle({
+      id: couponId,
+      filterParams,
+    });
 
-		if (!coupon) throw new CouponNotFound();
+    if (!coupon) throw new CouponNotFound();
 
-		const checkCoupon = makeCheckCouponService();
+    const checkCoupon = makeCheckCouponService();
 
-		await checkCoupon.handle({
-			code: coupon.code,
-			establishmentId,
-			userId
-		});
+    await checkCoupon.handle({
+      code: coupon.code,
+      establishmentId,
+      userId,
+    });
 
-		return coupon;
-	}
+    return coupon;
+  }
 }

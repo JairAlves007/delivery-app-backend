@@ -2,7 +2,7 @@ import { makePasswordResetTokenRepository } from "@/factories/repositories/make-
 import { ResetPasswordService } from "@/services/auth/reset-password-service.js";
 
 export const makeResetPasswordService = () => {
-	const passwordResetTokenRepository = makePasswordResetTokenRepository();
+  const passwordResetTokenRepository = makePasswordResetTokenRepository();
 
-	return new ResetPasswordService(passwordResetTokenRepository);
+  return new ResetPasswordService(passwordResetTokenRepository);
 };

@@ -5,9 +5,9 @@ import { setupSendResetPasswordMailWorker } from "./mail/send-reset-password-mai
 import { setupCreateOrderWorker } from "./order/create-order-worker.js";
 
 export const setupWorkers = () => {
-	setupForgetAllListingCacheKeysWorker();
-	setupCreateMenuForNewEstablishmentWorker();
-	setupSendOrderConfirmationMessageWorker();
-	setupSendResetPasswordMailWorker();
-	setupCreateOrderWorker();
+  setupForgetAllListingCacheKeysWorker();
+  setupCreateMenuForNewEstablishmentWorker();
+  setupSendOrderConfirmationMessageWorker();
+  setupSendResetPasswordMailWorker();
+  setupCreateOrderWorker();
 };

@@ -14,76 +14,76 @@ type ListEstablishmentServiceRequest = z.infer<typeof listQueryParamsSchema>;
 type ListEstablishmentServiceResponse = PaginatedResponse<EstablishmentsList>;
 
 export class ListEstablishmentService {
-	private establishmentRepository: IEstablishmentRepository;
+  private establishmentRepository: IEstablishmentRepository;
 
-	constructor(establishmentRepository: IEstablishmentRepository) {
-		this.establishmentRepository = establishmentRepository;
-	}
+  constructor(establishmentRepository: IEstablishmentRepository) {
+    this.establishmentRepository = establishmentRepository;
+  }
 
-	async handle({
-		page,
-		perPage,
-		...filterParams
-	}: ListEstablishmentServiceRequest): Promise<ListEstablishmentServiceResponse> {
-		const cache = makeCache();
-		const prefixKey = getFilterParamsCacheKey(filterParams);
+  async handle({
+    page,
+    perPage,
+    ...filterParams
+  }: ListEstablishmentServiceRequest): Promise<ListEstablishmentServiceResponse> {
+    const cache = makeCache();
+    const prefixKey = getFilterParamsCacheKey(filterParams);
 
-		const isPaging = !!page;
-		const totalPromise = cache.rememberForever(
-			`${prefixKey}total_${cache.keys.establishments}`,
-			async () => await this.establishmentRepository.count({ ...filterParams })
-		);
+    const isPaging = !!page;
+    const totalPromise = cache.rememberForever(
+      `${prefixKey}total_${cache.keys.establishments}`,
+      async () => await this.establishmentRepository.count({ ...filterParams }),
+    );
 
-		if (isPaging) {
-			const key = `${prefixKey}${cache.keys.establishments}_page_${page}_per_page_${perPage}`;
-			const [total, establishments] = await Promise.all([
-				totalPromise,
-				cache.rememberForever(
-					key,
-					async () =>
-						await this.establishmentRepository.paginate({
-							page,
-							perPage,
-							filterParams
-						})
-				)
-			]);
+    if (isPaging) {
+      const key = `${prefixKey}${cache.keys.establishments}_page_${page}_per_page_${perPage}`;
+      const [total, establishments] = await Promise.all([
+        totalPromise,
+        cache.rememberForever(
+          key,
+          async () =>
+            await this.establishmentRepository.paginate({
+              page,
+              perPage,
+              filterParams,
+            }),
+        ),
+      ]);
 
-			const totalPages = Math.ceil(total / perPage);
+      const totalPages = Math.ceil(total / perPage);
 
-			if (page > totalPages && totalPages > 0) {
-				await cache.forget(key);
-				throw new InvalidPage();
-			}
+      if (page > totalPages && totalPages > 0) {
+        await cache.forget(key);
+        throw new InvalidPage();
+      }
 
-			return {
-				items: mapEstablishments(establishments),
-				pagination: {
-					page,
-					perPage,
-					total,
-					totalPages
-				}
-			};
-		}
+      return {
+        items: mapEstablishments(establishments),
+        pagination: {
+          page,
+          perPage,
+          total,
+          totalPages,
+        },
+      };
+    }
 
-		const [total, establishments] = await Promise.all([
-			totalPromise,
-			cache.rememberForever(
-				`${prefixKey}all_${cache.keys.establishments}`,
-				async () =>
-					await this.establishmentRepository.listAll({ ...filterParams })
-			)
-		]);
+    const [total, establishments] = await Promise.all([
+      totalPromise,
+      cache.rememberForever(
+        `${prefixKey}all_${cache.keys.establishments}`,
+        async () =>
+          await this.establishmentRepository.listAll({ ...filterParams }),
+      ),
+    ]);
 
-		return {
-			items: mapEstablishments(establishments),
-			pagination: {
-				page: 1,
-				perPage: total,
-				total,
-				totalPages: 1
-			}
-		};
-	}
+    return {
+      items: mapEstablishments(establishments),
+      pagination: {
+        page: 1,
+        perPage: total,
+        total,
+        totalPages: 1,
+      },
+    };
+  }
 }

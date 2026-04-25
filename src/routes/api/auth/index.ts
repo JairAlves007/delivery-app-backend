@@ -7,9 +7,9 @@ import { signInRoute } from "./sign-in.route.js";
 import { signUpRoute } from "./sign-up.route.js";
 
 export const authRoutes = async (app: FastifyInstance) => {
-	app.register(signInRoute);
-	app.register(signUpRoute);
-	app.register(forgotPasswordRoute);
-	app.register(resetPasswordRoute);
-	app.register(meRoute);
+  app.register(signInRoute);
+  app.register(signUpRoute);
+  app.register(forgotPasswordRoute);
+  app.register(resetPasswordRoute);
+  app.register(meRoute);
 };

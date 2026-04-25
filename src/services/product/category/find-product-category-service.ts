@@ -10,33 +10,33 @@ import type { FilterField } from "@/types/crud.js";
 import type { ProductCategoryList } from "@/types/product-category.js";
 
 type FindProductCategoryServiceRequest = z.infer<
-	typeof productCategoryParamsSchema
+  typeof productCategoryParamsSchema
 > &
-	FilterField;
+  FilterField;
 
 export class FindProductCategoryService {
-	private productCategoryRepository: IProductCategoryRepository;
+  private productCategoryRepository: IProductCategoryRepository;
 
-	constructor(productCategoryRepository: IProductCategoryRepository) {
-		this.productCategoryRepository = productCategoryRepository;
-	}
+  constructor(productCategoryRepository: IProductCategoryRepository) {
+    this.productCategoryRepository = productCategoryRepository;
+  }
 
-	async handle({
-		id,
-		filterParams
-	}: FindProductCategoryServiceRequest): Promise<ProductCategoryList> {
-		const cache = makeCache();
-		const filterPrefixKey = getFilterParamsCacheKey(filterParams);
-		const key = `${filterPrefixKey}${cache.keys.productCategories}_${id}`;
+  async handle({
+    id,
+    filterParams,
+  }: FindProductCategoryServiceRequest): Promise<ProductCategoryList> {
+    const cache = makeCache();
+    const filterPrefixKey = getFilterParamsCacheKey(filterParams);
+    const key = `${filterPrefixKey}${cache.keys.productCategories}_${id}`;
 
-		const productCategory = await cache.rememberForever(
-			key,
-			async () =>
-				await this.productCategoryRepository.findById({ id, filterParams })
-		);
+    const productCategory = await cache.rememberForever(
+      key,
+      async () =>
+        await this.productCategoryRepository.findById({ id, filterParams }),
+    );
 
-		if (!productCategory) throw new ProductCategoryNotFound();
+    if (!productCategory) throw new ProductCategoryNotFound();
 
-		return mapProductCategory(productCategory);
-	}
+    return mapProductCategory(productCategory);
+  }
 }

@@ -9,32 +9,32 @@ import { mapEstablishment } from "@/services/establishment/map-establishment.js"
 import type { EstablishmentsList } from "@/types/establishment.js";
 
 type FindEstablishmentByIdServiceRequest = z.infer<
-	typeof establishmentParamsSchema
+  typeof establishmentParamsSchema
 >;
 
 export class FindEstablishmentByIdService {
-	private establishmentRepository: IEstablishmentRepository;
+  private establishmentRepository: IEstablishmentRepository;
 
-	constructor(establishmentRepository: IEstablishmentRepository) {
-		this.establishmentRepository = establishmentRepository;
-	}
+  constructor(establishmentRepository: IEstablishmentRepository) {
+    this.establishmentRepository = establishmentRepository;
+  }
 
-	async handle({
-		id
-	}: FindEstablishmentByIdServiceRequest): Promise<EstablishmentsList> {
-		const cache = makeCache();
-		const prefixKey = getFilterParamsCacheKey({
-			establishment_id: id
-		});
-		const key = `${prefixKey}${cache.keys.establishments}`;
+  async handle({
+    id,
+  }: FindEstablishmentByIdServiceRequest): Promise<EstablishmentsList> {
+    const cache = makeCache();
+    const prefixKey = getFilterParamsCacheKey({
+      establishment_id: id,
+    });
+    const key = `${prefixKey}${cache.keys.establishments}`;
 
-		const establishment = await cache.rememberForever(
-			key,
-			async () => await this.establishmentRepository.findById({ id })
-		);
+    const establishment = await cache.rememberForever(
+      key,
+      async () => await this.establishmentRepository.findById({ id }),
+    );
 
-		if (!establishment) throw new EstablishmentNotFound();
+    if (!establishment) throw new EstablishmentNotFound();
 
-		return mapEstablishment(establishment);
-	}
+    return mapEstablishment(establishment);
+  }
 }

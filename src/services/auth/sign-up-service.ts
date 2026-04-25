@@ -12,82 +12,82 @@ import type { EstablishmentID } from "@/types/establishment.js";
 import type { RoleWithPermissions } from "@/types/role.js";
 
 type SignUpServiceRequest = z.infer<typeof signUpBodySchema> & {
-	role: RoleType;
+  role: RoleType;
 };
 
 interface SignUpServiceResponse {
-	user: User;
-	role: RoleType;
-	establishmentId: EstablishmentID;
+  user: User;
+  role: RoleType;
+  establishmentId: EstablishmentID;
 }
 
 export class SignUpService {
-	private userRepository: IUserRepository;
-	private roleRepository: IRoleRepository;
-	private establishmentRepository: IEstablishmentRepository;
+  private userRepository: IUserRepository;
+  private roleRepository: IRoleRepository;
+  private establishmentRepository: IEstablishmentRepository;
 
-	constructor(
-		userRepository: IUserRepository,
-		roleRepository: IRoleRepository,
-		establishmentRepository: IEstablishmentRepository
-	) {
-		this.userRepository = userRepository;
-		this.roleRepository = roleRepository;
-		this.establishmentRepository = establishmentRepository;
-	}
+  constructor(
+    userRepository: IUserRepository,
+    roleRepository: IRoleRepository,
+    establishmentRepository: IEstablishmentRepository,
+  ) {
+    this.userRepository = userRepository;
+    this.roleRepository = roleRepository;
+    this.establishmentRepository = establishmentRepository;
+  }
 
-	async handle(data: SignUpServiceRequest): Promise<SignUpServiceResponse> {
-		const { name, email, password, role, origin } = data;
+  async handle(data: SignUpServiceRequest): Promise<SignUpServiceResponse> {
+    const { name, email, password, role, origin } = data;
 
-		if (!role) throw new UserUnauthorized();
+    if (!role) throw new UserUnauthorized();
 
-		const [roleData, password_hash]: [RoleWithPermissions | null, string] =
-			await Promise.all([
-				this.roleRepository.findByName(role),
-				hash(password, Constants.HASH_SALT_LENGTH)
-			]);
+    const [roleData, password_hash]: [RoleWithPermissions | null, string] =
+      await Promise.all([
+        this.roleRepository.findByName(role),
+        hash(password, Constants.HASH_SALT_LENGTH),
+      ]);
 
-		if (!roleData) throw new UserUnauthorized();
+    if (!roleData) throw new UserUnauthorized();
 
-		const establishment = await this.establishmentRepository.findBySlug(origin);
+    const establishment = await this.establishmentRepository.findBySlug(origin);
 
-		if (!establishment) throw new UserUnauthorized();
+    if (!establishment) throw new UserUnauthorized();
 
-		const establishmentId = establishment.id;
+    const establishmentId = establishment.id;
 
-		const user = await this.userRepository.create({
-			name,
-			email,
-			password: password_hash,
-			role: {
-				connect: {
-					id: roleData.id,
-					permissions: {
-						every: {
-							permission: {
-								name: {
-									in: roleData.permissions.map(
-										permission => permission.permission.name
-									)
-								}
-							}
-						}
-					}
-				}
-			},
-			...(role === RoleType.ESTABLISHMENT_OWNER && {
-				establishment: {
-					connect: {
-						id: establishmentId
-					}
-				}
-			})
-		});
+    const user = await this.userRepository.create({
+      name,
+      email,
+      password: password_hash,
+      role: {
+        connect: {
+          id: roleData.id,
+          permissions: {
+            every: {
+              permission: {
+                name: {
+                  in: roleData.permissions.map(
+                    (permission) => permission.permission.name,
+                  ),
+                },
+              },
+            },
+          },
+        },
+      },
+      ...(role === RoleType.ESTABLISHMENT_OWNER && {
+        establishment: {
+          connect: {
+            id: establishmentId,
+          },
+        },
+      }),
+    });
 
-		return {
-			user,
-			role,
-			establishmentId
-		};
-	}
+    return {
+      user,
+      role,
+      establishmentId,
+    };
+  }
 }

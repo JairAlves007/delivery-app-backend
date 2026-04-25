@@ -3,7 +3,7 @@ import { SendResetPasswordMailService } from "@/services/mail/send-reset-passwor
 import { makeMail } from "./make-mail.js";
 
 export const makeSendResetPasswordMailService = () => {
-	const mail = makeMail();
+  const mail = makeMail();
 
-	return new SendResetPasswordMailService(mail);
+  return new SendResetPasswordMailService(mail);
 };

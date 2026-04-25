@@ -4,32 +4,32 @@ import type { EstablishmentsList } from "@/types/establishment.js";
 import { parseHourToToday } from "./date.js";
 
 export function isEstablishmentOpen(
-	establishment: Pick<
-		EstablishmentsList,
-		"is_manually_closed" | "closures" | "openingHours"
-	>
+  establishment: Pick<
+    EstablishmentsList,
+    "is_manually_closed" | "closures" | "openingHours"
+  >,
 ): boolean {
-	const now = new Date();
+  const now = new Date();
 
-	if (establishment.is_manually_closed) return false;
+  if (establishment.is_manually_closed) return false;
 
-	const activeClosure = establishment.closures.find(
-		c => c.starts_at <= now && (c.ends_at == null || c.ends_at >= now)
-	);
+  const activeClosure = establishment.closures.find(
+    (c) => c.starts_at <= now && (c.ends_at == null || c.ends_at >= now),
+  );
 
-	if (activeClosure) return false;
+  if (activeClosure) return false;
 
-	const today = now.getDay();
-	const weekDays = Object.values(WeekDay);
+  const today = now.getDay();
+  const weekDays = Object.values(WeekDay);
 
-	const schedule = establishment.openingHours.find(
-		h => h.day_of_week === weekDays[today]
-	);
+  const schedule = establishment.openingHours.find(
+    (h) => h.day_of_week === weekDays[today],
+  );
 
-	if (!schedule || schedule.is_closed) return false;
+  if (!schedule || schedule.is_closed) return false;
 
-	const opensAt = parseHourToToday(schedule.opens_at);
-	const closesAt = parseHourToToday(schedule.closes_at);
+  const opensAt = parseHourToToday(schedule.opens_at);
+  const closesAt = parseHourToToday(schedule.closes_at);
 
-	return opensAt <= now && now <= closesAt;
+  return opensAt <= now && now <= closesAt;
 }

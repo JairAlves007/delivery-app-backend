@@ -1,120 +1,120 @@
 import { env } from "@/env.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import {
-	FileFormatType,
-	ForObjectResourceType
+  FileFormatType,
+  ForObjectResourceType,
 } from "@/generated/prisma/client.js";
 import {
-	type FileMimeType,
-	fileMimeTypeValues,
-	type ObjectResources,
-	type ResourceInfo,
-	type ResourceIntent,
-	type ResourceItem
+  type FileMimeType,
+  fileMimeTypeValues,
+  type ObjectResources,
+  type ResourceInfo,
+  type ResourceIntent,
+  type ResourceItem,
 } from "@/types/resource.js";
 
 export const mapMimeTypeToFileFormat = (
-	mimeType: FileMimeType
+  mimeType: FileMimeType,
 ): FileFormatType => {
-	switch (mimeType) {
-		case fileMimeTypeValues.PNG:
-			return FileFormatType.PNG;
-		case fileMimeTypeValues.JPG:
-			return FileFormatType.JPG;
-		case fileMimeTypeValues.JPEG:
-			return FileFormatType.JPEG;
-		default:
-			throw new Error(`MIME Type '${mimeType}' não suportado para conversão.`);
-	}
+  switch (mimeType) {
+    case fileMimeTypeValues.PNG:
+      return FileFormatType.PNG;
+    case fileMimeTypeValues.JPG:
+      return FileFormatType.JPG;
+    case fileMimeTypeValues.JPEG:
+      return FileFormatType.JPEG;
+    default:
+      throw new Error(`MIME Type '${mimeType}' não suportado para conversão.`);
+  }
 };
 
 export const mapObjectResourcesList = (
-	resources: ObjectResources[]
+  resources: ObjectResources[],
 ): ResourceItem => {
-	if (!resources) return {};
+  if (!resources) return {};
 
-	return resources.reduce((acc: ResourceItem, currentItem: ObjectResources) => {
-		const {
-			resource: { id, type, path, file_key }
-		} = currentItem;
+  return resources.reduce((acc: ResourceItem, currentItem: ObjectResources) => {
+    const {
+      resource: { id, type, path, file_key },
+    } = currentItem;
 
-		acc[type] = {
-			id,
-			path: env.PUBLIC_BUCKET_URL + `/${path}/${file_key}`,
-			fileKey: file_key
-		};
+    acc[type] = {
+      id,
+      path: env.PUBLIC_BUCKET_URL + `/${path}/${file_key}`,
+      fileKey: file_key,
+    };
 
-		return acc;
-	}, {});
+    return acc;
+  }, {});
 };
 
 export const getInfoByForResource = (
-	{ for: forResource, ...resource }: ResourceIntent,
-	objectId: string
+  { for: forResource, ...resource }: ResourceIntent,
+  objectId: string,
 ): ResourceInfo => {
-	const path = `${forResource.toLowerCase()}/${resource.type.toLowerCase()}`;
+  const path = `${forResource.toLowerCase()}/${resource.type.toLowerCase()}`;
 
-	switch (forResource) {
-		case ForObjectResourceType.ESTABLISHMENT:
-			return {
-				path,
-				attachData: {
-					establishmentResources: {
-						create: {
-							establishment_id: objectId
-						}
-					}
-				}
-			};
-		case ForObjectResourceType.PRODUCT:
-			return {
-				path,
-				attachData: {
-					productResources: {
-						create: {
-							product_id: objectId
-						}
-					}
-				}
-			};
-		case ForObjectResourceType.CATEGORY:
-			return {
-				path,
-				attachData: {
-					productCategoryResources: {
-						create: {
-							category_id: objectId
-						}
-					}
-				}
-			};
-		default:
-			return {
-				path,
-				attachData: {}
-			};
-	}
+  switch (forResource) {
+    case ForObjectResourceType.ESTABLISHMENT:
+      return {
+        path,
+        attachData: {
+          establishmentResources: {
+            create: {
+              establishment_id: objectId,
+            },
+          },
+        },
+      };
+    case ForObjectResourceType.PRODUCT:
+      return {
+        path,
+        attachData: {
+          productResources: {
+            create: {
+              product_id: objectId,
+            },
+          },
+        },
+      };
+    case ForObjectResourceType.CATEGORY:
+      return {
+        path,
+        attachData: {
+          productCategoryResources: {
+            create: {
+              category_id: objectId,
+            },
+          },
+        },
+      };
+    default:
+      return {
+        path,
+        attachData: {},
+      };
+  }
 };
 
 export const forgetCacheByForResource = async (
-	forResource: ForObjectResourceType
+  forResource: ForObjectResourceType,
 ): Promise<void> => {
-	if (!forResource) return;
+  if (!forResource) return;
 
-	const cache = makeCache();
-	let key = "";
+  const cache = makeCache();
+  let key = "";
 
-	switch (forResource) {
-		case ForObjectResourceType.ESTABLISHMENT:
-			key = cache.keys.establishments;
-			break;
-		case ForObjectResourceType.PRODUCT:
-			key = cache.keys.products;
-			break;
-		case ForObjectResourceType.CATEGORY:
-			key = cache.keys.productCategories;
-			break;
-	}
+  switch (forResource) {
+    case ForObjectResourceType.ESTABLISHMENT:
+      key = cache.keys.establishments;
+      break;
+    case ForObjectResourceType.PRODUCT:
+      key = cache.keys.products;
+      break;
+    case ForObjectResourceType.CATEGORY:
+      key = cache.keys.productCategories;
+      break;
+  }
 
-	await cache.forgetKeysContaining(key);
+  await cache.forgetKeysContaining(key);
 };

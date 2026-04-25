@@ -7,9 +7,9 @@ import { listAddonsRoute } from "./list-addons.route.js";
 import { updateAddonRoute } from "./update-addon.route.js";
 
 export const adminAddonRoutes = async (app: FastifyInstance) => {
-	app.register(listAddonsRoute);
-	app.register(findAddonRoute);
-	app.register(createAddonRoute);
-	app.register(updateAddonRoute);
-	app.register(deleteAddonRoute);
+  app.register(listAddonsRoute);
+  app.register(findAddonRoute);
+  app.register(createAddonRoute);
+  app.register(updateAddonRoute);
+  app.register(deleteAddonRoute);
 };

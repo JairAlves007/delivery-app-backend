@@ -4,17 +4,17 @@ import { cacheQueueName } from "@/queues/cache-queue.js";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 export const setupForgetAllListingCacheKeysWorker = async () => {
-	const cacheQueue = makeQueue<ForgetAllListingCacheKeysParams>(cacheQueueName);
+  const cacheQueue = makeQueue<ForgetAllListingCacheKeysParams>(cacheQueueName);
 
-	cacheQueue.registerProcessor(async payload => {
-		const cache = makeCache();
+  cacheQueue.registerProcessor(async (payload) => {
+    const cache = makeCache();
 
-		console.log("[Worker] Forgetting all listing cache keys...");
+    console.log("[Worker] Forgetting all listing cache keys...");
 
-		try {
-			await cache.forgetAllListingCacheKeys(payload);
-		} catch (error) {
-			console.log("[Worker] Error forgetting all listing cache keys:", error);
-		}
-	});
+    try {
+      await cache.forgetAllListingCacheKeys(payload);
+    } catch (error) {
+      console.log("[Worker] Error forgetting all listing cache keys:", error);
+    }
+  });
 };

@@ -1,5 +1,5 @@
 import { Cache } from "@/classes/cache.js";
 
 export const makeCache = () => {
-	return Cache.getInstance();
+  return Cache.getInstance();
 };
