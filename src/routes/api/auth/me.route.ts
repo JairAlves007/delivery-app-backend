@@ -46,7 +46,7 @@ export const meRoute = async (app: FastifyInstance) => {
 			const [user, establishmentData, menu] = await Promise.all([
 				findUserService.handle(userId),
 				findEstablishmentByIdService.handle({ id: establishmentId }),
-				menuService.handle(role, establishmentId)
+				menuService.handle(role)
 			]);
 
 			if (!user) {

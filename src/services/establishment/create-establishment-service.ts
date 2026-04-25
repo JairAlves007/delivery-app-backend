@@ -2,7 +2,7 @@ import z from "zod";
 
 import { slugify } from "@/helpers/utils.js";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
-import { createMenuForNewEstablishmentQueue } from "@/queues/establishment-queue.js";
+import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import { createEstablishmentBodySchema } from "@/schemas/establishment-schema.js";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
@@ -31,7 +31,7 @@ export class CreateEstablishmentService {
     paramsToForget,
     ...data
   }: CreateEstablishmentServiceParams): Promise<void> {
-    const establishment = await this.establishmentRepository.create({
+    await this.establishmentRepository.create({
       ...data,
       name,
       slug: slugify(name),
@@ -51,8 +51,8 @@ export class CreateEstablishmentService {
       },
     });
 
-    await createMenuForNewEstablishmentQueue({
-      establishmentId: establishment.id,
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "establishments",
       paramsToForget,
     });
   }

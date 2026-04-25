@@ -221,6 +221,28 @@ export const establishmentListResponseSchema = paginatedResponseSchema(
 );
 
 // ──────────────────────────────────────────────
+// Establishment Owner
+// ──────────────────────────────────────────────
+
+export const establishmentOwnerResponseSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+  created_at: dateStringSchema,
+  establishment: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      slug: z.string(),
+    })
+    .nullable(),
+});
+
+export const establishmentOwnerListResponseSchema = paginatedResponseSchema(
+  establishmentOwnerResponseSchema,
+);
+
+// ──────────────────────────────────────────────
 // Product Category
 // ──────────────────────────────────────────────
 
@@ -567,6 +589,14 @@ const registryItems = [
   { schema: districtListResponseSchema, id: "DistrictListResponse" },
   { schema: establishmentResponseSchema, id: "EstablishmentResponse" },
   { schema: establishmentListResponseSchema, id: "EstablishmentListResponse" },
+  {
+    schema: establishmentOwnerResponseSchema,
+    id: "EstablishmentOwnerResponse",
+  },
+  {
+    schema: establishmentOwnerListResponseSchema,
+    id: "EstablishmentOwnerListResponse",
+  },
   { schema: productCategoryResponseSchema, id: "ProductCategoryResponse" },
   {
     schema: productCategoryListResponseSchema,

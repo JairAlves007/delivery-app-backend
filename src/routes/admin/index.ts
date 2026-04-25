@@ -8,6 +8,7 @@ import { adminCouponRoutes } from "./coupon/index.js";
 import { adminDashboardRoutes } from "./dashboard/index.js";
 import { adminDistrictRoutes } from "./district/index.js";
 import { establishmentRoutes } from "./establishment/index.js";
+import { establishmentOwnerRoutes } from "./establishment-owner/index.js";
 import { adminOrderRoutes } from "./order/index.js";
 import { adminProductCategoryRoutes } from "./product/category/index.js";
 import { adminProductRoutes } from "./product/index.js";
@@ -20,6 +21,7 @@ export const adminRoutes = (app: FastifyInstance) => {
       api.register(adminAuthRoutes, { prefix: "/auth" });
       api.register(uploadRoutes, { prefix: "/upload" });
       api.register(establishmentRoutes, { prefix: "/establishment" });
+      api.register(establishmentOwnerRoutes, { prefix: "/establishment-owner" });
       api.register(adminProductRoutes, { prefix: "/products" });
       api.register(adminProductCategoryRoutes, { prefix: "/product/category" });
       api.register(adminDistrictRoutes, { prefix: "/district" });

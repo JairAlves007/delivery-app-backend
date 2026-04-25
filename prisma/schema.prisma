@@ -291,7 +291,6 @@ model Establishment {
   coupons                Coupon[]
   addonCategories        AddonCategory[]
   orders                 Order[]
-  menus                  Menu[]
   closures               Closure[]
   tags                   Tag[]
   address                EstablishmentAddress?
@@ -303,20 +302,17 @@ model Establishment {
 }
 
 model Menu {
-  id               Int           @id @default(autoincrement())
-  label            String        @db.VarChar(255)
-  slug             String        @db.VarChar(255)
-  order            Int
-  view_type        ViewType?
-  submenus         SubMenu[]
-  for_role         RoleType
-  establishment_id String
-  created_at       DateTime      @default(now()) @db.Timestamptz
-  updated_at       DateTime      @updatedAt @db.Timestamptz
-  establishment    Establishment @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id         Int       @id @default(autoincrement())
+  label      String    @db.VarChar(255)
+  slug       String    @db.VarChar(255)
+  order      Int
+  view_type  ViewType?
+  submenus   SubMenu[]
+  for_role   RoleType
+  created_at DateTime  @default(now()) @db.Timestamptz
+  updated_at DateTime  @updatedAt @db.Timestamptz
 
-  @@unique([establishment_id, slug, for_role])
-  @@index([establishment_id], name: "idx_menus_establishment_id")
+  @@unique([slug, for_role])
   @@map("menus")
 }
 
