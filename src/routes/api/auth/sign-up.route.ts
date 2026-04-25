@@ -71,7 +71,8 @@ export const signUpRoute = async (app: FastifyInstance) => {
 					type: Constants.TOKEN_TYPE,
 					expiresIn: Constants.ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
 					token,
-					refreshToken
+					refreshToken,
+					refreshTokenExpiresIn: Constants.REFRESH_TOKEN_EXPIRATION_IN_SECONDS
 				})
 			);
 		}

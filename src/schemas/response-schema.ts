@@ -484,6 +484,7 @@ export const signInCustomerResponseSchema = z.object({
   expiresIn: z.number(),
   token: z.string(),
   refreshToken: z.string(),
+  refreshTokenExpiresIn: z.number(),
 });
 
 export const signInAdminResponseSchema = signInCustomerResponseSchema;
