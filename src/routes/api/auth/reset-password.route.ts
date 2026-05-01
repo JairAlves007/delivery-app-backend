@@ -5,6 +5,7 @@ import { z } from "zod";
 import { makeResetPasswordService } from "@/factories/services/auth/make-reset-password-service.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { customerTags } from "@/http/swagger-tags.js";
 import {
   apiDefaultErrorResponseSchema,
   apiSuccessResponseSchema,
@@ -18,7 +19,7 @@ export const resetPasswordRoute = async (app: FastifyInstance) => {
     {
       schema: {
         operationId: "resetPassword",
-        tags: ["Auth"],
+        tags: customerTags("Auth"),
         summary: "Redefinir senha com token",
         body: resetPasswordBodySchema,
         response: {

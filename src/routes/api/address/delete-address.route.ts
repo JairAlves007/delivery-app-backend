@@ -6,6 +6,7 @@ import { makeDeleteAddressService } from "@/factories/services/address/make-dele
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { customerTags } from "@/http/swagger-tags.js";
 import { ensureIsResourceOwner } from "@/middlewares/ensure-is-resource-owner.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
@@ -22,7 +23,7 @@ export const deleteAddressRoute = async (app: FastifyInstance) => {
     {
       schema: {
         operationId: "deleteAddress",
-        tags: ["Addresses"],
+        tags: customerTags("Addresses"),
         summary: "Deletar um endereço",
         params: addressParamsSchema,
         response: {

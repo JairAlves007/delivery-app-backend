@@ -6,6 +6,7 @@ import { makeCreateAddressService } from "@/factories/services/address/make-crea
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { customerTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import { createAddressBodySchema } from "@/schemas/address-schema.js";
@@ -22,7 +23,7 @@ export const createAddressRoute = async (app: FastifyInstance) => {
     {
       schema: {
         operationId: "createAddress",
-        tags: ["Addresses"],
+        tags: customerTags("Addresses"),
         summary: "Criar um novo endereço",
         body: createAddressBodySchema,
         response: {

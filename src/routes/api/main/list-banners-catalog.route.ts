@@ -5,6 +5,7 @@ import { makeListBannerService } from "@/factories/services/banner/make-list-ban
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { customerTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
@@ -20,7 +21,7 @@ export const listBannersCatalogRoute = async (app: FastifyInstance) => {
     {
       schema: {
         operationId: "listBannersCatalog",
-        tags: ["Main (Home)"],
+        tags: customerTags("Main (Home)"),
         summary: "Listar banners na home",
         response: {
           200: apiSuccessResponseSchema(bannerListResponseSchema),

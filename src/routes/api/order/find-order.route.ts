@@ -5,6 +5,7 @@ import { makeFindOrderService } from "@/factories/services/order/make-find-order
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { customerTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
@@ -26,7 +27,7 @@ export const findOrderRoute = async (app: FastifyInstance) => {
     {
       schema: {
         operationId: "findMyOrder",
-        tags: ["Orders"],
+        tags: customerTags("Orders"),
         summary: "Buscar pedido pelo ID (Customer)",
         params: orderParamsSchema,
         response: {

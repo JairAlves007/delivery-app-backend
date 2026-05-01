@@ -7,6 +7,7 @@ import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { getUserEstablishmentId } from "@/helpers/get-user-establishment-id.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { customerTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
@@ -23,7 +24,7 @@ export const cancelOrderRoute = async (app: FastifyInstance) => {
     {
       schema: {
         operationId: "cancelOrder",
-        tags: ["Orders"],
+        tags: customerTags("Orders"),
         summary: "Cancelar pedido do cliente",
         params: orderParamsSchema,
         response: {

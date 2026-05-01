@@ -5,6 +5,7 @@ import { makeListMyOrdersService } from "@/factories/services/order/make-list-my
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { customerTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
@@ -25,7 +26,7 @@ export const myOrdersRoute = async (app: FastifyInstance) => {
 		{
 			schema: {
 				operationId: "myOrders",
-				tags: ["Orders"],
+				tags: customerTags("Orders"),
 				summary: "Listar meus pedidos",
 				params: establishmentParamsSchema,
 				querystring: listCursorQueryParamsSchema,

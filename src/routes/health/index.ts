@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 
 import { ApiResponse } from "@/helpers/api.js";
+import { sharedTags } from "@/http/swagger-tags.js";
 import {
   apiDefaultErrorResponseSchema,
   apiSuccessResponseSchema,
@@ -14,7 +15,7 @@ export const healthRoutes = async (app: FastifyInstance) => {
     {
       schema: {
         operationId: "healthPing",
-        tags: ["Health"],
+        tags: sharedTags("Health"),
         summary: "Verificar integridade da API",
         response: {
           200: apiSuccessResponseSchema(healthResponseSchema),

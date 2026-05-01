@@ -9,6 +9,7 @@ import { ApiResponse } from "@/helpers/api.js";
 import { isEstablishmentOpen } from "@/helpers/establishment.js";
 import { getUserEstablishmentId } from "@/helpers/get-user-establishment-id.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { sharedTags } from "@/http/swagger-tags.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
 	apiDefaultErrorResponseSchema,
@@ -23,7 +24,7 @@ export const meRoute = async (app: FastifyInstance) => {
 		{
 			schema: {
 				operationId: "me",
-				tags: ["Auth"],
+				tags: sharedTags("Auth"),
 				summary: "Retorna usuário, estabelecimento ativo e menu",
 				response: {
 					200: apiSuccessResponseSchema(meResponseSchema),

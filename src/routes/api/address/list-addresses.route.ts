@@ -5,6 +5,7 @@ import { makeListAddressService } from "@/factories/services/address/make-list-a
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { customerTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
@@ -24,7 +25,7 @@ export const listAddressesRoute = async (app: FastifyInstance) => {
     {
       schema: {
         operationId: "listAddresses",
-        tags: ["Addresses"],
+        tags: customerTags("Addresses"),
         summary: "Listar endereços",
         querystring: listCursorQueryParamsSchema,
         response: {

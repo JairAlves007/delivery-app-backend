@@ -7,6 +7,7 @@ import { RoleType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import Constants from "@/helpers/constants.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { adminTags } from "@/http/swagger-tags.js";
 import {
 	apiDefaultErrorResponseSchema,
 	apiSuccessResponseSchema,
@@ -21,7 +22,7 @@ export const signInRoute = async (app: FastifyInstance) => {
 		{
 			schema: {
 				operationId: "adminSignIn",
-				tags: ["Admin Auth"],
+				tags: adminTags("Admin Auth"),
 				summary: "Autenticar administrador",
 				body: signInBodySchema,
 				response: {

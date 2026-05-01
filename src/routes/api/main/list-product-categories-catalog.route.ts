@@ -5,6 +5,7 @@ import { makeListProductCategoriesCatalogService } from "@/factories/services/pr
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { customerTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
@@ -23,7 +24,7 @@ export const listProductCategoriesCatalogRoute = async (
     {
       schema: {
         operationId: "listProductCategoriesCatalog",
-        tags: ["Main (Home)"],
+        tags: customerTags("Main (Home)"),
         summary: "Listar categorias de produtos na home",
         querystring: listCursorQueryParamsSchema,
         response: {

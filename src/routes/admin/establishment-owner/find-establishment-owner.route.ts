@@ -5,6 +5,7 @@ import { makeFindEstablishmentOwnerService } from "@/factories/services/establis
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { adminTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
@@ -21,7 +22,7 @@ export const findEstablishmentOwnerRoute = async (app: FastifyInstance) => {
 		{
 			schema: {
 				operationId: "findEstablishmentOwner",
-				tags: ["Establishment Owners"],
+				tags: adminTags("Establishment Owners"),
 				summary: "Encontrar dono de estabelecimento pelo ID",
 				params: establishmentOwnerParamsSchema,
 				response: {

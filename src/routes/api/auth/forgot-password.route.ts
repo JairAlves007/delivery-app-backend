@@ -5,6 +5,7 @@ import { z } from "zod";
 import { makeForgotPasswordService } from "@/factories/services/auth/make-forgot-password-service.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { customerTags } from "@/http/swagger-tags.js";
 import {
   apiDefaultErrorResponseSchema,
   apiSuccessResponseSchema,
@@ -18,7 +19,7 @@ export const forgotPasswordRoute = async (app: FastifyInstance) => {
     {
       schema: {
         operationId: "forgotPassword",
-        tags: ["Auth"],
+        tags: customerTags("Auth"),
         summary: "Solicitar redefinição de senha",
         body: forgotPasswordBodySchema,
         response: {

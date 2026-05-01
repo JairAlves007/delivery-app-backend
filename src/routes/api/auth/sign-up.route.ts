@@ -8,6 +8,7 @@ import { RoleType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import Constants from "@/helpers/constants.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { customerTags } from "@/http/swagger-tags.js";
 import {
 	apiDefaultErrorResponseSchema,
 	apiSuccessResponseSchema,
@@ -22,7 +23,7 @@ export const signUpRoute = async (app: FastifyInstance) => {
 		{
 			schema: {
 				operationId: "signUp",
-				tags: ["Auth"],
+				tags: customerTags("Auth"),
 				summary: "Registrar um novo usuário",
 				body: signUpBodySchema,
 				response: {

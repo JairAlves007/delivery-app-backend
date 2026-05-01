@@ -6,6 +6,7 @@ import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { getUserEstablishmentId } from "@/helpers/get-user-establishment-id.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { customerTags } from "@/http/swagger-tags.js";
 import { ensureIsResourceOwner } from "@/middlewares/ensure-is-resource-owner.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
@@ -23,7 +24,7 @@ export const findAddressRoute = async (app: FastifyInstance) => {
     {
       schema: {
         operationId: "findAddress",
-        tags: ["Addresses"],
+        tags: customerTags("Addresses"),
         summary: "Encontrar um endereço",
         params: addressParamsSchema,
         response: {

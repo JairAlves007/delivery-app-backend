@@ -5,6 +5,7 @@ import { z } from "zod";
 import { makeRefreshTokenService } from "@/factories/services/auth/make-refresh-token-service.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { sharedTags } from "@/http/swagger-tags.js";
 import {
   apiDefaultErrorResponseSchema,
   apiSuccessResponseSchema,
@@ -18,7 +19,7 @@ export const logoutRoute = async (app: FastifyInstance) => {
     {
       schema: {
         operationId: "logout",
-        tags: ["Auth"],
+        tags: sharedTags("Auth"),
         summary: "Invalidar refresh token (logout)",
         body: refreshTokenBodySchema,
         response: {

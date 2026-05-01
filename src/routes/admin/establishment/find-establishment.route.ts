@@ -5,6 +5,7 @@ import { makeFindEstablishmentByIdService } from "@/factories/services/establish
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { adminTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
@@ -21,7 +22,7 @@ export const findEstablishmentRoute = async (app: FastifyInstance) => {
     {
       schema: {
         operationId: "findEstablishment",
-        tags: ["Establishments"],
+        tags: adminTags("Establishments"),
         summary: "Encontrar estabelecimento pelo ID",
         params: establishmentParamsSchema,
         response: {

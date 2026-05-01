@@ -6,6 +6,7 @@ import { RoleType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { getUserEstablishmentId } from "@/helpers/get-user-establishment-id.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { customerTags } from "@/http/swagger-tags.js";
 import { ensureUserHasRoles } from "@/middlewares/ensure-user-has-roles.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
@@ -23,7 +24,7 @@ export const checkCouponRoute = async (app: FastifyInstance) => {
 		{
 			schema: {
 				operationId: "checkCoupon",
-				tags: ["Coupons"],
+				tags: customerTags("Coupons"),
 				summary: "Checar validade de um cupom",
 				body: checkCouponBodySchema,
 				response: {

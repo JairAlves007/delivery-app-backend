@@ -6,6 +6,7 @@ import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { getUserEstablishmentId } from "@/helpers/get-user-establishment-id.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { adminTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
@@ -22,7 +23,7 @@ export const listDistrictsRoute = async (app: FastifyInstance) => {
     {
       schema: {
         operationId: "listDistricts",
-        tags: ["Districts"],
+        tags: adminTags("Districts"),
         summary: "Listar bairros",
         querystring: listQueryParamsSchema,
         response: {

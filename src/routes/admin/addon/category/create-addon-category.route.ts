@@ -7,6 +7,7 @@ import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { getUserEstablishmentId } from "@/helpers/get-user-establishment-id.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { adminTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import { createAddonCategoryBodySchema } from "@/schemas/addon-category-schema.js";
@@ -22,7 +23,7 @@ export const createAddonCategoryRoute = async (app: FastifyInstance) => {
     {
       schema: {
         operationId: "createAddonCategory",
-        tags: ["Addon Categories"],
+        tags: adminTags("Addon Categories"),
         summary: "Criar categoria de adicionais",
         body: createAddonCategoryBodySchema,
         response: {

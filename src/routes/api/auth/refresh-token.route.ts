@@ -5,6 +5,7 @@ import { makeRefreshTokenService } from "@/factories/services/auth/make-refresh-
 import { ApiResponse } from "@/helpers/api.js";
 import Constants from "@/helpers/constants.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { sharedTags } from "@/http/swagger-tags.js";
 import {
 	apiDefaultErrorResponseSchema,
 	apiSuccessResponseSchema,
@@ -19,7 +20,7 @@ export const refreshTokenRoute = async (app: FastifyInstance) => {
 		{
 			schema: {
 				operationId: "refreshToken",
-				tags: ["Auth"],
+				tags: sharedTags("Auth"),
 				summary: "Renovar token de acesso",
 				body: refreshTokenBodySchema,
 				response: {
