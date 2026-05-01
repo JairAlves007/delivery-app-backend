@@ -14,7 +14,6 @@ import {
 	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
 import {
-	establishmentParamsSchema,
 	listCursorQueryParamsSchema,
 	userIdSchema
 } from "@/schemas/generic-schema.js";
@@ -28,7 +27,6 @@ export const myOrdersRoute = async (app: FastifyInstance) => {
 				operationId: "myOrders",
 				tags: customerTags("Orders"),
 				summary: "Listar meus pedidos",
-				params: establishmentParamsSchema,
 				querystring: listCursorQueryParamsSchema,
 				response: {
 					200: apiSuccessResponseSchema(myOrdersResponseSchema),
@@ -45,7 +43,7 @@ export const myOrdersRoute = async (app: FastifyInstance) => {
 		},
 		async (request, reply) => {
 			const query = request.query;
-			const { establishmentId } = request.params;
+			const establishmentId = request.user.activeTenantId;
 			const userId = userIdSchema.parse(request.user.sub);
 
 			const listMyOrdersService = makeListMyOrdersService();
