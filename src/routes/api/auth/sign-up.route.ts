@@ -1,6 +1,5 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { z } from "zod";
 
 import { makeRefreshTokenService } from "@/factories/services/auth/make-refresh-token-service.js";
 import { makeSignUpService } from "@/factories/services/auth/make-sign-up-service.js";
@@ -27,9 +26,7 @@ export const signUpRoute = async (app: FastifyInstance) => {
 				summary: "Registrar um novo usuário",
 				body: signUpBodySchema,
 				response: {
-					201: apiSuccessResponseSchema(
-						signUpTokenResponseSchema.or(z.object({}))
-					),
+					201: apiSuccessResponseSchema(signUpTokenResponseSchema),
 					409: apiDefaultErrorResponseSchema,
 					422: apiValidationErrorResponseSchema,
 					500: apiDefaultErrorResponseSchema
@@ -45,12 +42,6 @@ export const signUpRoute = async (app: FastifyInstance) => {
 				...body,
 				role: RoleType.CUSTOMER
 			});
-
-			if (request.user?.role === RoleType.ADMIN) {
-				return reply
-					.status(HTTPStatusCodes.CREATED)
-					.send(ApiResponse.success("Usuário registrado com sucesso", {}));
-			}
 
 			const token = await reply.jwtSign(
 				{
