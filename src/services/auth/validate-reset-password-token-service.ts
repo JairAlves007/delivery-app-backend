@@ -1,27 +1,16 @@
-import { InvalidToken } from "@/errors/user/password/invalid-token-error.js";
 import type { IPasswordResetTokenRepository } from "@/interfaces/repositories/password-reset-token-repository.js";
 
-type ResetPasswordServiceParams = {
-  token: string;
-  newPassword: string;
-};
-
-export class ResetPasswordService {
+export class ValidateResetPasswordTokenService {
   private passwordResetTokenRepository: IPasswordResetTokenRepository;
 
   constructor(passwordResetTokenRepository: IPasswordResetTokenRepository) {
     this.passwordResetTokenRepository = passwordResetTokenRepository;
   }
 
-  async handle({ token, newPassword }: ResetPasswordServiceParams) {
+  async handle(token: string): Promise<{ valid: boolean }> {
     const passwordResetToken =
       await this.passwordResetTokenRepository.findByToken(token);
 
-    if (!passwordResetToken) throw new InvalidToken();
-
-    await this.passwordResetTokenRepository.resetPassword({
-      passwordResetToken,
-      newPassword,
-    });
+    return { valid: passwordResetToken !== null };
   }
 }

@@ -24,9 +24,15 @@ export const forgotPasswordRoute = async (app: FastifyInstance) => {
         body: forgotPasswordBodySchema,
         response: {
           200: apiSuccessResponseSchema(z.object({})),
-          404: apiDefaultErrorResponseSchema,
           422: apiValidationErrorResponseSchema,
+          429: apiDefaultErrorResponseSchema,
           500: apiDefaultErrorResponseSchema,
+        },
+      },
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: "15 minutes",
         },
       },
     },

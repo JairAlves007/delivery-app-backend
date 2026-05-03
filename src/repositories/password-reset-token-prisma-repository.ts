@@ -2,11 +2,14 @@ import { compare, hash } from "bcrypt-ts";
 
 import type { PasswordResetToken, Prisma } from "@/generated/prisma/client.js";
 import Constants from "@/helpers/constants.js";
+import { computeLookupHash } from "@/helpers/token.js";
 import type { IPasswordResetTokenRepository } from "@/interfaces/repositories/password-reset-token-repository.js";
 import prisma from "@/lib/prisma.js";
 import type { ResetPasswordParams } from "@/types/user.js";
 
-export class PasswordResetTokenPrismaRepository implements IPasswordResetTokenRepository {
+export class PasswordResetTokenPrismaRepository
+  implements IPasswordResetTokenRepository
+{
   async create(
     data: Prisma.PasswordResetTokenCreateInput,
   ): Promise<PasswordResetToken> {
@@ -14,22 +17,34 @@ export class PasswordResetTokenPrismaRepository implements IPasswordResetTokenRe
   }
 
   async findByToken(token: string): Promise<PasswordResetToken | null> {
-    const tokens = await prisma.passwordResetToken.findMany({
-      where: {
-        used_at: null,
-        expires_at: { gt: new Date() },
-      },
+    const lookupHash = computeLookupHash(token);
+
+    const candidate = await prisma.passwordResetToken.findUnique({
+      where: { lookup_hash: lookupHash },
     });
 
-    for (const t of tokens) {
-      const tokenIsValid = await compare(token, t.token_hash);
+    if (!candidate) return null;
 
-      if (tokenIsValid) {
-        return t;
-      }
-    }
+    if (candidate.used_at !== null) return null;
+    if (candidate.expires_at <= new Date()) return null;
 
-    return null;
+    const tokenIsValid = await compare(token, candidate.token_hash);
+
+    if (!tokenIsValid) return null;
+
+    return candidate;
+  }
+
+  async invalidatePreviousByUserId(userId: string): Promise<void> {
+    await prisma.passwordResetToken.updateMany({
+      where: {
+        user_id: userId,
+        used_at: null,
+      },
+      data: {
+        used_at: new Date(),
+      },
+    });
   }
 
   async resetPassword({
@@ -39,29 +54,31 @@ export class PasswordResetTokenPrismaRepository implements IPasswordResetTokenRe
     await prisma.$transaction(async (tx) => {
       const { id, user_id: userId } = passwordResetToken;
 
-      await tx.passwordResetToken.deleteMany({
+      await tx.passwordResetToken.updateMany({
         where: {
           user_id: userId,
-          OR: [{ expires_at: { lt: new Date() } }, { used_at: { not: null } }],
-        },
-      });
-
-      await tx.passwordResetToken.update({
-        where: {
-          id,
+          used_at: null,
         },
         data: {
           used_at: new Date(),
         },
       });
 
+      await tx.passwordResetToken.update({
+        where: { id },
+        data: { used_at: new Date() },
+      });
+
       await tx.user.update({
-        where: {
-          id: userId,
-        },
+        where: { id: userId },
         data: {
           password: await hash(newPassword, Constants.HASH_SALT_LENGTH),
         },
+      });
+
+      await tx.refreshToken.updateMany({
+        where: { user_id: userId, revoked_at: null },
+        data: { revoked_at: new Date() },
       });
     });
   }

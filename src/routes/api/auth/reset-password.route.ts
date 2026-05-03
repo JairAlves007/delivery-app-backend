@@ -26,7 +26,14 @@ export const resetPasswordRoute = async (app: FastifyInstance) => {
           200: apiSuccessResponseSchema(z.object({})),
           401: apiDefaultErrorResponseSchema,
           422: apiValidationErrorResponseSchema,
+          429: apiDefaultErrorResponseSchema,
           500: apiDefaultErrorResponseSchema,
+        },
+      },
+      config: {
+        rateLimit: {
+          max: 10,
+          timeWindow: "15 minutes",
         },
       },
     },

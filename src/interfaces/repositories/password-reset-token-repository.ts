@@ -6,5 +6,6 @@ export interface IPasswordResetTokenRepository {
     data: Prisma.PasswordResetTokenCreateInput,
   ): Promise<PasswordResetToken>;
   findByToken(token: string): Promise<PasswordResetToken | null>;
+  invalidatePreviousByUserId(userId: string): Promise<void>;
   resetPassword(params: ResetPasswordParams): Promise<void>;
 }
