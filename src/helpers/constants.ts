@@ -45,7 +45,8 @@ export default class Constants {
 		addresses: "addresses",
 		resourceRules: "resource_rules",
 		orders: "orders",
-		dashboard: "dashboard"
+		dashboard: "dashboard",
+		favorites: "favorites"
 	};
 
 	/** Cache TTL em segundos, por domínio */
@@ -54,6 +55,8 @@ export default class Constants {
 		dashboard: 60,
 		/** Pedidos mudam de status frequentemente — 2 min */
 		orders: 60 * 2,
+		/** Favoritos do usuário — 5 min */
+		favorites: 60 * 5,
 		/** Cupons podem expirar ou atingir limite de uso — 5 min */
 		coupons: 60 * 5,
 		/** Dados de usuário mudam moderadamente — 10 min */

@@ -298,6 +298,9 @@ export const productListResponseSchema = paginatedResponseSchema(
 	productResponseSchema
 );
 
+export const myFavoritesResponseSchema =
+	cursorPaginatedResponseSchema(productResponseSchema);
+
 // ──────────────────────────────────────────────
 // Order
 // ──────────────────────────────────────────────
@@ -415,6 +418,12 @@ const dashboardTopCustomerSchema = z.object({
 	spent: z.number()
 });
 
+const dashboardTopFavoritedProductSchema = z.object({
+	productId: z.string(),
+	name: z.string(),
+	favorites: z.number()
+});
+
 const dashboardCouponUsageSchema = z.object({
 	code: z.string(),
 	ordersWithCoupon: z.number(),
@@ -437,6 +446,7 @@ export const dashboardResponseSchema = z.object({
 	topProducts: z.array(dashboardTopProductSchema),
 	topCategories: z.array(dashboardTopCategorySchema),
 	topCustomers: z.array(dashboardTopCustomerSchema),
+	topFavoritedProducts: z.array(dashboardTopFavoritedProductSchema),
 	couponsUsage: z.array(dashboardCouponUsageSchema)
 });
 
@@ -622,6 +632,7 @@ const registryItems = [
 	},
 	{ schema: productResponseSchema, id: "ProductResponse" },
 	{ schema: productListResponseSchema, id: "ProductListResponse" },
+	{ schema: myFavoritesResponseSchema, id: "MyFavoritesResponse" },
 	{ schema: tagResponseSchema, id: "TagResponse" },
 	{ schema: tagDetailResponseSchema, id: "TagDetailResponse" },
 	{ schema: tagListResponseSchema, id: "TagListResponse" },

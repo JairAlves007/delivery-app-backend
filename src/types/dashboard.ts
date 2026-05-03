@@ -84,6 +84,12 @@ export type DashboardTopCustomerRow = {
   spent: number;
 };
 
+export type DashboardTopFavoritedProductRow = {
+  productId: string;
+  name: string;
+  favorites: number;
+};
+
 export type DashboardCouponUsageRow = {
   code: string;
   ordersWithCoupon: number;
@@ -106,5 +112,6 @@ export type DashboardResponse = {
   topProducts: DashboardTopProductRow[];
   topCategories: DashboardTopCategoryRow[];
   topCustomers: DashboardTopCustomerRow[];
+  topFavoritedProducts: DashboardTopFavoritedProductRow[];
   couponsUsage: DashboardCouponUsageRow[];
 };

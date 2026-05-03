@@ -19,6 +19,7 @@ import type {
   DashboardSummaryRow,
   DashboardTopCategoryRow,
   DashboardTopCustomerRow,
+  DashboardTopFavoritedProductRow,
   DashboardTopNInput,
   DashboardTopProductRow,
 } from "@/types/dashboard.js";
@@ -538,6 +539,41 @@ export class DashboardPrismaRepository implements IDashboardRepository {
       code: row.code,
       ordersWithCoupon: row.orders_with_coupon,
       discountTotal: row.discount_total,
+    }));
+  }
+
+  async getTopFavoritedProducts({
+    establishmentId,
+    from,
+    to,
+    limit,
+  }: DashboardTopNInput): Promise<DashboardTopFavoritedProductRow[]> {
+    const rows = await prisma.$queryRaw<
+      {
+        product_id: string;
+        name: string;
+        favorites: number;
+      }[]
+    >`
+			SELECT
+				p.id AS product_id,
+				p.name AS name,
+				COUNT(f.id)::int AS favorites
+			FROM favorites f
+			JOIN products p ON p.id = f.product_id
+			WHERE p.deleted_at IS NULL
+				AND p.establishment_id = ${establishmentId}
+				AND f.created_at >= ${from}
+				AND f.created_at <  ${to}
+			GROUP BY p.id, p.name
+			ORDER BY favorites DESC, p.name ASC
+			LIMIT ${limit};
+		`;
+
+    return rows.map((row) => ({
+      productId: row.product_id,
+      name: row.name,
+      favorites: row.favorites,
     }));
   }
 }
