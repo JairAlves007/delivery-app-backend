@@ -5,43 +5,44 @@ import type { IProductCategoryRepository } from "@/interfaces/repositories/produ
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import { createProductCategoryBodySchema } from "@/schemas/product-category-schema.js";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
+import type { EstablishmentID } from "@/types/establishment.js";
 
 type CreateProductCategoryServiceRequest = z.infer<
-  typeof createProductCategoryBodySchema
+	typeof createProductCategoryBodySchema
 > &
-  Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> & {
-    establishmentId: string;
-  };
+	Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> & {
+		establishmentId: EstablishmentID;
+	};
 
 export class CreateProductCategoryService {
-  private productCategoryRepository: IProductCategoryRepository;
+	private productCategoryRepository: IProductCategoryRepository;
 
-  constructor(productCategoryRepository: IProductCategoryRepository) {
-    this.productCategoryRepository = productCategoryRepository;
-  }
+	constructor(productCategoryRepository: IProductCategoryRepository) {
+		this.productCategoryRepository = productCategoryRepository;
+	}
 
-  async handle({
-    establishmentId,
-    bannerIds,
-    paramsToForget,
-    ...data
-  }: CreateProductCategoryServiceRequest) {
-    await this.productCategoryRepository.create({
-      ...data,
-      slug: slugify(data.name),
-      establishment: {
-        connect: {
-          id: establishmentId,
-        },
-      },
-      banners: {
-        connect: bannerIds?.map((bannerId) => ({ id: bannerId })),
-      },
-    });
+	async handle({
+		establishmentId,
+		bannerIds,
+		paramsToForget,
+		...data
+	}: CreateProductCategoryServiceRequest) {
+		await this.productCategoryRepository.create({
+			...data,
+			slug: slugify(data.name),
+			establishment: {
+				connect: {
+					id: establishmentId
+				}
+			},
+			banners: {
+				connect: bannerIds?.map(bannerId => ({ id: bannerId }))
+			}
+		});
 
-    await forgetAllListingCacheKeysQueue({
-      baseCacheKey: "productCategories",
-      paramsToForget,
-    });
-  }
+		await forgetAllListingCacheKeysQueue({
+			baseCacheKey: "productCategories",
+			paramsToForget
+		});
+	}
 }

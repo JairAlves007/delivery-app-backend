@@ -5,7 +5,7 @@ import { makeFindUserService } from "@/factories/services/user/make-find-user-se
 import { RoleType } from "@/generated/prisma/browser.js";
 import Constants from "@/helpers/constants.js";
 import type { IRefreshTokenRepository } from "@/interfaces/repositories/refresh-token-repository.js";
-import { UserID } from "@/types/user.js";
+import type { UserID } from "@/types/user.js";
 
 interface RefreshTokenPayload {
 	userId: UserID;
@@ -77,7 +77,7 @@ export class RefreshTokenService {
 		await this.refreshTokenRepository.revoke(refreshToken.id);
 	}
 
-	async revokeAll(userId: string): Promise<void> {
+	async revokeAll(userId: UserID): Promise<void> {
 		await this.refreshTokenRepository.revokeAllByUserId(userId);
 	}
 }

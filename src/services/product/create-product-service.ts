@@ -5,61 +5,62 @@ import type { IProductRepository } from "@/interfaces/repositories/product-repos
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import { createProductBodySchema } from "@/schemas/product-schema.js";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
+import type { EstablishmentID } from "@/types/establishment.js";
 
 type CreateProductServiceRequest = z.infer<typeof createProductBodySchema> &
-  Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> & {
-    establishmentId: string;
-  };
+	Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> & {
+		establishmentId: EstablishmentID;
+	};
 
 export class CreateProductService {
-  private productRepository: IProductRepository;
+	private productRepository: IProductRepository;
 
-  constructor(productRepository: IProductRepository) {
-    this.productRepository = productRepository;
-  }
+	constructor(productRepository: IProductRepository) {
+		this.productRepository = productRepository;
+	}
 
-  async handle({
-    establishmentId,
-    categoryId,
-    bannerIds,
-    tagIds,
-    discountPercentage: discount_percentage,
-    validUntil: valid_until,
-    paramsToForget,
-    ...data
-  }: CreateProductServiceRequest): Promise<void> {
-    const banners = bannerIds
-      ? {
-          connect: bannerIds.map((bannerId) => ({ id: bannerId })),
-        }
-      : undefined;
+	async handle({
+		establishmentId,
+		categoryId,
+		bannerIds,
+		tagIds,
+		discountPercentage: discount_percentage,
+		validUntil: valid_until,
+		paramsToForget,
+		...data
+	}: CreateProductServiceRequest): Promise<void> {
+		const banners = bannerIds
+			? {
+					connect: bannerIds.map(bannerId => ({ id: bannerId }))
+				}
+			: undefined;
 
-    await this.productRepository.create({
-      ...data,
-      slug: slugify(data.name),
-      discount_percentage,
-      valid_until,
-      establishment: {
-        connect: {
-          id: establishmentId,
-        },
-      },
-      category: {
-        connect: {
-          id: categoryId,
-        },
-      },
-      banners,
-      tags: {
-        create: tagIds.map((tagId) => ({
-          tag: { connect: { id: tagId } },
-        })),
-      },
-    });
+		await this.productRepository.create({
+			...data,
+			slug: slugify(data.name),
+			discount_percentage,
+			valid_until,
+			establishment: {
+				connect: {
+					id: establishmentId
+				}
+			},
+			category: {
+				connect: {
+					id: categoryId
+				}
+			},
+			banners,
+			tags: {
+				create: tagIds.map(tagId => ({
+					tag: { connect: { id: tagId } }
+				}))
+			}
+		});
 
-    await forgetAllListingCacheKeysQueue({
-      baseCacheKey: "products",
-      paramsToForget,
-    });
-  }
+		await forgetAllListingCacheKeysQueue({
+			baseCacheKey: "products",
+			paramsToForget
+		});
+	}
 }

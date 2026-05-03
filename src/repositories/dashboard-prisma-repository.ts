@@ -1,64 +1,65 @@
 import {
-  type DeliveryType,
-  type OrderStatusType,
-  type PaymentMethodType,
-  Prisma,
+	type DeliveryType,
+	type OrderStatusType,
+	type PaymentMethodType,
+	Prisma
 } from "@/generated/prisma/client.js";
 import Constants from "@/helpers/constants.js";
 import type { IDashboardRepository } from "@/interfaces/repositories/dashboard-repository.js";
 import prisma from "@/lib/prisma.js";
 import type {
-  DashboardBucketRow,
-  DashboardCouponUsageRow,
-  DashboardDeliveryTypeRow,
-  DashboardGranularity,
-  DashboardOrdersOverTimeInput,
-  DashboardPaymentMethodRow,
-  DashboardRepositoryInput,
-  DashboardStatusRow,
-  DashboardSummaryRow,
-  DashboardTopCategoryRow,
-  DashboardTopCustomerRow,
-  DashboardTopFavoritedProductRow,
-  DashboardTopNInput,
-  DashboardTopProductRow,
+	DashboardBucketRow,
+	DashboardCouponUsageRow,
+	DashboardDeliveryTypeRow,
+	DashboardGranularity,
+	DashboardOrdersOverTimeInput,
+	DashboardPaymentMethodRow,
+	DashboardRepositoryInput,
+	DashboardStatusRow,
+	DashboardSummaryRow,
+	DashboardTopCategoryRow,
+	DashboardTopCustomerRow,
+	DashboardTopFavoritedProductRow,
+	DashboardTopNInput,
+	DashboardTopProductRow
 } from "@/types/dashboard.js";
+import type { EstablishmentID } from "@/types/establishment.js";
 
-const buildEstablishmentFilter = (establishmentId: string) =>
-  Prisma.sql`AND o.establishment_id = ${establishmentId}`;
+const buildEstablishmentFilter = (establishmentId: EstablishmentID) =>
+	Prisma.sql`AND o.establishment_id = ${establishmentId}`;
 
 const granularityToSql = (granularity: DashboardGranularity) => {
-  switch (granularity) {
-    case "week":
-      return Prisma.sql`'week'`;
-    case "month":
-      return Prisma.sql`'month'`;
-    default:
-      return Prisma.sql`'day'`;
-  }
+	switch (granularity) {
+		case "week":
+			return Prisma.sql`'week'`;
+		case "month":
+			return Prisma.sql`'month'`;
+		default:
+			return Prisma.sql`'day'`;
+	}
 };
 
 export class DashboardPrismaRepository implements IDashboardRepository {
-  async getSummary({
-    establishmentId,
-    from,
-    to,
-  }: DashboardRepositoryInput): Promise<DashboardSummaryRow> {
-    const establishmentFilter = buildEstablishmentFilter(establishmentId);
+	async getSummary({
+		establishmentId,
+		from,
+		to
+	}: DashboardRepositoryInput): Promise<DashboardSummaryRow> {
+		const establishmentFilter = buildEstablishmentFilter(establishmentId);
 
-    const rows = await prisma.$queryRaw<
-      {
-        total_orders: number;
-        paid_orders: number;
-        cancelled_orders: number;
-        gross_revenue: number;
-        discounts_total: number;
-        shipping_total: number;
-        net_revenue: number;
-        average_order_value: number;
-        distinct_customers: number;
-      }[]
-    >`
+		const rows = await prisma.$queryRaw<
+			{
+				total_orders: number;
+				paid_orders: number;
+				cancelled_orders: number;
+				gross_revenue: number;
+				discounts_total: number;
+				shipping_total: number;
+				net_revenue: number;
+				average_order_value: number;
+				distinct_customers: number;
+			}[]
+		>`
 			WITH scoped_orders AS (
 				SELECT
 					o.id,
@@ -102,34 +103,34 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 			FROM joined;
 		`;
 
-    const row = rows[0];
+		const row = rows[0];
 
-    return {
-      totalOrders: row?.total_orders ?? 0,
-      paidOrders: row?.paid_orders ?? 0,
-      cancelledOrders: row?.cancelled_orders ?? 0,
-      grossRevenue: row?.gross_revenue ?? 0,
-      discountsTotal: row?.discounts_total ?? 0,
-      shippingTotal: row?.shipping_total ?? 0,
-      netRevenue: row?.net_revenue ?? 0,
-      averageOrderValue: row?.average_order_value ?? 0,
-      distinctCustomers: row?.distinct_customers ?? 0,
-    };
-  }
+		return {
+			totalOrders: row?.total_orders ?? 0,
+			paidOrders: row?.paid_orders ?? 0,
+			cancelledOrders: row?.cancelled_orders ?? 0,
+			grossRevenue: row?.gross_revenue ?? 0,
+			discountsTotal: row?.discounts_total ?? 0,
+			shippingTotal: row?.shipping_total ?? 0,
+			netRevenue: row?.net_revenue ?? 0,
+			averageOrderValue: row?.average_order_value ?? 0,
+			distinctCustomers: row?.distinct_customers ?? 0
+		};
+	}
 
-  async getOrdersOverTime({
-    establishmentId,
-    from,
-    to,
-    granularity,
-  }: DashboardOrdersOverTimeInput): Promise<DashboardBucketRow[]> {
-    const establishmentFilter = buildEstablishmentFilter(establishmentId);
-    const granularitySql = granularityToSql(granularity);
-    const timezone = Constants.DASHBOARD_TIMEZONE;
+	async getOrdersOverTime({
+		establishmentId,
+		from,
+		to,
+		granularity
+	}: DashboardOrdersOverTimeInput): Promise<DashboardBucketRow[]> {
+		const establishmentFilter = buildEstablishmentFilter(establishmentId);
+		const granularitySql = granularityToSql(granularity);
+		const timezone = Constants.DASHBOARD_TIMEZONE;
 
-    const rows = await prisma.$queryRaw<
-      { bucket: string; orders: number; revenue: number }[]
-    >`
+		const rows = await prisma.$queryRaw<
+			{ bucket: string; orders: number; revenue: number }[]
+		>`
 			WITH scoped_orders AS (
 				SELECT
 					o.id,
@@ -170,23 +171,23 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 			ORDER BY 1 ASC;
 		`;
 
-    return rows.map((row) => ({
-      bucket: row.bucket,
-      orders: row.orders,
-      revenue: row.revenue,
-    }));
-  }
+		return rows.map(row => ({
+			bucket: row.bucket,
+			orders: row.orders,
+			revenue: row.revenue
+		}));
+	}
 
-  async getOrdersByStatus({
-    establishmentId,
-    from,
-    to,
-  }: DashboardRepositoryInput): Promise<DashboardStatusRow[]> {
-    const establishmentFilter = buildEstablishmentFilter(establishmentId);
+	async getOrdersByStatus({
+		establishmentId,
+		from,
+		to
+	}: DashboardRepositoryInput): Promise<DashboardStatusRow[]> {
+		const establishmentFilter = buildEstablishmentFilter(establishmentId);
 
-    const rows = await prisma.$queryRaw<
-      { status: OrderStatusType; count: number; revenue: number }[]
-    >`
+		const rows = await prisma.$queryRaw<
+			{ status: OrderStatusType; count: number; revenue: number }[]
+		>`
 			WITH scoped_orders AS (
 				SELECT
 					o.id,
@@ -222,19 +223,19 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 			GROUP BY ls.status;
 		`;
 
-    return rows;
-  }
+		return rows;
+	}
 
-  async getOrdersByPaymentMethod({
-    establishmentId,
-    from,
-    to,
-  }: DashboardRepositoryInput): Promise<DashboardPaymentMethodRow[]> {
-    const establishmentFilter = buildEstablishmentFilter(establishmentId);
+	async getOrdersByPaymentMethod({
+		establishmentId,
+		from,
+		to
+	}: DashboardRepositoryInput): Promise<DashboardPaymentMethodRow[]> {
+		const establishmentFilter = buildEstablishmentFilter(establishmentId);
 
-    const rows = await prisma.$queryRaw<
-      { method: PaymentMethodType; count: number; revenue: number }[]
-    >`
+		const rows = await prisma.$queryRaw<
+			{ method: PaymentMethodType; count: number; revenue: number }[]
+		>`
 			WITH scoped_orders AS (
 				SELECT
 					o.id,
@@ -271,19 +272,19 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 			GROUP BY so.payment_method;
 		`;
 
-    return rows;
-  }
+		return rows;
+	}
 
-  async getOrdersByDeliveryType({
-    establishmentId,
-    from,
-    to,
-  }: DashboardRepositoryInput): Promise<DashboardDeliveryTypeRow[]> {
-    const establishmentFilter = buildEstablishmentFilter(establishmentId);
+	async getOrdersByDeliveryType({
+		establishmentId,
+		from,
+		to
+	}: DashboardRepositoryInput): Promise<DashboardDeliveryTypeRow[]> {
+		const establishmentFilter = buildEstablishmentFilter(establishmentId);
 
-    const rows = await prisma.$queryRaw<
-      { type: DeliveryType; count: number; revenue: number }[]
-    >`
+		const rows = await prisma.$queryRaw<
+			{ type: DeliveryType; count: number; revenue: number }[]
+		>`
 			WITH scoped_orders AS (
 				SELECT
 					o.id,
@@ -320,25 +321,25 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 			GROUP BY so.delivery_type;
 		`;
 
-    return rows;
-  }
+		return rows;
+	}
 
-  async getTopProducts({
-    establishmentId,
-    from,
-    to,
-    limit,
-  }: DashboardTopNInput): Promise<DashboardTopProductRow[]> {
-    const establishmentFilter = buildEstablishmentFilter(establishmentId);
+	async getTopProducts({
+		establishmentId,
+		from,
+		to,
+		limit
+	}: DashboardTopNInput): Promise<DashboardTopProductRow[]> {
+		const establishmentFilter = buildEstablishmentFilter(establishmentId);
 
-    const rows = await prisma.$queryRaw<
-      {
-        product_id: string;
-        name: string;
-        units_sold: number;
-        revenue: number;
-      }[]
-    >`
+		const rows = await prisma.$queryRaw<
+			{
+				product_id: string;
+				name: string;
+				units_sold: number;
+				revenue: number;
+			}[]
+		>`
 			WITH scoped_orders AS (
 				SELECT o.id
 				FROM orders o
@@ -369,30 +370,30 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 			LIMIT ${limit};
 		`;
 
-    return rows.map((row) => ({
-      productId: row.product_id,
-      name: row.name,
-      unitsSold: row.units_sold,
-      revenue: row.revenue,
-    }));
-  }
+		return rows.map(row => ({
+			productId: row.product_id,
+			name: row.name,
+			unitsSold: row.units_sold,
+			revenue: row.revenue
+		}));
+	}
 
-  async getTopCategories({
-    establishmentId,
-    from,
-    to,
-    limit,
-  }: DashboardTopNInput): Promise<DashboardTopCategoryRow[]> {
-    const establishmentFilter = buildEstablishmentFilter(establishmentId);
+	async getTopCategories({
+		establishmentId,
+		from,
+		to,
+		limit
+	}: DashboardTopNInput): Promise<DashboardTopCategoryRow[]> {
+		const establishmentFilter = buildEstablishmentFilter(establishmentId);
 
-    const rows = await prisma.$queryRaw<
-      {
-        category_id: string;
-        name: string;
-        units_sold: number;
-        revenue: number;
-      }[]
-    >`
+		const rows = await prisma.$queryRaw<
+			{
+				category_id: string;
+				name: string;
+				units_sold: number;
+				revenue: number;
+			}[]
+		>`
 			WITH scoped_orders AS (
 				SELECT o.id
 				FROM orders o
@@ -425,28 +426,28 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 			LIMIT ${limit};
 		`;
 
-    return rows.map((row) => ({
-      categoryId: row.category_id,
-      name: row.name,
-      unitsSold: row.units_sold,
-      revenue: row.revenue,
-    }));
-  }
+		return rows.map(row => ({
+			categoryId: row.category_id,
+			name: row.name,
+			unitsSold: row.units_sold,
+			revenue: row.revenue
+		}));
+	}
 
-  async getTopCustomers({
-    establishmentId,
-    from,
-    to,
-    limit,
-  }: DashboardTopNInput): Promise<DashboardTopCustomerRow[]> {
-    const rows = await prisma.$queryRaw<
-      {
-        user_id: string;
-        name: string;
-        orders: number;
-        spent: number;
-      }[]
-    >`
+	async getTopCustomers({
+		establishmentId,
+		from,
+		to,
+		limit
+	}: DashboardTopNInput): Promise<DashboardTopCustomerRow[]> {
+		const rows = await prisma.$queryRaw<
+			{
+				user_id: string;
+				name: string;
+				orders: number;
+				spent: number;
+			}[]
+		>`
 			WITH scoped_orders AS (
 				SELECT
 					o.id,
@@ -483,29 +484,29 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 			LIMIT ${limit};
 		`;
 
-    return rows.map((row) => ({
-      userId: row.user_id,
-      name: row.name,
-      orders: row.orders,
-      spent: row.spent,
-    }));
-  }
+		return rows.map(row => ({
+			userId: row.user_id,
+			name: row.name,
+			orders: row.orders,
+			spent: row.spent
+		}));
+	}
 
-  async getCouponsUsage({
-    establishmentId,
-    from,
-    to,
-    limit,
-  }: DashboardTopNInput): Promise<DashboardCouponUsageRow[]> {
-    const establishmentFilter = buildEstablishmentFilter(establishmentId);
+	async getCouponsUsage({
+		establishmentId,
+		from,
+		to,
+		limit
+	}: DashboardTopNInput): Promise<DashboardCouponUsageRow[]> {
+		const establishmentFilter = buildEstablishmentFilter(establishmentId);
 
-    const rows = await prisma.$queryRaw<
-      {
-        code: string;
-        orders_with_coupon: number;
-        discount_total: number;
-      }[]
-    >`
+		const rows = await prisma.$queryRaw<
+			{
+				code: string;
+				orders_with_coupon: number;
+				discount_total: number;
+			}[]
+		>`
 			WITH scoped_orders AS (
 				SELECT o.id
 				FROM orders o
@@ -535,26 +536,26 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 			LIMIT ${limit};
 		`;
 
-    return rows.map((row) => ({
-      code: row.code,
-      ordersWithCoupon: row.orders_with_coupon,
-      discountTotal: row.discount_total,
-    }));
-  }
+		return rows.map(row => ({
+			code: row.code,
+			ordersWithCoupon: row.orders_with_coupon,
+			discountTotal: row.discount_total
+		}));
+	}
 
-  async getTopFavoritedProducts({
-    establishmentId,
-    from,
-    to,
-    limit,
-  }: DashboardTopNInput): Promise<DashboardTopFavoritedProductRow[]> {
-    const rows = await prisma.$queryRaw<
-      {
-        product_id: string;
-        name: string;
-        favorites: number;
-      }[]
-    >`
+	async getTopFavoritedProducts({
+		establishmentId,
+		from,
+		to,
+		limit
+	}: DashboardTopNInput): Promise<DashboardTopFavoritedProductRow[]> {
+		const rows = await prisma.$queryRaw<
+			{
+				product_id: string;
+				name: string;
+				favorites: number;
+			}[]
+		>`
 			SELECT
 				p.id AS product_id,
 				p.name AS name,
@@ -570,10 +571,10 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 			LIMIT ${limit};
 		`;
 
-    return rows.map((row) => ({
-      productId: row.product_id,
-      name: row.name,
-      favorites: row.favorites,
-    }));
-  }
+		return rows.map(row => ({
+			productId: row.product_id,
+			name: row.name,
+			favorites: row.favorites
+		}));
+	}
 }

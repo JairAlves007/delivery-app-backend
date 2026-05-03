@@ -4,38 +4,39 @@ import type { IDistrictRepository } from "@/interfaces/repositories/district-rep
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import { createDistrictBodySchema } from "@/schemas/district-schema.js";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
+import type { EstablishmentID } from "@/types/establishment.js";
 
 type CreateDistrictServiceRequest = z.infer<typeof createDistrictBodySchema> &
-  Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> & {
-    establishmentId: string;
-  };
+	Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> & {
+		establishmentId: EstablishmentID;
+	};
 
 export class CreateDistrictService {
-  private districtRepository: IDistrictRepository;
+	private districtRepository: IDistrictRepository;
 
-  constructor(districtRepository: IDistrictRepository) {
-    this.districtRepository = districtRepository;
-  }
+	constructor(districtRepository: IDistrictRepository) {
+		this.districtRepository = districtRepository;
+	}
 
-  async handle({
-    establishmentId,
-    shippingCost: shipping_cost,
-    paramsToForget,
-    ...data
-  }: CreateDistrictServiceRequest) {
-    await this.districtRepository.create({
-      ...data,
-      shipping_cost,
-      establishment: {
-        connect: {
-          id: establishmentId,
-        },
-      },
-    });
+	async handle({
+		establishmentId,
+		shippingCost: shipping_cost,
+		paramsToForget,
+		...data
+	}: CreateDistrictServiceRequest) {
+		await this.districtRepository.create({
+			...data,
+			shipping_cost,
+			establishment: {
+				connect: {
+					id: establishmentId
+				}
+			}
+		});
 
-    await forgetAllListingCacheKeysQueue({
-      baseCacheKey: "districts",
-      paramsToForget,
-    });
-  }
+		await forgetAllListingCacheKeysQueue({
+			baseCacheKey: "districts",
+			paramsToForget
+		});
+	}
 }

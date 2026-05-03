@@ -4,40 +4,41 @@ import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-c
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import { createAddonCategoryBodySchema } from "@/schemas/addon-category-schema.js";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
+import type { EstablishmentID } from "@/types/establishment.js";
 
 type CreateAddonCategoryServiceRequest = z.infer<
-  typeof createAddonCategoryBodySchema
+	typeof createAddonCategoryBodySchema
 > &
-  Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> & {
-    establishmentId: string;
-  };
+	Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> & {
+		establishmentId: EstablishmentID;
+	};
 
 export class CreateAddonCategoryService {
-  private addonCategoryRepository: IAddonCategoryRepository;
+	private addonCategoryRepository: IAddonCategoryRepository;
 
-  constructor(addonCategoryRepository: IAddonCategoryRepository) {
-    this.addonCategoryRepository = addonCategoryRepository;
-  }
+	constructor(addonCategoryRepository: IAddonCategoryRepository) {
+		this.addonCategoryRepository = addonCategoryRepository;
+	}
 
-  async handle({
-    establishmentId,
-    maxQuantity: max_quantity,
-    paramsToForget,
-    ...data
-  }: CreateAddonCategoryServiceRequest) {
-    await this.addonCategoryRepository.create({
-      ...data,
-      max_quantity,
-      establishment: {
-        connect: {
-          id: establishmentId,
-        },
-      },
-    });
+	async handle({
+		establishmentId,
+		maxQuantity: max_quantity,
+		paramsToForget,
+		...data
+	}: CreateAddonCategoryServiceRequest) {
+		await this.addonCategoryRepository.create({
+			...data,
+			max_quantity,
+			establishment: {
+				connect: {
+					id: establishmentId
+				}
+			}
+		});
 
-    await forgetAllListingCacheKeysQueue({
-      baseCacheKey: "addonCategories",
-      paramsToForget,
-    });
-  }
+		await forgetAllListingCacheKeysQueue({
+			baseCacheKey: "addonCategories",
+			paramsToForget
+		});
+	}
 }

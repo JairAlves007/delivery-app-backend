@@ -1,117 +1,120 @@
 import type {
-  DeliveryType,
-  OrderStatusType,
-  PaymentMethodType,
+	DeliveryType,
+	OrderStatusType,
+	PaymentMethodType
 } from "@/generated/prisma/client.js";
+
+import type { EstablishmentID } from "./establishment.js";
+import type { UserID } from "./user.js";
 
 export type DashboardGranularity = "day" | "week" | "month";
 
 export type DashboardServiceInput = {
-  from?: Date;
-  to?: Date;
-  granularity: DashboardGranularity;
-  establishmentId: string;
+	from?: Date;
+	to?: Date;
+	granularity: DashboardGranularity;
+	establishmentId: EstablishmentID;
 };
 
 export type DashboardRepositoryInput = {
-  establishmentId: string;
-  from: Date;
-  to: Date;
+	establishmentId: EstablishmentID;
+	from: Date;
+	to: Date;
 };
 
 export type DashboardTopNInput = DashboardRepositoryInput & {
-  limit: number;
+	limit: number;
 };
 
 export type DashboardOrdersOverTimeInput = DashboardRepositoryInput & {
-  granularity: DashboardGranularity;
+	granularity: DashboardGranularity;
 };
 
 export type DashboardSummaryRow = {
-  totalOrders: number;
-  paidOrders: number;
-  cancelledOrders: number;
-  grossRevenue: number;
-  discountsTotal: number;
-  shippingTotal: number;
-  netRevenue: number;
-  averageOrderValue: number;
-  distinctCustomers: number;
+	totalOrders: number;
+	paidOrders: number;
+	cancelledOrders: number;
+	grossRevenue: number;
+	discountsTotal: number;
+	shippingTotal: number;
+	netRevenue: number;
+	averageOrderValue: number;
+	distinctCustomers: number;
 };
 
 export type DashboardBucketRow = {
-  bucket: string;
-  orders: number;
-  revenue: number;
+	bucket: string;
+	orders: number;
+	revenue: number;
 };
 
 export type DashboardStatusRow = {
-  status: OrderStatusType;
-  count: number;
-  revenue: number;
+	status: OrderStatusType;
+	count: number;
+	revenue: number;
 };
 
 export type DashboardPaymentMethodRow = {
-  method: PaymentMethodType;
-  count: number;
-  revenue: number;
+	method: PaymentMethodType;
+	count: number;
+	revenue: number;
 };
 
 export type DashboardDeliveryTypeRow = {
-  type: DeliveryType;
-  count: number;
-  revenue: number;
+	type: DeliveryType;
+	count: number;
+	revenue: number;
 };
 
 export type DashboardTopProductRow = {
-  productId: string;
-  name: string;
-  unitsSold: number;
-  revenue: number;
+	productId: string;
+	name: string;
+	unitsSold: number;
+	revenue: number;
 };
 
 export type DashboardTopCategoryRow = {
-  categoryId: string;
-  name: string;
-  unitsSold: number;
-  revenue: number;
+	categoryId: string;
+	name: string;
+	unitsSold: number;
+	revenue: number;
 };
 
 export type DashboardTopCustomerRow = {
-  userId: string;
-  name: string;
-  orders: number;
-  spent: number;
+	userId: UserID;
+	name: string;
+	orders: number;
+	spent: number;
 };
 
 export type DashboardTopFavoritedProductRow = {
-  productId: string;
-  name: string;
-  favorites: number;
+	productId: string;
+	name: string;
+	favorites: number;
 };
 
 export type DashboardCouponUsageRow = {
-  code: string;
-  ordersWithCoupon: number;
-  discountTotal: number;
+	code: string;
+	ordersWithCoupon: number;
+	discountTotal: number;
 };
 
 export type DashboardResponse = {
-  currency: "BRL";
-  range: {
-    from: string;
-    to: string;
-    granularity: DashboardGranularity;
-    timezone: string;
-  };
-  summary: DashboardSummaryRow;
-  ordersOverTime: DashboardBucketRow[];
-  ordersByStatus: DashboardStatusRow[];
-  ordersByPaymentMethod: DashboardPaymentMethodRow[];
-  ordersByDeliveryType: DashboardDeliveryTypeRow[];
-  topProducts: DashboardTopProductRow[];
-  topCategories: DashboardTopCategoryRow[];
-  topCustomers: DashboardTopCustomerRow[];
-  topFavoritedProducts: DashboardTopFavoritedProductRow[];
-  couponsUsage: DashboardCouponUsageRow[];
+	currency: "BRL";
+	range: {
+		from: string;
+		to: string;
+		granularity: DashboardGranularity;
+		timezone: string;
+	};
+	summary: DashboardSummaryRow;
+	ordersOverTime: DashboardBucketRow[];
+	ordersByStatus: DashboardStatusRow[];
+	ordersByPaymentMethod: DashboardPaymentMethodRow[];
+	ordersByDeliveryType: DashboardDeliveryTypeRow[];
+	topProducts: DashboardTopProductRow[];
+	topCategories: DashboardTopCategoryRow[];
+	topCustomers: DashboardTopCustomerRow[];
+	topFavoritedProducts: DashboardTopFavoritedProductRow[];
+	couponsUsage: DashboardCouponUsageRow[];
 };

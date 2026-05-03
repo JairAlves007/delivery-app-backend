@@ -1,177 +1,178 @@
 import type { Coupon, Prisma } from "@/generated/prisma/client.js";
 import {
-  buildFilterQueryOptions,
-  transformValidFilterParams,
+	buildFilterQueryOptions,
+	transformValidFilterParams
 } from "@/helpers/crud.js";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.js";
 import prisma from "@/lib/prisma.js";
 import type { CouponWithUserCoupons } from "@/types/coupon.js";
 import type {
-  DeleteContentParams,
-  FilterParams,
-  FindByIdParams,
-  PaginationParams,
-  UpdateContentParams,
+	DeleteContentParams,
+	FilterParams,
+	FindByIdParams,
+	PaginationParams,
+	UpdateContentParams
 } from "@/types/crud.js";
 import type { EstablishmentID } from "@/types/establishment.js";
+import type { UserID } from "@/types/user.js";
 
 export class CouponPrismaRepository implements ICouponRepository {
-  async listAll(filterParams?: FilterParams): Promise<Coupon[]> {
-    const { search, sortField, sortDirection, ...params } =
-      transformValidFilterParams(filterParams);
+	async listAll(filterParams?: FilterParams): Promise<Coupon[]> {
+		const { search, sortField, sortDirection, ...params } =
+			transformValidFilterParams(filterParams);
 
-    const { where, orderBy } =
-      buildFilterQueryOptions<Prisma.CouponOrderByWithRelationInput>({
-        search,
-        sortField: sortField ?? "id",
-        sortDirection: sortDirection ?? "asc",
-        searchableFields: ["code"],
-        defaultSortField: "id",
-      });
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.CouponOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "id",
+				sortDirection: sortDirection ?? "asc",
+				searchableFields: ["code"],
+				defaultSortField: "id"
+			});
 
-    return await prisma.coupon.findMany({
-      where: {
-        deleted_at: null,
-        ...where,
-        ...params,
-      },
-      orderBy,
-    });
-  }
+		return await prisma.coupon.findMany({
+			where: {
+				deleted_at: null,
+				...where,
+				...params
+			},
+			orderBy
+		});
+	}
 
-  async count(filterParams?: FilterParams): Promise<number> {
-    const {
-      search,
-      sortField = undefined,
-      sortDirection = undefined,
-      ...params
-    } = transformValidFilterParams(filterParams);
+	async count(filterParams?: FilterParams): Promise<number> {
+		const {
+			search,
+			sortField = undefined,
+			sortDirection = undefined,
+			...params
+		} = transformValidFilterParams(filterParams);
 
-    const { where, orderBy } =
-      buildFilterQueryOptions<Prisma.CouponOrderByWithRelationInput>({
-        search,
-        sortField,
-        sortDirection,
-        searchableFields: ["code"],
-        defaultSortField: "id",
-      });
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.CouponOrderByWithRelationInput>({
+				search,
+				sortField,
+				sortDirection,
+				searchableFields: ["code"],
+				defaultSortField: "id"
+			});
 
-    return await prisma.coupon.count({
-      where: {
-        deleted_at: null,
-        ...where,
-        ...params,
-      },
-      orderBy,
-    });
-  }
+		return await prisma.coupon.count({
+			where: {
+				deleted_at: null,
+				...where,
+				...params
+			},
+			orderBy
+		});
+	}
 
-  async paginate({
-    perPage,
-    page,
-    filterParams,
-  }: PaginationParams): Promise<Coupon[]> {
-    const { search, sortField, sortDirection, ...params } =
-      transformValidFilterParams(filterParams);
+	async paginate({
+		perPage,
+		page,
+		filterParams
+	}: PaginationParams): Promise<Coupon[]> {
+		const { search, sortField, sortDirection, ...params } =
+			transformValidFilterParams(filterParams);
 
-    const { where, orderBy } =
-      buildFilterQueryOptions<Prisma.CouponOrderByWithRelationInput>({
-        search,
-        sortField: sortField ?? "id",
-        sortDirection: sortDirection ?? "asc",
-        searchableFields: ["code"],
-        defaultSortField: "id",
-      });
+		const { where, orderBy } =
+			buildFilterQueryOptions<Prisma.CouponOrderByWithRelationInput>({
+				search,
+				sortField: sortField ?? "id",
+				sortDirection: sortDirection ?? "asc",
+				searchableFields: ["code"],
+				defaultSortField: "id"
+			});
 
-    return await prisma.coupon.findMany({
-      skip: (page - 1) * perPage,
-      take: perPage,
-      where: {
-        deleted_at: null,
-        ...where,
-        ...params,
-      },
-      orderBy,
-    });
-  }
+		return await prisma.coupon.findMany({
+			skip: (page - 1) * perPage,
+			take: perPage,
+			where: {
+				deleted_at: null,
+				...where,
+				...params
+			},
+			orderBy
+		});
+	}
 
-  async findById({
-    id,
-    filterParams,
-  }: FindByIdParams<number>): Promise<Coupon | null> {
-    const params = transformValidFilterParams(filterParams);
+	async findById({
+		id,
+		filterParams
+	}: FindByIdParams<number>): Promise<Coupon | null> {
+		const params = transformValidFilterParams(filterParams);
 
-    return await prisma.coupon.findUnique({
-      where: {
-        id,
-        deleted_at: null,
-        ...params,
-      },
-    });
-  }
+		return await prisma.coupon.findUnique({
+			where: {
+				id,
+				deleted_at: null,
+				...params
+			}
+		});
+	}
 
-  async check(
-    code: string,
-    establishmentId: EstablishmentID,
-    userId: string,
-  ): Promise<CouponWithUserCoupons | null> {
-    return await prisma.coupon.findUnique({
-      where: {
-        code,
-        establishment_id: establishmentId,
-        deleted_at: null,
-      },
-      include: {
-        userCoupons: {
-          where: {
-            user_id: userId,
-          },
-        },
-      },
-    });
-  }
+	async check(
+		code: string,
+		establishmentId: EstablishmentID,
+		userId: UserID
+	): Promise<CouponWithUserCoupons | null> {
+		return await prisma.coupon.findUnique({
+			where: {
+				code,
+				establishment_id: establishmentId,
+				deleted_at: null
+			},
+			include: {
+				userCoupons: {
+					where: {
+						user_id: userId
+					}
+				}
+			}
+		});
+	}
 
-  async create(data: Prisma.CouponCreateInput): Promise<void> {
-    await prisma.coupon.create({ data });
-  }
+	async create(data: Prisma.CouponCreateInput): Promise<void> {
+		await prisma.coupon.create({ data });
+	}
 
-  async update({
-    id,
-    data,
-    filterParams,
-  }: UpdateContentParams<number, Prisma.CouponUpdateInput>): Promise<void> {
-    const params = transformValidFilterParams(filterParams);
+	async update({
+		id,
+		data,
+		filterParams
+	}: UpdateContentParams<number, Prisma.CouponUpdateInput>): Promise<void> {
+		const params = transformValidFilterParams(filterParams);
 
-    await prisma.coupon.update({
-      where: {
-        id,
-        deleted_at: null,
-        ...params,
-      },
-      data,
-    });
-  }
+		await prisma.coupon.update({
+			where: {
+				id,
+				deleted_at: null,
+				...params
+			},
+			data
+		});
+	}
 
-  async delete({
-    id,
-    force,
-    filterParams,
-  }: DeleteContentParams<number>): Promise<void> {
-    const params = transformValidFilterParams(filterParams);
+	async delete({
+		id,
+		force,
+		filterParams
+	}: DeleteContentParams<number>): Promise<void> {
+		const params = transformValidFilterParams(filterParams);
 
-    if (force) {
-      await prisma.coupon.delete({
-        where: {
-          id,
-          ...params,
-        },
-      });
-    }
+		if (force) {
+			await prisma.coupon.delete({
+				where: {
+					id,
+					...params
+				}
+			});
+		}
 
-    await this.update({
-      id,
-      filterParams,
-      data: { deleted_at: new Date() },
-    });
-  }
+		await this.update({
+			id,
+			filterParams,
+			data: { deleted_at: new Date() }
+		});
+	}
 }

@@ -5,7 +5,7 @@ import Constants from "@/helpers/constants.js";
 import { computeLookupHash } from "@/helpers/token.js";
 import type { IPasswordResetTokenRepository } from "@/interfaces/repositories/password-reset-token-repository.js";
 import prisma from "@/lib/prisma.js";
-import type { ResetPasswordParams } from "@/types/user.js";
+import type { ResetPasswordParams, UserID } from "@/types/user.js";
 
 export class PasswordResetTokenPrismaRepository implements IPasswordResetTokenRepository {
 	async create(
@@ -33,7 +33,7 @@ export class PasswordResetTokenPrismaRepository implements IPasswordResetTokenRe
 		return candidate;
 	}
 
-	async invalidatePreviousByUserId(userId: string): Promise<void> {
+	async invalidatePreviousByUserId(userId: UserID): Promise<void> {
 		await prisma.passwordResetToken.updateMany({
 			where: {
 				user_id: userId,
