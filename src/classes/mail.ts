@@ -4,7 +4,7 @@ import { renderFile } from "ejs";
 
 import { FailedToSendMail } from "@/errors/mail/failed-to-send-mail-error.js";
 import type { IMail } from "@/interfaces/mail/mail-base.js";
-import { mail } from "@/lib/mail.js";
+import { mailTransporter } from "@/lib/mail.js";
 import type { ResetPasswordMailData } from "@/types/mail.js";
 
 export class Mail implements IMail {
@@ -33,16 +33,16 @@ export class Mail implements IMail {
 
     const html = await renderFile(resetPasswordMail, data);
 
-    const { error } = await mail.emails.send({
-      from,
-      subject: "Recuperação de senha",
-      to,
-      html,
-    });
-
-    if (!error) return;
-
-    console.error(error);
-    throw new FailedToSendMail("Reset Password");
+    try {
+      await mailTransporter.sendMail({
+        from,
+        subject: "Recuperação de senha",
+        to,
+        html,
+      });
+    } catch (error) {
+      console.error(error);
+      throw new FailedToSendMail("Reset Password");
+    }
   }
 }
