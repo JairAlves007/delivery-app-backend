@@ -60,13 +60,6 @@ export const resetPasswordBodySchema = z.object({
 
 z.globalRegistry.add(resetPasswordBodySchema, { id: "ResetPasswordBody" });
 
-export const validateResetPasswordTokenQuerySchema = z.object({
-	token: z
-		.string("O token deve ser preenchido")
-		.min(1, "O token deve ser preenchido")
-		.max(255)
-});
-
 export const refreshTokenBodySchema = z.object({
 	refreshToken: z
 		.string("O refresh token deve ser preenchido")
