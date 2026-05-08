@@ -104,33 +104,14 @@ export const addressLocationSchema = z.object({
     .max(255),
   street: z.string().trim().min(1, "A rua deve ser preenchida").max(255),
   phone: phoneSchema,
-  number: z
-    .string()
-    .trim()
-    .min(1, "O número deve ser preenchido")
-    .max(20)
-    .default("N/A")
-    .optional()
-    .nullable(),
+  number: z.string().trim().max(20).default("S/N").optional().nullable(),
   postalCode: z
     .string()
     .max(10, "CEP inválido")
     .regex(Constants.POSTAL_CODE_REGEX, "CEP inválido")
     .transform((val) => val.replace(/\D/g, "")),
-  complement: z
-    .string()
-    .trim()
-    .min(1, "O complemento deve ser preenchido")
-    .max(500)
-    .optional()
-    .nullable(),
-  referencePoint: z
-    .string()
-    .trim()
-    .min(1, "O ponto de referência deve ser preenchido")
-    .max(500)
-    .optional()
-    .nullable(),
+  complement: z.string().trim().max(500).optional().nullable(),
+  referencePoint: z.string().trim().max(500).optional().nullable(),
   latitude: z.number("A latitude deve ser preenchida").optional().nullable(),
   longitude: z.number("A longitude deve ser preenchida").optional().nullable(),
 });
