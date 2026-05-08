@@ -291,15 +291,17 @@ export const productResponseSchema = z.object({
 	stock: z.number().nullable(),
 	valid_until: nullableDateStringSchema,
 	resources: mappedResourceRecordSchema,
-	tags: z.array(tagResponseSchema)
+	tags: z.array(tagResponseSchema),
+	isFavorited: z.boolean().default(false)
 });
 
 export const productListResponseSchema = paginatedResponseSchema(
 	productResponseSchema
 );
 
-export const myFavoritesResponseSchema =
-	cursorPaginatedResponseSchema(productResponseSchema);
+export const myFavoritesResponseSchema = cursorPaginatedResponseSchema(
+	productResponseSchema
+);
 
 // ──────────────────────────────────────────────
 // Order

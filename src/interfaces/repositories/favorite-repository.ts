@@ -22,4 +22,5 @@ export interface IFavoriteRepository {
 	add(params: AddFavoriteParams): Promise<boolean>;
 	remove(params: FavoriteIdentifier): Promise<boolean>;
 	listProducts(params: ListFavoritesParams): Promise<ProductFromRepository[]>;
+	isProductFavorited(params: FavoriteIdentifier): Promise<boolean>;
 }
