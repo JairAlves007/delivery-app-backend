@@ -59,3 +59,13 @@ Multi-tenant food delivery SaaS backend. Tenancy is by `establishment_id`, carri
 ## API Docs
 
 Swagger + Scalar UI available at `/docs` in dev mode.
+
+## Agent Auto-Routing
+
+When a task is described, automatically select the most relevant agent from `.claude/agents/registry.md` without asking. Apply that agent's enforced rules throughout execution. Only mention agent selection if genuinely ambiguous.
+
+Routing: match task keywords → select agent → enforce agent's rules → execute.
+
+Security-auditor has veto power over all agents. Multi-domain tasks: primary agent leads, others validate their domain.
+
+See `.claude/agents/registry.md` for full routing table and keyword matching.
