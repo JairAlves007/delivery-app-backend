@@ -14,7 +14,6 @@ import type {
 	UpdateContentParams
 } from "@/types/crud.js";
 import type { EstablishmentID } from "@/types/establishment.js";
-import type { UserID } from "@/types/user.js";
 
 export class CouponPrismaRepository implements ICouponRepository {
 	async listAll(filterParams?: FilterParams): Promise<Coupon[]> {
@@ -114,7 +113,7 @@ export class CouponPrismaRepository implements ICouponRepository {
 	async check(
 		code: string,
 		establishmentId: EstablishmentID,
-		userId: UserID
+		customerPhone?: string | null
 	): Promise<CouponWithUserCoupons | null> {
 		return await prisma.coupon.findUnique({
 			where: {
@@ -124,9 +123,7 @@ export class CouponPrismaRepository implements ICouponRepository {
 			},
 			include: {
 				userCoupons: {
-					where: {
-						user_id: userId
-					}
+					where: customerPhone ? { customer_phone: customerPhone } : { customer_phone: "" }
 				}
 			}
 		});

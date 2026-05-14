@@ -551,6 +551,11 @@ export const meResponseSchema = z.object({
 	menu: authMenuSchema
 });
 
+export const establishmentContextResponseSchema = z.object({
+	establishment: authEstablishmentCustomerSchema,
+	menu: authMenuSchema,
+});
+
 // ──────────────────────────────────────────────
 // Main (Catalog)
 // ──────────────────────────────────────────────
@@ -650,6 +655,7 @@ const registryItems = [
 	{ schema: signUpTokenResponseSchema, id: "SignUpTokenResponse" },
 	{ schema: refreshTokenResponseSchema, id: "RefreshTokenResponse" },
 	{ schema: meResponseSchema, id: "MeResponse" },
+	{ schema: establishmentContextResponseSchema, id: "EstablishmentContextResponse" },
 	{ schema: bannersCatalogResponseSchema, id: "BannersCatalogResponse" },
 	{
 		schema: productCategoriesCatalogResponseSchema,

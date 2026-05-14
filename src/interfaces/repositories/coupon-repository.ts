@@ -1,7 +1,6 @@
 import type { Coupon, Prisma } from "@/generated/prisma/client.js";
 import type { CouponWithUserCoupons } from "@/types/coupon.js";
 import type { EstablishmentID } from "@/types/establishment.js";
-import type { UserID } from "@/types/user.js";
 
 import type { ICRUDBase } from "../crud-base.js";
 
@@ -14,6 +13,6 @@ export interface ICouponRepository extends ICRUDBase<
 	check(
 		code: string,
 		establishmentId: EstablishmentID,
-		userId: UserID
+		customerPhone?: string | null
 	): Promise<CouponWithUserCoupons | null>;
 }

@@ -2,8 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 
 import { makeFindProductService } from "@/factories/services/product/make-find-product-service.js";
-import { makeIsProductFavoritedService } from "@/factories/services/product/make-is-product-favorited-service.js";
-import { PermissionType, RoleType } from "@/generated/prisma/client.js";
+import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { getUserEstablishmentId } from "@/helpers/get-user-establishment-id.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
@@ -15,7 +14,6 @@ import {
 	apiSuccessResponseSchema,
 	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
-import { userIdSchema } from "@/schemas/generic-schema.js";
 import { productParamsSchema } from "@/schemas/product-schema.js";
 import { productResponseSchema } from "@/schemas/response-schema.js";
 
@@ -44,32 +42,22 @@ export const findProductRoute = async (app: FastifyInstance) => {
 		},
 		async (request, reply) => {
 			const { id } = request.params;
-			const isCustomer = request.user.role === RoleType.CUSTOMER;
 
 			const findProductService = makeFindProductService();
-			const isProductFavoritedService = makeIsProductFavoritedService();
 
-			const [product, isFavorited] = await Promise.all([
-				findProductService.handle({
-					id,
-					filterParams: {
-						establishment_id: getUserEstablishmentId(request.user)
-					}
-				}),
-				isCustomer
-					? isProductFavoritedService.handle({
-							userId: userIdSchema.parse(request.user.sub),
-							productId: id
-						})
-					: Promise.resolve(false)
-			]);
+			const product = await findProductService.handle({
+				id,
+				filterParams: {
+					establishment_id: getUserEstablishmentId(request.user)
+				}
+			});
 
 			return reply
 				.status(HTTPStatusCodes.OK)
 				.send(
 					ApiResponse.success("Produto encontrado com sucesso", {
 						...product,
-						isFavorited
+						isFavorited: false
 					})
 				);
 		}

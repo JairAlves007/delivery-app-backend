@@ -4,15 +4,15 @@
 
   "compilerOptions": {
     "lib": [
-      "es2024",
-      "ESNext.Array",
-      "ESNext.Collection",
-      "ESNext.Error",
-      "ESNext.Iterator",
-      "ESNext.Promise"
+      "es2023",
+      "es2021.string",
+      "esnext.array",
+      "esnext.collection",
+      "esnext.string",
+      "esnext.promise"
     ],
     "module": "nodenext",
-    "target": "es2024",
+    "target": "esnext",
 
     "strict": true,
     "esModuleInterop": true,

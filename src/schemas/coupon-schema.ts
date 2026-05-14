@@ -1,6 +1,7 @@
 import z from "zod";
 
 import { CouponType, DiscountType } from "@/generated/prisma/client.js";
+import { phoneSchema } from "@/schemas/generic-schema.js";
 
 const createCouponBodyBaseSchema = z.object({
   type: z.enum(CouponType, "Tipo de cupom inválido"),
@@ -73,12 +74,14 @@ export const updateCouponBodySchema = createCouponBodyBaseSchema.partial();
 z.globalRegistry.add(updateCouponBodySchema, { id: "UpdateCouponBody" });
 
 export const checkCouponBodySchema = z.object({
+  establishmentId: z.ulid("O id do estabelecimento deve ser preenchido"),
   code: z
     .string()
     .trim()
     .min(1, "O código deve ser preenchido")
     .max(50, "O código deve ter no máximo 50 caracteres")
     .transform((val) => val.toUpperCase()),
+  customerPhone: phoneSchema.optional(),
 });
 
 z.globalRegistry.add(checkCouponBodySchema, { id: "CheckCouponBody" });

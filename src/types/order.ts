@@ -10,11 +10,9 @@ import type {
 import type { orderPayloadSchema } from "@/schemas/response-schema.js";
 
 import type { AddonFromRepository } from "./addon.js";
-import type { UserAddressWithDefault } from "./address.js";
 import type { ForgetAllListingCacheKeysParams } from "./cache.js";
 import type { EstablishmentID } from "./establishment.js";
 import type { ProductList } from "./product.js";
-import type { UserID, UserWithRole } from "./user.js";
 
 export type OrderFromRepository = Prisma.OrderGetPayload<{
   include: {
@@ -41,17 +39,42 @@ export interface OrderAddonsToProcess extends AddonFromRepository {
   quantity: number;
 }
 
+export type OrderAddressInput = {
+  street: string;
+  number?: string | null;
+  neighborhood: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  complement?: string | null;
+  referencePoint?: string | null;
+  phone: string;
+};
+
+export type GuestAddress = {
+  customerName: string;
+  street: string;
+  number?: string | null;
+  neighborhood: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  complement?: string | null;
+  referencePoint?: string | null;
+  phone: string;
+};
+
 export type BuildOrderItemsParams = {
-  user: UserWithRole;
+  customerName: string;
+  customerPhone: string;
   comment?: string | null;
-  contactPhone?: string | null;
   deliveryType: DeliveryType;
   paymentMethod: PaymentMethodType;
   establishmentId: EstablishmentID;
   changeAmount?: number | null;
   couponDiscount: number;
   coupon: Coupon | null;
-  address: UserAddressWithDefault | null;
+  address: GuestAddress | null;
   district: District | null;
   shippingCost: number;
   subtotal: number;
@@ -60,7 +83,7 @@ export type BuildOrderItemsParams = {
 
 export type OrderInfo = {
   coupon: Coupon | null;
-  address: UserAddressWithDefault | null;
+  address: GuestAddress | null;
   district: District | null;
 };
 
@@ -89,9 +112,9 @@ export type OrderAddons = {
 
 export type OrderIntent = {
   establishmentId: EstablishmentID;
-  userId: UserID;
-  contactPhone?: string | null;
-  addressId?: string | null;
+  customerName: string;
+  customerPhone: string;
+  address?: OrderAddressInput | null;
   districtId?: string | null;
   couponId?: number | null;
   comment?: string | null;

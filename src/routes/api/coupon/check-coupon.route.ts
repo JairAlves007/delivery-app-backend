@@ -2,20 +2,15 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 
 import { makeCheckCouponService } from "@/factories/services/coupon/make-check-coupon-service.js";
-import { RoleType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
-import { getUserEstablishmentId } from "@/helpers/get-user-establishment-id.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import { customerTags } from "@/http/swagger-tags.js";
-import { ensureUserHasRoles } from "@/middlewares/ensure-user-has-roles.js";
-import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
 	apiDefaultErrorResponseSchema,
 	apiSuccessResponseSchema,
 	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
 import { checkCouponBodySchema } from "@/schemas/coupon-schema.js";
-import { userIdSchema } from "@/schemas/generic-schema.js";
 import { checkCouponResponseSchema } from "@/schemas/response-schema.js";
 
 export const checkCouponRoute = async (app: FastifyInstance) => {
@@ -29,26 +24,21 @@ export const checkCouponRoute = async (app: FastifyInstance) => {
 				body: checkCouponBodySchema,
 				response: {
 					200: apiSuccessResponseSchema(checkCouponResponseSchema),
-					401: apiDefaultErrorResponseSchema,
-					403: apiDefaultErrorResponseSchema,
 					422: apiValidationErrorResponseSchema,
 					500: apiDefaultErrorResponseSchema
 				}
 			},
-			onRequest: [isAuthenticated, ensureUserHasRoles([RoleType.CUSTOMER])]
 		},
 		async (request, reply) => {
-			const body = request.body;
-			const userId = userIdSchema.parse(request.user.sub);
-			const data = {
-				...body,
-				establishmentId: getUserEstablishmentId(request.user),
-				userId
-			};
+			const { establishmentId, code, customerPhone } = request.body;
 
 			const checkCouponService = makeCheckCouponService();
 
-			const couponIsValid = await checkCouponService.handle(data);
+			const couponIsValid = await checkCouponService.handle({
+				code,
+				establishmentId,
+				customerPhone,
+			});
 
 			return reply
 				.status(HTTPStatusCodes.OK)

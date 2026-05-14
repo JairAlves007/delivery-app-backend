@@ -1,6 +1,6 @@
 import z from "zod";
 
-import type { PasswordResetToken, Prisma } from "@/generated/prisma/client.js";
+import type { Prisma } from "@/generated/prisma/client.js";
 import { userIdSchema } from "@/schemas/generic-schema.js";
 
 export type UserWithRole = Prisma.UserGetPayload<{
@@ -8,8 +8,3 @@ export type UserWithRole = Prisma.UserGetPayload<{
 }>;
 
 export type UserID = z.infer<typeof userIdSchema>;
-
-export type ResetPasswordParams = {
-	passwordResetToken: PasswordResetToken;
-	newPassword: string;
-};

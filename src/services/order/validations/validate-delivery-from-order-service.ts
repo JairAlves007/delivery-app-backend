@@ -1,28 +1,28 @@
-import { makeFindAddressService } from "@/factories/services/address/make-find-address-service.js";
 import { makeFindDistrictService } from "@/factories/services/district/make-find-district-service.js";
 import { makeValidateCouponFromOrderService } from "@/factories/services/order/validations/make-validate-coupon-from-order-service.js";
 import { DeliveryType } from "@/generated/prisma/client.js";
 import type { EstablishmentID } from "@/types/establishment.js";
-import type { OrderInfo } from "@/types/order.js";
-import type { UserID } from "@/types/user.js";
+import type { GuestAddress, OrderAddressInput, OrderInfo } from "@/types/order.js";
 
 type ValidateDeliveryFromOrderServiceRequest = {
   establishmentId: EstablishmentID;
-  userId: UserID;
   deliveryType: DeliveryType;
+  customerName: string;
+  customerPhone: string;
   couponId?: number | null;
-  addressId?: string | null;
   districtId?: string | null;
+  address?: OrderAddressInput | null;
 };
 
 export class ValidateDeliveryFromOrderService {
   async handle({
     deliveryType,
     establishmentId,
-    userId,
+    customerName,
+    customerPhone,
     couponId,
-    addressId,
     districtId,
+    address,
   }: ValidateDeliveryFromOrderServiceRequest): Promise<OrderInfo> {
     const orderInfos: OrderInfo = {
       coupon: null,
@@ -32,17 +32,10 @@ export class ValidateDeliveryFromOrderService {
 
     if (deliveryType !== DeliveryType.DELIVERY) return orderInfos;
 
-    const findAddressService = makeFindAddressService();
     const findDistrictService = makeFindDistrictService();
     const validateCouponService = makeValidateCouponFromOrderService();
 
-    const [address, district, coupon] = await Promise.all([
-      addressId
-        ? findAddressService.handle({
-            id: addressId,
-            filterParams: { user_id: userId },
-          })
-        : null,
+    const [district, coupon] = await Promise.all([
       districtId
         ? findDistrictService.handle({
             id: districtId,
@@ -50,13 +43,29 @@ export class ValidateDeliveryFromOrderService {
           })
         : null,
       couponId
-        ? validateCouponService.handle({ couponId, establishmentId, userId })
+        ? validateCouponService.handle({ couponId, establishmentId, customerPhone })
         : null,
     ]);
 
-    if (address) orderInfos.address = address;
     if (district) orderInfos.district = district;
     if (coupon) orderInfos.coupon = coupon;
+
+    if (address?.street && address?.neighborhood && address?.city && address?.state) {
+      const guestAddress: GuestAddress = {
+        customerName,
+        phone: address.phone,
+        street: address.street,
+        number: address.number ?? null,
+        neighborhood: address.neighborhood,
+        city: address.city,
+        state: address.state,
+        postalCode: address.postalCode,
+        complement: address.complement ?? null,
+        referencePoint: address.referencePoint ?? null,
+      };
+
+      orderInfos.address = guestAddress;
+    }
 
     return orderInfos;
   }

@@ -7,10 +7,9 @@ import { CouponUserLimitReached } from "@/errors/coupon/user-limit-reached.js";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.js";
 import { checkCouponBodySchema } from "@/schemas/coupon-schema.js";
 import type { EstablishmentID } from "@/types/establishment.js";
-import type { UserID } from "@/types/user.js";
 
 type CheckCouponServiceRequest = z.infer<typeof checkCouponBodySchema> & {
-	userId: UserID;
+	customerPhone?: string | null;
 	establishmentId: EstablishmentID;
 };
 
@@ -29,13 +28,13 @@ export class CheckCouponService {
 	async handle({
 		code,
 		establishmentId,
-		userId
+		customerPhone
 	}: CheckCouponServiceRequest): Promise<CheckCouponServiceResponse> {
 		const now = new Date();
 		const coupon = await this.couponRepository.check(
 			code,
 			establishmentId,
-			userId
+			customerPhone
 		);
 
 		if (!coupon || (coupon.starts_at && coupon.starts_at > now))
@@ -47,6 +46,7 @@ export class CheckCouponService {
 			throw new CouponMaxUsesReached();
 
 		if (
+			customerPhone &&
 			coupon.uses_per_user &&
 			coupon.uses_per_user <= coupon.userCoupons.length
 		) {

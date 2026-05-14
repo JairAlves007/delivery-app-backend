@@ -1,10 +1,8 @@
-import { UserNotFound } from "@/errors/user/user-not-found.js";
 import { makeCalculateCouponDiscountFromOrderService } from "@/factories/services/order/validations/make-calculate-coupon-discount-from-order-service.js";
 import { makeValidateAddonsFromOrderService } from "@/factories/services/order/validations/make-validate-addons-from-order-service.js";
 import { makeValidateDeliveryFromOrderService } from "@/factories/services/order/validations/make-validate-delivery-from-order-service.js";
 import { makeValidateEstablishmentFromOrderService } from "@/factories/services/order/validations/make-validate-establishment-from-order-service.js";
 import { makeValidateProductFromOrderService } from "@/factories/services/order/validations/make-validate-product-from-order-service.js";
-import { makeFindUserService } from "@/factories/services/user/make-find-user-service.js";
 import {
   type Coupon,
   DiscountType,
@@ -19,12 +17,12 @@ import {
 } from "@/helpers/price.js";
 import { removeDuplicateItems } from "@/helpers/utils.js";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
+import prisma from "@/lib/prisma.js";
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
-import { sendOrderConfirmationMessageQueue } from "@/queues/mail-queue.js";
-import type { UserAddressWithDefault } from "@/types/address.js";
 import type {
   BuildOrderItemsParams,
   CreateOrderParams,
+  GuestAddress,
   OrderItems,
   OrderItemsToProcess,
 } from "@/types/order.js";
@@ -58,12 +56,12 @@ export class CreateOrderService {
   }
 
   private getOrderAddressDistrictInputData(
-    address: UserAddressWithDefault | null,
+    address: GuestAddress | null,
     district: District | null,
   ): Partial<Prisma.OrderCreateInput> | undefined {
     if (!address || !district) return undefined;
 
-    const { address_id, city, street, number, postal_code, state } = address;
+    const { city, street, number, neighborhood, postalCode, state, complement, referencePoint } = address;
     const { id: district_id, name: district_name, shipping_cost } = district;
 
     return {
@@ -71,16 +69,14 @@ export class CreateOrderService {
         create: {
           city,
           number,
-          postal_code,
+          neighborhood,
+          postal_code: postalCode,
           state,
           street,
+          complement,
+          reference_point: referencePoint,
           district_name,
           shipping_cost,
-          address: {
-            connect: {
-              id: address_id,
-            },
-          },
           district: {
             connect: {
               id: district_id,
@@ -92,10 +88,10 @@ export class CreateOrderService {
   }
 
   private buildOrderItems({
-    user,
+    customerName,
+    customerPhone,
     deliveryType,
     paymentMethod,
-    contactPhone,
     changeAmount,
     establishmentId,
     comment,
@@ -113,8 +109,8 @@ export class CreateOrderService {
     );
 
     return {
-      customer_name: user.name,
-      customer_phone: address ? address.phone : (contactPhone ?? "S/N"),
+      customer_name: customerName,
+      customer_phone: customerPhone,
       delivery_type: deliveryType,
       payment_method: paymentMethod,
       shipping_fee: shippingCost,
@@ -124,11 +120,6 @@ export class CreateOrderService {
       establishment: {
         connect: {
           id: establishmentId,
-        },
-      },
-      user: {
-        connect: {
-          id: user.id,
         },
       },
       items: {
@@ -164,16 +155,15 @@ export class CreateOrderService {
       paymentMethod,
       changeAmount,
       couponId,
-      addressId,
       establishmentId,
       districtId,
-      userId,
+      customerName,
+      customerPhone,
+      address: orderAddressInput,
       comment,
-      contactPhone,
       items,
     } = order;
 
-    const findUserService = makeFindUserService();
     const validateEstablishment = makeValidateEstablishmentFromOrderService();
     const validateDeliveryService = makeValidateDeliveryFromOrderService();
     const validateProductService = makeValidateProductFromOrderService();
@@ -183,8 +173,7 @@ export class CreateOrderService {
 
     const itemsValidated: OrderItems[] = removeDuplicateItems(items);
 
-    const [user, , delivery] = await Promise.all([
-      findUserService.handle(userId),
+    const [, delivery] = await Promise.all([
       validateEstablishment.handle({
         establishmentId,
         deliveryType,
@@ -193,14 +182,13 @@ export class CreateOrderService {
       validateDeliveryService.handle({
         deliveryType,
         establishmentId,
-        userId,
-        addressId,
+        customerName,
+        customerPhone,
         couponId,
         districtId,
+        address: orderAddressInput,
       }),
     ]);
-
-    if (!user) throw new UserNotFound();
 
     const { address, coupon, district } = delivery;
 
@@ -261,30 +249,24 @@ export class CreateOrderService {
         paymentMethod,
         shippingCost,
         subtotal,
-        user,
+        customerName,
+        customerPhone,
         changeAmount,
         comment,
-        contactPhone,
         orderItemsToProcess,
       }),
       { stockDecrements },
     );
 
+    if (coupon) {
+      await prisma.userCoupon.create({
+        data: { customer_phone: customerPhone, coupon_id: coupon.id },
+      });
+    }
+
     await forgetAllListingCacheKeysQueue({
       baseCacheKey: "orders",
       paramsToForget,
-    });
-
-    await sendOrderConfirmationMessageQueue({
-      ...order,
-      user,
-      address,
-      coupon,
-      couponDiscount,
-      shippingCost,
-      orderItemsToProcess,
-      district,
-      subtotal,
     });
   }
 }

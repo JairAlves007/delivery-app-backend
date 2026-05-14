@@ -16,7 +16,6 @@ import {
 
 import { env } from "@/env.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
-import { mailTransporter } from "@/lib/mail.js";
 import { redis } from "@/lib/redis.js";
 import replySendErrorPlugin from "@/plugins/reply-send-error.js";
 import { routes } from "@/routes/index.js";
@@ -163,12 +162,6 @@ app.addHook("onReady", () => {
     app.log.error({ error }, "❌ Failed to initialize BullMQ Workers");
   }
 
-  mailTransporter
-    .verify()
-    .then(() => app.log.info("✉️  SMTP transporter ready"))
-    .catch((error) =>
-      app.log.warn({ error }, "⚠️  SMTP verify failed — emails may not send"),
-    );
 });
 
 app.setErrorHandler((error, _request, reply) => {

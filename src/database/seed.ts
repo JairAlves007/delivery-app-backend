@@ -1263,19 +1263,6 @@ async function main() {
 						.map(name => ({ permission: { connect: { name } } }))
 				}
 			}
-		}),
-		prisma.role.create({
-			data: {
-				name: RoleType.CUSTOMER,
-				permissions: {
-					create: [
-						PermissionType.VIEW_CATALOG,
-						PermissionType.ADD_TO_CART,
-						PermissionType.MANAGE_OWN_ADDRESSES,
-						PermissionType.MANAGE_OWN_ORDERS
-					].map(name => ({ permission: { connect: { name } } }))
-				}
-			}
 		})
 	]);
 

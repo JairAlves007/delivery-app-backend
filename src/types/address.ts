@@ -1,30 +1,16 @@
-import type { Address, Prisma } from "@/generated/prisma/client.js";
-
-export type UserAddressStructured = Prisma.UserAddressGetPayload<{
-  select: {
-    id: true;
-    is_default: true;
-    address: {
-      select: {
-        id: true;
-        city: true;
-        complement: true;
-        district: true;
-        number: true;
-        neighborhood: true;
-        state: true;
-        street: true;
-        postal_code: true;
-        phone: true;
-        reference_point: true;
-        latitude: true;
-        longitude: true;
-      };
-    };
-  };
-}>;
-
-export type UserAddressWithDefault = Address & {
+export type UserAddressWithDefault = {
+  id: string;
   address_id: string;
   is_default: boolean;
+  street: string;
+  number: string | null;
+  neighborhood: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  complement: string | null;
+  reference_point: string | null;
+  phone: string;
+  latitude: number | null;
+  longitude: number | null;
 };

@@ -31,19 +31,6 @@ const envSchema = z.object({
   REDIS_HOST: z.string().default("127.0.0.1"),
   REDIS_PORT: z.coerce.number().default(6379),
   REDIS_PASSWORD: z.string().optional(),
-  SMTP_HOST: z.string().min(1, "SMTP host is required"),
-  SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(587),
-  SMTP_USER: z.string().default(""),
-  SMTP_PASS: z.string().default(""),
-  SMTP_SECURE: z
-    .enum(["true", "false"])
-    .default("false")
-    .transform((v) => v === "true"),
-  MAIL_FROM: z
-    .string()
-    .min(1)
-    .default("Delivery <no-reply@example.com>"),
-  SUPPORT_EMAIL: z.email().default("no-reply@example.com"),
 });
 
 export const env = envSchema.parse(process.env);

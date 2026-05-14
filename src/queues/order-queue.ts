@@ -23,11 +23,10 @@ const buildOrderJobId = ({ order }: CreateOrderParams): string => {
     .sort((a, b) => a.id.localeCompare(b.id));
 
   const payload = JSON.stringify({
-    userId: order.userId,
+    customerPhone: order.customerPhone,
     establishmentId: order.establishmentId,
     deliveryType: order.deliveryType,
     paymentMethod: order.paymentMethod,
-    addressId: order.addressId ?? null,
     districtId: order.districtId ?? null,
     couponId: order.couponId ?? null,
     changeAmount: order.changeAmount ?? null,

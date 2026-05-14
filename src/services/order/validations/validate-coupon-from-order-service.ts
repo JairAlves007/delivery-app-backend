@@ -3,19 +3,18 @@ import { makeCheckCouponService } from "@/factories/services/coupon/make-check-c
 import { makeFindCouponService } from "@/factories/services/coupon/make-find-coupon-service.js";
 import type { Coupon } from "@/generated/prisma/client.js";
 import type { EstablishmentID } from "@/types/establishment.js";
-import type { UserID } from "@/types/user.js";
 
 type ValidateCouponFromOrderServiceRequest = {
   establishmentId: EstablishmentID;
-  userId: UserID;
   couponId: number;
+  customerPhone: string;
 };
 
 export class ValidateCouponFromOrderService {
   async handle({
     establishmentId,
     couponId,
-    userId,
+    customerPhone,
   }: ValidateCouponFromOrderServiceRequest): Promise<Coupon> {
     const filterParams = { establishment_id: establishmentId };
 
@@ -32,7 +31,7 @@ export class ValidateCouponFromOrderService {
     await checkCoupon.handle({
       code: coupon.code,
       establishmentId,
-      userId,
+      customerPhone,
     });
 
     return coupon;
