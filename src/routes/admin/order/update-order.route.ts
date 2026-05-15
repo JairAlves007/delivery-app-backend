@@ -11,56 +11,56 @@ import { adminTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
 import {
-  apiDefaultErrorResponseSchema,
-  apiSuccessResponseSchema,
-  apiValidationErrorResponseSchema,
+	apiDefaultErrorResponseSchema,
+	apiSuccessResponseSchema,
+	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
 import {
-  orderParamsSchema,
-  updateOrderStatusBodySchema,
+	orderParamsSchema,
+	updateOrderStatusBodySchema
 } from "@/schemas/order-schema.js";
 
 export const updateOrderRoute = async (app: FastifyInstance) => {
-  app.withTypeProvider<ZodTypeProvider>().put(
-    "/:id",
-    {
-      schema: {
-        operationId: "updateOrder",
-        tags: adminTags("Orders"),
-        summary: "Atualizar status do pedido",
-        params: orderParamsSchema,
-        body: updateOrderStatusBodySchema,
-        response: {
-          204: apiSuccessResponseSchema(z.object({})),
-          401: apiDefaultErrorResponseSchema,
-          403: apiDefaultErrorResponseSchema,
-          404: apiDefaultErrorResponseSchema,
-          422: apiValidationErrorResponseSchema,
-          500: apiDefaultErrorResponseSchema,
-        },
-      },
-      onRequest: [
-        isAuthenticated,
-        ensureUserHasPermission([PermissionType.CANCEL_ORDERS]),
-      ],
-    },
-    async (request, reply) => {
-      const { id } = request.params;
-      const body = request.body;
-      const establishmentId = getUserEstablishmentId(request.user);
+	app.withTypeProvider<ZodTypeProvider>().put(
+		"/:id",
+		{
+			schema: {
+				operationId: "updateOrder",
+				tags: adminTags("Orders"),
+				summary: "Atualizar status do pedido",
+				params: orderParamsSchema,
+				body: updateOrderStatusBodySchema,
+				response: {
+					204: apiSuccessResponseSchema(z.object({})),
+					401: apiDefaultErrorResponseSchema,
+					403: apiDefaultErrorResponseSchema,
+					404: apiDefaultErrorResponseSchema,
+					422: apiValidationErrorResponseSchema,
+					500: apiDefaultErrorResponseSchema
+				}
+			},
+			onRequest: [
+				isAuthenticated,
+				ensureUserHasPermission([PermissionType.MANAGE_ORDERS])
+			]
+		},
+		async (request, reply) => {
+			const { id } = request.params;
+			const body = request.body;
+			const establishmentId = getUserEstablishmentId(request.user);
 
-      const updateOrderService = makeUpdateOrderService();
+			const updateOrderService = makeUpdateOrderService();
 
-      await updateOrderService.handle({
-        id,
-        ...body,
-        establishmentId,
-        paramsToForget: { establishment_id: establishmentId },
-      });
+			await updateOrderService.handle({
+				id,
+				...body,
+				establishmentId,
+				paramsToForget: { establishment_id: establishmentId }
+			});
 
-      return reply
-        .status(HTTPStatusCodes.NO_CONTENT)
-        .send(ApiResponse.success("Pedido atualizado com sucesso", {}));
-    },
-  );
+			return reply
+				.status(HTTPStatusCodes.NO_CONTENT)
+				.send(ApiResponse.success("Pedido atualizado com sucesso", {}));
+		}
+	);
 };

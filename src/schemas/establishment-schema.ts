@@ -45,6 +45,13 @@ z.globalRegistry.add(updateEstablishmentBodySchema, {
 	id: "UpdateEstablishmentBody"
 });
 
+export const updateMyEstablishmentBodySchema =
+	createEstablishmentBodySchema.omit({ nextBillingDate: true }).partial();
+
+z.globalRegistry.add(updateMyEstablishmentBodySchema, {
+	id: "UpdateMyEstablishmentBody"
+});
+
 export const establishmentParamsSchema = z.object({
 	id: z.ulid().min(1, "O id do estabelecimento deve ser preenchido")
 });

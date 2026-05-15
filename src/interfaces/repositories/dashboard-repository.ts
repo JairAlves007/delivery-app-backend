@@ -9,7 +9,6 @@ import type {
   DashboardSummaryRow,
   DashboardTopCategoryRow,
   DashboardTopCustomerRow,
-  DashboardTopFavoritedProductRow,
   DashboardTopNInput,
   DashboardTopProductRow,
 } from "@/types/dashboard.js";
@@ -38,7 +37,4 @@ export interface IDashboardRepository {
   getCouponsUsage(
     input: DashboardTopNInput,
   ): Promise<DashboardCouponUsageRow[]>;
-  getTopFavoritedProducts(
-    input: DashboardTopNInput,
-  ): Promise<DashboardTopFavoritedProductRow[]>;
 }

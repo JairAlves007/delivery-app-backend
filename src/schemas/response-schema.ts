@@ -299,9 +299,6 @@ export const productListResponseSchema = paginatedResponseSchema(
 	productResponseSchema
 );
 
-export const myFavoritesResponseSchema = cursorPaginatedResponseSchema(
-	productResponseSchema
-);
 
 // ──────────────────────────────────────────────
 // Order
@@ -356,8 +353,6 @@ export const orderPayloadSchema = z.object({
 export const orderListResponseSchema =
 	paginatedResponseSchema(orderPayloadSchema);
 
-export const myOrdersResponseSchema =
-	cursorPaginatedResponseSchema(orderPayloadSchema);
 
 // ──────────────────────────────────────────────
 // Dashboard
@@ -414,16 +409,10 @@ const dashboardTopCategorySchema = z.object({
 });
 
 const dashboardTopCustomerSchema = z.object({
-	userId: z.string(),
+	phone: z.string(),
 	name: z.string(),
 	orders: z.number(),
 	spent: z.number()
-});
-
-const dashboardTopFavoritedProductSchema = z.object({
-	productId: z.string(),
-	name: z.string(),
-	favorites: z.number()
 });
 
 const dashboardCouponUsageSchema = z.object({
@@ -448,7 +437,6 @@ export const dashboardResponseSchema = z.object({
 	topProducts: z.array(dashboardTopProductSchema),
 	topCategories: z.array(dashboardTopCategorySchema),
 	topCustomers: z.array(dashboardTopCustomerSchema),
-	topFavoritedProducts: z.array(dashboardTopFavoritedProductSchema),
 	couponsUsage: z.array(dashboardCouponUsageSchema)
 });
 
@@ -513,23 +501,7 @@ const authEstablishmentCustomerSchema = establishmentResponseSchema
 
 const authMenuSchema = z.array(menuItemSchema).nullable();
 
-export const signInCustomerResponseSchema = z.object({
-	type: z.string(),
-	expiresIn: z.number(),
-	token: z.string(),
-	refreshToken: z.string(),
-	refreshTokenExpiresIn: z.number()
-});
-
 export const signInAdminResponseSchema = z.object({
-	type: z.string(),
-	expiresIn: z.number(),
-	token: z.string(),
-	refreshToken: z.string(),
-	refreshTokenExpiresIn: z.number()
-});
-
-export const signUpTokenResponseSchema = z.object({
 	type: z.string(),
 	expiresIn: z.number(),
 	token: z.string(),
@@ -553,7 +525,7 @@ export const meResponseSchema = z.object({
 
 export const establishmentContextResponseSchema = z.object({
 	establishment: authEstablishmentCustomerSchema,
-	menu: authMenuSchema,
+	menu: authMenuSchema
 });
 
 // ──────────────────────────────────────────────
@@ -572,33 +544,6 @@ export const productsFromCategoryCatalogResponseSchema =
 export const suggestedProductsCatalogResponseSchema = listResponseSchema(
 	productResponseSchema
 );
-
-// ──────────────────────────────────────────────
-// Address
-// ──────────────────────────────────────────────
-
-const baseAddressSchema = z.object({
-	id: z.string(),
-	street: z.string(),
-	number: z.string().nullable(),
-	neighborhood: z.string(),
-	city: z.string(),
-	state: z.string(),
-	postal_code: z.string(),
-	complement: z.string().nullable(),
-	reference_point: z.string().nullable(),
-	phone: z.string(),
-	latitude: z.number().nullable(),
-	longitude: z.number().nullable()
-});
-
-export const addressResponseSchema = baseAddressSchema.extend({
-	address_id: z.string(),
-	is_default: z.boolean()
-});
-
-export const addressListResponseSchema =
-	cursorPaginatedResponseSchema(baseAddressSchema);
 
 // ──────────────────────────────────────────────
 // Health
@@ -639,23 +584,22 @@ const registryItems = [
 	},
 	{ schema: productResponseSchema, id: "ProductResponse" },
 	{ schema: productListResponseSchema, id: "ProductListResponse" },
-	{ schema: myFavoritesResponseSchema, id: "MyFavoritesResponse" },
 	{ schema: tagResponseSchema, id: "TagResponse" },
 	{ schema: tagDetailResponseSchema, id: "TagDetailResponse" },
 	{ schema: tagListResponseSchema, id: "TagListResponse" },
 	{ schema: z.enum(TagType), id: "TagType" },
 	{ schema: orderPayloadSchema, id: "OrderPayload" },
 	{ schema: orderListResponseSchema, id: "OrderListResponse" },
-	{ schema: myOrdersResponseSchema, id: "MyOrdersResponse" },
 	{ schema: dashboardResponseSchema, id: "DashboardResponse" },
 	{ schema: resourceRuleResponseSchema, id: "ResourceRuleResponse" },
 	{ schema: signedUrlResponseSchema, id: "SignedUrlResponse" },
 	{ schema: signInAdminResponseSchema, id: "SignInAdminResponse" },
-	{ schema: signInCustomerResponseSchema, id: "SignInCustomerResponse" },
-	{ schema: signUpTokenResponseSchema, id: "SignUpTokenResponse" },
 	{ schema: refreshTokenResponseSchema, id: "RefreshTokenResponse" },
 	{ schema: meResponseSchema, id: "MeResponse" },
-	{ schema: establishmentContextResponseSchema, id: "EstablishmentContextResponse" },
+	{
+		schema: establishmentContextResponseSchema,
+		id: "EstablishmentContextResponse"
+	},
 	{ schema: bannersCatalogResponseSchema, id: "BannersCatalogResponse" },
 	{
 		schema: productCategoriesCatalogResponseSchema,
@@ -669,8 +613,6 @@ const registryItems = [
 		schema: suggestedProductsCatalogResponseSchema,
 		id: "SuggestedProductsCatalogResponse"
 	},
-	{ schema: addressResponseSchema, id: "AddressResponse" },
-	{ schema: addressListResponseSchema, id: "AddressListResponse" },
 	{ schema: healthResponseSchema, id: "HealthResponse" },
 	{
 		schema: z.enum(AddonType),

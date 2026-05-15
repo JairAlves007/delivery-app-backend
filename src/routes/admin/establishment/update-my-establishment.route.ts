@@ -15,7 +15,7 @@ import {
 	apiSuccessResponseSchema,
 	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
-import { updateEstablishmentBodySchema } from "@/schemas/establishment-schema.js";
+import { updateMyEstablishmentBodySchema } from "@/schemas/establishment-schema.js";
 
 export const updateMyEstablishmentRoute = async (app: FastifyInstance) => {
 	app.withTypeProvider<ZodTypeProvider>().patch(
@@ -25,7 +25,7 @@ export const updateMyEstablishmentRoute = async (app: FastifyInstance) => {
 				operationId: "updateMyEstablishment",
 				tags: adminTags("Establishments"),
 				summary: "Atualizar meu estabelecimento",
-				body: updateEstablishmentBodySchema,
+				body: updateMyEstablishmentBodySchema,
 				response: {
 					204: apiSuccessResponseSchema(z.object({})),
 					401: apiDefaultErrorResponseSchema,

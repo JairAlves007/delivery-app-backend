@@ -5,7 +5,6 @@ import type {
 } from "@/generated/prisma/client.js";
 
 import type { EstablishmentID } from "./establishment.js";
-import type { UserID } from "./user.js";
 
 export type DashboardGranularity = "day" | "week" | "month";
 
@@ -81,16 +80,10 @@ export type DashboardTopCategoryRow = {
 };
 
 export type DashboardTopCustomerRow = {
-	userId: UserID;
+	phone: string;
 	name: string;
 	orders: number;
 	spent: number;
-};
-
-export type DashboardTopFavoritedProductRow = {
-	productId: string;
-	name: string;
-	favorites: number;
 };
 
 export type DashboardCouponUsageRow = {
@@ -115,6 +108,5 @@ export type DashboardResponse = {
 	topProducts: DashboardTopProductRow[];
 	topCategories: DashboardTopCategoryRow[];
 	topCustomers: DashboardTopCustomerRow[];
-	topFavoritedProducts: DashboardTopFavoritedProductRow[];
 	couponsUsage: DashboardCouponUsageRow[];
 };

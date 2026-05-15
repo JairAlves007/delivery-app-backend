@@ -19,7 +19,6 @@ import type {
 	DashboardSummaryRow,
 	DashboardTopCategoryRow,
 	DashboardTopCustomerRow,
-	DashboardTopFavoritedProductRow,
 	DashboardTopNInput,
 	DashboardTopProductRow
 } from "@/types/dashboard.js";
@@ -63,7 +62,7 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 			WITH scoped_orders AS (
 				SELECT
 					o.id,
-					o.user_id,
+					o.customer_phone,
 					o.subtotal,
 					o.shipping_fee,
 					COALESCE(oc.discount_value, 0) AS discount_value
@@ -99,7 +98,7 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 				COALESCE(SUM(shipping_fee)   FILTER (WHERE status <> 'CANCELLED'), 0)::int AS shipping_total,
 				COALESCE(SUM(net_total)      FILTER (WHERE status <> 'CANCELLED'), 0)::int AS net_revenue,
 				COALESCE(ROUND(AVG(net_total) FILTER (WHERE status <> 'CANCELLED')), 0)::int AS average_order_value,
-				COUNT(DISTINCT user_id) FILTER (WHERE status <> 'CANCELLED')::int AS distinct_customers
+				COUNT(DISTINCT customer_phone) FILTER (WHERE status <> 'CANCELLED')::int AS distinct_customers
 			FROM joined;
 		`;
 
@@ -442,7 +441,7 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 	}: DashboardTopNInput): Promise<DashboardTopCustomerRow[]> {
 		const rows = await prisma.$queryRaw<
 			{
-				user_id: string;
+				phone: string;
 				name: string;
 				orders: number;
 				spent: number;
@@ -451,7 +450,8 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 			WITH scoped_orders AS (
 				SELECT
 					o.id,
-					o.user_id,
+					o.customer_phone,
+					o.customer_name,
 					o.subtotal,
 					o.shipping_fee,
 					COALESCE(oc.discount_value, 0) AS discount_value
@@ -471,21 +471,20 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 				ORDER BY order_id, created_at DESC
 			)
 			SELECT
-				so.user_id AS user_id,
-				u.name AS name,
+				so.customer_phone AS phone,
+				MAX(so.customer_name) AS name,
 				COUNT(*)::int AS orders,
 				SUM(so.subtotal + so.shipping_fee - so.discount_value)::int AS spent
 			FROM scoped_orders so
 			JOIN latest_status ls ON ls.order_id = so.id
-			JOIN users u ON u.id = so.user_id
 			WHERE ls.status <> 'CANCELLED'
-			GROUP BY so.user_id, u.name
+			GROUP BY so.customer_phone
 			ORDER BY spent DESC, orders DESC
 			LIMIT ${limit};
 		`;
 
 		return rows.map(row => ({
-			userId: row.user_id,
+			phone: row.phone,
 			name: row.name,
 			orders: row.orders,
 			spent: row.spent
@@ -543,38 +542,5 @@ export class DashboardPrismaRepository implements IDashboardRepository {
 		}));
 	}
 
-	async getTopFavoritedProducts({
-		establishmentId,
-		from,
-		to,
-		limit
-	}: DashboardTopNInput): Promise<DashboardTopFavoritedProductRow[]> {
-		const rows = await prisma.$queryRaw<
-			{
-				product_id: string;
-				name: string;
-				favorites: number;
-			}[]
-		>`
-			SELECT
-				p.id AS product_id,
-				p.name AS name,
-				COUNT(f.id)::int AS favorites
-			FROM favorites f
-			JOIN products p ON p.id = f.product_id
-			WHERE p.deleted_at IS NULL
-				AND p.establishment_id = ${establishmentId}
-				AND f.created_at >= ${from}
-				AND f.created_at <  ${to}
-			GROUP BY p.id, p.name
-			ORDER BY favorites DESC, p.name ASC
-			LIMIT ${limit};
-		`;
-
-		return rows.map(row => ({
-			productId: row.product_id,
-			name: row.name,
-			favorites: row.favorites
-		}));
-	}
 }
+

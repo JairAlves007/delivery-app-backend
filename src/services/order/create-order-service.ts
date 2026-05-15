@@ -18,6 +18,7 @@ import {
 import { removeDuplicateItems } from "@/helpers/utils.js";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
 import prisma from "@/lib/prisma.js";
+import { makeSendOrderConfirmationMessageService } from "@/factories/services/order/make-send-order-confirmation-message.js";
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import type {
   BuildOrderItemsParams,
@@ -267,6 +268,24 @@ export class CreateOrderService {
     await forgetAllListingCacheKeysQueue({
       baseCacheKey: "orders",
       paramsToForget,
+    });
+
+    const sendConfirmationService = makeSendOrderConfirmationMessageService();
+    await sendConfirmationService.handle({
+      address,
+      coupon,
+      couponDiscount,
+      deliveryType,
+      district,
+      establishmentId,
+      paymentMethod,
+      shippingCost,
+      subtotal,
+      customerName,
+      customerPhone,
+      changeAmount,
+      comment,
+      orderItemsToProcess,
     });
   }
 }

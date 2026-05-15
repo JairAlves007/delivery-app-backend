@@ -36,7 +36,7 @@ export const deleteEstablishmentOwnerRoute = async (app: FastifyInstance) => {
 			},
 			onRequest: [
 				isAuthenticated,
-				ensureUserHasPermission([PermissionType.MANAGE_USERS])
+				ensureUserHasPermission([PermissionType.MANAGE_ESTABLISHMENT_OWNERS])
 			]
 		},
 		async (request, reply) => {

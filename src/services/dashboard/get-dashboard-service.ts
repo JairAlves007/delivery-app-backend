@@ -175,7 +175,6 @@ export class GetDashboardService {
 			topProducts,
 			topCategories,
 			topCustomers,
-			topFavoritedProducts,
 			couponsUsage
 		] = await Promise.all([
 			this.dashboardRepository.getSummary(scopedRange),
@@ -189,10 +188,6 @@ export class GetDashboardService {
 			this.dashboardRepository.getTopProducts({ ...scopedRange, limit }),
 			this.dashboardRepository.getTopCategories({ ...scopedRange, limit }),
 			this.dashboardRepository.getTopCustomers({ ...scopedRange, limit }),
-			this.dashboardRepository.getTopFavoritedProducts({
-				...scopedRange,
-				limit
-			}),
 			this.dashboardRepository.getCouponsUsage({ ...scopedRange, limit })
 		]);
 
@@ -212,7 +207,6 @@ export class GetDashboardService {
 			topProducts,
 			topCategories,
 			topCustomers,
-			topFavoritedProducts,
 			couponsUsage
 		};
 	}

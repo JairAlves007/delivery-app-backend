@@ -1227,11 +1227,11 @@ async function main() {
 		PermissionType.MANAGE_CATEGORIES,
 		PermissionType.MANAGE_PRODUCT_OPTIONS,
 		PermissionType.MANAGE_DISTRICTS,
-		PermissionType.CANCEL_ORDERS,
+		PermissionType.MANAGE_ORDERS,
 		PermissionType.MANAGE_OWN_ESTABLISHMENT,
 		PermissionType.MANAGE_BANNERS,
 		PermissionType.MANAGE_COUPONS,
-		PermissionType.VIEW_CUSTOMERS,
+		PermissionType.MANAGE_ESTABLISHMENT_OWNERS,
 		PermissionType.VIEW_DASHBOARD
 	];
 
