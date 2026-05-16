@@ -3,7 +3,10 @@ import {
 	buildFilterQueryOptions,
 	transformValidFilterParams
 } from "@/helpers/crud.js";
-import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
+import type {
+	IProductRepository,
+	SearchCatalogParams
+} from "@/interfaces/repositories/product-repository.js";
 import prisma from "@/lib/prisma.js";
 import type {
 	CursorPaginationParams,
@@ -291,5 +294,95 @@ export class ProductPrismaRepository implements IProductRepository {
 				product_id: id
 			}
 		});
+	}
+
+	async searchCatalog({
+		establishmentId,
+		categoryId,
+		search,
+		page,
+		perPage,
+		similarityThreshold
+	}: SearchCatalogParams): Promise<ProductFromRepository[]> {
+		const { searchSql, rankingSql } =
+			buildFilterQueryOptions<Prisma.ProductOrderByWithRelationInput>({
+				search,
+				searchableFields: ["name", "description"],
+				defaultSortField: "created_at",
+				useUnaccent: true,
+				similarityThreshold
+			});
+
+		if (!searchSql || !rankingSql) return [];
+
+		const offset = (page - 1) * perPage;
+
+		const rows = await prisma.$queryRaw<{ id: string }[]>`
+			SELECT p.id
+			FROM products p
+			WHERE p.deleted_at IS NULL
+				AND p.establishment_id = ${establishmentId}
+				${
+					categoryId
+						? Prisma.sql`AND p.category_id = ${categoryId}`
+						: Prisma.empty
+				}
+				AND ${searchSql}
+			ORDER BY ${rankingSql} DESC,
+				p.created_at DESC,
+				p.id ASC
+			LIMIT ${perPage}
+			OFFSET ${offset}
+		`;
+
+		if (rows.length === 0) return [];
+
+		const ids = rows.map(r => r.id);
+
+		const products = await prisma.product.findMany({
+			where: { id: { in: ids } },
+			include: {
+				resources: { select: { resource: true } },
+				tags: { select: { tag: true } }
+			}
+		});
+
+		const byId = new Map(products.map(p => [p.id, p]));
+		return ids
+			.map(id => byId.get(id))
+			.filter((p): p is ProductFromRepository => !!p);
+	}
+
+	async countSearchCatalog({
+		establishmentId,
+		categoryId,
+		search,
+		similarityThreshold
+	}: Omit<SearchCatalogParams, "page" | "perPage">): Promise<number> {
+		const { searchSql } =
+			buildFilterQueryOptions<Prisma.ProductOrderByWithRelationInput>({
+				search,
+				searchableFields: ["name", "description"],
+				defaultSortField: "created_at",
+				useUnaccent: true,
+				similarityThreshold
+			});
+
+		if (!searchSql) return 0;
+
+		const rows = await prisma.$queryRaw<{ count: bigint }[]>`
+			SELECT COUNT(*)::bigint AS count
+			FROM products p
+			WHERE p.deleted_at IS NULL
+				AND p.establishment_id = ${establishmentId}
+				${
+					categoryId
+						? Prisma.sql`AND p.category_id = ${categoryId}`
+						: Prisma.empty
+				}
+				AND ${searchSql}
+		`;
+
+		return Number(rows[0]?.count ?? 0);
 	}
 }

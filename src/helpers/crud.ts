@@ -1,9 +1,12 @@
+import { Prisma } from "@/generated/prisma/client.js";
 import { searchAndOrderBySchema } from "@/schemas/generic-schema.js";
 import type {
   FilterParams,
   SearchableModelFromRepositoryFields,
   ValidFilterParams,
 } from "@/types/crud.js";
+
+const DEFAULT_SIMILARITY_THRESHOLD = 0.2;
 
 export const transformValidFilterParams = (
   filterParams?: FilterParams,
@@ -38,16 +41,60 @@ export const getFilterParamsCacheKey = (
   return validEntries.map(([key, value]) => `${key}_${value}`).join("_") + "_";
 };
 
+const quoteIdentifier = (field: string): Prisma.Sql =>
+  Prisma.raw(`"${field.replace(/"/g, '""')}"`);
+
+export const buildUnaccentSearchSql = <Field>({
+  search,
+  searchableFields,
+  similarityThreshold,
+}: {
+  search: string;
+  searchableFields: (keyof Field)[];
+  similarityThreshold?: number;
+}): Prisma.Sql => {
+  const threshold = similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD;
+
+  const fragments = searchableFields.flatMap((field) => {
+    const column = quoteIdentifier(String(field));
+    return [
+      Prisma.sql`f_unaccent(${column}) ILIKE '%' || f_unaccent(${search}) || '%'`,
+      Prisma.sql`similarity(f_unaccent(${column}), f_unaccent(${search})) >= ${threshold}`,
+    ];
+  });
+
+  return Prisma.sql`(${Prisma.join(fragments, " OR ")})`;
+};
+
+export const buildUnaccentRankingSql = <Field>({
+  search,
+  searchableFields,
+}: {
+  search: string;
+  searchableFields: (keyof Field)[];
+}): Prisma.Sql => {
+  const similarityCalls = searchableFields.map((field) => {
+    const column = quoteIdentifier(String(field));
+    return Prisma.sql`similarity(f_unaccent(${column}), f_unaccent(${search}))`;
+  });
+
+  return Prisma.sql`GREATEST(${Prisma.join(similarityCalls, ", ")})`;
+};
+
 export function buildFilterQueryOptions<Field>({
   search,
   sortField,
   sortDirection,
   searchableFields,
   defaultSortField,
+  useUnaccent,
+  similarityThreshold,
 }: SearchableModelFromRepositoryFields<Field>) {
+  const hasSearch = !!search && searchableFields.length > 0;
+
   const where = {
-    ...(search &&
-      searchableFields.length > 0 && {
+    ...(hasSearch &&
+      !useUnaccent && {
         OR: searchableFields.map((field) => ({
           [field]: { contains: search, mode: "insensitive" },
         })),
@@ -61,5 +108,19 @@ export function buildFilterQueryOptions<Field>({
     [sortField]: sortDirection ?? "asc",
   };
 
-  return { where, orderBy };
+  const searchSql =
+    hasSearch && useUnaccent
+      ? buildUnaccentSearchSql<Field>({
+          search,
+          searchableFields,
+          similarityThreshold,
+        })
+      : undefined;
+
+  const rankingSql =
+    hasSearch && useUnaccent
+      ? buildUnaccentRankingSql<Field>({ search, searchableFields })
+      : undefined;
+
+  return { where, orderBy, searchSql, rankingSql };
 }

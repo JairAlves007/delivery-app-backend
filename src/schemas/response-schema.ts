@@ -291,14 +291,16 @@ export const productResponseSchema = z.object({
 	stock: z.number().nullable(),
 	valid_until: nullableDateStringSchema,
 	resources: mappedResourceRecordSchema,
-	tags: z.array(tagResponseSchema),
-	isFavorited: z.boolean().default(false)
+	tags: z.array(tagResponseSchema)
 });
 
 export const productListResponseSchema = paginatedResponseSchema(
 	productResponseSchema
 );
 
+export const productDetailResponseSchema = productResponseSchema.extend({
+	addonCategories: z.array(addonCategoryResponseSchema)
+});
 
 // ──────────────────────────────────────────────
 // Order
@@ -352,7 +354,6 @@ export const orderPayloadSchema = z.object({
 
 export const orderListResponseSchema =
 	paginatedResponseSchema(orderPayloadSchema);
-
 
 // ──────────────────────────────────────────────
 // Dashboard
@@ -545,6 +546,10 @@ export const suggestedProductsCatalogResponseSchema = listResponseSchema(
 	productResponseSchema
 );
 
+export const searchProductsCatalogResponseSchema = paginatedResponseSchema(
+	productResponseSchema
+);
+
 // ──────────────────────────────────────────────
 // Health
 // ──────────────────────────────────────────────
@@ -584,6 +589,7 @@ const registryItems = [
 	},
 	{ schema: productResponseSchema, id: "ProductResponse" },
 	{ schema: productListResponseSchema, id: "ProductListResponse" },
+	{ schema: productDetailResponseSchema, id: "ProductDetailResponse" },
 	{ schema: tagResponseSchema, id: "TagResponse" },
 	{ schema: tagDetailResponseSchema, id: "TagDetailResponse" },
 	{ schema: tagListResponseSchema, id: "TagListResponse" },
@@ -612,6 +618,10 @@ const registryItems = [
 	{
 		schema: suggestedProductsCatalogResponseSchema,
 		id: "SuggestedProductsCatalogResponse"
+	},
+	{
+		schema: searchProductsCatalogResponseSchema,
+		id: "SearchProductsCatalogResponse"
 	},
 	{ schema: healthResponseSchema, id: "HealthResponse" },
 	{

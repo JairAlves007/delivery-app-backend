@@ -1,54 +1,49 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import { z } from "zod";
 
 import { makeFindProductService } from "@/factories/services/product/make-find-product-service.js";
-import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
-import { getUserEstablishmentId } from "@/helpers/get-user-establishment-id.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
-import { adminTags } from "@/http/swagger-tags.js";
-import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
-import { isAuthenticated } from "@/middlewares/is-auth.js";
+import { customerTags } from "@/http/swagger-tags.js";
 import {
 	apiDefaultErrorResponseSchema,
 	apiSuccessResponseSchema,
 	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
+import { establishmentIdSchema } from "@/schemas/generic-schema.js";
 import { productParamsSchema } from "@/schemas/product-schema.js";
 import { productDetailResponseSchema } from "@/schemas/response-schema.js";
 
-export const findProductRoute = async (app: FastifyInstance) => {
+export const findProductCatalogRoute = async (app: FastifyInstance) => {
 	app.withTypeProvider<ZodTypeProvider>().get(
-		"/:id",
+		"/:establishmentId/product/:productId",
 		{
 			schema: {
-				operationId: "findProduct",
-				tags: adminTags("Products"),
-				summary: "Encontrar produto pelo ID",
-				params: productParamsSchema,
+				operationId: "findProductCatalog",
+				tags: customerTags("Main (Home)"),
+				summary: "Encontrar produto pelo ID na home do customer",
+				params: z.object({
+					establishmentId: establishmentIdSchema,
+					productId: productParamsSchema.shape.id
+				}),
 				response: {
 					200: apiSuccessResponseSchema(productDetailResponseSchema),
-					401: apiDefaultErrorResponseSchema,
-					403: apiDefaultErrorResponseSchema,
 					404: apiDefaultErrorResponseSchema,
 					422: apiValidationErrorResponseSchema,
 					500: apiDefaultErrorResponseSchema
 				}
-			},
-			onRequest: [
-				isAuthenticated,
-				ensureUserHasPermission([PermissionType.MANAGE_PRODUCTS])
-			]
+			}
 		},
 		async (request, reply) => {
-			const { id } = request.params;
+			const { establishmentId, productId } = request.params;
 
 			const findProductService = makeFindProductService();
 
 			const product = await findProductService.handle({
-				id,
+				id: productId,
 				filterParams: {
-					establishment_id: getUserEstablishmentId(request.user)
+					establishment_id: establishmentId
 				}
 			});
 

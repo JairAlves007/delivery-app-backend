@@ -29,6 +29,8 @@ export type SearchableModelFromRepositoryFields<Field> = Pick<
 > & {
   searchableFields: (keyof Field)[];
   defaultSortField: keyof Field;
+  useUnaccent?: boolean;
+  similarityThreshold?: number;
 };
 
 export type PaginationParams = FilterField & {
