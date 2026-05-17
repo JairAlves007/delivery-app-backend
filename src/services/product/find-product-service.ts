@@ -5,26 +5,31 @@ import { makeCache } from "@/factories/services/cache/make-cache.js";
 import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { transformPriceFromDatabase } from "@/helpers/price.js";
-import type { IAddonCategoryRepository } from "@/interfaces/repositories/addon-category-repository.js";
+import type { IProductAddonCategoryRepository } from "@/interfaces/repositories/product-addon-category-repository.js";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
 import { productParamsSchema } from "@/schemas/product-schema.js";
 import { mapProduct } from "@/services/product/map-product.js";
-import type { AddonCategoryFromRepository } from "@/types/addon-category.js";
 import type { FilterField } from "@/types/crud.js";
 import type { ProductDetail } from "@/types/product.js";
+import type { ProductAddonCategoryFromRepository } from "@/types/product-addon-category.js";
 
 type FindProductServiceRequest = z.infer<typeof productParamsSchema> &
   FilterField;
 
-const mapAddonCategories = (
-  categories: AddonCategoryFromRepository[],
+const mapProductAddonCategories = (
+  items: ProductAddonCategoryFromRepository[],
 ): ProductDetail["addonCategories"] =>
-  categories.map((category) => ({
-    id: category.id,
-    name: category.name,
-    type: category.type,
-    max_quantity: category.max_quantity,
-    addons: category.addons.map((addon) => ({
+  items.map((item) => ({
+    id: item.addonCategory.id,
+    name: item.addonCategory.name,
+    type: item.addonCategory.type,
+    pricing_strategy: item.addonCategory.pricing_strategy,
+    parts_count: item.addonCategory.parts_count,
+    min_selection: item.min_selection,
+    max_selection: item.max_selection,
+    is_required: item.is_required,
+    display_order: item.display_order,
+    addons: item.addonCategory.addons.map((addon) => ({
       id: addon.id,
       name: addon.name,
       price: transformPriceFromDatabase(addon.price),
@@ -32,16 +37,10 @@ const mapAddonCategories = (
   }));
 
 export class FindProductService {
-  private productRepository: IProductRepository;
-  private addonCategoryRepository: IAddonCategoryRepository;
-
   constructor(
-    productRepository: IProductRepository,
-    addonCategoryRepository: IAddonCategoryRepository,
-  ) {
-    this.productRepository = productRepository;
-    this.addonCategoryRepository = addonCategoryRepository;
-  }
+    private productRepository: IProductRepository,
+    private productAddonCategoryRepository: IProductAddonCategoryRepository,
+  ) {}
 
   public async handle({
     id,
@@ -50,20 +49,18 @@ export class FindProductService {
     const cache = makeCache();
     const filterPrefixKey = getFilterParamsCacheKey(filterParams);
     const productKey = `${filterPrefixKey}${cache.keys.products}_${id}`;
-    const establishmentId = filterParams?.establishment_id ?? undefined;
-    const addonCategoriesFilter = { establishment_id: establishmentId };
-    const addonCategoriesKey = `${getFilterParamsCacheKey(addonCategoriesFilter)}all_${cache.keys.addonCategories}`;
+    const productAddonCategoriesKey = `${cache.keys.productAddonCategories}_${id}`;
 
-    const [product, addonCategories] = await Promise.all([
+    const [product, productAddonCategories] = await Promise.all([
       cache.rememberForever(
         productKey,
         async () => await this.productRepository.findById({ id, filterParams }),
       ),
       cache.remember(
-        addonCategoriesKey,
+        productAddonCategoriesKey,
         Constants.CACHE_TTL.addonCategories,
         async () =>
-          await this.addonCategoryRepository.listAll(addonCategoriesFilter),
+          await this.productAddonCategoryRepository.listByProductId(id),
       ),
     ]);
 
@@ -71,7 +68,7 @@ export class FindProductService {
 
     return {
       ...mapProduct(product),
-      addonCategories: mapAddonCategories(addonCategories),
+      addonCategories: mapProductAddonCategories(productAddonCategories),
     };
   }
 }

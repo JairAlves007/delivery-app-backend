@@ -42,8 +42,22 @@ enum DiscountType {
 }
 
 enum AddonType {
-  QUANTITY
+  SINGLE_CHOICE
   MULTIPLE_CHOICE
+  QUANTITY
+  FRACTIONAL
+}
+
+enum AddonPricingStrategy {
+  SUM
+  MAX
+  AVERAGE
+  NONE
+}
+
+enum ProductPricingMode {
+  UNIT
+  PER_WEIGHT
 }
 
 enum SocialPlatform {
@@ -365,25 +379,28 @@ model ProductCategory {
 }
 
 model Product {
-  id                  String            @id @default(ulid())
+  id                  String                 @id @default(ulid())
   establishment_id    String
   category_id         String
-  name                String            @db.VarChar(255)
-  description         String            @db.VarChar(2000)
+  name                String                 @db.VarChar(255)
+  description         String                 @db.VarChar(2000)
   price               Int
-  slug                String            @db.VarChar(255)
+  pricing_mode        ProductPricingMode     @default(UNIT)
+  price_per_100g      Int?
+  slug                String                 @db.VarChar(255)
   discount_percentage Float?
   stock               Int?
-  valid_until         DateTime?         @db.Timestamptz
-  created_at          DateTime          @default(now()) @db.Timestamptz
-  updated_at          DateTime          @updatedAt @db.Timestamptz
-  deleted_at          DateTime?         @db.Timestamptz
-  establishment       Establishment     @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  category            ProductCategory   @relation(fields: [category_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  valid_until         DateTime?              @db.Timestamptz
+  created_at          DateTime               @default(now()) @db.Timestamptz
+  updated_at          DateTime               @updatedAt @db.Timestamptz
+  deleted_at          DateTime?              @db.Timestamptz
+  establishment       Establishment          @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  category            ProductCategory        @relation(fields: [category_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
   orderItems          OrderItem[]
   banners             Banner[]
   tags                ProductTag[]
   resources           ProductResource[]
+  addonCategories     ProductAddonCategory[]
 
   @@unique([slug, establishment_id])
   @@index([establishment_id], name: "idx_products_establishment_id")
@@ -432,18 +449,38 @@ model ProductTag {
 // ─── Addons ─────────────────────────────────────────────────────────
 
 model AddonCategory {
-  id               Int           @id @default(autoincrement())
+  id               Int                    @id @default(autoincrement())
   establishment_id String
-  name             String        @db.VarChar(255)
+  name             String                 @db.VarChar(255)
   type             AddonType
-  max_quantity     Int?
-  deleted_at       DateTime?     @db.Timestamptz
-  establishment    Establishment @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  pricing_strategy AddonPricingStrategy   @default(SUM)
+  parts_count      Int?
+  deleted_at       DateTime?              @db.Timestamptz
+  establishment    Establishment          @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   addons           Addon[]
+  products         ProductAddonCategory[]
 
   @@unique([name, establishment_id])
   @@index([establishment_id], name: "idx_addon_categories_establishment_id")
   @@map("addon_categories")
+}
+
+model ProductAddonCategory {
+  id                Int     @id @default(autoincrement())
+  product_id        String
+  addon_category_id Int
+  display_order     Int     @default(0)
+  is_required       Boolean @default(false)
+  min_selection     Int?
+  max_selection     Int?
+
+  product       Product       @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  addonCategory AddonCategory @relation(fields: [addon_category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([product_id, addon_category_id])
+  @@index([product_id], name: "idx_product_addon_categories_product_id")
+  @@index([addon_category_id], name: "idx_product_addon_categories_addon_category_id")
+  @@map("product_addon_categories")
 }
 
 model Addon {
@@ -628,13 +665,15 @@ model OrderCoupon {
 }
 
 model OrderItem {
-  id            Int      @id @default(autoincrement())
-  order_id      String
-  product_id    String
-  product_name  String   @db.VarChar(255)
-  product_price Int
-  quantity      Int
-  created_at    DateTime @default(now()) @db.Timestamptz
+  id                   Int      @id @default(autoincrement())
+  order_id             String
+  product_id           String
+  product_name         String   @db.VarChar(255)
+  product_price        Int
+  quantity             Int
+  weight_grams         Int?
+  addons_subtotal      Int      @default(0)
+  created_at           DateTime @default(now()) @db.Timestamptz
 
   order   Order            @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   product Product          @relation(fields: [product_id], references: [id], onDelete: Restrict, onUpdate: Cascade)

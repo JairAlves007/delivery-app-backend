@@ -2,6 +2,7 @@ import {
   type Coupon,
   CouponType,
   type District,
+  ProductPricingMode,
 } from "@/generated/prisma/client.js";
 import {
   getValueDiscounted,
@@ -28,13 +29,18 @@ export class CalculateCouponDiscountFromOrderService {
     orderItemsToProcess,
   }: CalculateCouponDiscountsRequest): CalculateCouponDiscountsResponse {
     let shippingCost = transformPriceFromDatabase(district?.shipping_cost ?? 0);
-    let subtotal = orderItemsToProcess.reduce((acc, item) => {
-      const addonsTotal = item.addons.reduce((acc, addon) => {
-        return acc + addon.price * addon.quantity;
-      }, 0);
 
-      return acc + item.product.price * item.product.quantity + addonsTotal;
+    let subtotal = orderItemsToProcess.reduce((acc, item) => {
+      const baseItemTotal =
+        item.product.pricing_mode === ProductPricingMode.PER_WEIGHT &&
+        item.product.price_per_100g != null &&
+        item.product.weight_grams != null
+          ? (item.product.price_per_100g * item.product.weight_grams) / 100
+          : item.product.price * item.product.quantity;
+
+      return acc + baseItemTotal + item.addonsSubtotal;
     }, 0);
+
     let couponDiscount = 0;
 
     if (!!coupon && !!district) {

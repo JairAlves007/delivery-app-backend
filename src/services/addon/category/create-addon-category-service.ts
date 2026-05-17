@@ -22,13 +22,15 @@ export class CreateAddonCategoryService {
 
 	async handle({
 		establishmentId,
-		maxQuantity: max_quantity,
+		pricingStrategy: pricing_strategy,
+		partsCount: parts_count,
 		paramsToForget,
 		...data
 	}: CreateAddonCategoryServiceRequest) {
 		await this.addonCategoryRepository.create({
 			...data,
-			max_quantity,
+			pricing_strategy,
+			parts_count: parts_count ?? null,
 			establishment: {
 				connect: {
 					id: establishmentId

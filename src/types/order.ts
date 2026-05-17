@@ -90,14 +90,17 @@ export type OrderInfo = {
 export type OrderItems = {
   id: string;
   quantity: number;
+  weight_grams?: number | null;
   addonCategories?: OrderCategoryAddons[] | null;
 };
 
 export type OrderItemsToProcess = {
   product: ProductList & {
     quantity: number;
+    weight_grams?: number | null;
   };
   addons: OrderAddonsToProcess[];
+  addonsSubtotal: number;
 };
 
 export type OrderCategoryAddons = {
@@ -128,7 +131,15 @@ export type OrderSubSectionMessage = {
   address: string;
   referencePoint: string;
   product: string;
+  productUnit: string;
+  productWeighted: string;
   addon: string;
+  addonCategoryBlock: string;
+  addonItemQuantity: string;
+  addonItemMultiple: string;
+  addonItemSingle: string;
+  addonItemFractional: string;
+  addonItemNone: string;
   coupon: string;
   changeAmount: string;
   comment: string;

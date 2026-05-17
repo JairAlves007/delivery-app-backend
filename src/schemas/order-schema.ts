@@ -60,6 +60,12 @@ export const createOrderBodySchema = z
 						.number("A quantidade deve ser preenchida")
 						.int("A quantidade deve ser um número inteiro")
 						.min(1, "A quantidade deve ser maior que zero"),
+					weightGrams: z.coerce
+						.number()
+						.int("O peso deve ser um número inteiro de gramas")
+						.min(1, "O peso deve ser maior que zero")
+						.optional()
+						.nullable(),
 					addonCategories: z
 						.array(
 							z.object({

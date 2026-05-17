@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import {
+	AddonPricingStrategy,
 	AddonType,
 	BannerLinkType,
 	CouponType,
@@ -10,6 +11,7 @@ import {
 	ForObjectResourceType,
 	OrderStatusType,
 	PaymentMethodType,
+	ProductPricingMode,
 	ResourceType,
 	RoleType,
 	SocialPlatform,
@@ -70,7 +72,8 @@ export const addonResponseSchema = z.object({
 			id: z.number(),
 			name: z.string(),
 			type: z.enum(AddonType),
-			max_quantity: z.number().nullable()
+			pricing_strategy: z.enum(AddonPricingStrategy),
+			parts_count: z.number().nullable()
 		})
 		.optional()
 });
@@ -83,7 +86,8 @@ export const addonCategoryResponseSchema = z.object({
 	id: z.number(),
 	name: z.string(),
 	type: z.enum(AddonType),
-	max_quantity: z.number().nullable(),
+	pricing_strategy: z.enum(AddonPricingStrategy),
+	parts_count: z.number().nullable(),
 	addons: z
 		.array(
 			z.object({
@@ -93,6 +97,25 @@ export const addonCategoryResponseSchema = z.object({
 			})
 		)
 		.optional()
+});
+
+export const productAddonCategoryResponseSchema = z.object({
+	id: z.number(),
+	name: z.string(),
+	type: z.enum(AddonType),
+	pricing_strategy: z.enum(AddonPricingStrategy),
+	parts_count: z.number().nullable(),
+	min_selection: z.number().nullable(),
+	max_selection: z.number().nullable(),
+	is_required: z.boolean(),
+	display_order: z.number(),
+	addons: z.array(
+		z.object({
+			id: z.number(),
+			name: z.string(),
+			price: z.number()
+		})
+	)
 });
 
 export const addonCategoryListResponseSchema = paginatedResponseSchema(
@@ -286,6 +309,8 @@ export const productResponseSchema = z.object({
 	name: z.string(),
 	description: z.string(),
 	price: z.number(),
+	pricing_mode: z.enum(ProductPricingMode),
+	price_per_100g: z.number().nullable(),
 	slug: z.string(),
 	discount_percentage: z.number().nullable(),
 	stock: z.number().nullable(),
@@ -299,7 +324,7 @@ export const productListResponseSchema = paginatedResponseSchema(
 );
 
 export const productDetailResponseSchema = productResponseSchema.extend({
-	addonCategories: z.array(addonCategoryResponseSchema)
+	addonCategories: z.array(productAddonCategoryResponseSchema)
 });
 
 // ──────────────────────────────────────────────
@@ -320,6 +345,8 @@ const orderItemSchema = z.object({
 	product_name: z.string(),
 	product_price: z.number(),
 	quantity: z.number(),
+	weight_grams: z.number().nullable(),
+	addons_subtotal: z.number(),
 	addons: z.array(orderItemAddonSchema).optional()
 });
 
@@ -564,6 +591,10 @@ const registryItems = [
 	{ schema: addonResponseSchema, id: "AddonResponse" },
 	{ schema: addonCategoryResponseSchema, id: "AddonCategoryResponse" },
 	{ schema: addonCategoryListResponseSchema, id: "AddonCategoryListResponse" },
+	{
+		schema: productAddonCategoryResponseSchema,
+		id: "ProductAddonCategoryResponse"
+	},
 	{ schema: addonListResponseSchema, id: "AddonListResponse" },
 	{ schema: bannerResponseSchema, id: "BannerResponse" },
 	{ schema: bannerListResponseSchema, id: "BannerListResponse" },

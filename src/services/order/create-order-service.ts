@@ -1,3 +1,4 @@
+import { makeSendOrderConfirmationMessageService } from "@/factories/services/order/make-send-order-confirmation-message.js";
 import { makeCalculateCouponDiscountFromOrderService } from "@/factories/services/order/validations/make-calculate-coupon-discount-from-order-service.js";
 import { makeValidateAddonsFromOrderService } from "@/factories/services/order/validations/make-validate-addons-from-order-service.js";
 import { makeValidateDeliveryFromOrderService } from "@/factories/services/order/validations/make-validate-delivery-from-order-service.js";
@@ -18,7 +19,6 @@ import {
 import { removeDuplicateItems } from "@/helpers/utils.js";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
 import prisma from "@/lib/prisma.js";
-import { makeSendOrderConfirmationMessageService } from "@/factories/services/order/make-send-order-confirmation-message.js";
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import type {
   BuildOrderItemsParams,
@@ -129,6 +129,8 @@ export class CreateOrderService {
           product_name: item.product.name,
           product_price: item.product.price,
           quantity: item.product.quantity,
+          weight_grams: item.product.weight_grams ?? null,
+          addons_subtotal: Math.round(item.addonsSubtotal * 100),
           addons: {
             create: item.addons.map((addon) => ({
               addon_id: addon.id,
@@ -195,14 +197,16 @@ export class CreateOrderService {
 
     const orderItemsToProcess: OrderItemsToProcess[] = await Promise.all(
       itemsValidated.map(async (item) => {
-        const [product, addons] = await Promise.all([
+        const [product, addonsResult] = await Promise.all([
           validateProductService.handle({
             establishmentId,
             productId: item.id,
             productQuantity: item.quantity,
+            weightGrams: item.weight_grams ?? null,
           }),
           validateAddonsService.handle({
             establishmentId,
+            productId: item.id,
             orderAddons: item.addonCategories,
           }),
         ]);
@@ -213,14 +217,19 @@ export class CreateOrderService {
           product.price,
         );
         const price = transformPriceFromDatabase(product.price - discount);
+        const addonsSubtotal = transformPriceFromDatabase(
+          addonsResult.addonsSubtotalCents,
+        );
 
         return {
           product: {
             ...product,
             quantity: item.quantity,
+            weight_grams: item.weight_grams ?? null,
             price,
           },
-          addons,
+          addons: addonsResult.addons,
+          addonsSubtotal,
         };
       }),
     );
@@ -236,7 +245,11 @@ export class CreateOrderService {
       .filter((item) => item.product.stock !== null)
       .map((item) => ({
         productId: item.product.id,
-        quantity: item.product.quantity,
+        quantity:
+          item.product.pricing_mode === "PER_WEIGHT" &&
+          item.product.weight_grams != null
+            ? item.product.weight_grams
+            : item.product.quantity,
       }));
 
     await this.orderRepository.create(

@@ -1,4 +1,5 @@
 import {
+  AddonPricingStrategy,
   CouponType,
   DeliveryType,
   DiscountType,
@@ -76,4 +77,33 @@ export const getPaymentMethodLabel = (
     case PaymentMethodType.MONEY:
       return "Dinheiro";
   }
+};
+
+export const getAddonStrategyLabel = (
+  strategy: AddonPricingStrategy,
+): string => {
+  switch (strategy) {
+    case AddonPricingStrategy.MAX:
+      return "(maior preço)";
+    case AddonPricingStrategy.AVERAGE:
+      return "(média)";
+    case AddonPricingStrategy.NONE:
+      return "(sem custo)";
+    case AddonPricingStrategy.SUM:
+      return "";
+  }
+};
+
+export const getFractionLabel = (
+  partsOccupied: number,
+  partsCount: number | null,
+): string => {
+  if (partsCount == null || partsCount <= 0) return `${partsOccupied}x`;
+  return `${partsOccupied}/${partsCount}`;
+};
+
+export const formatWeight = (grams: number): string => {
+  if (grams >= 1000)
+    return `${(grams / 1000).toFixed(3).replace(".", ",")} kg`;
+  return `${grams} g`;
 };

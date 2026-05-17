@@ -32,6 +32,8 @@ export class UpdateProductService {
 		paramsToForget,
 		discountPercentage: discount_percentage,
 		validUntil: valid_until,
+		pricingMode: pricing_mode,
+		pricePer100g: price_per_100g,
 		...data
 	}: UpdateProductRequest) {
 		await this.productRepository.deleteOldTags(id);
@@ -43,6 +45,8 @@ export class UpdateProductService {
 				...data,
 				discount_percentage,
 				valid_until,
+				...(pricing_mode != null ? { pricing_mode } : {}),
+				...(price_per_100g !== undefined ? { price_per_100g } : {}),
 				name,
 				...(!!name && { slug: slugify(name) }),
 				...(categoryId && {

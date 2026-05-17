@@ -1099,7 +1099,6 @@ async function seedEstablishment(
 			data: {
 				name: addonCategorySeed.name,
 				type: addonCategorySeed.type,
-				max_quantity: addonCategorySeed.max_quantity,
 				establishment_id: establishment.id
 			}
 		});

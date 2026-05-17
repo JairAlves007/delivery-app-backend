@@ -5,3 +5,11 @@ export type AddonCategoryFromRepository = Prisma.AddonCategoryGetPayload<{
     addons: true;
   };
 }>;
+
+export type AddonCategoryWithProductsFromRepository =
+  Prisma.AddonCategoryGetPayload<{
+    include: {
+      addons: true;
+      products: true;
+    };
+  }>;

@@ -26,6 +26,8 @@ export class CreateProductService {
 		tagIds,
 		discountPercentage: discount_percentage,
 		validUntil: valid_until,
+		pricingMode: pricing_mode,
+		pricePer100g: price_per_100g,
 		paramsToForget,
 		...data
 	}: CreateProductServiceRequest): Promise<void> {
@@ -40,6 +42,8 @@ export class CreateProductService {
 			slug: slugify(data.name),
 			discount_percentage,
 			valid_until,
+			pricing_mode,
+			price_per_100g: price_per_100g ?? null,
 			establishment: {
 				connect: {
 					id: establishmentId

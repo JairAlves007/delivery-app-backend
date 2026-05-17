@@ -1,5 +1,6 @@
 import z from "zod";
 
+import { ProductPricingMode } from "@/generated/prisma/client.js";
 import { transformPriceToDatabase } from "@/helpers/price.js";
 
 const createProductBodyBaseSchema = z.object({
@@ -13,6 +14,15 @@ const createProductBodyBaseSchema = z.object({
     .number("O preço deve ser preenchido")
     .min(0, "O preço deve ser maior ou igual a zero")
     .transform((val) => transformPriceToDatabase(val)),
+  pricingMode: z
+    .enum(ProductPricingMode, "Modo de preço inválido")
+    .default(ProductPricingMode.UNIT),
+  pricePer100g: z.coerce
+    .number()
+    .min(0, "O preço por 100g deve ser maior ou igual a zero")
+    .transform((val) => transformPriceToDatabase(val))
+    .nullable()
+    .optional(),
   tagIds: z.array(z.coerce.number().int().positive()),
   bannerIds: z.array(z.coerce.number().int().positive()).optional(),
   discountPercentage: z
@@ -34,25 +44,57 @@ const createProductBodyBaseSchema = z.object({
     .min(1, "O id da categoria deve ser preenchido"),
 });
 
-export const createProductBodySchema = createProductBodyBaseSchema.superRefine(
-  (data, ctx) => {
-    if (data.discountPercentage && data.discountPercentage > 100) {
-      ctx.addIssue({
-        path: ["discountPercentage"],
-        code: "too_big",
-        maximum: 100,
-        type: "number",
-        inclusive: true,
-        origin: "number",
-        message: "O valor percentual não pode ser maior que 100",
-      });
-    }
+const validateProductCoherence = (
+  data: {
+    discountPercentage?: number | null;
+    pricingMode?: ProductPricingMode;
+    pricePer100g?: number | null;
   },
+  ctx: z.RefinementCtx,
+) => {
+  if (data.discountPercentage && data.discountPercentage > 100) {
+    ctx.addIssue({
+      path: ["discountPercentage"],
+      code: "too_big",
+      maximum: 100,
+      type: "number",
+      inclusive: true,
+      origin: "number",
+      message: "O valor percentual não pode ser maior que 100",
+    });
+  }
+  if (
+    data.pricingMode === ProductPricingMode.PER_WEIGHT &&
+    (data.pricePer100g == null || data.pricePer100g <= 0)
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["pricePer100g"],
+      message:
+        "pricePer100g é obrigatório (>0) quando pricingMode é PER_WEIGHT",
+    });
+  }
+  if (
+    data.pricingMode === ProductPricingMode.UNIT &&
+    data.pricePer100g != null
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["pricePer100g"],
+      message: "pricePer100g só pode ser definido para pricingMode PER_WEIGHT",
+    });
+  }
+};
+
+export const createProductBodySchema = createProductBodyBaseSchema.superRefine(
+  validateProductCoherence,
 );
 
 z.globalRegistry.add(createProductBodySchema, { id: "CreateProductBody" });
 
-export const updateProductBodySchema = createProductBodyBaseSchema.partial();
+export const updateProductBodySchema = createProductBodyBaseSchema
+  .partial()
+  .superRefine(validateProductCoherence);
 
 z.globalRegistry.add(updateProductBodySchema, { id: "UpdateProductBody" });
 

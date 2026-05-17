@@ -40,6 +40,7 @@ export default class Constants {
 		banners: "banners",
 		addons: "addons",
 		addonCategories: "addon_categories",
+		productAddonCategories: "product_addon_categories",
 		users: "users",
 		menus: "menus",
 		addresses: "addresses",
@@ -99,9 +100,34 @@ export default class Constants {
 				• Adicionais: {none_addons}
 				{addons_section}
 			`,
+			productUnit: `
+				🍔 {product_name}
+				• Preço: {product_price}
+				• Quantidade: {product_quantity}
+				• Adicionais: {none_addons}
+				{addons_section}
+			`,
+			productWeighted: `
+				🍔 {product_name}
+				• Preço por 100g: {price_per_100g}
+				• Peso: {weight_grams_human}
+				• Total: {product_price}
+				• Adicionais: {none_addons}
+				{addons_section}
+			`,
 			addon: `
 				- {addon_quantity}x {addon_name} ({addon_price})
 			`,
+			addonCategoryBlock: `
+				▸ {category_name} {category_strategy_label}
+				{category_addons_list}
+				• Subtotal da categoria: {category_subtotal}
+			`,
+			addonItemQuantity: "    - {addon_quantity}x {addon_name} ({addon_price})",
+			addonItemMultiple: "    - {addon_name} ({addon_price})",
+			addonItemSingle: "    - {addon_name}",
+			addonItemFractional: "    - {fraction_label} {addon_name} ({addon_price})",
+			addonItemNone: "    - {addon_name}",
 			coupon: `🏷️ Cupom aplicado: {coupon_code} ({coupon_value})`,
 			changeAmount: `💵 Troco para: {change_amount_value}`,
 			comment: `📝 Observações: {comment_value}`,

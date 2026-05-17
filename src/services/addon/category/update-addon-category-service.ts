@@ -25,10 +25,13 @@ export class UpdateAddonCategoryService {
 		id,
 		establishmentId,
 		addonIds,
-		maxQuantity: max_quantity,
+		pricingStrategy: pricing_strategy,
+		partsCount: parts_count,
 		paramsToForget,
+		status,
 		...data
 	}: UpdateAddonCategoryServiceRequest) {
+		void status;
 		const addons = addonIds
 			? {
 					set: addonIds.map(addonId => ({
@@ -42,7 +45,8 @@ export class UpdateAddonCategoryService {
 			filterParams: { establishment_id: establishmentId },
 			data: {
 				...data,
-				max_quantity,
+				...(pricing_strategy != null ? { pricing_strategy } : {}),
+				...(parts_count !== undefined ? { parts_count } : {}),
 				addons
 			}
 		});
