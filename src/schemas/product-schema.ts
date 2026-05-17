@@ -42,6 +42,52 @@ const createProductBodyBaseSchema = z.object({
   categoryId: z
     .ulid("O id da categoria deve ser preenchido corretamente")
     .min(1, "O id da categoria deve ser preenchido"),
+  addonCategoryAttachments: z
+    .array(
+      z.object({
+        addonCategoryId: z.coerce
+          .number("O id da categoria de adicional deve ser preenchido")
+          .int()
+          .min(1, "O id da categoria de adicional deve ser maior que zero"),
+        displayOrder: z.coerce
+          .number()
+          .int("A ordem de exibição deve ser inteira")
+          .min(0)
+          .default(0),
+        isRequired: z.boolean().default(false),
+        minSelection: z.coerce
+          .number()
+          .int("A seleção mínima deve ser inteira")
+          .min(0, "A seleção mínima deve ser maior ou igual a zero")
+          .nullable()
+          .optional(),
+        maxSelection: z.coerce
+          .number()
+          .int("A seleção máxima deve ser inteira")
+          .min(1, "A seleção máxima deve ser maior ou igual a 1")
+          .nullable()
+          .optional(),
+      }).refine(
+        (data) => {
+          if (
+            data.minSelection != null &&
+            data.maxSelection != null &&
+            data.minSelection > data.maxSelection
+          ) {
+            return false;
+          }
+          if (data.isRequired && (data.minSelection == null || data.minSelection < 1)) {
+            return false;
+          }
+          return true;
+        },
+        {
+          message:
+            "minSelection não pode ser maior que maxSelection. Quando isRequired=true, minSelection deve ser >= 1",
+        },
+      ),
+    )
+    .optional(),
 });
 
 const validateProductCoherence = (

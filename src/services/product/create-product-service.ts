@@ -24,6 +24,7 @@ export class CreateProductService {
 		categoryId,
 		bannerIds,
 		tagIds,
+		addonCategoryAttachments,
 		discountPercentage: discount_percentage,
 		validUntil: valid_until,
 		pricingMode: pricing_mode,
@@ -58,6 +59,15 @@ export class CreateProductService {
 			tags: {
 				create: tagIds.map(tagId => ({
 					tag: { connect: { id: tagId } }
+				}))
+			},
+			addonCategories: {
+				create: addonCategoryAttachments?.map(att => ({
+					addon_category_id: att.addonCategoryId,
+					display_order: att.displayOrder,
+					is_required: att.isRequired,
+					min_selection: att.minSelection ?? null,
+					max_selection: att.maxSelection ?? null
 				}))
 			}
 		});

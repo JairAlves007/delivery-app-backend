@@ -296,6 +296,14 @@ export class ProductPrismaRepository implements IProductRepository {
 		});
 	}
 
+	async deleteOldProductAddonCategories(id: string): Promise<void> {
+		await prisma.productAddonCategory.deleteMany({
+			where: {
+				product_id: id
+			}
+		});
+	}
+
 	async searchCatalog({
 		establishmentId,
 		categoryId,

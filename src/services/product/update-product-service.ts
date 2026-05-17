@@ -29,6 +29,7 @@ export class UpdateProductService {
 		name,
 		bannerIds,
 		tagIds,
+		addonCategoryAttachments,
 		paramsToForget,
 		discountPercentage: discount_percentage,
 		validUntil: valid_until,
@@ -37,6 +38,7 @@ export class UpdateProductService {
 		...data
 	}: UpdateProductRequest) {
 		await this.productRepository.deleteOldTags(id);
+		await this.productRepository.deleteOldProductAddonCategories(id);
 
 		await this.productRepository.update({
 			id,
@@ -62,6 +64,15 @@ export class UpdateProductService {
 				tags: {
 					create: tagIds?.map(tagId => ({
 						tag: { connect: { id: tagId } }
+					}))
+				},
+				addonCategories: {
+					create: addonCategoryAttachments?.map(att => ({
+						addon_category_id: att.addonCategoryId,
+						display_order: att.displayOrder,
+						is_required: att.isRequired,
+						min_selection: att.minSelection ?? null,
+						max_selection: att.maxSelection ?? null
 					}))
 				}
 			}

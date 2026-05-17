@@ -24,6 +24,7 @@ export interface IProductRepository
 		>,
 		CursorPagination<ProductFromRepository, string> {
 	deleteOldTags(id: string): Promise<void>;
+	deleteOldProductAddonCategories(id: string): Promise<void>;
 	findSuggested(params: {
 		productId: string;
 		establishmentId: EstablishmentID;
