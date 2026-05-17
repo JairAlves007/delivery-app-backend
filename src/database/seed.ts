@@ -2,12 +2,14 @@ import { hash } from "bcrypt-ts";
 
 import { makeMenuRepository } from "@/factories/repositories/make-menu-repository.js";
 import {
+	AddonPricingStrategy,
 	AddonType,
 	BannerLinkType,
 	CouponType,
 	DiscountType,
 	FileFormatType,
 	PermissionType,
+	ProductPricingMode,
 	RoleType,
 	SocialPlatform,
 	TagType,
@@ -23,7 +25,8 @@ type AddonSeed = { name: string; price: number };
 type AddonCategorySeed = {
 	name: string;
 	type: AddonType;
-	max_quantity?: number;
+	pricing_strategy: AddonPricingStrategy;
+	parts_count?: number;
 	addons: AddonSeed[];
 };
 
@@ -31,6 +34,8 @@ type ProductSeed = {
 	name: string;
 	description: string;
 	price: number;
+	pricing_mode?: ProductPricingMode;
+	price_per_100g?: number;
 	category: string;
 	tags: TagType[];
 	discount_percentage?: number;
@@ -57,6 +62,15 @@ type OpeningHourSeed = {
 type SocialLinkSeed = { platform: SocialPlatform; url: string };
 
 type BannerSeed = { name: string; product_name: string };
+
+type ProductAddonCategoryRule = {
+	addon_category_name: string;
+	product_category_names: string[];
+	display_order: number;
+	is_required?: boolean;
+	min_selection?: number;
+	max_selection?: number;
+};
 
 type EstablishmentSeed = {
 	name: string;
@@ -88,6 +102,7 @@ type EstablishmentSeed = {
 	banners: BannerSeed[];
 	openingHours: OpeningHourSeed[];
 	socialLinks: SocialLinkSeed[];
+	productAddonCategoryRules: ProductAddonCategoryRule[];
 };
 
 const collectEstablishmentTagTypes = (seed: EstablishmentSeed): TagType[] => {
@@ -241,6 +256,7 @@ const milkShakeMix: EstablishmentSeed = {
 		{
 			name: "Coberturas",
 			type: AddonType.MULTIPLE_CHOICE,
+			pricing_strategy: AddonPricingStrategy.SUM,
 			addons: [
 				{ name: "Calda de Chocolate", price: transformPriceToDatabase(2) },
 				{ name: "Calda de Morango", price: transformPriceToDatabase(2) },
@@ -251,7 +267,7 @@ const milkShakeMix: EstablishmentSeed = {
 		{
 			name: "Adicionais",
 			type: AddonType.QUANTITY,
-			max_quantity: 5,
+			pricing_strategy: AddonPricingStrategy.SUM,
 			addons: [
 				{ name: "Granola", price: transformPriceToDatabase(3) },
 				{ name: "Paçoca", price: transformPriceToDatabase(2.5) },
@@ -263,7 +279,8 @@ const milkShakeMix: EstablishmentSeed = {
 		},
 		{
 			name: "Tamanho",
-			type: AddonType.MULTIPLE_CHOICE,
+			type: AddonType.SINGLE_CHOICE,
+			pricing_strategy: AddonPricingStrategy.MAX,
 			addons: [
 				{ name: "Pequeno (300ml)", price: 0 },
 				{ name: "Médio (500ml)", price: transformPriceToDatabase(3) },
@@ -316,6 +333,27 @@ const milkShakeMix: EstablishmentSeed = {
 		{
 			platform: SocialPlatform.WHATSAPP,
 			url: "https://wa.me/5585998765432"
+		}
+	],
+	productAddonCategoryRules: [
+		{
+			addon_category_name: "Coberturas",
+			product_category_names: ["Milk Shakes", "Sorvetes", "Açaí", "Sundaes"],
+			display_order: 1
+		},
+		{
+			addon_category_name: "Tamanho",
+			product_category_names: ["Milk Shakes"],
+			display_order: 2,
+			is_required: true,
+			min_selection: 1,
+			max_selection: 1
+		},
+		{
+			addon_category_name: "Adicionais",
+			product_category_names: ["Milk Shakes", "Açaí", "Sundaes", "Sorvetes"],
+			display_order: 3,
+			max_selection: 5
 		}
 	]
 };
@@ -455,7 +493,8 @@ const pizzariaBellaNapoli: EstablishmentSeed = {
 	addonCategories: [
 		{
 			name: "Bordas Recheadas",
-			type: AddonType.MULTIPLE_CHOICE,
+			type: AddonType.SINGLE_CHOICE,
+			pricing_strategy: AddonPricingStrategy.MAX,
 			addons: [
 				{ name: "Sem borda recheada", price: 0 },
 				{ name: "Catupiry", price: transformPriceToDatabase(8) },
@@ -466,7 +505,7 @@ const pizzariaBellaNapoli: EstablishmentSeed = {
 		{
 			name: "Adicionais",
 			type: AddonType.QUANTITY,
-			max_quantity: 5,
+			pricing_strategy: AddonPricingStrategy.SUM,
 			addons: [
 				{ name: "Mussarela extra", price: transformPriceToDatabase(5) },
 				{ name: "Calabresa extra", price: transformPriceToDatabase(6) },
@@ -477,7 +516,8 @@ const pizzariaBellaNapoli: EstablishmentSeed = {
 		},
 		{
 			name: "Tamanho",
-			type: AddonType.MULTIPLE_CHOICE,
+			type: AddonType.SINGLE_CHOICE,
+			pricing_strategy: AddonPricingStrategy.MAX,
 			addons: [
 				{ name: "Média (6 fatias)", price: 0 },
 				{ name: "Grande (8 fatias)", price: transformPriceToDatabase(10) },
@@ -532,6 +572,28 @@ const pizzariaBellaNapoli: EstablishmentSeed = {
 		{
 			platform: SocialPlatform.WHATSAPP,
 			url: "https://wa.me/5585987654321"
+		}
+	],
+	productAddonCategoryRules: [
+		{
+			addon_category_name: "Bordas Recheadas",
+			product_category_names: ["Pizzas Tradicionais", "Pizzas Especiais", "Pizzas Doces", "Calzones"],
+			display_order: 1,
+			is_required: false
+		},
+		{
+			addon_category_name: "Tamanho",
+			product_category_names: ["Pizzas Tradicionais", "Pizzas Especiais", "Pizzas Doces"],
+			display_order: 2,
+			is_required: true,
+			min_selection: 1,
+			max_selection: 1
+		},
+		{
+			addon_category_name: "Adicionais",
+			product_category_names: ["Pizzas Tradicionais", "Pizzas Especiais", "Calzones"],
+			display_order: 3,
+			max_selection: 5
 		}
 	]
 };
@@ -703,7 +765,8 @@ const churrascariaBoiGordo: EstablishmentSeed = {
 	addonCategories: [
 		{
 			name: "Ponto da Carne",
-			type: AddonType.MULTIPLE_CHOICE,
+			type: AddonType.SINGLE_CHOICE,
+			pricing_strategy: AddonPricingStrategy.NONE,
 			addons: [
 				{ name: "Mal passada", price: 0 },
 				{ name: "Ao ponto para mal", price: 0 },
@@ -715,6 +778,7 @@ const churrascariaBoiGordo: EstablishmentSeed = {
 		{
 			name: "Molhos",
 			type: AddonType.MULTIPLE_CHOICE,
+			pricing_strategy: AddonPricingStrategy.SUM,
 			addons: [
 				{ name: "Chimichurri", price: transformPriceToDatabase(3) },
 				{ name: "Barbecue", price: transformPriceToDatabase(3) },
@@ -725,7 +789,7 @@ const churrascariaBoiGordo: EstablishmentSeed = {
 		{
 			name: "Porções Extras",
 			type: AddonType.QUANTITY,
-			max_quantity: 4,
+			pricing_strategy: AddonPricingStrategy.SUM,
 			addons: [
 				{ name: "Pão de alho", price: transformPriceToDatabase(8) },
 				{ name: "Farofa extra", price: transformPriceToDatabase(6) },
@@ -775,6 +839,28 @@ const churrascariaBoiGordo: EstablishmentSeed = {
 		{
 			platform: SocialPlatform.WHATSAPP,
 			url: "https://wa.me/5585991234567"
+		}
+	],
+	productAddonCategoryRules: [
+		{
+			addon_category_name: "Ponto da Carne",
+			product_category_names: ["Cortes Bovinos"],
+			display_order: 1,
+			is_required: true,
+			min_selection: 1,
+			max_selection: 1
+		},
+		{
+			addon_category_name: "Molhos",
+			product_category_names: ["Cortes Bovinos", "Cortes Suínos", "Aves"],
+			display_order: 2,
+			is_required: false
+		},
+		{
+			addon_category_name: "Porções Extras",
+			product_category_names: ["Cortes Bovinos", "Cortes Suínos", "Aves", "Acompanhamentos", "Saladas"],
+			display_order: 3,
+			max_selection: 4
 		}
 	]
 };
@@ -936,7 +1022,8 @@ const sushiRyu: EstablishmentSeed = {
 	addonCategories: [
 		{
 			name: "Molhos",
-			type: AddonType.MULTIPLE_CHOICE,
+			type: AddonType.SINGLE_CHOICE,
+			pricing_strategy: AddonPricingStrategy.MAX,
 			addons: [
 				{ name: "Shoyu tradicional", price: 0 },
 				{ name: "Shoyu com limón (ponzu)", price: transformPriceToDatabase(2) },
@@ -950,7 +1037,7 @@ const sushiRyu: EstablishmentSeed = {
 		{
 			name: "Complementos",
 			type: AddonType.QUANTITY,
-			max_quantity: 4,
+			pricing_strategy: AddonPricingStrategy.SUM,
 			addons: [
 				{ name: "Wasabi extra", price: transformPriceToDatabase(2) },
 				{
@@ -1004,6 +1091,22 @@ const sushiRyu: EstablishmentSeed = {
 		{
 			platform: SocialPlatform.WHATSAPP,
 			url: "https://wa.me/5585992223344"
+		}
+	],
+	productAddonCategoryRules: [
+		{
+			addon_category_name: "Molhos",
+			product_category_names: ["Combinados", "Sashimis", "Niguiris", "Hot Rolls", "Temakis", "Pratos Quentes"],
+			display_order: 1,
+			is_required: true,
+			min_selection: 1,
+			max_selection: 1
+		},
+		{
+			addon_category_name: "Complementos",
+			product_category_names: ["Combinados", "Sashimis", "Niguiris", "Hot Rolls", "Temakis", "Pratos Quentes", "Bebidas"],
+			display_order: 2,
+			max_selection: 4
 		}
 	]
 };
@@ -1085,6 +1188,8 @@ async function seedEstablishment(
 				slug: slugify(p.name),
 				description: p.description,
 				price: p.price,
+				pricing_mode: p.pricing_mode ?? ProductPricingMode.UNIT,
+				price_per_100g: p.price_per_100g,
 				discount_percentage: p.discount_percentage,
 				establishment_id: establishment.id,
 				category_id: category.id
@@ -1094,14 +1199,20 @@ async function seedEstablishment(
 
 	const productByName = new Map(products.map(p => [p.name, p]));
 
+	const addonCategoryByName = new Map<string, { id: number }>();
+
 	for (const addonCategorySeed of seed.addonCategories) {
 		const addonCategory = await prisma.addonCategory.create({
 			data: {
 				name: addonCategorySeed.name,
 				type: addonCategorySeed.type,
+				pricing_strategy: addonCategorySeed.pricing_strategy,
+				parts_count: addonCategorySeed.parts_count,
 				establishment_id: establishment.id
 			}
 		});
+
+		addonCategoryByName.set(addonCategorySeed.name, addonCategory);
 
 		await prisma.addon.createMany({
 			data: addonCategorySeed.addons.map(a => ({
@@ -1109,6 +1220,35 @@ async function seedEstablishment(
 				price: a.price,
 				category_id: addonCategory.id
 			}))
+		});
+	}
+
+	const productAddonCategoryData = seed.productAddonCategoryRules.flatMap(rule => {
+		const addonCategory = addonCategoryByName.get(rule.addon_category_name);
+		if (!addonCategory) return [];
+		const category = categoryByName.get(rule.product_category_names[0]);
+		if (!category) return [];
+		return seed.products
+			.filter(p => rule.product_category_names.includes(p.category))
+			.map(p => {
+				const product = productByName.get(p.name);
+				if (!product) return null;
+				return {
+					product_id: product.id,
+					addon_category_id: addonCategory.id,
+					display_order: rule.display_order,
+					is_required: rule.is_required ?? false,
+					min_selection: rule.min_selection,
+					max_selection: rule.max_selection
+				};
+			})
+			.filter((d): d is NonNullable<typeof d> => d !== null);
+	});
+
+	if (productAddonCategoryData.length > 0) {
+		await prisma.productAddonCategory.createMany({
+			data: productAddonCategoryData,
+			skipDuplicates: true
 		});
 	}
 
