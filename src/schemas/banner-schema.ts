@@ -36,8 +36,5 @@ export const updateBannerBodySchema = createBannerBodyBaseSchema.partial();
 z.globalRegistry.add(updateBannerBodySchema, { id: "UpdateBannerBody" });
 
 export const bannerParamsSchema = z.object({
-  id: z.coerce
-    .number("O id deve ser preenchido")
-    .int()
-    .min(1, "O id deve ser maior que zero"),
+  id: z.ulid("ID do banner inválido"),
 });

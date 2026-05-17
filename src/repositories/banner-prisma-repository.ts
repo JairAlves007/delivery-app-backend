@@ -112,7 +112,7 @@ export class BannerPrismaRepository implements IBannerRepository {
     limit,
     cursor,
     filterParams,
-  }: CursorPaginationParams<number>): Promise<BannerFromRepository[]> {
+  }: CursorPaginationParams<string>): Promise<BannerFromRepository[]> {
     const { search, sortField, sortDirection, ...params } =
       transformValidFilterParams(filterParams);
 
@@ -148,7 +148,7 @@ export class BannerPrismaRepository implements IBannerRepository {
   async findById({
     id,
     filterParams,
-  }: FindByIdParams<number>): Promise<BannerFromRepository | null> {
+  }: FindByIdParams<string>): Promise<BannerFromRepository | null> {
     const params = transformValidFilterParams(filterParams);
 
     return await prisma.banner.findUnique({
@@ -175,7 +175,7 @@ export class BannerPrismaRepository implements IBannerRepository {
     id,
     data,
     filterParams,
-  }: UpdateContentParams<number, Prisma.BannerUpdateInput>): Promise<void> {
+  }: UpdateContentParams<string, Prisma.BannerUpdateInput>): Promise<void> {
     const params = transformValidFilterParams(filterParams);
 
     await prisma.banner.update({
@@ -192,7 +192,7 @@ export class BannerPrismaRepository implements IBannerRepository {
     id,
     force,
     filterParams,
-  }: DeleteContentParams<number>): Promise<void> {
+  }: DeleteContentParams<string>): Promise<void> {
     const params = transformValidFilterParams(filterParams);
 
     if (force) {

@@ -7,5 +7,5 @@ export type IBannerRepository = ICRUDBase<
   BannerFromRepository,
   Prisma.BannerCreateInput,
   Prisma.BannerUpdateInput,
-  number
+  string
 >;

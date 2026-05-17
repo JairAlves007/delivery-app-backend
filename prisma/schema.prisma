@@ -570,7 +570,7 @@ model DeliveryAddress {
 // ─── Banners ────────────────────────────────────────────────────────
 
 model Banner {
-  id               Int              @id @default(autoincrement())
+  id               String           @id @default(ulid())
   name             String           @db.VarChar(255)
   establishment_id String
   link_type        BannerLinkType
@@ -785,7 +785,7 @@ model ResourceRule {
 model BannerResource {
   id          String   @id @default(ulid())
   resource_id String
-  banner_id   Int
+  banner_id   String
   created_at  DateTime @default(now()) @db.Timestamptz
   updated_at  DateTime @updatedAt @db.Timestamptz
   resource    Resource @relation(fields: [resource_id], references: [id], onDelete: Cascade, onUpdate: Cascade)

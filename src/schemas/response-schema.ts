@@ -130,7 +130,7 @@ export const addonListResponseSchema =
 // ──────────────────────────────────────────────
 
 export const bannerResponseSchema = z.object({
-	id: z.number(),
+	id: z.string(),
 	name: z.string(),
 	link_type: z.enum(BannerLinkType),
 	product_id: z.string().nullable(),

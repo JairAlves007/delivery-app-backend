@@ -24,7 +24,7 @@ const createProductBodyBaseSchema = z.object({
     .nullable()
     .optional(),
   tagIds: z.array(z.coerce.number().int().positive()),
-  bannerIds: z.array(z.coerce.number().int().positive()).optional(),
+  bannerIds: z.array(z.string()).optional(),
   discountPercentage: z
     .number("O desconto deve ser preenchido")
     .min(0, "O desconto deve ser maior ou igual a zero")

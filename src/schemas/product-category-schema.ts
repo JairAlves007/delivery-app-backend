@@ -8,7 +8,7 @@ export const createProductCategoryBodySchema = z.object({
     .min(0, "A ordem deve ser maior ou igual a zero")
     .optional()
     .nullable(),
-  bannerIds: z.array(z.coerce.number().int().positive()).optional(),
+  bannerIds: z.array(z.string()).optional(),
 });
 
 export const updateProductCategoryBodySchema =

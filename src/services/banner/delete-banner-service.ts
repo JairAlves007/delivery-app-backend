@@ -4,7 +4,7 @@ import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 import type { FilterField } from "@/types/crud.js";
 
 type DeleteBannerServiceParams = {
-  id: number;
+  id: string;
 } & FilterField &
   Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
 

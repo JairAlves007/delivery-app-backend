@@ -11,7 +11,7 @@ interface UpdateBannerServiceRequest
 	extends
 		z.infer<typeof updateBannerBodySchema>,
 		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
-	id: number;
+	id: string;
 	establishmentId: EstablishmentID;
 }
 
