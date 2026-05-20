@@ -13,7 +13,10 @@ import {
 	getFractionLabel,
 	getPaymentMethodLabel
 } from "@/helpers/order.js";
-import { transformPriceToHumanReadable } from "@/helpers/price.js";
+import {
+	transformPriceFromDatabase,
+	transformPriceToHumanReadable
+} from "@/helpers/price.js";
 import { app } from "@/http/app.js";
 import { calculateAddonPricing } from "@/services/order/pricing/calculate-addon-pricing.js";
 import type { AddonFromRepository } from "@/types/addon.js";
@@ -68,12 +71,14 @@ export class SendOrderConfirmationMessageService {
 		switch (group.type) {
 			case AddonType.QUANTITY:
 				return subSections.addonItemQuantity
-					.replaceAll("{addon_quantity}", addon.quantity.toString())
 					.replaceAll("{addon_name}", addon.name)
 					.replaceAll(
-						"{addon_price}",
-						transformPriceToHumanReadable(addon.price * addon.quantity)
-					);
+						"{addon_unit_price}",
+						transformPriceToHumanReadable(
+							transformPriceFromDatabase(addon.price)
+						)
+					)
+					.replaceAll("{addon_quantity}", addon.quantity.toString());
 			case AddonType.SINGLE_CHOICE:
 				return subSections.addonItemSingle.replaceAll(
 					"{addon_name}",
@@ -84,7 +89,9 @@ export class SendOrderConfirmationMessageService {
 					.replaceAll("{addon_name}", addon.name)
 					.replaceAll(
 						"{addon_price}",
-						transformPriceToHumanReadable(addon.price)
+						transformPriceToHumanReadable(
+							transformPriceFromDatabase(addon.price)
+						)
 					);
 			case AddonType.FRACTIONAL:
 				return subSections.addonItemFractional
@@ -95,7 +102,9 @@ export class SendOrderConfirmationMessageService {
 					.replaceAll("{addon_name}", addon.name)
 					.replaceAll(
 						"{addon_price}",
-						transformPriceToHumanReadable(addon.price)
+						transformPriceToHumanReadable(
+							transformPriceFromDatabase(addon.price)
+						)
 					);
 		}
 	}
@@ -114,7 +123,7 @@ export class SendOrderConfirmationMessageService {
 					type: group.type,
 					partsCount: group.partsCount,
 					addons: group.addons.map(a => ({
-						priceCents: Math.round(a.price * 100),
+						priceCents: a.price,
 						quantity: a.quantity
 					}))
 				});
@@ -127,7 +136,9 @@ export class SendOrderConfirmationMessageService {
 					.replaceAll("{category_addons_list}", list)
 					.replaceAll(
 						"{category_subtotal}",
-						transformPriceToHumanReadable(subtotalCents / 100)
+						transformPriceToHumanReadable(
+							transformPriceFromDatabase(subtotalCents)
+						)
 					);
 			})
 			.join("");
@@ -146,17 +157,19 @@ export class SendOrderConfirmationMessageService {
 		if (isWeighted) {
 			const weightGrams = item.product.weight_grams as number;
 			const pricePer100g = item.product.price_per_100g as number;
-			const totalPrice = (pricePer100g * weightGrams) / 100;
+			const totalPriceCents = Math.round((pricePer100g * weightGrams) / 100);
 			return subSections.productWeighted
 				.replaceAll("{product_name}", item.product.name)
 				.replaceAll(
 					"{price_per_100g}",
-					transformPriceToHumanReadable(pricePer100g)
+					transformPriceToHumanReadable(transformPriceFromDatabase(pricePer100g))
 				)
 				.replaceAll("{weight_grams_human}", formatWeight(weightGrams))
 				.replaceAll(
 					"{product_price}",
-					transformPriceToHumanReadable(totalPrice)
+					transformPriceToHumanReadable(
+						transformPriceFromDatabase(totalPriceCents)
+					)
 				)
 				.replaceAll("{none_addons}", hasAddons ? "" : "Nenhum")
 				.replaceAll("{addons_section}", addonBlocks);
@@ -168,7 +181,15 @@ export class SendOrderConfirmationMessageService {
 			.replaceAll(
 				"{product_price}",
 				transformPriceToHumanReadable(
-					item.product.price * item.product.quantity
+					transformPriceFromDatabase(item.product.price)
+				)
+			)
+			.replaceAll(
+				"{product_total}",
+				transformPriceToHumanReadable(
+					transformPriceFromDatabase(
+						item.product.price * item.product.quantity
+					)
 				)
 			)
 			.replaceAll("{none_addons}", hasAddons ? "" : "Nenhum")
@@ -206,12 +227,17 @@ export class SendOrderConfirmationMessageService {
 			.replaceAll("{payment_method}", getPaymentMethodLabel(paymentMethod))
 			.replaceAll(
 				"{shipping_cost}",
-				transformPriceToHumanReadable(shippingCost)
+				transformPriceToHumanReadable(transformPriceFromDatabase(shippingCost))
 			)
-			.replaceAll("{subtotal}", transformPriceToHumanReadable(subtotal))
+			.replaceAll(
+				"{subtotal}",
+				transformPriceToHumanReadable(transformPriceFromDatabase(subtotal))
+			)
 			.replaceAll(
 				"{total_price}",
-				transformPriceToHumanReadable(subtotal + shippingCost)
+				transformPriceToHumanReadable(
+					transformPriceFromDatabase(subtotal + shippingCost)
+				)
 			)
 			.replaceAll("{order_created_at}", formatDateToHumanReadable(new Date()))
 			.replaceAll(
@@ -250,7 +276,9 @@ export class SendOrderConfirmationMessageService {
 				coupon
 					? subSectionsTemplates.discount.replaceAll(
 							"{discount_value}",
-							transformPriceToHumanReadable(couponDiscount)
+							transformPriceToHumanReadable(
+								transformPriceFromDatabase(couponDiscount)
+							)
 						)
 					: ""
 			)
@@ -259,7 +287,9 @@ export class SendOrderConfirmationMessageService {
 				changeAmount
 					? subSectionsTemplates.changeAmount.replaceAll(
 							"{change_amount_value}",
-							transformPriceToHumanReadable(changeAmount)
+							transformPriceToHumanReadable(
+								transformPriceFromDatabase(changeAmount)
+							)
 						)
 					: ""
 			)

@@ -12,7 +12,7 @@ import type { orderPayloadSchema } from "@/schemas/response-schema.js";
 import type { AddonFromRepository } from "./addon.js";
 import type { ForgetAllListingCacheKeysParams } from "./cache.js";
 import type { EstablishmentID } from "./establishment.js";
-import type { ProductList } from "./product.js";
+import type { ProductFromRepository } from "./product.js";
 
 export type OrderFromRepository = Prisma.OrderGetPayload<{
   include: {
@@ -95,12 +95,12 @@ export type OrderItems = {
 };
 
 export type OrderItemsToProcess = {
-  product: ProductList & {
+  product: ProductFromRepository & {
     quantity: number;
     weight_grams?: number | null;
   };
   addons: OrderAddonsToProcess[];
-  addonsSubtotal: number;
+  addonsSubtotalCents: number;
 };
 
 export type OrderCategoryAddons = {
@@ -119,7 +119,7 @@ export type OrderIntent = {
   customerPhone: string;
   address?: OrderAddressInput | null;
   districtId?: string | null;
-  couponId?: number | null;
+  couponId?: string | null;
   comment?: string | null;
   paymentMethod: PaymentMethodType;
   deliveryType: DeliveryType;

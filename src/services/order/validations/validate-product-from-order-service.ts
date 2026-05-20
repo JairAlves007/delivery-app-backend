@@ -3,10 +3,10 @@ import { ProductOutOfStockError } from "@/errors/product/out-of-stock-error.js";
 import { ProductQuantityNotAllowedForWeightedError } from "@/errors/product/quantity-not-allowed-for-weighted-error.js";
 import { ProductWeightNotAllowedError } from "@/errors/product/weight-not-allowed-error.js";
 import { ProductWeightRequiredError } from "@/errors/product/weight-required-error.js";
-import { makeFindProductService } from "@/factories/services/product/make-find-product-service.js";
+import { makeProductRepository } from "@/factories/repositories/make-product-repository.js";
 import { ProductPricingMode } from "@/generated/prisma/client.js";
 import type { EstablishmentID } from "@/types/establishment.js";
-import type { ProductList } from "@/types/product.js";
+import type { ProductFromRepository } from "@/types/product.js";
 
 type ValidateProductFromOrderServiceRequest = {
   establishmentId: EstablishmentID;
@@ -21,11 +21,11 @@ export class ValidateProductFromOrderService {
     productId,
     productQuantity,
     weightGrams,
-  }: ValidateProductFromOrderServiceRequest): Promise<ProductList> {
+  }: ValidateProductFromOrderServiceRequest): Promise<ProductFromRepository> {
     const filterParams = { establishment_id: establishmentId };
-    const findProductService = makeFindProductService();
+    const productRepository = makeProductRepository();
 
-    const product = await findProductService.handle({
+    const product = await productRepository.findById({
       id: productId,
       filterParams,
     });

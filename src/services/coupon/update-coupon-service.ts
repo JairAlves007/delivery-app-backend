@@ -12,7 +12,7 @@ interface UpdateCouponServiceRequest
 	extends
 		z.infer<typeof updateCouponBodySchema>,
 		Pick<ForgetAllListingCacheKeysParams, "paramsToForget"> {
-	id: number;
+	id: string;
 	establishmentId: EstablishmentID;
 }
 

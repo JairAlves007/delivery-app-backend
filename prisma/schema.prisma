@@ -591,7 +591,7 @@ model Banner {
 // ─── Coupons ────────────────────────────────────────────────────────
 
 model Coupon {
-  id               Int           @id @default(autoincrement())
+  id               String        @id @default(ulid())
   establishment_id String
   code             String        @unique @db.VarChar(50)
   type             CouponType
@@ -614,7 +614,7 @@ model Coupon {
 model UserCoupon {
   id             Int    @id @default(autoincrement())
   customer_phone String @db.VarChar(20)
-  coupon_id      Int
+  coupon_id      String
   coupon         Coupon @relation(fields: [coupon_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([customer_phone], name: "idx_user_coupons_customer_phone")
@@ -635,7 +635,7 @@ model Order {
   customer_name        String                @db.VarChar(255)
   customer_phone       String                @db.VarChar(20)
   establishment_id     String
-  coupon_id            Int?
+  coupon_id            String?
   created_at           DateTime              @default(now()) @db.Timestamptz
   updated_at           DateTime              @updatedAt @db.Timestamptz
   deleted_at           DateTime?             @db.Timestamptz

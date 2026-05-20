@@ -9,7 +9,7 @@ type ValidateDeliveryFromOrderServiceRequest = {
   deliveryType: DeliveryType;
   customerName: string;
   customerPhone: string;
-  couponId?: number | null;
+  couponId?: string | null;
   districtId?: string | null;
   address?: OrderAddressInput | null;
 };

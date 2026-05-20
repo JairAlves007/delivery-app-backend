@@ -98,7 +98,7 @@ export class CouponPrismaRepository implements ICouponRepository {
 	async findById({
 		id,
 		filterParams
-	}: FindByIdParams<number>): Promise<Coupon | null> {
+	}: FindByIdParams<string>): Promise<Coupon | null> {
 		const params = transformValidFilterParams(filterParams);
 
 		return await prisma.coupon.findUnique({
@@ -137,7 +137,7 @@ export class CouponPrismaRepository implements ICouponRepository {
 		id,
 		data,
 		filterParams
-	}: UpdateContentParams<number, Prisma.CouponUpdateInput>): Promise<void> {
+	}: UpdateContentParams<string, Prisma.CouponUpdateInput>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
 		await prisma.coupon.update({
@@ -154,7 +154,7 @@ export class CouponPrismaRepository implements ICouponRepository {
 		id,
 		force,
 		filterParams
-	}: DeleteContentParams<number>): Promise<void> {
+	}: DeleteContentParams<string>): Promise<void> {
 		const params = transformValidFilterParams(filterParams);
 
 		if (force) {

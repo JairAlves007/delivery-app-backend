@@ -4,6 +4,7 @@ import { CouponExpired } from "@/errors/coupon/expired.js";
 import { CouponMaxUsesReached } from "@/errors/coupon/max-uses-reached.js";
 import { CouponNotFound } from "@/errors/coupon/not-found.js";
 import { CouponUserLimitReached } from "@/errors/coupon/user-limit-reached.js";
+import type { CouponType, DiscountType } from "@/generated/prisma/client.js";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.js";
 import { checkCouponBodySchema } from "@/schemas/coupon-schema.js";
 import type { EstablishmentID } from "@/types/establishment.js";
@@ -14,8 +15,12 @@ type CheckCouponServiceRequest = z.infer<typeof checkCouponBodySchema> & {
 };
 
 interface CheckCouponServiceResponse {
-	isValid: boolean;
-	code: string | null;
+	id: string;
+	code: string;
+	type: CouponType;
+	discount_type: DiscountType;
+	value: number;
+	ends_at: Date | null;
 }
 
 export class CheckCouponService {
@@ -54,8 +59,12 @@ export class CheckCouponService {
 		}
 
 		return {
-			isValid: true,
-			code: coupon.code
+			id: coupon.id,
+			code: coupon.code,
+			type: coupon.type,
+			discount_type: coupon.discount_type,
+			value: coupon.value,
+			ends_at: coupon.ends_at
 		};
 	}
 }

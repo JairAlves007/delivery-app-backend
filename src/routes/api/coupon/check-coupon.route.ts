@@ -34,7 +34,7 @@ export const checkCouponRoute = async (app: FastifyInstance) => {
 
 			const checkCouponService = makeCheckCouponService();
 
-			const couponIsValid = await checkCouponService.handle({
+			const coupon = await checkCouponService.handle({
 				code,
 				establishmentId,
 				customerPhone,
@@ -42,9 +42,7 @@ export const checkCouponRoute = async (app: FastifyInstance) => {
 
 			return reply
 				.status(HTTPStatusCodes.OK)
-				.send(
-					ApiResponse.success("Cupom foi checado com sucesso", couponIsValid)
-				);
+				.send(ApiResponse.success("Cupom foi checado com sucesso", coupon));
 		}
 	);
 };

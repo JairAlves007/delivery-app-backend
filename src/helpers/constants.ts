@@ -102,8 +102,9 @@ export default class Constants {
 			`,
 			productUnit: `
 				🍔 {product_name}
-				• Preço: {product_price}
+				• Preço unitário: {product_price}
 				• Quantidade: {product_quantity}
+				• Total: {product_total}
 				• Adicionais: {none_addons}
 				{addons_section}
 			`,
@@ -123,7 +124,8 @@ export default class Constants {
 				{category_addons_list}
 				• Subtotal da categoria: {category_subtotal}
 			`,
-			addonItemQuantity: "    - {addon_quantity}x {addon_name} ({addon_price})",
+			addonItemQuantity:
+				"    - {addon_name} ({addon_unit_price} × {addon_quantity})",
 			addonItemMultiple: "    - {addon_name} ({addon_price})",
 			addonItemSingle: "    - {addon_name}",
 			addonItemFractional: "    - {fraction_label} {addon_name} ({addon_price})",

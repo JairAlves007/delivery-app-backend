@@ -34,11 +34,11 @@ export const getValueDiscounted = (
 ): number => {
   switch (discountType) {
     case DiscountType.PERCENTAGE:
-      return (
+      return Math.round(
         valueToBeDiscounted *
-        transformValueToPercentageFromDatabase(discountValue)
+          transformValueToPercentageFromDatabase(discountValue),
       );
     case DiscountType.FIXED:
-      return transformPriceFromDatabase(discountValue);
+      return discountValue;
   }
 };

@@ -4,7 +4,6 @@ import { makeProductAddonCategoryRepository } from "@/factories/repositories/mak
 import { makeFindAddonService } from "@/factories/services/addon/make-find-addon-service.js";
 import { makeValidateAddonCategoriesFromOrderService } from "@/factories/services/order/validations/make-validate-addon-categories-from-order-service.js";
 import { AddonType } from "@/generated/prisma/client.js";
-import { transformPriceFromDatabase } from "@/helpers/price.js";
 import { removeDuplicateItems } from "@/helpers/utils.js";
 import { calculateAddonPricing } from "@/services/order/pricing/calculate-addon-pricing.js";
 import type { EstablishmentID } from "@/types/establishment.js";
@@ -88,7 +87,7 @@ export class ValidateAddonsFromOrderService {
         addons.push({
           ...addonItem,
           quantity,
-          price: transformPriceFromDatabase(addonItem.price),
+          price: addonItem.price,
         });
 
         collectedForPricing.push({

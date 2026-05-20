@@ -12,10 +12,7 @@ import {
   type Prisma,
 } from "@/generated/prisma/client.js";
 import { getStatusLabel } from "@/helpers/order.js";
-import {
-  getValueDiscounted,
-  transformPriceFromDatabase,
-} from "@/helpers/price.js";
+import { getValueDiscounted } from "@/helpers/price.js";
 import { removeDuplicateItems } from "@/helpers/utils.js";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
 import prisma from "@/lib/prisma.js";
@@ -130,7 +127,7 @@ export class CreateOrderService {
           product_price: item.product.price,
           quantity: item.product.quantity,
           weight_grams: item.product.weight_grams ?? null,
-          addons_subtotal: Math.round(item.addonsSubtotal * 100),
+          addons_subtotal: item.addonsSubtotalCents,
           addons: {
             create: item.addons.map((addon) => ({
               addon_id: addon.id,
@@ -216,10 +213,7 @@ export class CreateOrderService {
           product.discount_percentage ?? 0,
           product.price,
         );
-        const price = transformPriceFromDatabase(product.price - discount);
-        const addonsSubtotal = transformPriceFromDatabase(
-          addonsResult.addonsSubtotalCents,
-        );
+        const price = product.price - discount;
 
         return {
           product: {
@@ -229,7 +223,7 @@ export class CreateOrderService {
             price,
           },
           addons: addonsResult.addons,
-          addonsSubtotal,
+          addonsSubtotalCents: addonsResult.addonsSubtotalCents,
         };
       }),
     );

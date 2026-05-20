@@ -6,7 +6,7 @@ import type { EstablishmentID } from "@/types/establishment.js";
 
 type ValidateCouponFromOrderServiceRequest = {
   establishmentId: EstablishmentID;
-  couponId: number;
+  couponId: string;
   customerPhone: string;
 };
 

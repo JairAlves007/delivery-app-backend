@@ -26,10 +26,8 @@ export const createOrderBodySchema = z
 			.min(1, "O bairro deve ser preenchido")
 			.optional()
 			.nullable(),
-		couponId: z.coerce
-			.number("O cupom deve ser preenchido")
-			.int()
-			.min(1, "O cupom deve ser preenchido")
+		couponId: z
+			.ulid("O cupom deve ser preenchido")
 			.optional()
 			.nullable(),
 		comment: z

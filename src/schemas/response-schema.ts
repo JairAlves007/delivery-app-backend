@@ -146,7 +146,7 @@ export const bannerListResponseSchema =
 // ──────────────────────────────────────────────
 
 export const couponResponseSchema = z.object({
-	id: z.number(),
+	id: z.string(),
 	code: z.string(),
 	type: z.enum(CouponType),
 	discount_type: z.enum(DiscountType),
@@ -161,8 +161,12 @@ export const couponListResponseSchema =
 	paginatedResponseSchema(couponResponseSchema);
 
 export const checkCouponResponseSchema = z.object({
-	isValid: z.boolean(),
-	code: z.string().nullable()
+	id: z.string(),
+	code: z.string(),
+	type: z.enum(CouponType),
+	discount_type: z.enum(DiscountType),
+	value: z.number(),
+	ends_at: nullableDateStringSchema
 });
 
 // ──────────────────────────────────────────────

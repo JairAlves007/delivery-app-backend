@@ -8,7 +8,7 @@ export interface ICouponRepository extends ICRUDBase<
 	Coupon,
 	Prisma.CouponCreateInput,
 	Prisma.CouponUpdateInput,
-	number
+	string
 > {
 	check(
 		code: string,

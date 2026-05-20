@@ -87,8 +87,5 @@ export const checkCouponBodySchema = z.object({
 z.globalRegistry.add(checkCouponBodySchema, { id: "CheckCouponBody" });
 
 export const couponParamsSchema = z.object({
-  id: z.coerce
-    .number("O id deve ser preenchido")
-    .int()
-    .min(1, "O id deve ser maior que zero"),
+  id: z.ulid("O id deve ser preenchido"),
 });
