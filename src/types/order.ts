@@ -81,6 +81,19 @@ export type BuildOrderItemsParams = {
   orderItemsToProcess: OrderItemsToProcess[];
 };
 
+export type SendOrderConfirmationMessageParams = {
+  customerName: string;
+  customerPhone: string;
+  comment?: string | null;
+  deliveryType: DeliveryType;
+  paymentMethod: PaymentMethodType;
+  changeAmount?: number | null;
+  coupon: Coupon | null;
+  address: GuestAddress | null;
+  district: District | null;
+  orderItemsToProcess: OrderItemsToProcess[];
+};
+
 export type OrderInfo = {
   coupon: Coupon | null;
   address: GuestAddress | null;
@@ -143,7 +156,8 @@ export type OrderSubSectionMessage = {
   coupon: string;
   changeAmount: string;
   comment: string;
-  discount: string;
+  discountOrder: string;
+  discountShipping: string;
 };
 
 export type CreateOrderParams = {

@@ -281,13 +281,9 @@ export class CreateOrderService {
     await sendConfirmationService.handle({
       address,
       coupon,
-      couponDiscount,
       deliveryType,
       district,
-      establishmentId,
       paymentMethod,
-      shippingCost,
-      subtotal,
       customerName,
       customerPhone,
       changeAmount,

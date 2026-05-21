@@ -102,19 +102,17 @@ export default class Constants {
 			`,
 			productUnit: `
 				🍔 {product_name}
-				• Preço unitário: {product_price}
-				• Quantidade: {product_quantity}
-				• Total: {product_total}
+				• {product_price} × {product_quantity} = {product_subtotal}
 				• Adicionais: {none_addons}
 				{addons_section}
+				• Total do item: {item_total}
 			`,
 			productWeighted: `
 				🍔 {product_name}
-				• Preço por 100g: {price_per_100g}
-				• Peso: {weight_grams_human}
-				• Total: {product_price}
+				• {price_per_100g} × {weight_grams_human} = {product_subtotal}
 				• Adicionais: {none_addons}
 				{addons_section}
+				• Total do item: {item_total}
 			`,
 			addon: `
 				- {addon_quantity}x {addon_name} ({addon_price})
@@ -133,7 +131,8 @@ export default class Constants {
 			coupon: `🏷️ Cupom aplicado: {coupon_code} ({coupon_value})`,
 			changeAmount: `💵 Troco para: {change_amount_value}`,
 			comment: `📝 Observações: {comment_value}`,
-			discount: `🎟️ Desconto: {discount_value}`
+			discountOrder: `🎟️ Desconto no pedido: - {discount_value}`,
+			discountShipping: `🎟️ Desconto no frete: - {discount_value}`
 		};
 
 	public static readonly ORDER_MESSAGE_TEMPLATE = `
@@ -155,8 +154,8 @@ export default class Constants {
 		{comment}
 
 		🚚 Tipo de entrega: {delivery_type}
-		📦 Valor do frete: {shipping_cost}
-		🧾 Subtotal: {subtotal}
+		🧾 Subtotal dos itens: {subtotal}
+		📦 Frete: {shipping_cost}
 		{discount}
 		💰 Total a pagar: {total_price}
 
