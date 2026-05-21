@@ -38,3 +38,7 @@ export const uploadResourceRulesQuerySchema = z.object({
     "Precisamos saber para qual recurso pertencem as imagens",
   ),
 });
+
+export const deleteResourceParamsSchema = z.object({
+  resourceId: z.ulid("O id do recurso deve ser preenchido corretamente"),
+});

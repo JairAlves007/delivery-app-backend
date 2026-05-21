@@ -34,3 +34,18 @@ export type ResourceItem = Partial<
 export type ObjectResources = {
   resource: Resource;
 };
+
+export type DeleteResourceJobPayload = {
+  resourceId: string;
+  bucketKey: string;
+  forResources: ForObjectResourceType[];
+};
+
+export type ResourceWithJoinCounts = Resource & {
+  _count: {
+    productResources: number;
+    establishmentResources: number;
+    productCategoryResources: number;
+    bannerResources: number;
+  };
+};
