@@ -67,6 +67,25 @@ export class ResourcePrismaRepository implements IResourceRepository {
     });
   }
 
+  async findResourceLocationById({
+    resourceId,
+    establishmentId,
+  }: {
+    resourceId: string;
+    establishmentId: string;
+  }): Promise<{ path: string; file_key: string } | null> {
+    return await prisma.resource.findFirst({
+      where: {
+        id: resourceId,
+        establishment_id: establishmentId,
+      },
+      select: {
+        path: true,
+        file_key: true,
+      },
+    });
+  }
+
   async deleteResource({ resourceId }: { resourceId: string }): Promise<void> {
     await prisma.resource.delete({
       where: {

@@ -18,5 +18,9 @@ export interface IResourceRepository {
     resourceId: string;
     establishmentId: string;
   }): Promise<ResourceWithJoinCounts | null>;
+  findResourceLocationById(params: {
+    resourceId: string;
+    establishmentId: string;
+  }): Promise<{ path: string; file_key: string } | null>;
   deleteResource(params: { resourceId: string }): Promise<void>;
 }

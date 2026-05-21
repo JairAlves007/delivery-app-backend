@@ -6,35 +6,53 @@ import { makeQueue } from "@/factories/services/queue/make-queue.js";
 import { forgetCacheByForResource } from "@/helpers/resource.js";
 import { app } from "@/http/app.js";
 import { r2 } from "@/lib/cloudflare.js";
-import {
-  deleteResourceJobName,
-  resourceQueueName,
-} from "@/queues/resource-queue.js";
-import type { DeleteResourceJobPayload } from "@/types/resource.js";
+import { resourceQueueName } from "@/queues/resource-queue.js";
+import type { ResourceJobPayload } from "@/types/resource.js";
 
 export const setupDeleteResourceWorker = () => {
-  const resourceQueue = makeQueue<DeleteResourceJobPayload>(resourceQueueName);
+  const resourceQueue = makeQueue<ResourceJobPayload>(resourceQueueName);
   const resourceRepository = makeResourceRepository();
 
-  resourceQueue.registerProcessor(async (payload) => {
-    const { resourceId, bucketKey, forResources } = payload;
-
-    app.log.info(
-      { jobName: deleteResourceJobName, resourceId, bucketKey },
-      "[Worker] Deleting resource from R2 + DB",
-    );
-
+  const deleteR2Object = async (bucketKey: string): Promise<void> => {
     await r2.send(
       new DeleteObjectCommand({
         Bucket: env.CLOUDFLARE_BUCKET_NAME,
         Key: bucketKey,
       }),
     );
+  };
 
-    await resourceRepository.deleteResource({ resourceId });
+  resourceQueue.registerProcessor(async (payload) => {
+    switch (payload.kind) {
+      case "delete-resource": {
+        const { resourceId, bucketKey, forResources } = payload;
 
-    await Promise.all(
-      forResources.map((forResource) => forgetCacheByForResource(forResource)),
-    );
+        app.log.info(
+          { kind: payload.kind, resourceId, bucketKey },
+          "[Worker] Deleting resource from R2 + DB",
+        );
+
+        await deleteR2Object(bucketKey);
+        await resourceRepository.deleteResource({ resourceId });
+        await Promise.all(
+          forResources.map((forResource) =>
+            forgetCacheByForResource(forResource),
+          ),
+        );
+        return;
+      }
+
+      case "delete-r2-object": {
+        const { bucketKey } = payload;
+
+        app.log.info(
+          { kind: payload.kind, bucketKey },
+          "[Worker] Deleting R2 object (DB row preserved)",
+        );
+
+        await deleteR2Object(bucketKey);
+        return;
+      }
+    }
   });
 };

@@ -36,10 +36,20 @@ export type ObjectResources = {
 };
 
 export type DeleteResourceJobPayload = {
+  kind: "delete-resource";
   resourceId: string;
   bucketKey: string;
   forResources: ForObjectResourceType[];
 };
+
+export type DeleteR2ObjectJobPayload = {
+  kind: "delete-r2-object";
+  bucketKey: string;
+};
+
+export type ResourceJobPayload =
+  | DeleteResourceJobPayload
+  | DeleteR2ObjectJobPayload;
 
 export type ResourceWithJoinCounts = Resource & {
   _count: {

@@ -11,6 +11,7 @@ import {
 } from "@/helpers/resource.js";
 import { SignedUrl } from "@/helpers/signed-url.js";
 import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.js";
+import { enqueueDeleteR2Object } from "@/queues/resource-queue.js";
 import { uploadSignedUrlBodySchema } from "@/schemas/upload-schema.js";
 import type { EstablishmentID } from "@/types/establishment.js";
 import type { ResourceIntent } from "@/types/resource.js";
@@ -68,10 +69,6 @@ export class GenerateSignedUrlForUploadService {
 		objectId,
 		resource
 	}: GenerateSignedUrlForUploadServiceRequest): Promise<SignedUrlDetail> {
-		// TODO: In future, add wrangler-queues for r2-upload-events to validate signed urls and fire events when my file was uploaded
-		// TODO: In future, add wrangler-queues for r2-delete-events to validate signed urls and fire events when my file was deleted
-		// TODO: In future, improve store db logic
-
 		const resourceIntent: ResourceIntent = resource;
 
 		const resourcePromises = [];
@@ -79,6 +76,13 @@ export class GenerateSignedUrlForUploadService {
 		await this.validateResourceRule({
 			resourceIntent
 		});
+
+		const oldLocation = resourceId
+			? await this.resourceRepository.findResourceLocationById({
+					resourceId,
+					establishmentId
+				})
+			: null;
 
 		const { path, attachData } = getInfoByForResource(resourceIntent, objectId);
 
@@ -123,6 +127,15 @@ export class GenerateSignedUrlForUploadService {
 		resourcePromises.push(forgetCacheByForResource(resourceIntent.for));
 
 		await Promise.all(resourcePromises);
+
+		if (oldLocation) {
+			const oldBucketKey = `${oldLocation.path}/${oldLocation.file_key}`;
+			const newBucketKey = `${path}/${fileKey}`;
+
+			if (oldBucketKey !== newBucketKey) {
+				await enqueueDeleteR2Object({ bucketKey: oldBucketKey });
+			}
+		}
 
 		return {
 			signedUrl,
