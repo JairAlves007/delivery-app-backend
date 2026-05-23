@@ -3,7 +3,10 @@ import {
 	buildFilterQueryOptions,
 	transformValidFilterParams
 } from "@/helpers/crud.js";
-import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
+import type {
+	IEstablishmentRepository,
+	OpeningHourInputItem
+} from "@/interfaces/repositories/establishment-repository.js";
 import prisma from "@/lib/prisma.js";
 import type {
 	DeleteContentParams,
@@ -202,5 +205,29 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 			id,
 			data: { deleted_at: new Date() }
 		});
+	}
+
+	async replaceOpeningHours({
+		establishmentId,
+		items
+	}: {
+		establishmentId: string;
+		items: OpeningHourInputItem[];
+	}): Promise<void> {
+		await prisma.$transaction([
+			prisma.openingHour.deleteMany({
+				where: { establishment_id: establishmentId }
+			}),
+			...(items.length > 0
+				? [
+						prisma.openingHour.createMany({
+							data: items.map(item => ({
+								establishment_id: establishmentId,
+								...item
+							}))
+						})
+					]
+				: [])
+		]);
 	}
 }

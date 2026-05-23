@@ -28,6 +28,7 @@ export class CreateEstablishmentService {
     acceptsCreditCard: accepts_credit_card,
     onlyDelivery: only_delivery,
     nextBillingDate: next_billing_date,
+    openingHours,
     paramsToForget,
     ...data
   }: CreateEstablishmentServiceParams): Promise<void> {
@@ -49,6 +50,18 @@ export class CreateEstablishmentService {
           },
         },
       },
+      ...(openingHours && openingHours.length > 0
+        ? {
+            openingHours: {
+              create: openingHours.map((h) => ({
+                day_of_week: h.dayOfWeek,
+                opens_at: h.isClosed ? "00:00" : (h.opensAt ?? "00:00"),
+                closes_at: h.isClosed ? "00:00" : (h.closesAt ?? "00:00"),
+                is_closed: h.isClosed,
+              })),
+            },
+          }
+        : {}),
     });
 
     await forgetAllListingCacheKeysQueue({

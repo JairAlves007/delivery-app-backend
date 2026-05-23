@@ -1,8 +1,54 @@
 import z from "zod";
 
+import { WeekDay } from "@/generated/prisma/client.js";
 import { checkIfCNPJIsValid } from "@/helpers/validation-errors.js";
 
 import { addressLocationSchema, userEmailSchema } from "./generic-schema.js";
+
+const HH_MM_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+export const openingHourInputSchema = z
+	.object({
+		dayOfWeek: z.enum(WeekDay, "Dia da semana inválido"),
+		opensAt: z
+			.string()
+			.regex(HH_MM_REGEX, "opensAt deve estar no formato HH:MM")
+			.optional(),
+		closesAt: z
+			.string()
+			.regex(HH_MM_REGEX, "closesAt deve estar no formato HH:MM")
+			.optional(),
+		isClosed: z.boolean("isClosed deve ser preenchido")
+	})
+	.superRefine((data, ctx) => {
+		if (data.isClosed) return;
+
+		if (!data.opensAt) {
+			ctx.addIssue({
+				code: "custom",
+				message: "opensAt é obrigatório quando isClosed=false",
+				path: ["opensAt"]
+			});
+		}
+
+		if (!data.closesAt) {
+			ctx.addIssue({
+				code: "custom",
+				message: "closesAt é obrigatório quando isClosed=false",
+				path: ["closesAt"]
+			});
+		}
+
+		if (data.opensAt && data.closesAt && data.opensAt === data.closesAt) {
+			ctx.addIssue({
+				code: "custom",
+				message: "opensAt e closesAt não podem ser iguais",
+				path: ["closesAt"]
+			});
+		}
+	});
+
+z.globalRegistry.add(openingHourInputSchema, { id: "OpeningHourInput" });
 
 export const createEstablishmentBodySchema = z.object({
 	name: z.string().trim().min(1, "O nome deve ser preenchido").max(255),
@@ -31,7 +77,8 @@ export const createEstablishmentBodySchema = z.object({
 		.date("Precisamos saber a data de próximo pagamento")
 		.refine(val => val >= new Date(), {
 			message: "Precisamos saber a data de próximo pagamento"
-		})
+		}),
+	openingHours: z.array(openingHourInputSchema).optional()
 });
 
 z.globalRegistry.add(createEstablishmentBodySchema, {

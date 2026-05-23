@@ -5,15 +5,21 @@ import {
 	PaymentMethodType
 } from "@/generated/prisma/client.js";
 import Constants from "@/helpers/constants.js";
+import { transformPriceFromDatabase } from "@/helpers/price.js";
 import type { IDashboardRepository } from "@/interfaces/repositories/dashboard-repository.js";
 import type {
 	DashboardBucketRow,
+	DashboardCouponUsageRow,
 	DashboardDeliveryTypeRow,
 	DashboardGranularity,
 	DashboardPaymentMethodRow,
 	DashboardResponse,
 	DashboardServiceInput,
-	DashboardStatusRow
+	DashboardStatusRow,
+	DashboardSummaryRow,
+	DashboardTopCategoryRow,
+	DashboardTopCustomerRow,
+	DashboardTopProductRow
 } from "@/types/dashboard.js";
 import type { EstablishmentID } from "@/types/establishment.js";
 
@@ -125,6 +131,53 @@ const zeroFillDeliveryTypes = (
 	);
 };
 
+const toReais = transformPriceFromDatabase;
+
+const convertSummary = (row: DashboardSummaryRow): DashboardSummaryRow => ({
+	...row,
+	grossRevenue: toReais(row.grossRevenue),
+	discountsTotal: toReais(row.discountsTotal),
+	shippingTotal: toReais(row.shippingTotal),
+	netRevenue: toReais(row.netRevenue),
+	averageOrderValue: toReais(row.averageOrderValue)
+});
+
+const convertBuckets = (rows: DashboardBucketRow[]): DashboardBucketRow[] =>
+	rows.map(row => ({ ...row, revenue: toReais(row.revenue) }));
+
+const convertStatuses = (rows: DashboardStatusRow[]): DashboardStatusRow[] =>
+	rows.map(row => ({ ...row, revenue: toReais(row.revenue) }));
+
+const convertPaymentMethods = (
+	rows: DashboardPaymentMethodRow[]
+): DashboardPaymentMethodRow[] =>
+	rows.map(row => ({ ...row, revenue: toReais(row.revenue) }));
+
+const convertDeliveryTypes = (
+	rows: DashboardDeliveryTypeRow[]
+): DashboardDeliveryTypeRow[] =>
+	rows.map(row => ({ ...row, revenue: toReais(row.revenue) }));
+
+const convertTopProducts = (
+	rows: DashboardTopProductRow[]
+): DashboardTopProductRow[] =>
+	rows.map(row => ({ ...row, revenue: toReais(row.revenue) }));
+
+const convertTopCategories = (
+	rows: DashboardTopCategoryRow[]
+): DashboardTopCategoryRow[] =>
+	rows.map(row => ({ ...row, revenue: toReais(row.revenue) }));
+
+const convertTopCustomers = (
+	rows: DashboardTopCustomerRow[]
+): DashboardTopCustomerRow[] =>
+	rows.map(row => ({ ...row, spent: toReais(row.spent) }));
+
+const convertCouponsUsage = (
+	rows: DashboardCouponUsageRow[]
+): DashboardCouponUsageRow[] =>
+	rows.map(row => ({ ...row, discountTotal: toReais(row.discountTotal) }));
+
 export class GetDashboardService {
 	private dashboardRepository: IDashboardRepository;
 
@@ -199,15 +252,21 @@ export class GetDashboardService {
 				granularity,
 				timezone: Constants.DASHBOARD_TIMEZONE
 			},
-			summary,
-			ordersOverTime: zeroFillBuckets(granularity, from, to, ordersOverTimeRaw),
-			ordersByStatus: zeroFillStatuses(ordersByStatusRaw),
-			ordersByPaymentMethod: zeroFillPaymentMethods(ordersByPaymentMethodRaw),
-			ordersByDeliveryType: zeroFillDeliveryTypes(ordersByDeliveryTypeRaw),
-			topProducts,
-			topCategories,
-			topCustomers,
-			couponsUsage
+			summary: convertSummary(summary),
+			ordersOverTime: convertBuckets(
+				zeroFillBuckets(granularity, from, to, ordersOverTimeRaw)
+			),
+			ordersByStatus: convertStatuses(zeroFillStatuses(ordersByStatusRaw)),
+			ordersByPaymentMethod: convertPaymentMethods(
+				zeroFillPaymentMethods(ordersByPaymentMethodRaw)
+			),
+			ordersByDeliveryType: convertDeliveryTypes(
+				zeroFillDeliveryTypes(ordersByDeliveryTypeRaw)
+			),
+			topProducts: convertTopProducts(topProducts),
+			topCategories: convertTopCategories(topCategories),
+			topCustomers: convertTopCustomers(topCustomers),
+			couponsUsage: convertCouponsUsage(couponsUsage)
 		};
 	}
 }

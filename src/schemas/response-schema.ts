@@ -240,7 +240,8 @@ export const establishmentResponseSchema = z.object({
 	resources: mappedResourceRecordSchema,
 	socialLinks: z.array(socialLinkSchema),
 	openingHours: z.array(openingHourSchema),
-	closures: z.array(closureSchema)
+	closures: z.array(closureSchema),
+	isOpen: z.boolean()
 });
 
 export const establishmentListResponseSchema = paginatedResponseSchema(

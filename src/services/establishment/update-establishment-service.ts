@@ -26,6 +26,7 @@ export class UpdateEstablishmentService {
     nextBillingDate: next_billing_date,
     acceptsCreditCard: accepts_credit_card,
     onlyDelivery: only_delivery,
+    openingHours,
     paramsToForget,
     ...data
   }: UpdateEstablishmentRequest) {
@@ -56,6 +57,18 @@ export class UpdateEstablishmentService {
       id,
       data: updateInput,
     });
+
+    if (openingHours !== undefined) {
+      await this.establishmentRepository.replaceOpeningHours({
+        establishmentId: id,
+        items: openingHours.map((h) => ({
+          day_of_week: h.dayOfWeek,
+          opens_at: h.isClosed ? "00:00" : (h.opensAt ?? "00:00"),
+          closes_at: h.isClosed ? "00:00" : (h.closesAt ?? "00:00"),
+          is_closed: h.isClosed,
+        })),
+      });
+    }
 
     await forgetAllListingCacheKeysQueue({
       baseCacheKey: "establishments",

@@ -1,3 +1,4 @@
+import { isEstablishmentOpen } from "@/helpers/establishment.js";
 import { mapObjectResourcesList } from "@/helpers/resource.js";
 import type {
   EstablishmentFromRepository,
@@ -6,11 +7,22 @@ import type {
 
 export const mapEstablishment = (
   establishment: EstablishmentFromRepository,
-): EstablishmentsList => ({
-  ...establishment,
-  address: establishment.address?.address ?? null,
-  resources: mapObjectResourcesList(establishment.resources),
-});
+): EstablishmentsList => {
+  const mapped = {
+    ...establishment,
+    address: establishment.address?.address ?? null,
+    resources: mapObjectResourcesList(establishment.resources),
+  };
+
+  return {
+    ...mapped,
+    isOpen: isEstablishmentOpen({
+      is_manually_closed: mapped.is_manually_closed,
+      closures: mapped.closures,
+      openingHours: mapped.openingHours,
+    }),
+  };
+};
 
 export const mapEstablishments = (
   establishments: EstablishmentFromRepository[],
