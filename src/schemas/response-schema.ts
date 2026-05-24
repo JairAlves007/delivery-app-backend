@@ -556,9 +556,27 @@ export const meResponseSchema = z.object({
 	menu: authMenuSchema
 });
 
+export const themeColorsSchema = z.object({
+	primary: z.string(),
+	secondary: z.string(),
+	accent: z.string(),
+	destructive: z.string(),
+	background: z.string(),
+	foreground: z.string(),
+	muted: z.string(),
+	border: z.string()
+});
+
+export const establishmentThemeResponseSchema = z.object({
+	schemaVersion: z.string(),
+	colors: themeColorsSchema,
+	colorsDark: themeColorsSchema
+});
+
 export const establishmentContextResponseSchema = z.object({
 	establishment: authEstablishmentCustomerSchema,
-	menu: authMenuSchema
+	menu: authMenuSchema,
+	theme: establishmentThemeResponseSchema
 });
 
 // ──────────────────────────────────────────────
@@ -641,6 +659,14 @@ const registryItems = [
 	{
 		schema: establishmentContextResponseSchema,
 		id: "EstablishmentContextResponse"
+	},
+	{
+		schema: establishmentThemeResponseSchema,
+		id: "EstablishmentThemeResponse"
+	},
+	{
+		schema: themeColorsSchema,
+		id: "ThemeColors"
 	},
 	{ schema: bannersCatalogResponseSchema, id: "BannersCatalogResponse" },
 	{

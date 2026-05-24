@@ -47,8 +47,34 @@ export default class Constants {
 		resourceRules: "resource_rules",
 		orders: "orders",
 		dashboard: "dashboard",
-		favorites: "favorites"
+		favorites: "favorites",
+		establishmentTheme: "establishment_theme"
 	};
+
+	public static readonly THEME_SCHEMA_VERSION: string = "1";
+
+	public static readonly DEFAULT_ESTABLISHMENT_THEME = {
+		colors: {
+			primary: "#FA8C00",
+			secondary: "#FFF6EC",
+			accent: "#1C1C1C",
+			destructive: "#C2526E",
+			background: "#FFFFFF",
+			foreground: "#1C1C1C",
+			muted: "#E0E0E0",
+			border: "#FA8C00"
+		},
+		colorsDark: {
+			primary: "#FA8C00",
+			secondary: "#2E2A27",
+			accent: "#E8E2DD",
+			destructive: "#BA5269",
+			background: "#211E1B",
+			foreground: "#F4EFEB",
+			muted: "#36312E",
+			border: "#3A3431"
+		}
+	} as const;
 
 	/** Cache TTL em segundos, por domínio */
 	public static readonly CACHE_TTL = {
@@ -76,6 +102,8 @@ export default class Constants {
 		addonCategories: 60 * 30,
 		/** Dados de estabelecimento — 1 h */
 		establishments: 60 * 60,
+		/** Tema do estabelecimento — 1 h */
+		establishmentTheme: 60 * 60,
 		/** Distritos/áreas de entrega — 1 h */
 		districts: 60 * 60,
 		/** Menus estruturais — 12 h */

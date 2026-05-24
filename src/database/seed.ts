@@ -1404,6 +1404,7 @@ async function main() {
 		PermissionType.MANAGE_DISTRICTS,
 		PermissionType.MANAGE_ORDERS,
 		PermissionType.MANAGE_OWN_ESTABLISHMENT,
+		PermissionType.MANAGE_OWN_ESTABLISHMENT_THEME,
 		PermissionType.MANAGE_BANNERS,
 		PermissionType.MANAGE_COUPONS,
 		PermissionType.MANAGE_ESTABLISHMENT_OWNERS,
