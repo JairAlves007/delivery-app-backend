@@ -577,13 +577,22 @@ const pizzariaBellaNapoli: EstablishmentSeed = {
 	productAddonCategoryRules: [
 		{
 			addon_category_name: "Bordas Recheadas",
-			product_category_names: ["Pizzas Tradicionais", "Pizzas Especiais", "Pizzas Doces", "Calzones"],
+			product_category_names: [
+				"Pizzas Tradicionais",
+				"Pizzas Especiais",
+				"Pizzas Doces",
+				"Calzones"
+			],
 			display_order: 1,
 			is_required: false
 		},
 		{
 			addon_category_name: "Tamanho",
-			product_category_names: ["Pizzas Tradicionais", "Pizzas Especiais", "Pizzas Doces"],
+			product_category_names: [
+				"Pizzas Tradicionais",
+				"Pizzas Especiais",
+				"Pizzas Doces"
+			],
 			display_order: 2,
 			is_required: true,
 			min_selection: 1,
@@ -591,7 +600,11 @@ const pizzariaBellaNapoli: EstablishmentSeed = {
 		},
 		{
 			addon_category_name: "Adicionais",
-			product_category_names: ["Pizzas Tradicionais", "Pizzas Especiais", "Calzones"],
+			product_category_names: [
+				"Pizzas Tradicionais",
+				"Pizzas Especiais",
+				"Calzones"
+			],
 			display_order: 3,
 			max_selection: 5
 		}
@@ -858,7 +871,13 @@ const churrascariaBoiGordo: EstablishmentSeed = {
 		},
 		{
 			addon_category_name: "Porções Extras",
-			product_category_names: ["Cortes Bovinos", "Cortes Suínos", "Aves", "Acompanhamentos", "Saladas"],
+			product_category_names: [
+				"Cortes Bovinos",
+				"Cortes Suínos",
+				"Aves",
+				"Acompanhamentos",
+				"Saladas"
+			],
 			display_order: 3,
 			max_selection: 4
 		}
@@ -1096,7 +1115,14 @@ const sushiRyu: EstablishmentSeed = {
 	productAddonCategoryRules: [
 		{
 			addon_category_name: "Molhos",
-			product_category_names: ["Combinados", "Sashimis", "Niguiris", "Hot Rolls", "Temakis", "Pratos Quentes"],
+			product_category_names: [
+				"Combinados",
+				"Sashimis",
+				"Niguiris",
+				"Hot Rolls",
+				"Temakis",
+				"Pratos Quentes"
+			],
 			display_order: 1,
 			is_required: true,
 			min_selection: 1,
@@ -1104,7 +1130,15 @@ const sushiRyu: EstablishmentSeed = {
 		},
 		{
 			addon_category_name: "Complementos",
-			product_category_names: ["Combinados", "Sashimis", "Niguiris", "Hot Rolls", "Temakis", "Pratos Quentes", "Bebidas"],
+			product_category_names: [
+				"Combinados",
+				"Sashimis",
+				"Niguiris",
+				"Hot Rolls",
+				"Temakis",
+				"Pratos Quentes",
+				"Bebidas"
+			],
 			display_order: 2,
 			max_selection: 4
 		}
@@ -1223,27 +1257,29 @@ async function seedEstablishment(
 		});
 	}
 
-	const productAddonCategoryData = seed.productAddonCategoryRules.flatMap(rule => {
-		const addonCategory = addonCategoryByName.get(rule.addon_category_name);
-		if (!addonCategory) return [];
-		const category = categoryByName.get(rule.product_category_names[0]);
-		if (!category) return [];
-		return seed.products
-			.filter(p => rule.product_category_names.includes(p.category))
-			.map(p => {
-				const product = productByName.get(p.name);
-				if (!product) return null;
-				return {
-					product_id: product.id,
-					addon_category_id: addonCategory.id,
-					display_order: rule.display_order,
-					is_required: rule.is_required ?? false,
-					min_selection: rule.min_selection,
-					max_selection: rule.max_selection
-				};
-			})
-			.filter((d): d is NonNullable<typeof d> => d !== null);
-	});
+	const productAddonCategoryData = seed.productAddonCategoryRules.flatMap(
+		rule => {
+			const addonCategory = addonCategoryByName.get(rule.addon_category_name);
+			if (!addonCategory) return [];
+			const category = categoryByName.get(rule.product_category_names[0]);
+			if (!category) return [];
+			return seed.products
+				.filter(p => rule.product_category_names.includes(p.category))
+				.map(p => {
+					const product = productByName.get(p.name);
+					if (!product) return null;
+					return {
+						product_id: product.id,
+						addon_category_id: addonCategory.id,
+						display_order: rule.display_order,
+						is_required: rule.is_required ?? false,
+						min_selection: rule.min_selection,
+						max_selection: rule.max_selection
+					};
+				})
+				.filter((d): d is NonNullable<typeof d> => d !== null);
+		}
+	);
 
 	if (productAddonCategoryData.length > 0) {
 		await prisma.productAddonCategory.createMany({
@@ -1434,6 +1470,7 @@ async function main() {
 			{ type: "LOGO", for: "ESTABLISHMENT", width: 200, height: 200 },
 			{ type: "BANNER", for: "ESTABLISHMENT", width: 1920, height: 1080 },
 			{ type: "THUMBNAIL", for: "CATEGORY", width: 320, height: 320 },
+			{ type: "BANNER", for: "CATEGORY", width: 1920, height: 1080 },
 			{ type: "BANNER", for: "BANNER", width: 1920, height: 1080 }
 		]
 	});

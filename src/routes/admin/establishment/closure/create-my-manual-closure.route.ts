@@ -5,6 +5,7 @@ import { EstablishmentNotFound } from "@/errors/establishment/not-found-error.js
 import { makeCreateManualClosureService } from "@/factories/services/closure/make-create-manual-closure-service.js";
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
+import { getUserEstablishmentId } from "@/helpers/get-user-establishment-id.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import { adminTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
@@ -41,7 +42,7 @@ export const createMyManualClosureRoute = async (app: FastifyInstance) => {
 			]
 		},
 		async (request, reply) => {
-			const establishmentId = request.user.primaryTenantId;
+			const establishmentId = getUserEstablishmentId(request.user);
 
 			if (!establishmentId) throw new EstablishmentNotFound();
 
