@@ -201,7 +201,7 @@ const socialLinkSchema = z.object({
 	url: z.string()
 });
 
-const closureSchema = z.object({
+export const closureSchema = z.object({
 	id: z.number(),
 	starts_at: dateStringSchema,
 	ends_at: nullableDateStringSchema,
@@ -234,7 +234,6 @@ export const establishmentResponseSchema = z.object({
 	cnpj: z.string().nullable(),
 	only_delivery: z.boolean(),
 	accepts_credit_card: z.boolean(),
-	is_manually_closed: z.boolean(),
 	next_billing_date: dateStringSchema,
 	address: establishmentAddressSchema,
 	resources: mappedResourceRecordSchema,

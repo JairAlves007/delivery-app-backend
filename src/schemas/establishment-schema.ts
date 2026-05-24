@@ -1,6 +1,6 @@
 import z from "zod";
 
-import { WeekDay } from "@/generated/prisma/client.js";
+import { SocialPlatform, WeekDay } from "@/generated/prisma/client.js";
 import { checkIfCNPJIsValid } from "@/helpers/validation-errors.js";
 
 import { addressLocationSchema, userEmailSchema } from "./generic-schema.js";
@@ -50,6 +50,13 @@ export const openingHourInputSchema = z
 
 z.globalRegistry.add(openingHourInputSchema, { id: "OpeningHourInput" });
 
+export const socialLinkInputSchema = z.object({
+	platform: z.enum(SocialPlatform, "Plataforma de rede social inválida"),
+	url: z.url("URL da rede social inválida").max(2048).nullable()
+});
+
+z.globalRegistry.add(socialLinkInputSchema, { id: "SocialLinkInput" });
+
 export const createEstablishmentBodySchema = z.object({
 	name: z.string().trim().min(1, "O nome deve ser preenchido").max(255),
 	address: addressLocationSchema,
@@ -78,7 +85,8 @@ export const createEstablishmentBodySchema = z.object({
 		.refine(val => val >= new Date(), {
 			message: "Precisamos saber a data de próximo pagamento"
 		}),
-	openingHours: z.array(openingHourInputSchema).optional()
+	openingHours: z.array(openingHourInputSchema).optional(),
+	socialLinks: z.array(socialLinkInputSchema).optional()
 });
 
 z.globalRegistry.add(createEstablishmentBodySchema, {

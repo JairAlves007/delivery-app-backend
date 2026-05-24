@@ -54,14 +54,9 @@ const getZonedWeekdayAndMinutes = (
 };
 
 export function isEstablishmentOpen(
-  establishment: Pick<
-    EstablishmentsList,
-    "is_manually_closed" | "closures" | "openingHours"
-  >,
+  establishment: Pick<EstablishmentsList, "closures" | "openingHours">,
 ): boolean {
   const now = new Date();
-
-  if (establishment.is_manually_closed) return false;
 
   const activeClosure = establishment.closures.find(
     (c) => c.starts_at <= now && (c.ends_at == null || c.ends_at >= now),

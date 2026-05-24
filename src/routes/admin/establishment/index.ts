@@ -1,5 +1,9 @@
 import type { FastifyInstance } from "fastify";
 
+import { createManualClosureRoute } from "./closure/create-manual-closure.route.js";
+import { createMyManualClosureRoute } from "./closure/create-my-manual-closure.route.js";
+import { reopenEstablishmentRoute } from "./closure/reopen-establishment.route.js";
+import { reopenMyEstablishmentRoute } from "./closure/reopen-my-establishment.route.js";
 import { createEstablishmentRoute } from "./create-establishment.route.js";
 import { deleteEstablishmentRoute } from "./delete-establishment.route.js";
 import { findEstablishmentRoute } from "./find-establishment.route.js";
@@ -16,4 +20,8 @@ export const establishmentRoutes = async (app: FastifyInstance) => {
 	app.register(updateEstablishmentRoute);
 	app.register(updateMyEstablishmentRoute);
 	app.register(deleteEstablishmentRoute);
+	app.register(createMyManualClosureRoute);
+	app.register(createManualClosureRoute);
+	app.register(reopenMyEstablishmentRoute);
+	app.register(reopenEstablishmentRoute);
 };

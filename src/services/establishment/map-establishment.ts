@@ -17,7 +17,6 @@ export const mapEstablishment = (
   return {
     ...mapped,
     isOpen: isEstablishmentOpen({
-      is_manually_closed: mapped.is_manually_closed,
       closures: mapped.closures,
       openingHours: mapped.openingHours,
     }),

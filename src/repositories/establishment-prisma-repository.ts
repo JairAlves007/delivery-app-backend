@@ -5,7 +5,8 @@ import {
 } from "@/helpers/crud.js";
 import type {
 	IEstablishmentRepository,
-	OpeningHourInputItem
+	OpeningHourInputItem,
+	SocialLinkUpsertItem
 } from "@/interfaces/repositories/establishment-repository.js";
 import prisma from "@/lib/prisma.js";
 import type {
@@ -228,6 +229,51 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 						})
 					]
 				: [])
+		]);
+	}
+
+	async upsertSocialLinks({
+		establishmentId,
+		items
+	}: {
+		establishmentId: string;
+		items: SocialLinkUpsertItem[];
+	}): Promise<void> {
+		if (items.length === 0) return;
+
+		const toDelete = items.filter(item => item.url === null);
+		const toUpsert = items.filter(
+			(item): item is { platform: SocialLinkUpsertItem["platform"]; url: string } =>
+				item.url !== null
+		);
+
+		await prisma.$transaction([
+			...(toDelete.length > 0
+				? [
+						prisma.socialLink.deleteMany({
+							where: {
+								establishment_id: establishmentId,
+								platform: { in: toDelete.map(item => item.platform) }
+							}
+						})
+					]
+				: []),
+			...toUpsert.map(item =>
+				prisma.socialLink.upsert({
+					where: {
+						platform_establishment_id: {
+							platform: item.platform,
+							establishment_id: establishmentId
+						}
+					},
+					create: {
+						platform: item.platform,
+						url: item.url,
+						establishment_id: establishmentId
+					},
+					update: { url: item.url }
+				})
+			)
 		]);
 	}
 }

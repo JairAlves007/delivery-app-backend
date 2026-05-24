@@ -2,7 +2,8 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
 
-import { makeUpdateEstablishmentService } from "@/factories/services/establishment/make-update-establishment-service.js";
+import { EstablishmentNotFound } from "@/errors/establishment/not-found-error.js";
+import { makeReopenEstablishmentService } from "@/factories/services/closure/make-reopen-establishment-service.js";
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
@@ -14,23 +15,17 @@ import {
 	apiSuccessResponseSchema,
 	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
-import {
-	establishmentParamsSchema,
-	updateEstablishmentBodySchema
-} from "@/schemas/establishment-schema.js";
 
-export const updateEstablishmentRoute = async (app: FastifyInstance) => {
-	app.withTypeProvider<ZodTypeProvider>().patch(
-		"/:id",
+export const reopenMyEstablishmentRoute = async (app: FastifyInstance) => {
+	app.withTypeProvider<ZodTypeProvider>().delete(
+		"/my/closures/active",
 		{
 			schema: {
-				operationId: "updateEstablishment",
+				operationId: "reopenMyEstablishment",
 				tags: adminTags("Establishments"),
-				summary: "Atualizar estabelecimento",
-				params: establishmentParamsSchema,
-				body: updateEstablishmentBodySchema,
+				summary: "Reabrir meu estabelecimento (encerra fechamentos ativos)",
 				response: {
-					204: apiSuccessResponseSchema(z.object({})),
+					200: apiSuccessResponseSchema(z.object({ endedCount: z.number() })),
 					401: apiDefaultErrorResponseSchema,
 					403: apiDefaultErrorResponseSchema,
 					404: apiDefaultErrorResponseSchema,
@@ -40,25 +35,21 @@ export const updateEstablishmentRoute = async (app: FastifyInstance) => {
 			},
 			onRequest: [
 				isAuthenticated,
-				ensureUserHasPermission([PermissionType.MANAGE_ESTABLISHMENTS])
+				ensureUserHasPermission([PermissionType.MANAGE_OWN_ESTABLISHMENT])
 			]
 		},
 		async (request, reply) => {
-			const data = request.body;
-			const { id } = request.params;
+			const establishmentId = request.user.primaryTenantId;
 
-			const updateEstablishmentService = makeUpdateEstablishmentService();
+			if (!establishmentId) throw new EstablishmentNotFound();
 
-			await updateEstablishmentService.handle({
-				id,
-				...data,
-				paramsToForget: { establishment_id: id }
-			});
+			const service = makeReopenEstablishmentService();
+			const result = await service.handle({ establishmentId });
 
 			return reply
-				.status(HTTPStatusCodes.NO_CONTENT)
+				.status(HTTPStatusCodes.OK)
 				.send(
-					ApiResponse.success("Estabelecimento atualizado com sucesso", {})
+					ApiResponse.success("Estabelecimento reaberto com sucesso", result)
 				);
 		}
 	);

@@ -29,9 +29,15 @@ export class CreateEstablishmentService {
     onlyDelivery: only_delivery,
     nextBillingDate: next_billing_date,
     openingHours,
+    socialLinks,
     paramsToForget,
     ...data
   }: CreateEstablishmentServiceParams): Promise<void> {
+    const socialLinksToCreate = (socialLinks ?? []).filter(
+      (link): link is { platform: typeof link.platform; url: string } =>
+        link.url !== null,
+    );
+
     await this.establishmentRepository.create({
       ...data,
       name,
@@ -58,6 +64,16 @@ export class CreateEstablishmentService {
                 opens_at: h.isClosed ? "00:00" : (h.opensAt ?? "00:00"),
                 closes_at: h.isClosed ? "00:00" : (h.closesAt ?? "00:00"),
                 is_closed: h.isClosed,
+              })),
+            },
+          }
+        : {}),
+      ...(socialLinksToCreate.length > 0
+        ? {
+            socialLinks: {
+              create: socialLinksToCreate.map((link) => ({
+                platform: link.platform,
+                url: link.url,
               })),
             },
           }

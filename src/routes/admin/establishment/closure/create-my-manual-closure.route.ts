@@ -1,12 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { z } from "zod";
 
 import { EstablishmentNotFound } from "@/errors/establishment/not-found-error.js";
-import { makeUpdateEstablishmentService } from "@/factories/services/establishment/make-update-establishment-service.js";
+import { makeCreateManualClosureService } from "@/factories/services/closure/make-create-manual-closure-service.js";
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
-import { getUserEstablishmentId } from "@/helpers/get-user-establishment-id.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import { adminTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
@@ -16,19 +14,20 @@ import {
 	apiSuccessResponseSchema,
 	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
-import { updateMyEstablishmentBodySchema } from "@/schemas/establishment-schema.js";
+import { manualClosureBodySchema } from "@/schemas/closure-schema.js";
+import { closureSchema } from "@/schemas/response-schema.js";
 
-export const updateMyEstablishmentRoute = async (app: FastifyInstance) => {
-	app.withTypeProvider<ZodTypeProvider>().patch(
-		"/my",
+export const createMyManualClosureRoute = async (app: FastifyInstance) => {
+	app.withTypeProvider<ZodTypeProvider>().post(
+		"/my/closures/manual",
 		{
 			schema: {
-				operationId: "updateMyEstablishment",
+				operationId: "createMyManualClosure",
 				tags: adminTags("Establishments"),
-				summary: "Atualizar meu estabelecimento",
-				body: updateMyEstablishmentBodySchema,
+				summary: "Fechar meu estabelecimento manualmente",
+				body: manualClosureBodySchema,
 				response: {
-					204: apiSuccessResponseSchema(z.object({})),
+					201: apiSuccessResponseSchema(closureSchema),
 					401: apiDefaultErrorResponseSchema,
 					403: apiDefaultErrorResponseSchema,
 					404: apiDefaultErrorResponseSchema,
@@ -42,24 +41,22 @@ export const updateMyEstablishmentRoute = async (app: FastifyInstance) => {
 			]
 		},
 		async (request, reply) => {
-			const establishmentId = getUserEstablishmentId(request.user);
+			const establishmentId = request.user.primaryTenantId;
 
 			if (!establishmentId) throw new EstablishmentNotFound();
 
 			const data = request.body;
 
-			const updateEstablishmentService = makeUpdateEstablishmentService();
-
-			await updateEstablishmentService.handle({
-				id: establishmentId,
-				...data,
-				paramsToForget: { establishment_id: establishmentId }
+			const service = makeCreateManualClosureService();
+			const closure = await service.handle({
+				establishmentId,
+				...data
 			});
 
 			return reply
-				.status(HTTPStatusCodes.NO_CONTENT)
+				.status(HTTPStatusCodes.CREATED)
 				.send(
-					ApiResponse.success("Estabelecimento atualizado com sucesso", {})
+					ApiResponse.success("Estabelecimento fechado com sucesso", closure)
 				);
 		}
 	);

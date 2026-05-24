@@ -1,6 +1,7 @@
 import type {
   Establishment,
   Prisma,
+  SocialPlatform,
   WeekDay,
 } from "@/generated/prisma/client.js";
 import type { EstablishmentFromRepository } from "@/types/establishment.js";
@@ -14,6 +15,11 @@ export type OpeningHourInputItem = {
   is_closed: boolean;
 };
 
+export type SocialLinkUpsertItem = {
+  platform: SocialPlatform;
+  url: string | null;
+};
+
 export interface IEstablishmentRepository extends ICRUDBase<
   EstablishmentFromRepository,
   Prisma.EstablishmentCreateInput,
@@ -25,5 +31,9 @@ export interface IEstablishmentRepository extends ICRUDBase<
   replaceOpeningHours(params: {
     establishmentId: string;
     items: OpeningHourInputItem[];
+  }): Promise<void>;
+  upsertSocialLinks(params: {
+    establishmentId: string;
+    items: SocialLinkUpsertItem[];
   }): Promise<void>;
 }

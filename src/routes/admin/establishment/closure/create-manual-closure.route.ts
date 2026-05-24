@@ -1,8 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { z } from "zod";
 
-import { makeUpdateEstablishmentService } from "@/factories/services/establishment/make-update-establishment-service.js";
+import { makeCreateManualClosureService } from "@/factories/services/closure/make-create-manual-closure-service.js";
 import { PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
@@ -15,22 +14,23 @@ import {
 	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
 import {
-	establishmentParamsSchema,
-	updateEstablishmentBodySchema
-} from "@/schemas/establishment-schema.js";
+	establishmentClosureParamsSchema,
+	manualClosureBodySchema
+} from "@/schemas/closure-schema.js";
+import { closureSchema } from "@/schemas/response-schema.js";
 
-export const updateEstablishmentRoute = async (app: FastifyInstance) => {
-	app.withTypeProvider<ZodTypeProvider>().patch(
-		"/:id",
+export const createManualClosureRoute = async (app: FastifyInstance) => {
+	app.withTypeProvider<ZodTypeProvider>().post(
+		"/:id/closures/manual",
 		{
 			schema: {
-				operationId: "updateEstablishment",
+				operationId: "createManualClosure",
 				tags: adminTags("Establishments"),
-				summary: "Atualizar estabelecimento",
-				params: establishmentParamsSchema,
-				body: updateEstablishmentBodySchema,
+				summary: "Fechar estabelecimento manualmente",
+				params: establishmentClosureParamsSchema,
+				body: manualClosureBodySchema,
 				response: {
-					204: apiSuccessResponseSchema(z.object({})),
+					201: apiSuccessResponseSchema(closureSchema),
 					401: apiDefaultErrorResponseSchema,
 					403: apiDefaultErrorResponseSchema,
 					404: apiDefaultErrorResponseSchema,
@@ -44,21 +44,19 @@ export const updateEstablishmentRoute = async (app: FastifyInstance) => {
 			]
 		},
 		async (request, reply) => {
-			const data = request.body;
 			const { id } = request.params;
+			const data = request.body;
 
-			const updateEstablishmentService = makeUpdateEstablishmentService();
-
-			await updateEstablishmentService.handle({
-				id,
-				...data,
-				paramsToForget: { establishment_id: id }
+			const service = makeCreateManualClosureService();
+			const closure = await service.handle({
+				establishmentId: id,
+				...data
 			});
 
 			return reply
-				.status(HTTPStatusCodes.NO_CONTENT)
+				.status(HTTPStatusCodes.CREATED)
 				.send(
-					ApiResponse.success("Estabelecimento atualizado com sucesso", {})
+					ApiResponse.success("Estabelecimento fechado com sucesso", closure)
 				);
 		}
 	);
