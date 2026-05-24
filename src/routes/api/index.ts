@@ -4,6 +4,7 @@ import { couponRoutes } from "./coupon/index.js";
 import { districtCatalogRoutes } from "./district/index.js";
 import { mainRoutes } from "./main/index.js";
 import { orderRoutes } from "./order/index.js";
+import { webhookRoutes } from "./webhooks/index.js";
 
 export const apiRoutes = (app: FastifyInstance) => {
 	app.register(async api => {
@@ -11,5 +12,6 @@ export const apiRoutes = (app: FastifyInstance) => {
 		api.register(couponRoutes, { prefix: "/coupon" });
 		api.register(orderRoutes, { prefix: "/order" });
 		api.register(districtCatalogRoutes, { prefix: "/district" });
+		api.register(webhookRoutes);
 	});
 };

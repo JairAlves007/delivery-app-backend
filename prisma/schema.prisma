@@ -193,6 +193,28 @@ enum ViewType {
   VIEW_TAGS
 }
 
+enum WhatsAppIntegrationStatus {
+  PENDING
+  CONNECTED
+  DISCONNECTED
+  FAILED
+}
+
+enum OrderMessageTrigger {
+  ORDER_CONFIRMED
+  STATUS_SHIPPED
+  STATUS_DELIVERED
+  STATUS_CANCELLED
+}
+
+enum WhatsAppMessageStatus {
+  PENDING
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
 // ─── Core: Auth & RBAC ──────────────────────────────────────────────
 
 model Role {
@@ -262,19 +284,19 @@ model RefreshToken {
 // ─── Establishment & Config ─────────────────────────────────────────
 
 model Establishment {
-  id                     String                  @id @default(ulid())
-  name                   String                  @db.VarChar(255)
-  slug                   String                  @unique @db.VarChar(255)
-  description            String                  @db.VarChar(1000)
-  email                  String                  @unique @db.VarChar(320)
-  cnpj                   String?                 @unique @db.VarChar(18)
+  id                     String                            @id @default(ulid())
+  name                   String                            @db.VarChar(255)
+  slug                   String                            @unique @db.VarChar(255)
+  description            String                            @db.VarChar(1000)
+  email                  String                            @unique @db.VarChar(320)
+  cnpj                   String?                           @unique @db.VarChar(18)
   only_delivery          Boolean
   accepts_credit_card    Boolean
-  next_billing_date      DateTime                @db.Timestamptz
-  owner_id               String?                 @unique
-  created_at             DateTime                @default(now()) @db.Timestamptz
-  deleted_at             DateTime?               @db.Timestamptz
-  owner                  User?                   @relation(fields: [owner_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  next_billing_date      DateTime                          @db.Timestamptz
+  owner_id               String?                           @unique
+  created_at             DateTime                          @default(now()) @db.Timestamptz
+  deleted_at             DateTime?                         @db.Timestamptz
+  owner                  User?                             @relation(fields: [owner_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
   openingHours           OpeningHour[]
   socialLinks            SocialLink[]
   products               Product[]
@@ -291,6 +313,9 @@ model Establishment {
   establishmentResources Resource[]
   resources              EstablishmentResource[]
   theme                  EstablishmentTheme?
+  whatsappIntegration    EstablishmentWhatsAppIntegration?
+  orderMessageTemplates  OrderStatusMessageTemplate[]
+  whatsappMessageLogs    WhatsAppMessageLog[]
 
   @@map("establishments")
 }
@@ -673,6 +698,7 @@ model Order {
   coupon               Coupon?               @relation(fields: [coupon_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
   orderCoupon          OrderCoupon?
   orderDeliveryAddress OrderDeliveryAddress?
+  whatsappMessageLogs  WhatsAppMessageLog[]
 
   @@index([establishment_id], name: "idx_orders_establishment_id")
   @@index([coupon_id], name: "idx_orders_coupon_id")
@@ -693,15 +719,15 @@ model OrderCoupon {
 }
 
 model OrderItem {
-  id                   Int      @id @default(autoincrement())
-  order_id             String
-  product_id           String
-  product_name         String   @db.VarChar(255)
-  product_price        Int
-  quantity             Int
-  weight_grams         Int?
-  addons_subtotal      Int      @default(0)
-  created_at           DateTime @default(now()) @db.Timestamptz
+  id              Int      @id @default(autoincrement())
+  order_id        String
+  product_id      String
+  product_name    String   @db.VarChar(255)
+  product_price   Int
+  quantity        Int
+  weight_grams    Int?
+  addons_subtotal Int      @default(0)
+  created_at      DateTime @default(now()) @db.Timestamptz
 
   order   Order            @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   product Product          @relation(fields: [product_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -868,4 +894,66 @@ model ProductCategoryResource {
   @@index([category_id], name: "idx_product_category_resources_category_id")
   @@index([resource_id], name: "idx_product_category_resources_resource_id")
   @@map("product_category_resources")
+}
+
+// ─── WhatsApp Integration ───────────────────────────────────────────
+
+model EstablishmentWhatsAppIntegration {
+  id                    String                    @id @default(ulid())
+  establishment_id      String                    @unique
+  evolution_instance_id String                    @unique
+  meta_phone_number_id  String                    @db.VarChar(64)
+  meta_waba_id          String                    @db.VarChar(64)
+  meta_access_token     String                    @db.Text
+  status                WhatsAppIntegrationStatus @default(PENDING)
+  last_connected_at     DateTime?                 @db.Timestamptz
+  last_error            String?                   @db.VarChar(1000)
+  created_at            DateTime                  @default(now()) @db.Timestamptz
+  updated_at            DateTime                  @updatedAt @db.Timestamptz
+  deleted_at            DateTime?                 @db.Timestamptz
+  establishment         Establishment             @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([establishment_id], name: "idx_establishment_whatsapp_integrations_establishment_id")
+  @@index([status], name: "idx_establishment_whatsapp_integrations_status")
+  @@map("establishment_whatsapp_integrations")
+}
+
+model OrderStatusMessageTemplate {
+  id               String              @id @default(ulid())
+  establishment_id String
+  trigger          OrderMessageTrigger
+  enabled          Boolean             @default(true)
+  template_text    String              @db.Text
+  created_at       DateTime            @default(now()) @db.Timestamptz
+  updated_at       DateTime            @updatedAt @db.Timestamptz
+  establishment    Establishment       @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([establishment_id, trigger])
+  @@index([establishment_id], name: "idx_order_status_message_templates_establishment_id")
+  @@map("order_status_message_templates")
+}
+
+model WhatsAppMessageLog {
+  id                  String                @id @default(ulid())
+  establishment_id    String
+  order_id            String?
+  trigger             OrderMessageTrigger
+  to_phone            String                @db.VarChar(20)
+  status              WhatsAppMessageStatus @default(PENDING)
+  provider_message_id String?               @db.VarChar(255)
+  error_text          String?               @db.VarChar(1000)
+  attempts            Int                   @default(0)
+  sent_at             DateTime?             @db.Timestamptz
+  delivered_at        DateTime?             @db.Timestamptz
+  read_at             DateTime?             @db.Timestamptz
+  failed_at           DateTime?             @db.Timestamptz
+  created_at          DateTime              @default(now()) @db.Timestamptz
+  establishment       Establishment         @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  order               Order?                @relation(fields: [order_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([establishment_id, status], name: "idx_whatsapp_message_logs_establishment_status")
+  @@index([order_id], name: "idx_whatsapp_message_logs_order_id")
+  @@index([provider_message_id], name: "idx_whatsapp_message_logs_provider_message_id")
+  @@index([created_at], name: "idx_whatsapp_message_logs_created_at")
+  @@map("whatsapp_message_logs")
 }

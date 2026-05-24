@@ -1,3 +1,4 @@
+import { makeFindEstablishmentByIdService } from "@/factories/services/establishment/make-find-establishment-by-id-service.js";
 import { makeSendOrderConfirmationMessageService } from "@/factories/services/order/make-send-order-confirmation-message.js";
 import { makeCalculateCouponDiscountFromOrderService } from "@/factories/services/order/validations/make-calculate-coupon-discount-from-order-service.js";
 import { makeValidateAddonsFromOrderService } from "@/factories/services/order/validations/make-validate-addons-from-order-service.js";
@@ -246,7 +247,7 @@ export class CreateOrderService {
             : item.product.quantity,
       }));
 
-    await this.orderRepository.create(
+    const { id: orderId } = await this.orderRepository.create(
       this.buildOrderItems({
         address,
         coupon,
@@ -277,8 +278,16 @@ export class CreateOrderService {
       paramsToForget,
     });
 
+    const findEstablishmentByIdService = makeFindEstablishmentByIdService();
+    const establishment = await findEstablishmentByIdService.handle({
+      id: establishmentId,
+    });
+
     const sendConfirmationService = makeSendOrderConfirmationMessageService();
     await sendConfirmationService.handle({
+      establishmentId,
+      orderId,
+      establishmentName: establishment?.name ?? "",
       address,
       coupon,
       deliveryType,

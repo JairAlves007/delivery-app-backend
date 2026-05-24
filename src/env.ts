@@ -31,6 +31,14 @@ const envSchema = z.object({
   REDIS_HOST: z.string().default("127.0.0.1"),
   REDIS_PORT: z.coerce.number().default(6379),
   REDIS_PASSWORD: z.string().optional(),
+  EVOLUTION_API_URL: z.url("Evolution API URL is required"),
+  EVOLUTION_API_KEY: z.string().min(1, "Evolution API key is required"),
+  EVOLUTION_WEBHOOK_SECRET: z
+    .string()
+    .min(32, "Evolution webhook secret must be at least 32 characters"),
+  WHATSAPP_CREDENTIALS_ENCRYPTION_KEY: z
+    .string()
+    .length(64, "WhatsApp credentials encryption key must be 64 hex chars (32 bytes)"),
 });
 
 export const env = envSchema.parse(process.env);
