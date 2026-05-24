@@ -28,7 +28,7 @@ export type ResourceInfo = {
 };
 
 export type ResourceItem = Partial<
-  Record<string, { id: string; path: string; fileKey: string }>
+  Record<ResourceType, { id: string; path: string; fileKey: string }>
 >;
 
 export type ObjectResources = {

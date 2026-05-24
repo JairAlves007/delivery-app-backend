@@ -34,28 +34,29 @@ import {
 const dateStringSchema = z.union([z.string(), z.date()]);
 const nullableDateStringSchema = dateStringSchema.nullable();
 
+const resourceTypeSchema = z.enum(ResourceType);
+z.globalRegistry.add(resourceTypeSchema, { id: "ResourceType" });
+
 // ──────────────────────────────────────────────
 // Resource
 // ──────────────────────────────────────────────
 
 export const resourceResponseSchema = z.object({
 	id: z.string(),
-	type: z.enum(ResourceType),
+	type: resourceTypeSchema,
 	path: z.string(),
 	file_key: z.string(),
 	created_at: dateStringSchema,
 	updated_at: dateStringSchema
 });
 
-const mappedResourceRecordSchema = z.record(
-	z.string(),
-	z
-		.object({
-			id: z.string(),
-			path: z.string(),
-			fileKey: z.string()
-		})
-		.optional()
+const mappedResourceRecordSchema = z.partialRecord(
+	resourceTypeSchema,
+	z.object({
+		id: z.string(),
+		path: z.string(),
+		fileKey: z.string()
+	})
 );
 
 // ──────────────────────────────────────────────
@@ -483,7 +484,7 @@ const fileFormatSchema = z.object({
 
 export const resourceRuleResponseSchema = z.object({
 	id: z.number(),
-	type: z.enum(ResourceType),
+	type: resourceTypeSchema,
 	width: z.number(),
 	height: z.number(),
 	for: z.enum(ForObjectResourceType),
@@ -694,10 +695,6 @@ const registryItems = [
 	{
 		schema: z.enum(PaymentMethodType),
 		id: "PaymentMethodType"
-	},
-	{
-		schema: z.enum(ResourceType),
-		id: "ResourceType"
 	},
 	{
 		schema: z.enum(RoleType),
