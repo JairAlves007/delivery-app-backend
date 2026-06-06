@@ -140,6 +140,13 @@ const defaultMenus: DefaultMenu[] = [
 		order: 9,
 		for_audience: MenuAudienceType.ESTABLISHMENT_OWNER
 	},
+	{
+		label: "Cardápio Digital",
+		slug: "digital-menu",
+		view_type: ViewType.VIEW_DIGITAL_MENU,
+		order: 10,
+		for_audience: MenuAudienceType.ESTABLISHMENT_OWNER
+	},
 
 	// Admin
 	{
@@ -237,6 +244,13 @@ const defaultMenus: DefaultMenu[] = [
 		slug: "districts",
 		view_type: ViewType.VIEW_DISTRICTS,
 		order: 9,
+		for_audience: MenuAudienceType.ADMIN
+	},
+	{
+		label: "Cardápio Digital",
+		slug: "digital-menu",
+		view_type: ViewType.VIEW_DIGITAL_MENU,
+		order: 10,
 		for_audience: MenuAudienceType.ADMIN
 	}
 ];

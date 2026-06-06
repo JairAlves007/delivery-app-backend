@@ -225,6 +225,7 @@ enum ViewType {
   VIEW_BANNERS
   VIEW_DISTRICTS
   VIEW_TAGS
+  VIEW_DIGITAL_MENU
 }
 
 // ─── Core: Auth & RBAC ──────────────────────────────────────────────

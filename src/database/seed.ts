@@ -1407,6 +1407,8 @@ async function main() {
 		PermissionType.MANAGE_OWN_ESTABLISHMENT_THEME,
 		PermissionType.MANAGE_BANNERS,
 		PermissionType.MANAGE_COUPONS,
+		PermissionType.MANAGE_WHATSAPP,
+		PermissionType.MANAGE_DIGITAL_MENU,
 		PermissionType.MANAGE_ESTABLISHMENT_OWNERS,
 		PermissionType.VIEW_DASHBOARD
 	];
