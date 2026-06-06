@@ -109,6 +109,18 @@ enum WhatsappMessageStatus {
   RECEIVED
 }
 
+enum DigitalMenuSource {
+  GENERATED
+  UPLOADED
+}
+
+enum DigitalMenuStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}
+
 enum PermissionType {
   // Establishment Owner
   MANAGE_PRODUCTS
@@ -121,6 +133,7 @@ enum PermissionType {
   MANAGE_BANNERS
   MANAGE_COUPONS
   MANAGE_WHATSAPP
+  MANAGE_DIGITAL_MENU
 
   // Admin
   MANAGE_ESTABLISHMENTS
@@ -315,8 +328,25 @@ model Establishment {
   whatsappIntegration    EstablishmentWhatsappIntegration?
   whatsappTemplates      OrderStatusMessageTemplate[]
   whatsappMessageLogs    WhatsappMessageLog[]
+  digitalMenu            EstablishmentDigitalMenu?
 
   @@map("establishments")
+}
+
+model EstablishmentDigitalMenu {
+  id               String            @id @default(ulid())
+  establishment_id String            @unique
+  source           DigitalMenuSource
+  status           DigitalMenuStatus @default(PENDING)
+  file_path        String?           @db.VarChar(512)
+  file_key         String?           @db.VarChar(255)
+  generated_at     DateTime?         @db.Timestamptz
+  created_at       DateTime          @default(now()) @db.Timestamptz
+  updated_at       DateTime          @updatedAt @db.Timestamptz
+  deleted_at       DateTime?         @db.Timestamptz
+  establishment    Establishment     @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("establishment_digital_menus")
 }
 
 model EstablishmentTheme {

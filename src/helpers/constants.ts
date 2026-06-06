@@ -15,6 +15,10 @@ export default class Constants {
 	public static readonly MAX_LISTING_LIMIT: number = 200;
 	public static readonly DASHBOARD_TOP_N: number = 10;
 	public static readonly DASHBOARD_TIMEZONE: string = "America/Fortaleza";
+	public static readonly DIGITAL_MENU_STORAGE_DIR: string = "storage/menus";
+	public static readonly DIGITAL_MENU_MAX_UPLOAD_BYTES: number =
+		10 * 1024 * 1024;
+	public static readonly DIGITAL_MENU_MIME_TYPE: string = "application/pdf";
 
 	// Regex
 	public static readonly PHONE_REGEX: RegExp = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
@@ -48,7 +52,8 @@ export default class Constants {
 		orders: "orders",
 		dashboard: "dashboard",
 		favorites: "favorites",
-		establishmentTheme: "establishment_theme"
+		establishmentTheme: "establishment_theme",
+		digitalMenu: "digital_menu"
 	};
 
 	public static readonly THEME_SCHEMA_VERSION: string = "1";
@@ -102,6 +107,8 @@ export default class Constants {
 		establishments: 60 * 60,
 		/** Tema do estabelecimento — 1 h */
 		establishmentTheme: 60 * 60,
+		/** Cardápio digital — 1 h */
+		digitalMenu: 60 * 60,
 		/** Distritos/áreas de entrega — 1 h */
 		districts: 60 * 60,
 		/** Menus estruturais — 12 h */

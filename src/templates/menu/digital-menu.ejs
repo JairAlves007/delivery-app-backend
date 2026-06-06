@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cardápio — <%= establishment.name %></title>
+  <style>
+    :root {
+      --primary: <%= colors.primary %>;
+      --secondary: <%= colors.secondary %>;
+      --background: <%= colors.background %>;
+      --foreground: <%= colors.foreground %>;
+      --muted: <%= colors.muted %>;
+      --border: <%= colors.border %>;
+    }
+
+    @page {
+      size: A4;
+      margin: 14mm 16mm;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      font-size: 11pt;
+      line-height: 1.45;
+    }
+
+    .header {
+      text-align: center;
+      padding-bottom: 18px;
+      margin-bottom: 6px;
+    }
+
+    .header .logo {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      border-radius: 50%;
+      margin-bottom: 12px;
+    }
+
+    .header h1 {
+      font-size: 23pt;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .header .tagline {
+      margin-top: 6px;
+      font-size: 10pt;
+      color: var(--foreground);
+      opacity: 0.65;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .header .rule {
+      width: 56px;
+      height: 3px;
+      background: var(--primary);
+      margin: 14px auto 0;
+      border-radius: 2px;
+    }
+
+    .category {
+      margin-top: 22px;
+      break-inside: avoid-page;
+    }
+
+    .category-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13pt;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    .category-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      opacity: 0.45;
+    }
+
+    .product {
+      padding: 7px 0;
+      break-inside: avoid;
+    }
+
+    .product-line {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .product-name {
+      font-weight: 600;
+      font-size: 11pt;
+    }
+
+    .product-leader {
+      flex: 1;
+      border-bottom: 1.5px dotted var(--muted);
+      transform: translateY(-3px);
+    }
+
+    .product-price {
+      font-weight: 700;
+      color: var(--primary);
+      white-space: nowrap;
+    }
+
+    .product-price .original {
+      font-weight: 400;
+      color: var(--foreground);
+      opacity: 0.45;
+      text-decoration: line-through;
+      margin-right: 6px;
+      font-size: 9.5pt;
+    }
+
+    .product-description {
+      font-size: 9.5pt;
+      color: var(--foreground);
+      opacity: 0.6;
+      max-width: 86%;
+      margin-top: 1px;
+    }
+
+    .empty {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 11pt;
+      opacity: 0.6;
+    }
+
+    .footer {
+      margin-top: 34px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 8.5pt;
+      color: var(--foreground);
+      opacity: 0.55;
+    }
+
+    .footer p + p {
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <% if (establishment.logoUrl) { %>
+      <img class="logo" src="<%= establishment.logoUrl %>" alt="<%= establishment.name %>" />
+    <% } %>
+    <h1><%= establishment.name %></h1>
+    <% if (establishment.description) { %>
+      <p class="tagline"><%= establishment.description %></p>
+    <% } %>
+    <div class="rule"></div>
+  </header>
+
+  <main>
+    <% if (categories.length === 0) { %>
+      <p class="empty">Cardápio em atualização. Volte em breve!</p>
+    <% } %>
+
+    <% categories.forEach((category) => { %>
+      <section class="category">
+        <h2 class="category-title"><%= category.name %></h2>
+
+        <% category.products.forEach((product) => { %>
+          <article class="product">
+            <div class="product-line">
+              <span class="product-name"><%= product.name %></span>
+              <span class="product-leader"></span>
+              <span class="product-price">
+                <% if (product.originalPriceLabel) { %>
+                  <span class="original"><%= product.originalPriceLabel %></span>
+                <% } %>
+                <%= product.priceLabel %>
+              </span>
+            </div>
+            <% if (product.description) { %>
+              <p class="product-description"><%= product.description %></p>
+            <% } %>
+          </article>
+        <% }) %>
+      </section>
+    <% }) %>
+  </main>
+
+  <footer class="footer">
+    <% if (establishment.addressLine) { %>
+      <p><%= establishment.addressLine %></p>
+    <% } %>
+    <% if (establishment.phone) { %>
+      <p><%= establishment.phone %></p>
+    <% } %>
+    <p>Cardápio atualizado em <%= generatedAtLabel %></p>
+  </footer>
+</body>
+</html>

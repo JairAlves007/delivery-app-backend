@@ -1,4 +1,5 @@
 import { setupForgetAllListingCacheKeysWorker } from "./cache/forget-all-listing-cache-keys-worker.js";
+import { setupGenerateDigitalMenuWorker } from "./digital-menu/generate-digital-menu-worker.js";
 import { setupCreateOrderWorker } from "./order/create-order-worker.js";
 import { setupDeleteResourceWorker } from "./resource/delete-resource-worker.js";
 import { setupSendWhatsappMessageWorker } from "./whatsapp/send-whatsapp-message-worker.js";
@@ -8,4 +9,5 @@ export const setupWorkers = () => {
   setupCreateOrderWorker();
   setupDeleteResourceWorker();
   setupSendWhatsappMessageWorker();
+  setupGenerateDigitalMenuWorker();
 };
