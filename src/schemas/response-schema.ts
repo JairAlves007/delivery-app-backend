@@ -22,7 +22,10 @@ import {
 	WeekDay
 } from "@/generated/prisma/client.js";
 
-import { dashboardGranularitySchema } from "./dashboard-schema.js";
+import {
+	dashboardExportFormatSchema,
+	dashboardGranularitySchema
+} from "./dashboard-schema.js";
 import {
 	cursorPaginatedResponseSchema,
 	listResponseSchema,
@@ -662,6 +665,8 @@ const registryItems = [
 	{ schema: orderPayloadSchema, id: "OrderPayload" },
 	{ schema: orderListResponseSchema, id: "OrderListResponse" },
 	{ schema: dashboardResponseSchema, id: "DashboardResponse" },
+	{ schema: dashboardGranularitySchema, id: "DashboardGranularity" },
+	{ schema: dashboardExportFormatSchema, id: "DashboardExportFormat" },
 	{ schema: resourceRuleResponseSchema, id: "ResourceRuleResponse" },
 	{ schema: signedUrlResponseSchema, id: "SignedUrlResponse" },
 	{ schema: signInAdminResponseSchema, id: "SignInAdminResponse" },

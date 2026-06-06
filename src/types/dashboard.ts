@@ -92,6 +92,18 @@ export type DashboardCouponUsageRow = {
 	discountTotal: number;
 };
 
+export type DashboardExportFormat = "xlsx" | "csv";
+
+export type DashboardExportServiceInput = DashboardServiceInput & {
+	format: DashboardExportFormat;
+};
+
+export type DashboardExportResult = {
+	buffer: Buffer;
+	fileName: string;
+	mimeType: string;
+};
+
 export type DashboardResponse = {
 	currency: "BRL";
 	range: {

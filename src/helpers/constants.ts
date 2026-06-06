@@ -19,6 +19,10 @@ export default class Constants {
 	public static readonly DIGITAL_MENU_MAX_UPLOAD_BYTES: number =
 		10 * 1024 * 1024;
 	public static readonly DIGITAL_MENU_MIME_TYPE: string = "application/pdf";
+	public static readonly DASHBOARD_EXPORT_MIME_TYPES = {
+		xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		csv: "text/csv; charset=utf-8"
+	} as const;
 
 	// Regex
 	public static readonly PHONE_REGEX: RegExp = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
