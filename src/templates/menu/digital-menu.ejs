@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>Cardápio — <%= establishment.name %></title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600;700&family=Playfair+Display+SC:wght@400;700&display=swap');
+
     :root {
       --primary: <%= colors.primary %>;
       --secondary: <%= colors.secondary %>;
@@ -15,7 +17,7 @@
 
     @page {
       size: A4;
-      margin: 14mm 16mm;
+      margin: 12mm 14mm 18mm;
     }
 
     * {
@@ -27,96 +29,282 @@
     }
 
     body {
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-family: "Karla", "Helvetica Neue", Helvetica, Arial, sans-serif;
       background: var(--background);
       color: var(--foreground);
-      font-size: 11pt;
-      line-height: 1.45;
+      font-size: 10.5pt;
+      line-height: 1.5;
     }
 
-    .header {
+    main, .hero, .footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
       text-align: center;
-      padding-bottom: 18px;
-      margin-bottom: 6px;
+      color: var(--foreground);
+      margin-bottom: 8px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--primary) 10%, var(--background)), var(--background));
+      border: 1.5px solid color-mix(in srgb, var(--primary) 24%, var(--background));
+      border-top: 4px solid var(--primary);
     }
 
-    .header .logo {
-      width: 72px;
-      height: 72px;
-      object-fit: contain;
+    .hero.has-image {
+      color: #ffffff;
+      border: none;
+    }
+
+    .hero .hero-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero .hero-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.55));
+    }
+
+    .hero .hero-content {
+      position: relative;
+      padding: 26px 24px 24px;
+    }
+
+    .hero .logo,
+    .hero .logo-fallback {
+      width: 74px;
+      height: 74px;
       border-radius: 50%;
-      margin-bottom: 12px;
+      margin: 0 auto 10px;
+      border: 2.5px solid var(--primary);
+      background: color-mix(in srgb, var(--primary) 14%, var(--background));
     }
 
-    .header h1 {
-      font-size: 23pt;
+    .hero.has-image .logo,
+    .hero.has-image .logo-fallback {
+      border-color: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .hero .logo {
+      object-fit: contain;
+      padding: 3px;
+    }
+
+    .hero .logo-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero .logo-fallback svg {
+      width: 34px;
+      height: 34px;
+      stroke: var(--primary);
+      opacity: 0.9;
+    }
+
+    .hero.has-image .logo-fallback svg {
+      stroke: #ffffff;
+      opacity: 0.95;
+    }
+
+    .hero h1 {
+      font-family: "Playfair Display SC", Georgia, serif;
+      font-size: 25pt;
       font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      line-height: 1.15;
     }
 
-    .header .tagline {
+    .hero.has-image h1 {
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    }
+
+    .hero .tagline {
       margin-top: 6px;
       font-size: 10pt;
-      color: var(--foreground);
-      opacity: 0.65;
-      max-width: 420px;
+      font-weight: 500;
+      opacity: 0.7;
+      max-width: 460px;
       margin-left: auto;
       margin-right: auto;
     }
 
-    .header .rule {
-      width: 56px;
-      height: 3px;
-      background: var(--primary);
-      margin: 14px auto 0;
-      border-radius: 2px;
+    .hero.has-image .tagline {
+      opacity: 0.92;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero .badge {
+      display: inline-block;
+      margin-top: 12px;
+      font-size: 8pt;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--primary);
+      padding: 4px 16px;
+      border: 1.5px solid var(--primary);
+      border-radius: 999px;
+    }
+
+    .hero.has-image .badge {
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.85);
+      background: rgba(0, 0, 0, 0.18);
     }
 
     .category {
-      margin-top: 22px;
+      margin-top: 20px;
       break-inside: avoid-page;
     }
 
-    .category-title {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 13pt;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--primary);
-      margin-bottom: 10px;
+    .category-banner {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      background: color-mix(in srgb, var(--primary) 12%, var(--background));
+      border: 1.5px solid color-mix(in srgb, var(--primary) 26%, var(--background));
+      border-left: 5px solid var(--primary);
+      break-after: avoid;
     }
 
-    .category-title::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-      opacity: 0.45;
+    .category-banner.has-image {
+      background: linear-gradient(120deg, var(--primary), var(--secondary));
+      border: none;
+    }
+
+    .category-banner .banner-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .category-banner .banner-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.18));
+    }
+
+    .category-banner .banner-content {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      min-height: 46px;
+    }
+
+    .category-banner .banner-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .category-banner .banner-icon svg {
+      width: 19px;
+      height: 19px;
+      stroke: var(--primary);
+      opacity: 0.9;
+    }
+
+    .category-banner.has-image .banner-icon svg {
+      stroke: #ffffff;
+      opacity: 0.95;
+    }
+
+    .category-banner h2 {
+      font-family: "Playfair Display SC", Georgia, serif;
+      font-size: 13.5pt;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--primary);
+    }
+
+    .category-banner.has-image h2 {
+      color: #ffffff;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+    }
+
+    .category-products {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 14px;
     }
 
     .product {
-      padding: 7px 0;
+      display: flex;
+      gap: 11px;
+      padding: 9px 11px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
       break-inside: avoid;
+      background: transparent;
+    }
+
+    .product-thumb,
+    .product-thumb-fallback {
+      width: 52px;
+      height: 52px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .product-thumb {
+      object-fit: cover;
+      border: 1px solid var(--border);
+    }
+
+    .product-thumb-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: color-mix(in srgb, var(--primary) 14%, var(--background));
+      border: 1px solid color-mix(in srgb, var(--primary) 28%, var(--background));
+    }
+
+    .product-thumb-fallback svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--primary);
+      opacity: 0.9;
+    }
+
+    .product-body {
+      flex: 1;
+      min-width: 0;
     }
 
     .product-line {
       display: flex;
       align-items: baseline;
-      gap: 8px;
+      gap: 6px;
     }
 
     .product-name {
-      font-weight: 600;
-      font-size: 11pt;
+      font-weight: 700;
+      font-size: 10pt;
+      letter-spacing: 0.01em;
     }
 
     .product-leader {
       flex: 1;
-      border-bottom: 1.5px dotted var(--muted);
+      min-width: 10px;
+      border-bottom: 1.5px dotted var(--border);
       transform: translateY(-3px);
     }
 
@@ -124,57 +312,105 @@
       font-weight: 700;
       color: var(--primary);
       white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      font-size: 10pt;
     }
 
     .product-price .original {
-      font-weight: 400;
+      font-weight: 500;
       color: var(--foreground);
       opacity: 0.45;
       text-decoration: line-through;
-      margin-right: 6px;
-      font-size: 9.5pt;
+      margin-right: 5px;
+      font-size: 8.5pt;
+    }
+
+    .offer-pill {
+      display: inline-block;
+      font-size: 6.5pt;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--background);
+      background: var(--primary);
+      padding: 1.5px 7px;
+      border-radius: 999px;
+      margin-left: 6px;
+      vertical-align: 1.5px;
     }
 
     .product-description {
-      font-size: 9.5pt;
+      font-size: 8.5pt;
+      font-weight: 400;
       color: var(--foreground);
-      opacity: 0.6;
-      max-width: 86%;
-      margin-top: 1px;
+      opacity: 0.62;
+      margin-top: 2px;
+      line-height: 1.4;
     }
 
     .empty {
-      margin-top: 40px;
+      margin-top: 48px;
       text-align: center;
       font-size: 11pt;
       opacity: 0.6;
     }
 
     .footer {
-      margin-top: 34px;
-      padding-top: 12px;
-      border-top: 1px solid var(--border);
+      margin-top: 30px;
+      padding-top: 13px;
+      border-top: 2.5px solid var(--primary);
       text-align: center;
-      font-size: 8.5pt;
-      color: var(--foreground);
-      opacity: 0.55;
+      padding-bottom: 26px;
     }
 
-    .footer p + p {
-      margin-top: 2px;
+    .footer .contact {
+      font-size: 9pt;
+      font-weight: 600;
+      color: var(--foreground);
+    }
+
+    .footer .contact span + span::before {
+      content: "·";
+      margin: 0 8px;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .footer .updated {
+      margin-top: 5px;
+      font-size: 8pt;
+      color: var(--foreground);
+      opacity: 0.5;
+      letter-spacing: 0.04em;
     }
   </style>
 </head>
 <body>
-  <header class="header">
-    <% if (establishment.logoUrl) { %>
-      <img class="logo" src="<%= establishment.logoUrl %>" alt="<%= establishment.name %>" />
+  <header class="hero<%= establishment.bannerUrl ? " has-image" : "" %>">
+    <% if (establishment.bannerUrl) { %>
+      <img class="hero-image" src="<%= establishment.bannerUrl %>" alt="" />
+      <div class="hero-scrim"></div>
     <% } %>
-    <h1><%= establishment.name %></h1>
-    <% if (establishment.description) { %>
-      <p class="tagline"><%= establishment.description %></p>
-    <% } %>
-    <div class="rule"></div>
+    <div class="hero-content">
+      <% if (establishment.logoUrl) { %>
+        <img class="logo" src="<%= establishment.logoUrl %>" alt="<%= establishment.name %>" />
+      <% } else { %>
+        <div class="logo-fallback">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" />
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+            <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
+            <path d="M2 7h20" />
+            <path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7" />
+          </svg>
+        </div>
+      <% } %>
+      <h1><%= establishment.name %></h1>
+      <% if (establishment.description) { %>
+        <p class="tagline"><%= establishment.description %></p>
+      <% } %>
+      <span class="badge">Cardápio</span>
+    </div>
   </header>
 
   <main>
@@ -184,37 +420,74 @@
 
     <% categories.forEach((category) => { %>
       <section class="category">
-        <h2 class="category-title"><%= category.name %></h2>
+        <div class="category-banner<%= category.bannerUrl ? " has-image" : "" %>">
+          <% if (category.bannerUrl) { %>
+            <img class="banner-image" src="<%= category.bannerUrl %>" alt="" />
+            <div class="banner-scrim"></div>
+          <% } %>
+          <div class="banner-content">
+            <span class="banner-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8" />
+                <path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7" />
+                <path d="m2.1 21.8 6.4-6.3" />
+                <path d="m19 5-7 7" />
+              </svg>
+            </span>
+            <h2><%= category.name %></h2>
+          </div>
+        </div>
 
-        <% category.products.forEach((product) => { %>
-          <article class="product">
-            <div class="product-line">
-              <span class="product-name"><%= product.name %></span>
-              <span class="product-leader"></span>
-              <span class="product-price">
-                <% if (product.originalPriceLabel) { %>
-                  <span class="original"><%= product.originalPriceLabel %></span>
+        <div class="category-products">
+          <% category.products.forEach((product) => { %>
+            <article class="product">
+              <% if (product.imageUrl) { %>
+                <img class="product-thumb" src="<%= product.imageUrl %>" alt="<%= product.name %>" />
+              <% } else { %>
+                <div class="product-thumb-fallback">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+                    <path d="M7 2v20" />
+                    <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
+                  </svg>
+                </div>
+              <% } %>
+              <div class="product-body">
+                <div class="product-line">
+                  <span class="product-name"><%= product.name %></span>
+                  <span class="product-leader"></span>
+                  <span class="product-price">
+                    <% if (product.originalPriceLabel) { %>
+                      <span class="original"><%= product.originalPriceLabel %></span>
+                    <% } %>
+                    <%= product.priceLabel %>
+                  </span>
+                </div>
+                <% if (product.description) { %>
+                  <p class="product-description">
+                    <%= product.description %><% if (product.originalPriceLabel) { %><span class="offer-pill">Oferta</span><% } %>
+                  </p>
+                <% } else if (product.originalPriceLabel) { %>
+                  <p class="product-description"><span class="offer-pill">Oferta</span></p>
                 <% } %>
-                <%= product.priceLabel %>
-              </span>
-            </div>
-            <% if (product.description) { %>
-              <p class="product-description"><%= product.description %></p>
-            <% } %>
-          </article>
-        <% }) %>
+              </div>
+            </article>
+          <% }) %>
+        </div>
       </section>
     <% }) %>
   </main>
 
   <footer class="footer">
-    <% if (establishment.addressLine) { %>
-      <p><%= establishment.addressLine %></p>
-    <% } %>
-    <% if (establishment.phone) { %>
-      <p><%= establishment.phone %></p>
-    <% } %>
-    <p>Cardápio atualizado em <%= generatedAtLabel %></p>
+    <p class="contact">
+      <% if (establishment.addressLine) { %>
+        <span><%= establishment.addressLine %></span>
+      <% } %>
+      <% if (establishment.phone) { %>
+        <span><%= establishment.phone %></span>
+      <% } %>
+    </p>
+    <p class="updated">Cardápio atualizado em <%= generatedAtLabel %></p>
   </footer>
 </body>
 </html>

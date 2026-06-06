@@ -51,12 +51,24 @@ export class DigitalMenuPrismaRepository implements IDigitalMenuRepository {
           where: { deleted_at: null },
           orderBy: { order: "asc" },
           include: {
+            resources: {
+              select: {
+                resource: true,
+              },
+            },
             products: {
               where: {
                 deleted_at: null,
                 OR: [{ valid_until: null }, { valid_until: { gte: new Date() } }],
               },
               orderBy: { name: "asc" },
+              include: {
+                resources: {
+                  select: {
+                    resource: true,
+                  },
+                },
+              },
             },
           },
         },

@@ -18,7 +18,20 @@ export type DigitalMenuRenderSource = Prisma.EstablishmentGetPayload<{
     };
     categories: {
       include: {
-        products: true;
+        resources: {
+          select: {
+            resource: true;
+          };
+        };
+        products: {
+          include: {
+            resources: {
+              select: {
+                resource: true;
+              };
+            };
+          };
+        };
       };
     };
   };
@@ -30,10 +43,12 @@ export type DigitalMenuProduct = {
   priceLabel: string;
   originalPriceLabel: string | null;
   isPerWeight: boolean;
+  imageUrl: string | null;
 };
 
 export type DigitalMenuCategory = {
   name: string;
+  bannerUrl: string | null;
   products: DigitalMenuProduct[];
 };
 
@@ -53,6 +68,7 @@ export type DigitalMenuRenderData = {
     addressLine: string | null;
     phone: string | null;
     logoUrl: string | null;
+    bannerUrl: string | null;
   };
   colors: DigitalMenuColors;
   categories: DigitalMenuCategory[];

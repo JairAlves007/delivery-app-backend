@@ -25,6 +25,7 @@ const formatCents = (cents: number): string =>
 const mapProduct = (
   product: DigitalMenuRenderSource["categories"][number]["products"][number],
 ): DigitalMenuProduct => {
+  const productResources = mapObjectResourcesList(product.resources);
   const isPerWeight = product.pricing_mode === ProductPricingMode.PER_WEIGHT;
   const baseCents = isPerWeight
     ? (product.price_per_100g ?? product.price)
@@ -44,6 +45,10 @@ const mapProduct = (
     originalPriceLabel:
       discount > 0 ? `${formatCents(baseCents)}${suffix}` : null,
     isPerWeight,
+    imageUrl:
+      productResources[ResourceType.THUMBNAIL]?.path ??
+      productResources[ResourceType.BANNER]?.path ??
+      null,
   };
 };
 
@@ -75,10 +80,18 @@ export const mapDigitalMenuRenderData = (params: {
 
   const categories: DigitalMenuCategory[] = source.categories
     .filter((category) => category.products.length > 0)
-    .map((category) => ({
-      name: category.name,
-      products: category.products.map(mapProduct),
-    }));
+    .map((category) => {
+      const categoryResources = mapObjectResourcesList(category.resources);
+
+      return {
+        name: category.name,
+        bannerUrl:
+          categoryResources[ResourceType.BANNER]?.path ??
+          categoryResources[ResourceType.THUMBNAIL]?.path ??
+          null,
+        products: category.products.map(mapProduct),
+      };
+    });
 
   const generatedAtLabel = new Date().toLocaleDateString("pt-BR", {
     timeZone: Constants.DASHBOARD_TIMEZONE,
@@ -94,6 +107,7 @@ export const mapDigitalMenuRenderData = (params: {
       addressLine,
       phone,
       logoUrl: resources[ResourceType.LOGO]?.path ?? null,
+      bannerUrl: resources[ResourceType.BANNER]?.path ?? null,
     },
     colors: {
       primary: theme.colors.primary,

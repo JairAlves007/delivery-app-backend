@@ -6,6 +6,8 @@ import {
 	BannerLinkType,
 	CouponType,
 	DeliveryType,
+	DigitalMenuSource,
+	DigitalMenuStatus,
 	DiscountType,
 	FileFormatType,
 	ForObjectResourceType,
@@ -600,6 +602,16 @@ export const searchProductsCatalogResponseSchema = paginatedResponseSchema(
 );
 
 // ──────────────────────────────────────────────
+// Digital Menu
+// ──────────────────────────────────────────────
+
+export const digitalMenuStatusResponseSchema = z.object({
+	status: z.enum(DigitalMenuStatus),
+	source: z.enum(DigitalMenuSource),
+	generatedAt: nullableDateStringSchema
+});
+
+// ──────────────────────────────────────────────
 // Health
 // ──────────────────────────────────────────────
 
@@ -685,6 +697,18 @@ const registryItems = [
 		id: "SearchProductsCatalogResponse"
 	},
 	{ schema: healthResponseSchema, id: "HealthResponse" },
+	{
+		schema: digitalMenuStatusResponseSchema,
+		id: "DigitalMenuStatusResponse"
+	},
+	{
+		schema: z.enum(DigitalMenuSource),
+		id: "DigitalMenuSource"
+	},
+	{
+		schema: z.enum(DigitalMenuStatus),
+		id: "DigitalMenuStatus"
+	},
 	{
 		schema: z.enum(AddonType),
 		id: "AddonType"

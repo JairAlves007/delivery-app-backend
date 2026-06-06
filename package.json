@@ -4,7 +4,7 @@
 	"description": "Delivery Micro SAAS Backend",
 	"scripts": {
 		"dev": "tsx --watch --env-file .env src/http/server.ts",
-		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json && cp -R src/templates dist/templates",
+		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
 		"start": "node dist/http/server.js",
 		"db:migrate": "prisma migrate dev",
 		"db:studio": "prisma studio",
