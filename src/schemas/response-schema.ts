@@ -559,7 +559,6 @@ export const meResponseSchema = z.object({
 export const themeColorsSchema = z.object({
 	primary: z.string(),
 	secondary: z.string(),
-	accent: z.string(),
 	destructive: z.string(),
 	background: z.string(),
 	foreground: z.string(),

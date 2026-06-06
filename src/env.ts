@@ -31,6 +31,11 @@ const envSchema = z.object({
   REDIS_HOST: z.string().default("127.0.0.1"),
   REDIS_PORT: z.coerce.number().default(6379),
   REDIS_PASSWORD: z.string().optional(),
+  EVOLUTION_API_URL: z.url("Evolution API url é obrigatória"),
+  EVOLUTION_API_KEY: z.string().min(1, "Evolution API key é obrigatória"),
+  EVOLUTION_WEBHOOK_TOKEN: z
+    .string()
+    .min(16, "Evolution webhook token deve ter ao menos 16 caracteres"),
 });
 
 export const env = envSchema.parse(process.env);

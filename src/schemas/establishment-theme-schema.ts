@@ -7,7 +7,6 @@ const hexColorSchema = z
 export const updateEstablishmentThemeBodySchema = z.object({
 	primary: hexColorSchema.optional(),
 	secondary: hexColorSchema.optional(),
-	accent: hexColorSchema.optional(),
 	destructive: hexColorSchema.optional(),
 	background: hexColorSchema.optional(),
 	foreground: hexColorSchema.optional(),
@@ -15,7 +14,6 @@ export const updateEstablishmentThemeBodySchema = z.object({
 	border: hexColorSchema.optional(),
 	primaryDark: hexColorSchema.optional(),
 	secondaryDark: hexColorSchema.optional(),
-	accentDark: hexColorSchema.optional(),
 	destructiveDark: hexColorSchema.optional(),
 	backgroundDark: hexColorSchema.optional(),
 	foregroundDark: hexColorSchema.optional(),

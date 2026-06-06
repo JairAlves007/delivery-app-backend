@@ -57,7 +57,6 @@ export default class Constants {
 		colors: {
 			primary: "#FA8C00",
 			secondary: "#FFF6EC",
-			accent: "#1C1C1C",
 			destructive: "#C2526E",
 			background: "#FFFFFF",
 			foreground: "#1C1C1C",
@@ -67,7 +66,6 @@ export default class Constants {
 		colorsDark: {
 			primary: "#FA8C00",
 			secondary: "#2E2A27",
-			accent: "#E8E2DD",
 			destructive: "#BA5269",
 			background: "#211E1B",
 			foreground: "#F4EFEB",
@@ -154,7 +152,8 @@ export default class Constants {
 				"    - {addon_name} ({addon_unit_price} × {addon_quantity})",
 			addonItemMultiple: "    - {addon_name} ({addon_price})",
 			addonItemSingle: "    - {addon_name}",
-			addonItemFractional: "    - {fraction_label} {addon_name} ({addon_price})",
+			addonItemFractional:
+				"    - {fraction_label} {addon_name} ({addon_price})",
 			addonItemNone: "    - {addon_name}",
 			coupon: `🏷️ Cupom aplicado: {coupon_code} ({coupon_value})`,
 			changeAmount: `💵 Troco para: {change_amount_value}`,

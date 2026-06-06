@@ -279,6 +279,7 @@ export class CreateOrderService {
 
     const sendConfirmationService = makeSendOrderConfirmationMessageService();
     await sendConfirmationService.handle({
+      establishmentId,
       address,
       coupon,
       deliveryType,

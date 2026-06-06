@@ -89,6 +89,26 @@ enum RoleType {
   ADMIN
 }
 
+enum WhatsappConnectionStatus {
+  DISCONNECTED
+  CONNECTING
+  CONNECTED
+}
+
+enum WhatsappMessageDirection {
+  OUTBOUND
+  INBOUND
+}
+
+enum WhatsappMessageStatus {
+  PENDING
+  SENT
+  DELIVERED
+  READ
+  FAILED
+  RECEIVED
+}
+
 enum PermissionType {
   // Establishment Owner
   MANAGE_PRODUCTS
@@ -100,6 +120,7 @@ enum PermissionType {
   MANAGE_OWN_ESTABLISHMENT_THEME
   MANAGE_BANNERS
   MANAGE_COUPONS
+  MANAGE_WHATSAPP
 
   // Admin
   MANAGE_ESTABLISHMENTS
@@ -291,6 +312,9 @@ model Establishment {
   establishmentResources Resource[]
   resources              EstablishmentResource[]
   theme                  EstablishmentTheme?
+  whatsappIntegration    EstablishmentWhatsappIntegration?
+  whatsappTemplates      OrderStatusMessageTemplate[]
+  whatsappMessageLogs    WhatsappMessageLog[]
 
   @@map("establishments")
 }
@@ -300,7 +324,6 @@ model EstablishmentTheme {
   establishment_id String        @unique
   primary          String        @db.VarChar(7)
   secondary        String        @db.VarChar(7)
-  accent           String        @db.VarChar(7)
   destructive      String        @db.VarChar(7)
   background       String        @db.VarChar(7)
   foreground       String        @db.VarChar(7)
@@ -308,7 +331,6 @@ model EstablishmentTheme {
   border           String        @db.VarChar(7)
   primary_dark     String        @db.VarChar(7)
   secondary_dark   String        @db.VarChar(7)
-  accent_dark      String        @db.VarChar(7)
   destructive_dark String        @db.VarChar(7)
   background_dark  String        @db.VarChar(7)
   foreground_dark  String        @db.VarChar(7)
@@ -673,6 +695,7 @@ model Order {
   coupon               Coupon?               @relation(fields: [coupon_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
   orderCoupon          OrderCoupon?
   orderDeliveryAddress OrderDeliveryAddress?
+  whatsappMessageLogs  WhatsappMessageLog[]
 
   @@index([establishment_id], name: "idx_orders_establishment_id")
   @@index([coupon_id], name: "idx_orders_coupon_id")
@@ -737,6 +760,63 @@ model OrderStatus {
 
   @@unique([order_id, value])
   @@map("order_statuses")
+}
+
+model EstablishmentWhatsappIntegration {
+  id                String                   @id @default(ulid())
+  establishment_id  String                   @unique
+  instance_name     String                   @unique @db.VarChar(255)
+  instance_token    String?                  @db.VarChar(255)
+  status            WhatsappConnectionStatus @default(DISCONNECTED)
+  connected_number  String?                  @db.VarChar(20)
+  last_connected_at DateTime?                @db.Timestamptz
+  created_at        DateTime                 @default(now()) @db.Timestamptz
+  updated_at        DateTime                 @updatedAt @db.Timestamptz
+  deleted_at        DateTime?                @db.Timestamptz
+  establishment     Establishment            @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([establishment_id], name: "idx_whatsapp_integrations_establishment_id")
+  @@index([deleted_at], name: "idx_whatsapp_integrations_deleted_at")
+  @@map("establishment_whatsapp_integrations")
+}
+
+model OrderStatusMessageTemplate {
+  id               String          @id @default(ulid())
+  establishment_id String
+  status           OrderStatusType
+  body             String          @db.VarChar(4000)
+  is_active        Boolean         @default(true)
+  created_at       DateTime        @default(now()) @db.Timestamptz
+  updated_at       DateTime        @updatedAt @db.Timestamptz
+  deleted_at       DateTime?       @db.Timestamptz
+  establishment    Establishment   @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([establishment_id, status])
+  @@index([establishment_id], name: "idx_order_status_templates_establishment_id")
+  @@map("order_status_message_templates")
+}
+
+model WhatsappMessageLog {
+  id                  String                   @id @default(ulid())
+  establishment_id    String
+  order_id            String?
+  direction           WhatsappMessageDirection
+  status              WhatsappMessageStatus
+  recipient           String                   @db.VarChar(32)
+  order_status        OrderStatusType?
+  payload             Json
+  error               String?                  @db.VarChar(2000)
+  provider_message_id String?                  @db.VarChar(255)
+  created_at          DateTime                 @default(now()) @db.Timestamptz
+  updated_at          DateTime                 @updatedAt @db.Timestamptz
+  establishment       Establishment            @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  order               Order?                   @relation(fields: [order_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([establishment_id], name: "idx_whatsapp_message_logs_establishment_id")
+  @@index([order_id], name: "idx_whatsapp_message_logs_order_id")
+  @@index([provider_message_id], name: "idx_whatsapp_message_logs_provider_message_id")
+  @@index([created_at], name: "idx_whatsapp_message_logs_created_at")
+  @@map("whatsapp_message_logs")
 }
 
 model OrderDeliveryAddress {

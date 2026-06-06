@@ -6,7 +6,6 @@ export type EstablishmentThemePayload = {
 	colors: {
 		primary: string;
 		secondary: string;
-		accent: string;
 		destructive: string;
 		background: string;
 		foreground: string;
@@ -16,7 +15,6 @@ export type EstablishmentThemePayload = {
 	colorsDark: {
 		primary: string;
 		secondary: string;
-		accent: string;
 		destructive: string;
 		background: string;
 		foreground: string;
@@ -35,7 +33,6 @@ export const mapEstablishmentTheme = (params: {
 		? {
 				primary: row.primary,
 				secondary: row.secondary,
-				accent: row.accent,
 				destructive: row.destructive,
 				background: row.background,
 				foreground: row.foreground,
@@ -48,7 +45,6 @@ export const mapEstablishmentTheme = (params: {
 		? {
 				primary: row.primary_dark,
 				secondary: row.secondary_dark,
-				accent: row.accent_dark,
 				destructive: row.destructive_dark,
 				background: row.background_dark,
 				foreground: row.foreground_dark,

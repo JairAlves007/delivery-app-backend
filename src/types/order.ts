@@ -82,6 +82,8 @@ export type BuildOrderItemsParams = {
 };
 
 export type SendOrderConfirmationMessageParams = {
+  establishmentId: EstablishmentID;
+  orderId?: string | null;
   customerName: string;
   customerPhone: string;
   comment?: string | null;

@@ -2,6 +2,7 @@ import {
 	AddonPricingStrategy,
 	AddonType,
 	CouponType,
+	OrderStatusType,
 	ProductPricingMode
 } from "@/generated/prisma/client.js";
 import Constants from "@/helpers/constants.js";
@@ -18,7 +19,7 @@ import {
 	transformPriceFromDatabase,
 	transformPriceToHumanReadable
 } from "@/helpers/price.js";
-import { app } from "@/http/app.js";
+import { sendWhatsappMessageQueue } from "@/queues/whatsapp-queue.js";
 import { calculateAddonPricing } from "@/services/order/pricing/calculate-addon-pricing.js";
 import {
 	calculateOrderPricing,
@@ -300,6 +301,12 @@ export class SendOrderConfirmationMessageService {
 	async handle(params: SendOrderConfirmationMessageParams) {
 		const message = this.generateMessage(params);
 
-		app.log.info({ message }, "[Order] confirmation message built");
+		await sendWhatsappMessageQueue({
+			establishmentId: params.establishmentId,
+			orderId: params.orderId,
+			orderStatus: OrderStatusType.PREPARING,
+			recipientPhone: params.customerPhone,
+			body: message
+		});
 	}
 }

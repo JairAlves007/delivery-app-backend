@@ -9,7 +9,6 @@ import type {
 export type UpdateEstablishmentThemeBody = {
 	primary?: string;
 	secondary?: string;
-	accent?: string;
 	destructive?: string;
 	background?: string;
 	foreground?: string;
@@ -17,7 +16,6 @@ export type UpdateEstablishmentThemeBody = {
 	border?: string;
 	primaryDark?: string;
 	secondaryDark?: string;
-	accentDark?: string;
 	destructiveDark?: string;
 	backgroundDark?: string;
 	foregroundDark?: string;
@@ -36,7 +34,6 @@ const buildUpsertInput = (params: {
 		primary: body.primary ?? current?.primary ?? defaults.colors.primary,
 		secondary:
 			body.secondary ?? current?.secondary ?? defaults.colors.secondary,
-		accent: body.accent ?? current?.accent ?? defaults.colors.accent,
 		destructive:
 			body.destructive ?? current?.destructive ?? defaults.colors.destructive,
 		background:
@@ -46,15 +43,11 @@ const buildUpsertInput = (params: {
 		muted: body.muted ?? current?.muted ?? defaults.colors.muted,
 		border: body.border ?? current?.border ?? defaults.colors.border,
 		primary_dark:
-			body.primaryDark ??
-			current?.primary_dark ??
-			defaults.colorsDark.primary,
+			body.primaryDark ?? current?.primary_dark ?? defaults.colorsDark.primary,
 		secondary_dark:
 			body.secondaryDark ??
 			current?.secondary_dark ??
 			defaults.colorsDark.secondary,
-		accent_dark:
-			body.accentDark ?? current?.accent_dark ?? defaults.colorsDark.accent,
 		destructive_dark:
 			body.destructiveDark ??
 			current?.destructive_dark ??

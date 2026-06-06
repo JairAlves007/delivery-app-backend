@@ -3,7 +3,6 @@ import type { EstablishmentTheme } from "@/generated/prisma/client.js";
 export type UpsertEstablishmentThemeInput = {
 	primary: string;
 	secondary: string;
-	accent: string;
 	destructive: string;
 	background: string;
 	foreground: string;
@@ -11,7 +10,6 @@ export type UpsertEstablishmentThemeInput = {
 	border: string;
 	primary_dark: string;
 	secondary_dark: string;
-	accent_dark: string;
 	destructive_dark: string;
 	background_dark: string;
 	foreground_dark: string;
