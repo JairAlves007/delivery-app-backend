@@ -8,7 +8,10 @@ import {
 } from "@/generated/prisma/client.js";
 import type { OrderFromRepository, OrderPayload } from "@/types/order.js";
 
-import { transformPriceToHumanReadable } from "./price.js";
+import {
+  transformPriceFromDatabase,
+  transformPriceToHumanReadable,
+} from "./price.js";
 
 export const getStatusLabel = (status: OrderStatusType) => {
   switch (status) {
@@ -30,6 +33,30 @@ export const transformOrderByStatus = (
 ): OrderPayload => {
   return {
     ...order,
+    change_amount:
+      order.change_amount != null
+        ? transformPriceFromDatabase(order.change_amount)
+        : null,
+    shipping_fee: transformPriceFromDatabase(order.shipping_fee),
+    subtotal: transformPriceFromDatabase(order.subtotal),
+    items: order.items.map((item) => ({
+      ...item,
+      product_price: transformPriceFromDatabase(item.product_price),
+      addons_subtotal: transformPriceFromDatabase(item.addons_subtotal),
+      addons: item.addons.map((addon) => ({
+        ...addon,
+        addon_price: transformPriceFromDatabase(addon.addon_price),
+      })),
+    })),
+    coupon: order.coupon
+      ? {
+          ...order.coupon,
+          value:
+            order.coupon.discount_type === DiscountType.FIXED
+              ? transformPriceFromDatabase(order.coupon.value)
+              : order.coupon.value,
+        }
+      : null,
     status: {
       label: order.statuses[0].label,
       value: order.statuses[0].value,
