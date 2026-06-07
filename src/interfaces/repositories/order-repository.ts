@@ -23,5 +23,5 @@ export interface IOrderRepository
   create(
     data: Prisma.OrderCreateInput,
     options?: CreateOrderRepositoryOptions,
-  ): Promise<void>;
+  ): Promise<{ id: string }>;
 }

@@ -1,5 +1,8 @@
 import { MenuAudienceType, ViewType } from "@/generated/prisma/client.js";
-import type { IMenuRepository } from "@/interfaces/repositories/menu-repository.js";
+import type {
+	FindMenuSlugByViewTypeParams,
+	IMenuRepository
+} from "@/interfaces/repositories/menu-repository.js";
 import prisma from "@/lib/prisma.js";
 import type { MenuWithSubmenus } from "@/types/menu.js";
 
@@ -276,6 +279,18 @@ export class MenuPrismaRepository implements IMenuRepository {
 			},
 			orderBy: { order: "asc" }
 		});
+	}
+
+	async findSlugByViewType({
+		viewType,
+		forAudience
+	}: FindMenuSlugByViewTypeParams): Promise<string | null> {
+		const menu = await prisma.menu.findFirst({
+			where: { view_type: viewType, for_audience: forAudience },
+			select: { slug: true }
+		});
+
+		return menu?.slug ?? null;
 	}
 
 	async ensureDefaults(): Promise<void> {

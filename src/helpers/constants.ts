@@ -1,3 +1,4 @@
+import type { NotificationType } from "@/generated/prisma/client.js";
 import type { OrderSubSectionMessage } from "@/types/order.js";
 
 export default class Constants {
@@ -23,6 +24,23 @@ export default class Constants {
 		xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 		csv: "text/csv; charset=utf-8"
 	} as const;
+
+	// Notifications
+	public static readonly NOTIFICATION_DEFAULTS: Record<
+		NotificationType,
+		{ expiresInDays: number }
+	> = {
+		ORDER_CREATED: { expiresInDays: 3 }
+	};
+
+	public static readonly NOTIFICATION_CLEANUP_CRON: string = "0 3 * * *";
+	public static readonly NOTIFICATION_CLEANUP_SCHEDULER_ID: string =
+		"cleanup-expired-notifications";
+	public static readonly NOTIFICATION_CHANNEL_PREFIX: string =
+		"notifications:establishment:";
+	public static readonly SSE_TICKET_PREFIX: string = "sse-ticket:";
+	public static readonly SSE_TICKET_TTL_SECONDS: number = 60;
+	public static readonly SSE_HEARTBEAT_MS: number = 25_000;
 
 	// Regex
 	public static readonly PHONE_REGEX: RegExp = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;

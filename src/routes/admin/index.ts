@@ -10,6 +10,7 @@ import { adminDigitalMenuRoutes } from "./digital-menu/index.js";
 import { adminDistrictRoutes } from "./district/index.js";
 import { establishmentRoutes } from "./establishment/index.js";
 import { establishmentOwnerRoutes } from "./establishment-owner/index.js";
+import { adminNotificationRoutes } from "./notification/index.js";
 import { adminOrderRoutes } from "./order/index.js";
 import { adminProductCategoryRoutes } from "./product/category/index.js";
 import { adminProductRoutes } from "./product/index.js";
@@ -36,6 +37,7 @@ export const adminRoutes = (app: FastifyInstance) => {
       api.register(adminTagRoutes, { prefix: "/tag" });
       api.register(adminWhatsappRoutes, { prefix: "/whatsapp" });
       api.register(adminDigitalMenuRoutes, { prefix: "/digital-menu" });
+      api.register(adminNotificationRoutes, { prefix: "/notification" });
     },
     { prefix: "/admin" },
   );

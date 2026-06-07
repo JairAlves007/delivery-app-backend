@@ -8,6 +8,7 @@ import {
   type Coupon,
   DiscountType,
   type District,
+  NotificationType,
   OrderStatusType,
   type Prisma,
 } from "@/generated/prisma/client.js";
@@ -17,6 +18,7 @@ import { removeDuplicateItems } from "@/helpers/utils.js";
 import type { IOrderRepository } from "@/interfaces/repositories/order-repository.js";
 import prisma from "@/lib/prisma.js";
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { createNotificationQueue } from "@/queues/notification-queue.js";
 import type {
   BuildOrderItemsParams,
   CreateOrderParams,
@@ -246,7 +248,7 @@ export class CreateOrderService {
             : item.product.quantity,
       }));
 
-    await this.orderRepository.create(
+    const { id: orderId } = await this.orderRepository.create(
       this.buildOrderItems({
         address,
         coupon,
@@ -290,6 +292,14 @@ export class CreateOrderService {
       changeAmount,
       comment,
       orderItemsToProcess,
+    });
+
+    await createNotificationQueue({
+      establishmentId,
+      type: NotificationType.ORDER_CREATED,
+      title: "Novo pedido recebido",
+      description: `Pedido de ${customerName}`,
+      metadata: { orderId, customerName, customerPhone },
     });
   }
 }

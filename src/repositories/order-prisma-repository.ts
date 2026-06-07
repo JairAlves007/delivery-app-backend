@@ -119,15 +119,19 @@ export class OrderPrismaRepository implements IOrderRepository {
   async create(
     data: Prisma.OrderCreateInput,
     options?: CreateOrderRepositoryOptions,
-  ): Promise<void> {
+  ): Promise<{ id: string }> {
     const stockDecrements = options?.stockDecrements ?? [];
 
     if (stockDecrements.length === 0) {
-      await prisma.order.create({ data });
-      return;
+      const order = await prisma.order.create({
+        data,
+        select: { id: true },
+      });
+
+      return { id: order.id };
     }
 
-    await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx) => {
       for (const { productId, quantity } of stockDecrements) {
         const { count } = await tx.product.updateMany({
           where: {
@@ -141,7 +145,12 @@ export class OrderPrismaRepository implements IOrderRepository {
         if (count === 0) throw new ProductOutOfStockError();
       }
 
-      await tx.order.create({ data });
+      const order = await tx.order.create({
+        data,
+        select: { id: true },
+      });
+
+      return { id: order.id };
     });
   }
 

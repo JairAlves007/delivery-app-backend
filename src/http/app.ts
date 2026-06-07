@@ -154,9 +154,9 @@ app.register(fastifyJwt, {
 app.register(replySendErrorPlugin);
 app.register(routes);
 
-app.addHook("onReady", () => {
+app.addHook("onReady", async () => {
   try {
-    setupWorkers();
+    await setupWorkers();
     app.log.info("👷 BullMQ Workers initialized successfully");
   } catch (error) {
     app.log.error({ error }, "❌ Failed to initialize BullMQ Workers");

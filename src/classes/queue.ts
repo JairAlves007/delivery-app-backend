@@ -9,7 +9,11 @@ import {
 
 import { env } from "@/env.js";
 import { app } from "@/http/app.js";
-import type { IJob, IQueueProvider } from "@/interfaces/queue/queue-base.js";
+import type {
+  IJob,
+  IQueueProvider,
+  IRepeatableJob,
+} from "@/interfaces/queue/queue-base.js";
 
 class BullMQProvider implements IQueueProvider {
   private queueName: string;
@@ -44,6 +48,18 @@ class BullMQProvider implements IQueueProvider {
 
   async add<T = unknown>({ name, data, options }: IJob<T>): Promise<void> {
     await this.queue.add(name, data, options);
+  }
+
+  async scheduleRepeatable<T = unknown>({
+    schedulerId,
+    pattern,
+    job,
+  }: IRepeatableJob<T>): Promise<void> {
+    await this.queue.upsertJobScheduler(
+      schedulerId,
+      { pattern },
+      { name: job.name, data: job.data, opts: job.options },
+    );
   }
 
   process(processFunction: (job: Job) => Promise<void>): void {
@@ -81,6 +97,14 @@ export class BaseQueue<T = unknown> {
 
   async enqueue(name: string, data: T, options?: JobsOptions): Promise<void> {
     await this.provider.add({ name, data, options });
+  }
+
+  async scheduleRepeatable(
+    schedulerId: string,
+    pattern: string,
+    job: IJob<T>,
+  ): Promise<void> {
+    await this.provider.scheduleRepeatable({ schedulerId, pattern, job });
   }
 
   registerProcessor(handler: (data: T) => Promise<void>): void {

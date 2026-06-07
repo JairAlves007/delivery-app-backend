@@ -11,6 +11,7 @@ import {
 	DiscountType,
 	FileFormatType,
 	ForObjectResourceType,
+	NotificationType,
 	OrderStatusType,
 	PaymentMethodType,
 	ProductPricingMode,
@@ -615,6 +616,35 @@ export const digitalMenuStatusResponseSchema = z.object({
 });
 
 // ──────────────────────────────────────────────
+// Notifications
+// ──────────────────────────────────────────────
+
+export const notificationResponseSchema = z.object({
+	id: z.string(),
+	type: z.enum(NotificationType),
+	title: z.string(),
+	description: z.string(),
+	link: z.string().nullable(),
+	metadata: z.unknown().nullable(),
+	seen: z.boolean(),
+	created_at: dateStringSchema,
+	expires_at: dateStringSchema
+});
+
+export const notificationListResponseSchema = cursorPaginatedResponseSchema(
+	notificationResponseSchema
+);
+
+export const notificationUnseenCountResponseSchema = z.object({
+	count: z.number()
+});
+
+export const sseTicketResponseSchema = z.object({
+	ticket: z.string(),
+	expiresIn: z.number()
+});
+
+// ──────────────────────────────────────────────
 // Health
 // ──────────────────────────────────────────────
 
@@ -702,6 +732,20 @@ const registryItems = [
 		id: "SearchProductsCatalogResponse"
 	},
 	{ schema: healthResponseSchema, id: "HealthResponse" },
+	{ schema: notificationResponseSchema, id: "NotificationResponse" },
+	{
+		schema: notificationListResponseSchema,
+		id: "NotificationListResponse"
+	},
+	{
+		schema: notificationUnseenCountResponseSchema,
+		id: "NotificationUnseenCountResponse"
+	},
+	{ schema: sseTicketResponseSchema, id: "SseTicketResponse" },
+	{
+		schema: z.enum(NotificationType),
+		id: "NotificationType"
+	},
 	{
 		schema: digitalMenuStatusResponseSchema,
 		id: "DigitalMenuStatusResponse"
