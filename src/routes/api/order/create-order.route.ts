@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
 
+import { makeValidateCustomerPhoneFromOrderService } from "@/factories/services/order/validations/make-validate-customer-phone-from-order-service.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import { customerTags } from "@/http/swagger-tags.js";
@@ -31,6 +32,14 @@ export const createOrderRoute = async (app: FastifyInstance) => {
     },
     async (request, reply) => {
       const body = request.body;
+
+      const validateCustomerPhoneService =
+        makeValidateCustomerPhoneFromOrderService();
+
+      await validateCustomerPhoneService.handle({
+        establishmentId: body.establishmentId,
+        customerPhone: body.customerPhone,
+      });
 
       await createOrderQueue({
         order: body,

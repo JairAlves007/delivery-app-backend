@@ -27,4 +27,6 @@ export interface IEstablishmentWhatsappIntegrationRepository {
     params: UpsertWhatsappIntegrationParams,
   ): Promise<EstablishmentWhatsappIntegration>;
   updateStatus(params: UpdateWhatsappIntegrationStatusParams): Promise<void>;
+  softDeleteByEstablishmentId(establishmentId: string): Promise<void>;
+  clearInstanceToken(establishmentId: string): Promise<void>;
 }

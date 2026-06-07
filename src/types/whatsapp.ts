@@ -66,6 +66,25 @@ export type SendTextProviderResult = {
   raw: unknown;
 };
 
+export type CheckNumberProviderParams = {
+  instanceName: string;
+  instanceToken?: string | null;
+  number: string;
+};
+
+export type CheckNumberProviderResult = {
+  exists: boolean;
+};
+
+export type DisconnectInstanceProviderParams = {
+  instanceName: string;
+  instanceToken?: string | null;
+};
+
+export type CleanupWhatsappInstanceJob = {
+  establishmentId: EstablishmentID;
+};
+
 export type WhatsappWebhookData = {
   key?: {
     id?: string;

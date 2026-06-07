@@ -8,6 +8,7 @@ import { setupCleanupNotificationsWorker } from "./notification/cleanup-notifica
 import { setupCreateNotificationWorker } from "./notification/create-notification-worker.js";
 import { setupCreateOrderWorker } from "./order/create-order-worker.js";
 import { setupDeleteResourceWorker } from "./resource/delete-resource-worker.js";
+import { setupCleanupWhatsappInstanceWorker } from "./whatsapp/cleanup-whatsapp-instance-worker.js";
 import { setupSendWhatsappMessageWorker } from "./whatsapp/send-whatsapp-message-worker.js";
 
 export const setupWorkers = async () => {
@@ -15,6 +16,7 @@ export const setupWorkers = async () => {
   setupCreateOrderWorker();
   setupDeleteResourceWorker();
   setupSendWhatsappMessageWorker();
+  setupCleanupWhatsappInstanceWorker();
   setupGenerateDigitalMenuWorker();
   setupCreateNotificationWorker();
   setupCleanupNotificationsWorker();

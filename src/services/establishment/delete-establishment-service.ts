@@ -1,5 +1,6 @@
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
+import { enqueueCleanupWhatsappInstance } from "@/queues/whatsapp-cleanup-queue.js";
 import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
 
 type DeleteEstablishmentParams = {
@@ -23,5 +24,7 @@ export class DeleteEstablishmentService {
       baseCacheKey: "establishments",
       paramsToForget,
     });
+
+    await enqueueCleanupWhatsappInstance({ establishmentId: id });
   }
 }

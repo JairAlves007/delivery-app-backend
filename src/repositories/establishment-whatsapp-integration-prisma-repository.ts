@@ -67,4 +67,26 @@ export class EstablishmentWhatsappIntegrationPrismaRepository
       },
     });
   }
+
+  async softDeleteByEstablishmentId(establishmentId: string): Promise<void> {
+    await prisma.establishmentWhatsappIntegration.updateMany({
+      where: { establishment_id: establishmentId, deleted_at: null },
+      data: {
+        deleted_at: new Date(),
+        status: WhatsappConnectionStatus.DISCONNECTED,
+        connected_number: null,
+      },
+    });
+  }
+
+  async clearInstanceToken(establishmentId: string): Promise<void> {
+    await prisma.establishmentWhatsappIntegration.updateMany({
+      where: { establishment_id: establishmentId, deleted_at: null },
+      data: {
+        instance_token: null,
+        status: WhatsappConnectionStatus.DISCONNECTED,
+        connected_number: null,
+      },
+    });
+  }
 }

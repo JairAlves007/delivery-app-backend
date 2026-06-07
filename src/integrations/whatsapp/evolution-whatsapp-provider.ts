@@ -1,12 +1,16 @@
+import { WhatsappProviderError } from "@/errors/whatsapp/whatsapp-provider-error.js";
 import { WhatsappConnectionStatus } from "@/generated/prisma/client.js";
 import type { IWhatsappProvider } from "@/interfaces/integrations/whatsapp-provider.js";
 import { evolutionRequest } from "@/lib/evolution.js";
 import type {
+  CheckNumberProviderParams,
+  CheckNumberProviderResult,
   ConnectInstanceProviderParams,
   ConnectInstanceProviderResult,
   ConnectionStatusProviderResult,
   CreateInstanceProviderParams,
   CreateInstanceProviderResult,
+  DisconnectInstanceProviderParams,
   SendTextProviderParams,
   SendTextProviderResult,
 } from "@/types/whatsapp.js";
@@ -30,6 +34,12 @@ type SendTextResponse = {
   key?: { id?: string; remoteJid?: string };
   status?: string;
 };
+
+type WhatsappNumbersResponse = Array<{
+  exists?: boolean;
+  jid?: string;
+  number?: string;
+}>;
 
 const WEBHOOK_EVENTS = [
   "CONNECTION_UPDATE",
@@ -126,4 +136,53 @@ export class EvolutionWhatsappProvider implements IWhatsappProvider {
       raw: data,
     };
   }
+
+  async checkNumberHasWhatsapp({
+    instanceName,
+    instanceToken,
+    number,
+  }: CheckNumberProviderParams): Promise<CheckNumberProviderResult> {
+    const data = await evolutionRequest<WhatsappNumbersResponse>({
+      method: "POST",
+      path: `/chat/whatsappNumbers/${instanceName}`,
+      apiKey: instanceToken,
+      body: {
+        numbers: [number],
+      },
+    });
+
+    return { exists: data[0]?.exists === true };
+  }
+
+  async disconnectInstance({
+    instanceName,
+    instanceToken,
+  }: DisconnectInstanceProviderParams): Promise<void> {
+    await this.tolerate404(() =>
+      evolutionRequest({
+        method: "DELETE",
+        path: `/instance/logout/${instanceName}`,
+        apiKey: instanceToken,
+      }),
+    );
+
+    await this.tolerate404(() =>
+      evolutionRequest({
+        method: "DELETE",
+        path: `/instance/delete/${instanceName}`,
+        apiKey: instanceToken,
+      }),
+    );
+  }
+
+  private tolerate404 = async (fn: () => Promise<unknown>): Promise<void> => {
+    try {
+      await fn();
+    } catch (error) {
+      if (error instanceof WhatsappProviderError && error.providerStatus === 404)
+        return;
+
+      throw error;
+    }
+  };
 }
