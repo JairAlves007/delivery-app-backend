@@ -48,6 +48,11 @@ export class CreateManualClosureService {
 			paramsToForget: { establishment_id: establishmentId }
 		});
 
+		await forgetAllListingCacheKeysQueue({
+			baseCacheKey: "establishments",
+			paramsToForget: { establishment_slug: establishment.slug }
+		});
+
 		return closure;
 	}
 }

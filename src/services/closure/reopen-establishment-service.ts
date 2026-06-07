@@ -38,6 +38,11 @@ export class ReopenEstablishmentService {
 			paramsToForget: { establishment_id: establishmentId }
 		});
 
+		await forgetAllListingCacheKeysQueue({
+			baseCacheKey: "establishments",
+			paramsToForget: {}
+		});
+
 		return { endedCount };
 	}
 }
