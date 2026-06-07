@@ -31,7 +31,6 @@ export class UpdateCouponService {
 		startsAt: starts_at,
 		endsAt: ends_at,
 		maxUses: max_uses,
-		usesPerUser: uses_per_user,
 		paramsToForget,
 		...data
 	}: UpdateCouponServiceRequest) {
@@ -49,8 +48,7 @@ export class UpdateCouponService {
 				discount_type,
 				starts_at,
 				ends_at,
-				max_uses,
-				uses_per_user
+				max_uses
 			}
 		});
 

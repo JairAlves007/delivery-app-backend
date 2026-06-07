@@ -26,11 +26,6 @@ const createCouponBodyBaseSchema = z.object({
     .int("O uso máximo deve ser um número inteiro")
     .min(1, "O uso máximo deve ser maior que zero")
     .nullable(),
-  usesPerUser: z.coerce
-    .number()
-    .int("O uso por usuário deve ser um número inteiro")
-    .min(1, "O uso por usuário deve ser maior que zero")
-    .nullable(),
 });
 
 export const createCouponBodySchema = createCouponBodyBaseSchema.superRefine(

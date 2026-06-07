@@ -53,11 +53,12 @@ class BullMQProvider implements IQueueProvider {
   async scheduleRepeatable<T = unknown>({
     schedulerId,
     pattern,
+    tz,
     job,
   }: IRepeatableJob<T>): Promise<void> {
     await this.queue.upsertJobScheduler(
       schedulerId,
-      { pattern },
+      { pattern, tz },
       { name: job.name, data: job.data, opts: job.options },
     );
   }
@@ -99,12 +100,13 @@ export class BaseQueue<T = unknown> {
     await this.provider.add({ name, data, options });
   }
 
-  async scheduleRepeatable(
-    schedulerId: string,
-    pattern: string,
-    job: IJob<T>,
-  ): Promise<void> {
-    await this.provider.scheduleRepeatable({ schedulerId, pattern, job });
+  async scheduleRepeatable({
+    schedulerId,
+    pattern,
+    tz,
+    job,
+  }: IRepeatableJob<T>): Promise<void> {
+    await this.provider.scheduleRepeatable({ schedulerId, pattern, tz, job });
   }
 
   registerProcessor(handler: (data: T) => Promise<void>): void {

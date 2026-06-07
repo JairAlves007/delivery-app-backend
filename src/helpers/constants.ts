@@ -30,12 +30,19 @@ export default class Constants {
 		NotificationType,
 		{ expiresInDays: number }
 	> = {
-		ORDER_CREATED: { expiresInDays: 3 }
+		ORDER_CREATED: { expiresInDays: 3 },
+		LOW_STOCK: { expiresInDays: 7 },
+		BILLING_DUE: { expiresInDays: 3 }
 	};
 
 	public static readonly NOTIFICATION_CLEANUP_CRON: string = "0 3 * * *";
 	public static readonly NOTIFICATION_CLEANUP_SCHEDULER_ID: string =
 		"cleanup-expired-notifications";
+	public static readonly BILLING_DUE_CRON: string = "0 14 * * *";
+	public static readonly BILLING_DUE_SCHEDULER_ID: string =
+		"check-billing-due";
+	public static readonly BILLING_DUE_DAYS_BEFORE: number = 3;
+	public static readonly BILLING_GRACE_PERIOD_DAYS: number = 3;
 	public static readonly NOTIFICATION_CHANNEL_PREFIX: string =
 		"notifications:establishment:";
 	public static readonly SSE_TICKET_PREFIX: string = "sse-ticket:";

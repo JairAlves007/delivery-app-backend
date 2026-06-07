@@ -35,6 +35,12 @@ const createProductBodyBaseSchema = z.object({
     .int("O estoque deve ser um número inteiro")
     .min(0, "O estoque deve ser maior ou igual a zero")
     .optional(),
+  lowStockThreshold: z
+    .number("O limite de estoque baixo deve ser preenchido")
+    .int("O limite de estoque baixo deve ser um número inteiro")
+    .min(0, "O limite de estoque baixo deve ser maior ou igual a zero")
+    .nullable()
+    .optional(),
   validUntil: z.coerce
     .date("A data de validade deve ser preenchida")
     .refine((val) => val >= new Date(), "A data de validade deve ser futura")

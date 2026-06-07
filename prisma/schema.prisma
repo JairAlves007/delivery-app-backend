@@ -123,6 +123,8 @@ enum DigitalMenuStatus {
 
 enum NotificationType {
   ORDER_CREATED
+  LOW_STOCK
+  BILLING_DUE
 }
 
 enum PermissionType {
@@ -510,6 +512,7 @@ model Product {
   slug                String                 @db.VarChar(255)
   discount_percentage Float?
   stock               Int?
+  low_stock_threshold Int?
   valid_until         DateTime?              @db.Timestamptz
   created_at          DateTime               @default(now()) @db.Timestamptz
   updated_at          DateTime               @updatedAt @db.Timestamptz
@@ -721,7 +724,6 @@ model Coupon {
   ends_at          DateTime?     @db.Timestamptz
   deleted_at       DateTime?     @db.Timestamptz
   max_uses         Int?
-  uses_per_user    Int?
   establishment    Establishment @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   orders           Order[]
   userCoupons      UserCoupon[]

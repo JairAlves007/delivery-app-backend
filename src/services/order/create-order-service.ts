@@ -11,6 +11,7 @@ import {
   NotificationType,
   OrderStatusType,
   type Prisma,
+  ProductPricingMode,
 } from "@/generated/prisma/client.js";
 import { getStatusLabel } from "@/helpers/order.js";
 import { getValueDiscounted } from "@/helpers/price.js";
@@ -246,9 +247,13 @@ export class CreateOrderService {
           item.product.weight_grams != null
             ? item.product.weight_grams
             : item.product.quantity,
+        prevStock: item.product.stock as number,
+        lowStockThreshold: item.product.low_stock_threshold,
+        productName: item.product.name,
+        pricingMode: item.product.pricing_mode,
       }));
 
-    const { id: orderId } = await this.orderRepository.create(
+    const { id: orderId, lowStockProducts } = await this.orderRepository.create(
       this.buildOrderItems({
         address,
         coupon,
@@ -301,5 +306,24 @@ export class CreateOrderService {
       description: `Pedido de ${customerName}`,
       metadata: { orderId, customerName, customerPhone },
     });
+
+    for (const product of lowStockProducts) {
+      const stockLabel =
+        product.pricingMode === ProductPricingMode.PER_WEIGHT
+          ? `${product.stock}g`
+          : `${product.stock}`;
+
+      await createNotificationQueue({
+        establishmentId,
+        type: NotificationType.LOW_STOCK,
+        title: "Estoque baixo",
+        description: `${product.name} com estoque baixo (${stockLabel} restantes)`,
+        metadata: {
+          productId: product.id,
+          productName: product.name,
+          stock: product.stock,
+        },
+      });
+    }
   }
 }

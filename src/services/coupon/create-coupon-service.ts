@@ -27,7 +27,6 @@ export class CreateCouponService {
 		startsAt: starts_at,
 		endsAt: ends_at,
 		maxUses: max_uses,
-		usesPerUser: uses_per_user,
 		paramsToForget,
 		...data
 	}: CreateCouponServiceRequest) {
@@ -41,7 +40,6 @@ export class CreateCouponService {
 			starts_at,
 			ends_at,
 			max_uses,
-			uses_per_user,
 			establishment: {
 				connect: {
 					id: establishmentId

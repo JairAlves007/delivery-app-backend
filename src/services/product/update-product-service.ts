@@ -35,6 +35,7 @@ export class UpdateProductService {
 		validUntil: valid_until,
 		pricingMode: pricing_mode,
 		pricePer100g: price_per_100g,
+		lowStockThreshold: low_stock_threshold,
 		...data
 	}: UpdateProductRequest) {
 		await this.productRepository.deleteOldTags(id);
@@ -49,6 +50,7 @@ export class UpdateProductService {
 				valid_until,
 				...(pricing_mode != null ? { pricing_mode } : {}),
 				...(price_per_100g !== undefined ? { price_per_100g } : {}),
+				...(low_stock_threshold !== undefined ? { low_stock_threshold } : {}),
 				name,
 				...(!!name && { slug: slugify(name) }),
 				...(categoryId && {

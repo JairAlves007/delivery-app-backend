@@ -1,11 +1,35 @@
-import type { Prisma } from "@/generated/prisma/client.js";
+import type {
+  Prisma,
+  ProductPricingMode,
+} from "@/generated/prisma/client.js";
 import type { OrderFromRepository } from "@/types/order.js";
 
 import type { ICRUDBase } from "../crud-base.js";
 import type { CursorPagination } from "../cursor-pagination.js";
 
+export type StockDecrement = {
+  productId: string;
+  quantity: number;
+  prevStock: number;
+  lowStockThreshold: number | null;
+  productName: string;
+  pricingMode: ProductPricingMode;
+};
+
+export type LowStockProduct = {
+  id: string;
+  name: string;
+  stock: number;
+  pricingMode: ProductPricingMode;
+};
+
 export type CreateOrderRepositoryOptions = {
-  stockDecrements?: Array<{ productId: string; quantity: number }>;
+  stockDecrements?: StockDecrement[];
+};
+
+export type CreateOrderRepositoryResult = {
+  id: string;
+  lowStockProducts: LowStockProduct[];
 };
 
 export interface IOrderRepository
@@ -23,5 +47,5 @@ export interface IOrderRepository
   create(
     data: Prisma.OrderCreateInput,
     options?: CreateOrderRepositoryOptions,
-  ): Promise<{ id: string }>;
+  ): Promise<CreateOrderRepositoryResult>;
 }

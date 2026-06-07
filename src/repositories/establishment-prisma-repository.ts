@@ -1,9 +1,12 @@
 import type { Establishment, Prisma } from "@/generated/prisma/client.js";
+import { getBillingGraceCutoff } from "@/helpers/billing.js";
 import {
 	buildFilterQueryOptions,
 	transformValidFilterParams
 } from "@/helpers/crud.js";
 import type {
+	BillingDueEstablishment,
+	FindBillingDueBetweenParams,
 	IEstablishmentRepository,
 	OpeningHourInputItem,
 	SocialLinkUpsertItem
@@ -128,7 +131,7 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 			where: {
 				id,
 				deleted_at: null,
-				OR: [{ next_billing_date: { gt: new Date() } }]
+				OR: [{ next_billing_date: { gt: getBillingGraceCutoff() } }]
 			},
 			include: {
 				address: {
@@ -148,12 +151,29 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		});
 	}
 
+	async findBillingDueBetween({
+		start,
+		end
+	}: FindBillingDueBetweenParams): Promise<BillingDueEstablishment[]> {
+		return await prisma.establishment.findMany({
+			where: {
+				deleted_at: null,
+				next_billing_date: { gte: start, lte: end }
+			},
+			select: {
+				id: true,
+				name: true,
+				next_billing_date: true
+			}
+		});
+	}
+
 	async findBySlug(slug: string): Promise<EstablishmentFromRepository | null> {
 		return await prisma.establishment.findUnique({
 			where: {
 				slug,
 				deleted_at: null,
-				OR: [{ next_billing_date: { gt: new Date() } }]
+				OR: [{ next_billing_date: { gt: getBillingGraceCutoff() } }]
 			},
 			include: {
 				address: {

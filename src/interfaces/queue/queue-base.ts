@@ -8,6 +8,7 @@ export interface IJob<T = any> {
 export interface IRepeatableJob<T = any> {
   schedulerId: string;
   pattern: string;
+  tz?: string;
   job: IJob<T>;
 }
 

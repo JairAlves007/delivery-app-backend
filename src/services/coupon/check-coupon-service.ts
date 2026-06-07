@@ -47,16 +47,11 @@ export class CheckCouponService {
 
 		if (coupon.ends_at && coupon.ends_at < now) throw new CouponExpired();
 
-		if (coupon.max_uses && coupon.max_uses <= 0)
+		if (coupon.max_uses != null && coupon._count.userCoupons >= coupon.max_uses)
 			throw new CouponMaxUsesReached();
 
-		if (
-			customerPhone &&
-			coupon.uses_per_user &&
-			coupon.uses_per_user <= coupon.userCoupons.length
-		) {
+		if (customerPhone && coupon.userCoupons.length > 0)
 			throw new CouponUserLimitReached();
-		}
 
 		return {
 			id: coupon.id,

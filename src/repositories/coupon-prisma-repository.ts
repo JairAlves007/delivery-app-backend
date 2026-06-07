@@ -124,6 +124,9 @@ export class CouponPrismaRepository implements ICouponRepository {
 			include: {
 				userCoupons: {
 					where: customerPhone ? { customer_phone: customerPhone } : { customer_phone: "" }
+				},
+				_count: {
+					select: { userCoupons: true }
 				}
 			}
 		});

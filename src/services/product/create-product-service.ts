@@ -29,6 +29,7 @@ export class CreateProductService {
 		validUntil: valid_until,
 		pricingMode: pricing_mode,
 		pricePer100g: price_per_100g,
+		lowStockThreshold: low_stock_threshold,
 		paramsToForget,
 		...data
 	}: CreateProductServiceRequest): Promise<void> {
@@ -45,6 +46,7 @@ export class CreateProductService {
 			valid_until,
 			pricing_mode,
 			price_per_100g: price_per_100g ?? null,
+			low_stock_threshold: low_stock_threshold ?? null,
 			establishment: {
 				connect: {
 					id: establishmentId

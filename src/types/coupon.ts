@@ -8,5 +8,5 @@ export type ValidationReason =
   | "USER_LIMIT_REACHED";
 
 export type CouponWithUserCoupons = Prisma.CouponGetPayload<{
-  include: { userCoupons: true };
+  include: { userCoupons: true; _count: { select: { userCoupons: true } } };
 }>;

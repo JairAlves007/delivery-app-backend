@@ -8,8 +8,25 @@ import {
 import Constants from "@/helpers/constants.js";
 import type { IMenuRepository } from "@/interfaces/repositories/menu-repository.js";
 
-const NOTIFICATION_VIEW_TYPES: Record<NotificationType, ViewType> = {
+const NOTIFICATION_VIEW_TYPES: Record<NotificationType, ViewType | null> = {
   [NotificationType.ORDER_CREATED]: ViewType.VIEW_ORDERS,
+  [NotificationType.LOW_STOCK]: ViewType.VIEW_PRODUCTS,
+  [NotificationType.BILLING_DUE]: null,
+};
+
+const NOTIFICATION_LINK_PARAMS: Record<
+  NotificationType,
+  { metadataKey: string; queryKey: string } | null
+> = {
+  [NotificationType.ORDER_CREATED]: {
+    metadataKey: "orderId",
+    queryKey: "orderId",
+  },
+  [NotificationType.LOW_STOCK]: {
+    metadataKey: "productId",
+    queryKey: "productId",
+  },
+  [NotificationType.BILLING_DUE]: null,
 };
 
 type ResolveNotificationLinkParams = {
@@ -29,6 +46,9 @@ export class ResolveNotificationLinkService {
     metadata,
   }: ResolveNotificationLinkParams): Promise<string | null> {
     const viewType = NOTIFICATION_VIEW_TYPES[type];
+
+    if (!viewType) return null;
+
     const cache = makeCache();
 
     const slug = await cache.remember(
@@ -43,11 +63,17 @@ export class ResolveNotificationLinkService {
 
     if (!slug) return null;
 
-    const orderId =
-      metadata && typeof metadata === "object" && "orderId" in metadata
-        ? metadata.orderId
+    const linkParams = NOTIFICATION_LINK_PARAMS[type];
+
+    if (!linkParams) return `/${slug}`;
+
+    const { metadataKey, queryKey } = linkParams;
+
+    const value =
+      metadata && typeof metadata === "object" && metadataKey in metadata
+        ? (metadata as Record<string, unknown>)[metadataKey]
         : null;
 
-    return orderId ? `/${slug}?orderId=${String(orderId)}` : `/${slug}`;
+    return value ? `/${slug}?${queryKey}=${String(value)}` : `/${slug}`;
   }
 }

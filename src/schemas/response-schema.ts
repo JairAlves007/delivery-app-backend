@@ -160,8 +160,7 @@ export const couponResponseSchema = z.object({
 	value: z.number(),
 	starts_at: nullableDateStringSchema,
 	ends_at: nullableDateStringSchema,
-	max_uses: z.number().nullable(),
-	uses_per_user: z.number().nullable()
+	max_uses: z.number().nullable()
 });
 
 export const couponListResponseSchema =
@@ -325,6 +324,7 @@ export const productResponseSchema = z.object({
 	slug: z.string(),
 	discount_percentage: z.number().nullable(),
 	stock: z.number().nullable(),
+	low_stock_threshold: z.number().nullable(),
 	valid_until: nullableDateStringSchema,
 	resources: mappedResourceRecordSchema,
 	tags: z.array(tagResponseSchema)

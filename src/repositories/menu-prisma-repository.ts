@@ -187,7 +187,7 @@ const defaultMenus: DefaultMenu[] = [
 				order: 1
 			},
 			{
-				label: "Ver produtos",
+				label: "Ver Produtos",
 				slug: "view-products",
 				view_type: ViewType.VIEW_PRODUCTS,
 				order: 2
@@ -296,7 +296,12 @@ export class MenuPrismaRepository implements IMenuRepository {
 	async ensureDefaults(): Promise<void> {
 		for (const menu of defaultMenus) {
 			await prisma.menu.upsert({
-				where: { slug_for_audience: { slug: menu.slug, for_audience: menu.for_audience } },
+				where: {
+					slug_for_audience: {
+						slug: menu.slug,
+						for_audience: menu.for_audience
+					}
+				},
 				update: {
 					label: menu.label,
 					view_type: menu.view_type,

@@ -20,6 +20,17 @@ export type SocialLinkUpsertItem = {
   url: string | null;
 };
 
+export type BillingDueEstablishment = {
+  id: string;
+  name: string;
+  next_billing_date: Date;
+};
+
+export type FindBillingDueBetweenParams = {
+  start: Date;
+  end: Date;
+};
+
 export interface IEstablishmentRepository extends ICRUDBase<
   EstablishmentFromRepository,
   Prisma.EstablishmentCreateInput,
@@ -28,6 +39,9 @@ export interface IEstablishmentRepository extends ICRUDBase<
   Establishment
 > {
   findBySlug(slug: string): Promise<EstablishmentFromRepository | null>;
+  findBillingDueBetween(
+    params: FindBillingDueBetweenParams,
+  ): Promise<BillingDueEstablishment[]>;
   replaceOpeningHours(params: {
     establishmentId: string;
     items: OpeningHourInputItem[];

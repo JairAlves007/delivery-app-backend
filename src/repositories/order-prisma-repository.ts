@@ -4,7 +4,9 @@ import Constants from "@/helpers/constants.js";
 import { transformValidFilterParams } from "@/helpers/crud.js";
 import type {
   CreateOrderRepositoryOptions,
+  CreateOrderRepositoryResult,
   IOrderRepository,
+  LowStockProduct,
 } from "@/interfaces/repositories/order-repository.js";
 import prisma from "@/lib/prisma.js";
 import type {
@@ -119,7 +121,7 @@ export class OrderPrismaRepository implements IOrderRepository {
   async create(
     data: Prisma.OrderCreateInput,
     options?: CreateOrderRepositoryOptions,
-  ): Promise<{ id: string }> {
+  ): Promise<CreateOrderRepositoryResult> {
     const stockDecrements = options?.stockDecrements ?? [];
 
     if (stockDecrements.length === 0) {
@@ -128,21 +130,39 @@ export class OrderPrismaRepository implements IOrderRepository {
         select: { id: true },
       });
 
-      return { id: order.id };
+      return { id: order.id, lowStockProducts: [] };
     }
 
     return await prisma.$transaction(async (tx) => {
-      for (const { productId, quantity } of stockDecrements) {
+      const lowStockProducts: LowStockProduct[] = [];
+
+      for (const decrement of stockDecrements) {
         const { count } = await tx.product.updateMany({
           where: {
-            id: productId,
+            id: decrement.productId,
             deleted_at: null,
-            stock: { gte: quantity },
+            stock: { gte: decrement.quantity },
           },
-          data: { stock: { decrement: quantity } },
+          data: { stock: { decrement: decrement.quantity } },
         });
 
         if (count === 0) throw new ProductOutOfStockError();
+
+        const newStock = decrement.prevStock - decrement.quantity;
+        const threshold = decrement.lowStockThreshold;
+        const crossed =
+          threshold != null &&
+          newStock <= threshold &&
+          decrement.prevStock > threshold;
+
+        if (crossed) {
+          lowStockProducts.push({
+            id: decrement.productId,
+            name: decrement.productName,
+            stock: newStock,
+            pricingMode: decrement.pricingMode,
+          });
+        }
       }
 
       const order = await tx.order.create({
@@ -150,7 +170,7 @@ export class OrderPrismaRepository implements IOrderRepository {
         select: { id: true },
       });
 
-      return { id: order.id };
+      return { id: order.id, lowStockProducts };
     });
   }
 
