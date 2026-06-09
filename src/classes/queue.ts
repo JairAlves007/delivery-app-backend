@@ -71,7 +71,7 @@ class BullMQProvider implements IQueueProvider {
   ): void {
     this.worker = new Worker(this.queueName, processFunction, {
       connection: this.connection,
-      concurrency: options?.concurrency,
+      ...(options?.concurrency ? { concurrency: options.concurrency } : {}),
     });
 
     this.worker.on("failed", async (job, error) => {
