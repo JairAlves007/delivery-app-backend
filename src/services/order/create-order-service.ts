@@ -20,9 +20,11 @@ import type { IOrderRepository } from "@/interfaces/repositories/order-repositor
 import prisma from "@/lib/prisma.js";
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import { createNotificationQueue } from "@/queues/notification-queue.js";
+import { buildOrderJobId } from "@/queues/order-queue.js";
 import type {
   BuildOrderItemsParams,
   CreateOrderParams,
+  CreateOrderPlan,
   GuestAddress,
   OrderItems,
   OrderItemsToProcess,
@@ -101,6 +103,7 @@ export class CreateOrderService {
     district,
     shippingCost,
     subtotal,
+    idempotencyKey,
     orderItemsToProcess,
   }: BuildOrderItemsParams): Prisma.OrderCreateInput {
     const couponData = this.getOrderCouponInputData(coupon);
@@ -118,6 +121,7 @@ export class CreateOrderService {
       change_amount: changeAmount,
       comment,
       subtotal,
+      idempotency_key: idempotencyKey,
       establishment: {
         connect: {
           id: establishmentId,
@@ -152,7 +156,10 @@ export class CreateOrderService {
     };
   }
 
-  async handle({ order, paramsToForget }: CreateOrderParams) {
+  async buildPlan({
+    order,
+    paramsToForget,
+  }: CreateOrderParams): Promise<CreateOrderPlan> {
     const {
       deliveryType,
       paymentMethod,
@@ -166,6 +173,8 @@ export class CreateOrderService {
       comment,
       items,
     } = order;
+
+    const idempotencyKey = buildOrderJobId({ order, paramsToForget });
 
     const validateEstablishment = makeValidateEstablishmentFromOrderService();
     const validateDeliveryService = makeValidateDeliveryFromOrderService();
@@ -253,58 +262,90 @@ export class CreateOrderService {
         pricingMode: item.product.pricing_mode,
       }));
 
+    const orderInput = this.buildOrderItems({
+      address,
+      coupon,
+      couponDiscount,
+      deliveryType,
+      district,
+      establishmentId,
+      paymentMethod,
+      shippingCost,
+      subtotal,
+      customerName,
+      customerPhone,
+      changeAmount,
+      comment,
+      idempotencyKey,
+      orderItemsToProcess,
+    });
+
+    return {
+      idempotencyKey,
+      orderInput,
+      stockDecrements,
+      paramsToForget,
+      establishmentId,
+      customerName,
+      customerPhone,
+      changeAmount,
+      comment,
+      deliveryType,
+      paymentMethod,
+      address,
+      coupon,
+      district,
+      orderItemsToProcess,
+    };
+  }
+
+  async persist(plan: CreateOrderPlan): Promise<void> {
+    const alreadyProcessed =
+      await this.orderRepository.existsByIdempotencyKey(plan.idempotencyKey);
+
+    if (alreadyProcessed) return;
+
     const { id: orderId, lowStockProducts } = await this.orderRepository.create(
-      this.buildOrderItems({
-        address,
-        coupon,
-        couponDiscount,
-        deliveryType,
-        district,
-        establishmentId,
-        paymentMethod,
-        shippingCost,
-        subtotal,
-        customerName,
-        customerPhone,
-        changeAmount,
-        comment,
-        orderItemsToProcess,
-      }),
-      { stockDecrements },
+      plan.orderInput,
+      { stockDecrements: plan.stockDecrements },
     );
 
-    if (coupon) {
+    if (plan.coupon) {
       await prisma.userCoupon.create({
-        data: { customer_phone: customerPhone, coupon_id: coupon.id },
+        data: { customer_phone: plan.customerPhone, coupon_id: plan.coupon.id },
       });
     }
 
     await forgetAllListingCacheKeysQueue({
       baseCacheKey: "orders",
-      paramsToForget,
+      paramsToForget: plan.paramsToForget,
     });
 
     const sendConfirmationService = makeSendOrderConfirmationMessageService();
     await sendConfirmationService.handle({
-      establishmentId,
-      address,
-      coupon,
-      deliveryType,
-      district,
-      paymentMethod,
-      customerName,
-      customerPhone,
-      changeAmount,
-      comment,
-      orderItemsToProcess,
+      establishmentId: plan.establishmentId,
+      address: plan.address,
+      coupon: plan.coupon,
+      deliveryType: plan.deliveryType,
+      district: plan.district,
+      paymentMethod: plan.paymentMethod,
+      customerName: plan.customerName,
+      customerPhone: plan.customerPhone,
+      changeAmount: plan.changeAmount,
+      comment: plan.comment,
+      orderItemsToProcess: plan.orderItemsToProcess,
     });
 
     await createNotificationQueue({
-      establishmentId,
+      establishmentId: plan.establishmentId,
       type: NotificationType.ORDER_CREATED,
       title: "Novo pedido recebido",
-      description: `Pedido de ${customerName}`,
-      metadata: { orderId, customerName, customerPhone },
+      description: `Pedido de ${plan.customerName}`,
+      metadata: {
+        orderId,
+        customerName: plan.customerName,
+        customerPhone: plan.customerPhone,
+      },
     });
 
     for (const product of lowStockProducts) {
@@ -314,7 +355,7 @@ export class CreateOrderService {
           : `${product.stock}`;
 
       await createNotificationQueue({
-        establishmentId,
+        establishmentId: plan.establishmentId,
         type: NotificationType.LOW_STOCK,
         title: "Estoque baixo",
         description: `${product.name} com estoque baixo (${stockLabel} restantes)`,

@@ -31,6 +31,7 @@ export default class Constants {
 		{ expiresInDays: number }
 	> = {
 		ORDER_CREATED: { expiresInDays: 3 },
+		ORDER_FAILED: { expiresInDays: 7 },
 		LOW_STOCK: { expiresInDays: 7 },
 		BILLING_DUE: { expiresInDays: 3 }
 	};
@@ -82,7 +83,8 @@ export default class Constants {
 		dashboard: "dashboard",
 		favorites: "favorites",
 		establishmentTheme: "establishment_theme",
-		digitalMenu: "digital_menu"
+		digitalMenu: "digital_menu",
+		whatsappNumberCheck: "whatsapp_number_check"
 	};
 
 	public static readonly THEME_SCHEMA_VERSION: string = "1";
@@ -143,7 +145,9 @@ export default class Constants {
 		/** Menus estruturais — 12 h */
 		menus: 60 * 60 * 12,
 		/** Regras de upload (schema) — 24 h */
-		resourceRules: 60 * 60 * 24
+		resourceRules: 60 * 60 * 24,
+		/** Número possui WhatsApp — estável, 6 h */
+		whatsappNumberCheck: 60 * 60 * 6
 	};
 
 	// Order

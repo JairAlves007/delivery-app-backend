@@ -1,3 +1,4 @@
+import type { Cache } from "@/classes/cache.js";
 import { WhatsappIntegrationNotFound } from "@/errors/whatsapp/whatsapp-integration-not-found.js";
 import type { IWhatsappProvider } from "@/interfaces/integrations/whatsapp-provider.js";
 import type { IEstablishmentWhatsappIntegrationRepository } from "@/interfaces/repositories/establishment-whatsapp-integration-repository.js";
@@ -10,13 +11,16 @@ type DisconnectEstablishmentWhatsappRequest = {
 export class DisconnectEstablishmentWhatsappService {
   private integrationRepository: IEstablishmentWhatsappIntegrationRepository;
   private whatsappProvider: IWhatsappProvider;
+  private cache: Cache;
 
   constructor(
     integrationRepository: IEstablishmentWhatsappIntegrationRepository,
     whatsappProvider: IWhatsappProvider,
+    cache: Cache,
   ) {
     this.integrationRepository = integrationRepository;
     this.whatsappProvider = whatsappProvider;
+    this.cache = cache;
   }
 
   async handle({
@@ -34,6 +38,10 @@ export class DisconnectEstablishmentWhatsappService {
 
     await this.integrationRepository.softDeleteByEstablishmentId(
       establishmentId,
+    );
+
+    await this.cache.forgetKeysContaining(
+      `${this.cache.keys.whatsappNumberCheck}:${establishmentId}`,
     );
   }
 }

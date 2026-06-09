@@ -118,6 +118,15 @@ export class OrderPrismaRepository implements IOrderRepository {
     });
   }
 
+  async existsByIdempotencyKey(idempotencyKey: string): Promise<boolean> {
+    const order = await prisma.order.findUnique({
+      where: { idempotency_key: idempotencyKey },
+      select: { id: true },
+    });
+
+    return order !== null;
+  }
+
   async create(
     data: Prisma.OrderCreateInput,
     options?: CreateOrderRepositoryOptions,

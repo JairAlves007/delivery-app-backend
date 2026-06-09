@@ -123,6 +123,7 @@ enum DigitalMenuStatus {
 
 enum NotificationType {
   ORDER_CREATED
+  ORDER_FAILED
   LOW_STOCK
   BILLING_DUE
 }
@@ -758,6 +759,7 @@ model Order {
   customer_phone       String                @db.VarChar(20)
   establishment_id     String
   coupon_id            String?
+  idempotency_key      String?               @unique @map("idempotency_key")
   created_at           DateTime              @default(now()) @db.Timestamptz
   updated_at           DateTime              @updatedAt @db.Timestamptz
   deleted_at           DateTime?             @db.Timestamptz
@@ -773,6 +775,18 @@ model Order {
   @@index([coupon_id], name: "idx_orders_coupon_id")
   @@index([created_at], name: "idx_orders_created_at")
   @@map("orders")
+}
+
+model FailedJob {
+  id         String   @id @default(ulid())
+  queue_name String   @db.VarChar(100)
+  job_id     String?  @db.VarChar(255)
+  payload    Json
+  error      String   @db.Text
+  created_at DateTime @default(now()) @db.Timestamptz
+
+  @@index([queue_name], name: "idx_failed_jobs_queue_name")
+  @@map("failed_jobs")
 }
 
 model OrderCoupon {

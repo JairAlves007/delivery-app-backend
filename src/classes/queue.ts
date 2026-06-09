@@ -10,7 +10,9 @@ import {
 import { env } from "@/env.js";
 import { app } from "@/http/app.js";
 import type {
+  IFinalFailure,
   IJob,
+  IProcessorOptions,
   IQueueProvider,
   IRepeatableJob,
 } from "@/interfaces/queue/queue-base.js";
@@ -63,21 +65,53 @@ class BullMQProvider implements IQueueProvider {
     );
   }
 
-  process(processFunction: (job: Job) => Promise<void>): void {
+  process(
+    processFunction: (job: Job) => Promise<void>,
+    options?: IProcessorOptions,
+  ): void {
     this.worker = new Worker(this.queueName, processFunction, {
       connection: this.connection,
+      concurrency: options?.concurrency,
     });
 
-    this.worker.on("failed", (job, error) => {
+    this.worker.on("failed", async (job, error) => {
       app.log.error(
         { error },
         `[Queue] Job ${job?.id} failed with message: ${error.message}`,
       );
+
+      if (!job || !options?.onFinalFailure) return;
+
+      const maxAttempts = job.opts.attempts ?? 1;
+
+      if (job.attemptsMade < maxAttempts) return;
+
+      try {
+        await options.onFinalFailure({
+          jobId: job.id,
+          data: job.data,
+          error,
+        });
+      } catch (handlerError) {
+        app.log.error(
+          { error: handlerError },
+          `[Queue] onFinalFailure handler failed for job ${job.id}`,
+        );
+      }
+    });
+
+    this.worker.on("stalled", (jobId) => {
+      app.log.warn(`[Queue] Job ${jobId} stalled on queue ${this.queueName}`);
     });
 
     this.worker.on("error", (error) => {
       app.log.error({ error }, "[Queue] Worker error:");
     });
+  }
+
+  async close(): Promise<void> {
+    await this.worker?.close();
+    await this.queue.close();
   }
 }
 
@@ -96,6 +130,12 @@ export class BaseQueue<T = unknown> {
     return this.instances.get(queueName) as BaseQueue<T>;
   }
 
+  public static async closeAll(): Promise<void> {
+    await Promise.all(
+      [...this.instances.values()].map((instance) => instance.provider.close()),
+    );
+  }
+
   async enqueue(name: string, data: T, options?: JobsOptions): Promise<void> {
     await this.provider.add({ name, data, options });
   }
@@ -109,9 +149,15 @@ export class BaseQueue<T = unknown> {
     await this.provider.scheduleRepeatable({ schedulerId, pattern, tz, job });
   }
 
-  registerProcessor(handler: (data: T) => Promise<void>): void {
+  registerProcessor(
+    handler: (data: T) => Promise<void>,
+    options?: {
+      concurrency?: number;
+      onFinalFailure?: (failure: IFinalFailure<T>) => Promise<void> | void;
+    },
+  ): void {
     this.provider.process(async (job) => {
       await handler(job.data);
-    });
+    }, options as IProcessorOptions);
   }
 }

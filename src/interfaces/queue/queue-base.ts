@@ -12,8 +12,23 @@ export interface IRepeatableJob<T = any> {
   job: IJob<T>;
 }
 
+export interface IFinalFailure<T = any> {
+  jobId?: string;
+  data: T;
+  error: Error;
+}
+
+export interface IProcessorOptions<T = any> {
+  concurrency?: number;
+  onFinalFailure?: (failure: IFinalFailure<T>) => Promise<void> | void;
+}
+
 export interface IQueueProvider {
   add<T = any>(job: IJob<T>): Promise<void>;
   scheduleRepeatable<T = any>(repeatable: IRepeatableJob<T>): Promise<void>;
-  process(processFunction: (job: any) => Promise<void>): void;
+  process(
+    processFunction: (job: any) => Promise<void>,
+    options?: IProcessorOptions,
+  ): void;
+  close(): Promise<void>;
 }

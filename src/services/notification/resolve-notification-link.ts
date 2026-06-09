@@ -10,6 +10,7 @@ import type { IMenuRepository } from "@/interfaces/repositories/menu-repository.
 
 const NOTIFICATION_VIEW_TYPES: Record<NotificationType, ViewType | null> = {
   [NotificationType.ORDER_CREATED]: ViewType.VIEW_ORDERS,
+  [NotificationType.ORDER_FAILED]: ViewType.VIEW_ORDERS,
   [NotificationType.LOW_STOCK]: ViewType.VIEW_PRODUCTS,
   [NotificationType.BILLING_DUE]: null,
 };
@@ -22,6 +23,7 @@ const NOTIFICATION_LINK_PARAMS: Record<
     metadataKey: "orderId",
     queryKey: "orderId",
   },
+  [NotificationType.ORDER_FAILED]: null,
   [NotificationType.LOW_STOCK]: {
     metadataKey: "productId",
     queryKey: "productId",

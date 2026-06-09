@@ -48,4 +48,5 @@ export interface IOrderRepository
     data: Prisma.OrderCreateInput,
     options?: CreateOrderRepositoryOptions,
   ): Promise<CreateOrderRepositoryResult>;
+  existsByIdempotencyKey(idempotencyKey: string): Promise<boolean>;
 }

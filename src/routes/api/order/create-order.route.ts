@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
 
+import { makeCreateOrderService } from "@/factories/services/order/make-create-order-service.js";
 import { makeValidateCustomerPhoneFromOrderService } from "@/factories/services/order/validations/make-validate-customer-phone-from-order-service.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
@@ -35,16 +36,19 @@ export const createOrderRoute = async (app: FastifyInstance) => {
 
       const validateCustomerPhoneService =
         makeValidateCustomerPhoneFromOrderService();
+      const createOrderService = makeCreateOrderService();
 
       await validateCustomerPhoneService.handle({
         establishmentId: body.establishmentId,
         customerPhone: body.customerPhone,
       });
 
-      await createOrderQueue({
+      const plan = await createOrderService.buildPlan({
         order: body,
         paramsToForget: { establishment_id: body.establishmentId },
       });
+
+      await createOrderQueue(plan);
 
       return reply
         .status(HTTPStatusCodes.ACCEPTED)

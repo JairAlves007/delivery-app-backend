@@ -1,5 +1,7 @@
+import type { Cache } from "@/classes/cache.js";
 import { PhoneWithoutWhatsapp } from "@/errors/whatsapp/phone-without-whatsapp.js";
 import { WhatsappConnectionStatus } from "@/generated/prisma/client.js";
+import Constants from "@/helpers/constants.js";
 import { normalizeToBrazilianJid } from "@/helpers/phone.js";
 import type { IWhatsappProvider } from "@/interfaces/integrations/whatsapp-provider.js";
 import type { IEstablishmentWhatsappIntegrationRepository } from "@/interfaces/repositories/establishment-whatsapp-integration-repository.js";
@@ -13,13 +15,16 @@ type ValidateCustomerPhoneFromOrderServiceRequest = {
 export class ValidateCustomerPhoneFromOrderService {
   private whatsappIntegrationRepository: IEstablishmentWhatsappIntegrationRepository;
   private whatsappProvider: IWhatsappProvider;
+  private cache: Cache;
 
   constructor(
     whatsappIntegrationRepository: IEstablishmentWhatsappIntegrationRepository,
     whatsappProvider: IWhatsappProvider,
+    cache: Cache,
   ) {
     this.whatsappIntegrationRepository = whatsappIntegrationRepository;
     this.whatsappProvider = whatsappProvider;
+    this.cache = cache;
   }
 
   async handle({
@@ -36,19 +41,21 @@ export class ValidateCustomerPhoneFromOrderService {
     if (!integration || integration.status !== WhatsappConnectionStatus.CONNECTED)
       return;
 
-    let exists: boolean;
+    const cacheKey = `${this.cache.keys.whatsappNumberCheck}:${establishmentId}:${number}`;
 
-    try {
-      const result = await this.whatsappProvider.checkNumberHasWhatsapp({
-        instanceName: integration.instance_name,
-        instanceToken: integration.instance_token,
-        number,
-      });
+    const exists = await this.cache.remember(
+      cacheKey,
+      Constants.CACHE_TTL.whatsappNumberCheck,
+      async () => {
+        const result = await this.whatsappProvider.checkNumberHasWhatsapp({
+          instanceName: integration.instance_name,
+          instanceToken: integration.instance_token,
+          number,
+        });
 
-      exists = result.exists;
-    } catch {
-      return;
-    }
+        return result.exists;
+      },
+    );
 
     if (!exists) throw new PhoneWithoutWhatsapp();
   }

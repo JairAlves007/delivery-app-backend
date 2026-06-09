@@ -1,11 +1,11 @@
 import { createHash } from "node:crypto";
 
 import { makeQueue } from "@/factories/services/queue/make-queue.js";
-import type { CreateOrderParams } from "@/types/order.js";
+import type { CreateOrderParams, CreateOrderPlan } from "@/types/order.js";
 
 export const orderQueueName = "order-queue";
 
-const buildOrderJobId = ({ order }: CreateOrderParams): string => {
+export const buildOrderJobId = ({ order }: CreateOrderParams): string => {
   const items = [...order.items]
     .map((item) => ({
       id: item.id,
@@ -36,10 +36,10 @@ const buildOrderJobId = ({ order }: CreateOrderParams): string => {
   return `create-order-${createHash("sha1").update(payload).digest("hex")}`;
 };
 
-export const createOrderQueue = async (payload: CreateOrderParams) => {
-  const queue = makeQueue<CreateOrderParams>(orderQueueName);
+export const createOrderQueue = async (payload: CreateOrderPlan) => {
+  const queue = makeQueue<CreateOrderPlan>(orderQueueName);
 
   await queue.enqueue("create-order", payload, {
-    jobId: buildOrderJobId(payload),
+    jobId: payload.idempotencyKey,
   });
 };

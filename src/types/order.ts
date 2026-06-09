@@ -7,6 +7,7 @@ import type {
   PaymentMethodType,
   Prisma,
 } from "@/generated/prisma/client.js";
+import type { StockDecrement } from "@/interfaces/repositories/order-repository.js";
 import type { orderPayloadSchema } from "@/schemas/response-schema.js";
 
 import type { AddonFromRepository } from "./addon.js";
@@ -78,6 +79,7 @@ export type BuildOrderItemsParams = {
   district: District | null;
   shippingCost: number;
   subtotal: number;
+  idempotencyKey: string;
   orderItemsToProcess: OrderItemsToProcess[];
 };
 
@@ -164,4 +166,21 @@ export type OrderSubSectionMessage = {
 
 export type CreateOrderParams = {
   order: OrderIntent;
+} & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;
+
+export type CreateOrderPlan = {
+  idempotencyKey: string;
+  orderInput: Prisma.OrderCreateInput;
+  stockDecrements: StockDecrement[];
+  establishmentId: EstablishmentID;
+  customerName: string;
+  customerPhone: string;
+  changeAmount?: number | null;
+  comment?: string | null;
+  deliveryType: DeliveryType;
+  paymentMethod: PaymentMethodType;
+  address: GuestAddress | null;
+  coupon: Coupon | null;
+  district: District | null;
+  orderItemsToProcess: OrderItemsToProcess[];
 } & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;

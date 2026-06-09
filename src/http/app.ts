@@ -14,6 +14,7 @@ import {
   validatorCompiler,
 } from "fastify-type-provider-zod";
 
+import { BaseQueue } from "@/classes/queue.js";
 import { env } from "@/env.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import { redis } from "@/lib/redis.js";
@@ -161,7 +162,15 @@ app.addHook("onReady", async () => {
   } catch (error) {
     app.log.error({ error }, "❌ Failed to initialize BullMQ Workers");
   }
+});
 
+app.addHook("onClose", async () => {
+  try {
+    await BaseQueue.closeAll();
+    app.log.info("👷 BullMQ Workers closed gracefully");
+  } catch (error) {
+    app.log.error({ error }, "❌ Failed to close BullMQ Workers");
+  }
 });
 
 app.setErrorHandler((error, _request, reply) => {
