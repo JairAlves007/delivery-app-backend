@@ -3,6 +3,7 @@ import z from "zod";
 import { InvalidPage } from "@/errors/pagination/invalid-page.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import { RoleType } from "@/generated/prisma/client.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IUserRepository } from "@/interfaces/repositories/user-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
@@ -31,23 +32,27 @@ export class ListEstablishmentOwnerService {
 		const role = RoleType.ESTABLISHMENT_OWNER;
 		const isPaging = !!page;
 
-		const totalPromise = cache.rememberForever(
+		const totalPromise = cache.remember(
 			`${prefixKey}total`,
-			async () => await this.userRepository.countByRole(role, filterParams)
+			Constants.CACHE_TTL.users,
+			async () => await this.userRepository.countByRole(role, filterParams),
+			{ domain: "users" }
 		);
 
 		if (isPaging) {
 			const key = `${prefixKey}page_${page}_per_page_${perPage}`;
 			const [total, items] = await Promise.all([
 				totalPromise,
-				cache.rememberForever(
+				cache.remember(
 					key,
+					Constants.CACHE_TTL.users,
 					async () =>
 						await this.userRepository.paginateByRole(role, {
 							page,
 							perPage,
 							filterParams
-						})
+						}),
+					{ domain: "users" }
 				)
 			]);
 
@@ -66,9 +71,11 @@ export class ListEstablishmentOwnerService {
 
 		const [total, items] = await Promise.all([
 			totalPromise,
-			cache.rememberForever(
+			cache.remember(
 				`${prefixKey}all`,
-				async () => await this.userRepository.listAllByRole(role, filterParams)
+				Constants.CACHE_TTL.users,
+				async () => await this.userRepository.listAllByRole(role, filterParams),
+				{ domain: "users" }
 			)
 		]);
 

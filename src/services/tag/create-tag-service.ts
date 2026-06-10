@@ -47,6 +47,11 @@ export class CreateTagService {
 				baseCacheKey: "tags",
 				paramsToForget
 			});
+
+			await forgetAllListingCacheKeysQueue({
+				baseCacheKey: "products",
+				paramsToForget
+			});
 		}
 	}
 }

@@ -201,7 +201,8 @@ export class GetDashboardService {
 					to,
 					granularity,
 					establishmentId
-				})
+				}),
+			{ domain: "dashboard", establishmentId }
 		);
 	}
 

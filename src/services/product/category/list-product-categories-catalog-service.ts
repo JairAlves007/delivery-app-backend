@@ -1,6 +1,7 @@
 import z from "zod";
 
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.js";
 import {
@@ -38,14 +39,16 @@ export class ListProductCategoriesCatalogService {
     });
     const key = `${prefixKey}${cache.keys.productCategories}_limit_${limit}${cursorSuffix}`;
 
-    const raw = await cache.rememberForever(
+    const raw = await cache.remember(
       key,
+      Constants.CACHE_TTL.productCategories,
       async () =>
         await this.productCategoryRepository.cursorPaginate({
           limit,
           cursor,
           filterParams: { establishment_id: establishmentId },
         }),
+      { domain: "productCategories", establishmentId },
     );
     const hasNextPage = raw.length > limit;
     const productCategories = hasNextPage ? raw.slice(0, limit) : raw;

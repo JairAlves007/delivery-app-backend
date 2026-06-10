@@ -49,5 +49,10 @@ export class DetachProductAddonCategoryService {
       baseCacheKey: "products",
       paramsToForget,
     });
+
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "productAddonCategories",
+      paramsToForget,
+    });
   }
 }

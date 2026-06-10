@@ -38,6 +38,7 @@ export class ListBannersCatalogService {
         await this.bannerRepository.listAll({
           establishment_id: establishmentId,
         }),
+      { domain: "banners", establishmentId },
     );
 
     if (banners.length <= 0) await cache.forget(key);

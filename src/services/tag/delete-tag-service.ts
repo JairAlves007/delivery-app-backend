@@ -26,5 +26,10 @@ export class DeleteTagService {
       baseCacheKey: "tags",
       paramsToForget,
     });
+
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "products",
+      paramsToForget,
+    });
   }
 }

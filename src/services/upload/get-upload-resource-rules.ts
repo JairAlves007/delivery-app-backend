@@ -1,4 +1,5 @@
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.js";
 import type {
   ResourceRuleFromRepository,
@@ -18,12 +19,14 @@ export class GetUploadResourceRulesService {
     const cache = makeCache();
     const key = `${cache.keys.resourceRules}_${forObject}`;
 
-    return await cache.rememberForever(
+    return await cache.remember(
       key,
+      Constants.CACHE_TTL.resourceRules,
       async () =>
         await this.resourceRepository.getUploadResourceRules({
           forObject,
         }),
+      { domain: "resourceRules" },
     );
   }
 }

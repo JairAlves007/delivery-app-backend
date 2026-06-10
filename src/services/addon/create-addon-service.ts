@@ -33,5 +33,10 @@ export class CreateAddonService {
 			baseCacheKey: "addons",
 			paramsToForget
 		});
+
+		await forgetAllListingCacheKeysQueue({
+			baseCacheKey: "productAddonCategories",
+			paramsToForget
+		});
 	}
 }

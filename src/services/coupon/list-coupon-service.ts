@@ -34,6 +34,7 @@ export class ListCouponService {
       `${prefixKey}total_${cache.keys.coupons}`,
       Constants.CACHE_TTL.coupons,
       async () => await this.couponRepository.count(filterParams),
+      { domain: "coupons", establishmentId: filterParams?.establishment_id },
     );
 
     if (isPaging) {
@@ -50,6 +51,10 @@ export class ListCouponService {
               perPage,
               filterParams,
             }),
+          {
+            domain: "coupons",
+            establishmentId: filterParams?.establishment_id,
+          },
         ),
       ]);
 
@@ -77,6 +82,7 @@ export class ListCouponService {
         `${prefixKey}all_${cache.keys.coupons}`,
         Constants.CACHE_TTL.coupons,
         async () => await this.couponRepository.listAll(filterParams),
+        { domain: "coupons", establishmentId: filterParams?.establishment_id },
       ),
     ]);
 

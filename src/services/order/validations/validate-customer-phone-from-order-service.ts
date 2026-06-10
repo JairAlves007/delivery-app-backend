@@ -55,6 +55,7 @@ export class ValidateCustomerPhoneFromOrderService {
 
         return result.exists;
       },
+      { domain: "whatsappNumberCheck", establishmentId },
     );
 
     if (!exists) throw new PhoneWithoutWhatsapp();

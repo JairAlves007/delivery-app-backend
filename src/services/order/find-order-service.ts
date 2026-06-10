@@ -27,6 +27,7 @@ export class FindOrderService {
       key,
       Constants.CACHE_TTL.orders,
       async () => await this.orderRepository.findById({ id, filterParams }),
+      { domain: "orders", establishmentId: filterParams?.establishment_id },
     );
 
     if (!order) throw new OrderNotFound();

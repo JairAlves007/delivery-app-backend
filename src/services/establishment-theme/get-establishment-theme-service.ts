@@ -27,7 +27,8 @@ export class GetEstablishmentThemeService {
 					);
 
 				return mapEstablishmentTheme({ row });
-			}
+			},
+			{ domain: "establishmentTheme", establishmentId }
 		);
 	}
 }

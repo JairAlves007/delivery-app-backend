@@ -1,4 +1,5 @@
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import type { IUserRepository } from "@/interfaces/repositories/user-repository.js";
 import type { UserID, UserWithRole } from "@/types/user.js";
 
@@ -13,9 +14,11 @@ export class FindUserService {
     const cache = makeCache();
     const key = `${cache.keys.users}_${id}`;
 
-    return await cache.rememberForever(
+    return await cache.remember(
       key,
+      Constants.CACHE_TTL.users,
       async () => await this.userRepository.findById(id),
+      { domain: "users" },
     );
   }
 }

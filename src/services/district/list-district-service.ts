@@ -42,6 +42,7 @@ export class ListDistrictService {
       `${prefixKey}total_${cache.keys.districts}`,
       Constants.CACHE_TTL.districts,
       async () => await this.districtRepository.count(filterParams),
+      { domain: "districts", establishmentId: filterParams?.establishment_id },
     );
 
     if (isPaging) {
@@ -58,6 +59,10 @@ export class ListDistrictService {
               perPage,
               filterParams,
             }),
+          {
+            domain: "districts",
+            establishmentId: filterParams?.establishment_id,
+          },
         ),
       ]);
 
@@ -85,6 +90,10 @@ export class ListDistrictService {
         `${prefixKey}all_${cache.keys.districts}`,
         Constants.CACHE_TTL.districts,
         async () => await this.districtRepository.listAll(filterParams),
+        {
+          domain: "districts",
+          establishmentId: filterParams?.establishment_id,
+        },
       ),
     ]);
 

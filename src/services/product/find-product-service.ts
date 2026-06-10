@@ -52,15 +52,21 @@ export class FindProductService {
     const productAddonCategoriesKey = `${cache.keys.productAddonCategories}_${id}`;
 
     const [product, productAddonCategories] = await Promise.all([
-      cache.rememberForever(
+      cache.remember(
         productKey,
+        Constants.CACHE_TTL.products,
         async () => await this.productRepository.findById({ id, filterParams }),
+        { domain: "products", establishmentId: filterParams?.establishment_id },
       ),
       cache.remember(
         productAddonCategoriesKey,
         Constants.CACHE_TTL.addonCategories,
         async () =>
           await this.productAddonCategoryRepository.listByProductId(id),
+        {
+          domain: "productAddonCategories",
+          establishmentId: filterParams?.establishment_id,
+        },
       ),
     ]);
 

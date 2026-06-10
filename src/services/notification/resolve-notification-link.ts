@@ -61,6 +61,7 @@ export class ResolveNotificationLinkService {
           viewType,
           forAudience: MenuAudienceType.ESTABLISHMENT_OWNER,
         }),
+      { domain: "menus" },
     );
 
     if (!slug) return null;

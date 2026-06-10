@@ -38,7 +38,8 @@ export class ListSuggestedProductsCatalogService {
 					productId,
 					establishmentId,
 					limit
-				})
+				}),
+			{ domain: "products", establishmentId }
 		);
 
 		return { items: mapProducts(products) };

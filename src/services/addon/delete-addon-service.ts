@@ -26,5 +26,10 @@ export class DeleteAddonService {
       baseCacheKey: "addons",
       paramsToForget,
     });
+
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "productAddonCategories",
+      paramsToForget,
+    });
   }
 }

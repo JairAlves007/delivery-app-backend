@@ -2,6 +2,7 @@ import z from "zod";
 
 import { InvalidPage } from "@/errors/pagination/invalid-page.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
@@ -30,23 +31,30 @@ export class ListProductService {
     const prefixKey = getFilterParamsCacheKey(filterParams);
 
     const isPaging = !!page;
-    const totalPromise = cache.rememberForever(
+    const totalPromise = cache.remember(
       `${prefixKey}total_${cache.keys.products}`,
+      Constants.CACHE_TTL.products,
       async () => await this.productRepository.count(filterParams),
+      { domain: "products", establishmentId: filterParams?.establishment_id },
     );
 
     if (isPaging) {
       const key = `${prefixKey}${cache.keys.products}_page_${page}_per_page_${perPage}`;
       const [total, products] = await Promise.all([
         totalPromise,
-        cache.rememberForever(
+        cache.remember(
           key,
+          Constants.CACHE_TTL.products,
           async () =>
             await this.productRepository.paginate({
               page,
               perPage,
               filterParams,
             }),
+          {
+            domain: "products",
+            establishmentId: filterParams?.establishment_id,
+          },
         ),
       ]);
 
@@ -70,9 +78,11 @@ export class ListProductService {
 
     const [total, products] = await Promise.all([
       totalPromise,
-      cache.rememberForever(
+      cache.remember(
         `${prefixKey}all_${cache.keys.products}`,
+        Constants.CACHE_TTL.products,
         async () => await this.productRepository.listAll(filterParams),
+        { domain: "products", establishmentId: filterParams?.establishment_id },
       ),
     ]);
 

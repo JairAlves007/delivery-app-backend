@@ -2,6 +2,7 @@ import z from "zod";
 
 import { InvalidPage } from "@/errors/pagination/invalid-page.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
 import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
@@ -29,23 +30,27 @@ export class ListEstablishmentService {
     const prefixKey = getFilterParamsCacheKey(filterParams);
 
     const isPaging = !!page;
-    const totalPromise = cache.rememberForever(
+    const totalPromise = cache.remember(
       `${prefixKey}total_${cache.keys.establishments}`,
+      Constants.CACHE_TTL.establishments,
       async () => await this.establishmentRepository.count({ ...filterParams }),
+      { domain: "establishments" },
     );
 
     if (isPaging) {
       const key = `${prefixKey}${cache.keys.establishments}_page_${page}_per_page_${perPage}`;
       const [total, establishments] = await Promise.all([
         totalPromise,
-        cache.rememberForever(
+        cache.remember(
           key,
+          Constants.CACHE_TTL.establishments,
           async () =>
             await this.establishmentRepository.paginate({
               page,
               perPage,
               filterParams,
             }),
+          { domain: "establishments" },
         ),
       ]);
 
@@ -69,10 +74,12 @@ export class ListEstablishmentService {
 
     const [total, establishments] = await Promise.all([
       totalPromise,
-      cache.rememberForever(
+      cache.remember(
         `${prefixKey}all_${cache.keys.establishments}`,
+        Constants.CACHE_TTL.establishments,
         async () =>
           await this.establishmentRepository.listAll({ ...filterParams }),
+        { domain: "establishments" },
       ),
     ]);
 

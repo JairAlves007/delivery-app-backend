@@ -63,6 +63,11 @@ export class AttachProductAddonCategoryService {
       baseCacheKey: "products",
       paramsToForget,
     });
+
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "productAddonCategories",
+      paramsToForget,
+    });
   }
 
   private coerceMaxByType(

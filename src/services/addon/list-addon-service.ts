@@ -42,6 +42,7 @@ export class ListAddonService {
       `${prefixKey}total_${cache.keys.addons}`,
       Constants.CACHE_TTL.addons,
       async () => await this.addonRepository.count(filterParams),
+      { domain: "addons", establishmentId: filterParams?.establishment_id },
     );
 
     if (isPaging) {
@@ -57,6 +58,7 @@ export class ListAddonService {
               perPage,
               filterParams,
             }),
+          { domain: "addons", establishmentId: filterParams?.establishment_id },
         ),
       ]);
 
@@ -84,6 +86,7 @@ export class ListAddonService {
         `${prefixKey}all_${cache.keys.addons}`,
         Constants.CACHE_TTL.addons,
         async () => await this.addonRepository.listAll(filterParams),
+        { domain: "addons", establishmentId: filterParams?.establishment_id },
       ),
     ]);
 

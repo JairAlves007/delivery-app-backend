@@ -1,6 +1,7 @@
 import z from "zod";
 
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
 import {
@@ -48,14 +49,16 @@ export class ListProductsFromCategoryCatalogService {
       cursorSuffix,
     ].join("_");
 
-    const raw = await cache.rememberForever(
+    const raw = await cache.remember(
       key,
+      Constants.CACHE_TTL.products,
       async () =>
         await this.productRepository.cursorPaginate({
           limit,
           cursor,
           filterParams,
         }),
+      { domain: "products", establishmentId },
     );
     const hasNextPage = raw.length > limit;
     const products = hasNextPage ? raw.slice(0, limit) : raw;

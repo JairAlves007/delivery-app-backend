@@ -42,6 +42,7 @@ export class ListOrderService {
       `${prefixKey}total_${cache.keys.orders}`,
       ttl,
       async () => await this.orderRepository.count(filterParams),
+      { domain: "orders", establishmentId: filterParams?.establishment_id },
     );
 
     if (isPaging) {
@@ -57,6 +58,7 @@ export class ListOrderService {
               perPage,
               filterParams,
             }),
+          { domain: "orders", establishmentId: filterParams?.establishment_id },
         ),
       ]);
 
@@ -84,6 +86,7 @@ export class ListOrderService {
         `${prefixKey}${cache.keys.orders}`,
         ttl,
         async () => await this.orderRepository.listAll(filterParams),
+        { domain: "orders", establishmentId: filterParams?.establishment_id },
       ),
     ]);
 

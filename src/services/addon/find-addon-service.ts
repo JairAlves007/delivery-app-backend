@@ -31,6 +31,7 @@ export class FindAddonService {
       key,
       Constants.CACHE_TTL.addons,
       async () => await this.addonRepository.findById({ id, filterParams }),
+      { domain: "addons", establishmentId: filterParams?.establishment_id },
     );
 
     if (!addon) throw new AddonNotFound();

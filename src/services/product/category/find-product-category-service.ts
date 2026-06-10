@@ -2,6 +2,7 @@ import z from "zod";
 
 import { ProductCategoryNotFound } from "@/errors/product/category/not-found-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.js";
 import { productCategoryParamsSchema } from "@/schemas/product-category-schema.js";
@@ -29,10 +30,15 @@ export class FindProductCategoryService {
     const filterPrefixKey = getFilterParamsCacheKey(filterParams);
     const key = `${filterPrefixKey}${cache.keys.productCategories}_${id}`;
 
-    const productCategory = await cache.rememberForever(
+    const productCategory = await cache.remember(
       key,
+      Constants.CACHE_TTL.productCategories,
       async () =>
         await this.productCategoryRepository.findById({ id, filterParams }),
+      {
+        domain: "productCategories",
+        establishmentId: filterParams?.establishment_id,
+      },
     );
 
     if (!productCategory) throw new ProductCategoryNotFound();

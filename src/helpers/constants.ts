@@ -64,6 +64,8 @@ export default class Constants {
 	public static readonly REFRESH_TOKEN_EXPIRATION_TIME: string = "7d";
 
 	// Cache
+	public static readonly CACHE_TAG_SET_TTL_SECONDS: number = 60 * 60 * 24;
+
 	public static readonly CACHE_KEYS = {
 		products: "products",
 		productCategories: "products_categories",

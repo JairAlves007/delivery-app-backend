@@ -2,6 +2,7 @@ import z from "zod";
 
 import { InvalidPage } from "@/errors/pagination/invalid-page.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
 import { establishmentParamsSchema } from "@/schemas/generic-schema.js";
@@ -56,18 +57,22 @@ export class SearchProductsCatalogService {
     };
 
     const [total, products] = await Promise.all([
-      cache.rememberForever(
+      cache.remember(
         totalKey,
+        Constants.CACHE_TTL.products,
         async () => await this.productRepository.countSearchCatalog(repoArgs),
+        { domain: "products", establishmentId },
       ),
-      cache.rememberForever(
+      cache.remember(
         pageKey,
+        Constants.CACHE_TTL.products,
         async () =>
           await this.productRepository.searchCatalog({
             ...repoArgs,
             page: currentPage,
             perPage,
           }),
+        { domain: "products", establishmentId },
       ),
     ]);
 

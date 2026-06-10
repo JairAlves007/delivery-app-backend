@@ -33,6 +33,10 @@ export class FindAddonCategoryService {
       Constants.CACHE_TTL.addonCategories,
       async () =>
         await this.addonCategoryRepository.findById({ id, filterParams }),
+      {
+        domain: "addonCategories",
+        establishmentId: filterParams?.establishment_id,
+      },
     );
 
     if (!addonCategory) throw new AddonCategoryNotFound();

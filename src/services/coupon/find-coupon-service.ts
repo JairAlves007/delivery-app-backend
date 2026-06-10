@@ -31,6 +31,7 @@ export class FindCouponService {
       key,
       Constants.CACHE_TTL.coupons,
       async () => await this.couponRepository.findById({ id, filterParams }),
+      { domain: "coupons", establishmentId: filterParams?.establishment_id },
     );
 
     if (!coupon) throw new CouponNotFound();

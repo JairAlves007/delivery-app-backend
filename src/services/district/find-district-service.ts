@@ -31,6 +31,7 @@ export class FindDistrictService {
       key,
       Constants.CACHE_TTL.districts,
       async () => await this.districtRepository.findById({ id, filterParams }),
+      { domain: "districts", establishmentId: filterParams?.establishment_id },
     );
 
     if (!district) throw new DistrictNotFound();

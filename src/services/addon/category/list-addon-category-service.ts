@@ -34,6 +34,10 @@ export class ListAddonCategoryService {
       `${prefixKey}total_${cache.keys.addonCategories}`,
       Constants.CACHE_TTL.addonCategories,
       async () => await this.addonCategoryRepository.count(filterParams),
+      {
+        domain: "addonCategories",
+        establishmentId: filterParams?.establishment_id,
+      },
     );
 
     if (isPaging) {
@@ -49,6 +53,10 @@ export class ListAddonCategoryService {
               perPage,
               filterParams,
             }),
+          {
+            domain: "addonCategories",
+            establishmentId: filterParams?.establishment_id,
+          },
         ),
       ]);
 
@@ -76,6 +84,10 @@ export class ListAddonCategoryService {
         `${prefixKey}all_${cache.keys.addonCategories}`,
         Constants.CACHE_TTL.addonCategories,
         async () => await this.addonCategoryRepository.listAll(filterParams),
+        {
+          domain: "addonCategories",
+          establishmentId: filterParams?.establishment_id,
+        },
       ),
     ]);
 

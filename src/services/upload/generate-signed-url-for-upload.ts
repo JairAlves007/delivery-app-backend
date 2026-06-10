@@ -4,6 +4,7 @@ import { IncorrectResourceSize } from "@/errors/resource/incorrect-resource-size
 import { InvalidResource } from "@/errors/resource/invalid-resource-error.js";
 import { UnavailableResourceMimeType } from "@/errors/resource/unavailable-resource-mime-type-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import {
 	forgetCacheByForResource,
 	getInfoByForResource,
@@ -40,12 +41,14 @@ export class GenerateSignedUrlForUploadService {
 		const cache = makeCache();
 		const key = `${cache.keys.resourceRules}_${resourceIntent.type}_${resourceIntent.for}_${resourceIntent.width}_${resourceIntent.height}_${resourceIntent.mimeType}`;
 
-		const resourceRule = await cache.rememberForever(
+		const resourceRule = await cache.remember(
 			key,
+			Constants.CACHE_TTL.resourceRules,
 			async () =>
 				await this.resourceRepository.validateResourceRule({
 					resourceIntent
-				})
+				}),
+			{ domain: "resourceRules" }
 		);
 
 		if (!resourceRule) throw new InvalidResource();

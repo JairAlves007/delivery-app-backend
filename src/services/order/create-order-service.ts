@@ -321,6 +321,11 @@ export class CreateOrderService {
       paramsToForget: plan.paramsToForget,
     });
 
+    await forgetAllListingCacheKeysQueue({
+      baseCacheKey: "dashboard",
+      paramsToForget: plan.paramsToForget,
+    });
+
     const sendConfirmationService = makeSendOrderConfirmationMessageService();
     await sendConfirmationService.handle({
       establishmentId: plan.establishmentId,

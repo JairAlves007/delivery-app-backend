@@ -2,6 +2,7 @@ import z from "zod";
 
 import { EstablishmentNotFound } from "@/errors/establishment/not-found-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import type { IEstablishmentRepository } from "@/interfaces/repositories/establishment-repository.js";
 import { establishmentParamsSchema } from "@/schemas/establishment-schema.js";
@@ -28,9 +29,11 @@ export class FindEstablishmentByIdService {
     });
     const key = `${prefixKey}${cache.keys.establishments}`;
 
-    const establishment = await cache.rememberForever(
+    const establishment = await cache.remember(
       key,
+      Constants.CACHE_TTL.establishments,
       async () => await this.establishmentRepository.findById({ id }),
+      { domain: "establishments", establishmentId: id },
     );
 
     if (!establishment) throw new EstablishmentNotFound();

@@ -32,6 +32,7 @@ export class FindBannerService {
       key,
       Constants.CACHE_TTL.banners,
       async () => await this.bannerRepository.findById({ id, filterParams }),
+      { domain: "banners", establishmentId: filterParams?.establishment_id },
     );
 
     if (!banner) throw new BannerNotFound();

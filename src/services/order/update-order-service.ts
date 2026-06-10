@@ -59,6 +59,11 @@ export class UpdateOrderService {
 			paramsToForget
 		});
 
+		await forgetAllListingCacheKeysQueue({
+			baseCacheKey: "dashboard",
+			paramsToForget
+		});
+
 		await this.notifyCustomer({ id, status, establishmentId });
 	}
 

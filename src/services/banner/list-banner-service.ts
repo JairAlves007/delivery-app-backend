@@ -34,7 +34,8 @@ export class ListBannerService {
 		const totalPromise = cache.remember(
 			`${prefixKey}total_${cache.keys.banners}`,
 			Constants.CACHE_TTL.banners,
-			async () => await this.bannerRepository.count(filterParams)
+			async () => await this.bannerRepository.count(filterParams),
+			{ domain: "banners", establishmentId: filterParams?.establishment_id }
 		);
 
 		if (isPaging) {
@@ -50,7 +51,8 @@ export class ListBannerService {
 							page,
 							perPage,
 							filterParams
-						})
+						}),
+					{ domain: "banners", establishmentId: filterParams?.establishment_id }
 				)
 			]);
 
@@ -77,7 +79,8 @@ export class ListBannerService {
 			cache.remember(
 				`${prefixKey}all_${cache.keys.banners}`,
 				Constants.CACHE_TTL.banners,
-				async () => await this.bannerRepository.listAll(filterParams)
+				async () => await this.bannerRepository.listAll(filterParams),
+				{ domain: "banners", establishmentId: filterParams?.establishment_id }
 			)
 		]);
 

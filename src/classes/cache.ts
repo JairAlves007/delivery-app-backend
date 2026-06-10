@@ -1,9 +1,12 @@
 import Constants from "@/helpers/constants.js";
-import { getFilterParamsCacheKey } from "@/helpers/crud.js";
 import { app } from "@/http/app.js";
 import type { ICacheBase } from "@/interfaces/cache/cache-base.js";
 import { redis } from "@/lib/redis.js";
-import type { ForgetAllListingCacheKeysParams } from "@/types/cache.js";
+import type {
+	CacheKeys,
+	CacheTagScope,
+	ForgetAllListingCacheKeysParams
+} from "@/types/cache.js";
 
 export class Cache implements ICacheBase {
 	private static instance: Cache | null = null;
@@ -13,6 +16,22 @@ export class Cache implements ICacheBase {
 	static getInstance() {
 		if (!this.instance) this.instance = new Cache();
 		return this.instance;
+	}
+
+	private tagSetKey(domain: CacheKeys, establishmentId?: string | null) {
+		const base = `cachetag:${this.keys[domain]}`;
+		return establishmentId ? `${base}:est_${establishmentId}` : base;
+	}
+
+	private async registerKey(key: string, scope: CacheTagScope) {
+		try {
+			const setKey = this.tagSetKey(scope.domain, scope.establishmentId);
+
+			await redis.sadd(setKey, key);
+			await redis.expire(setKey, Constants.CACHE_TAG_SET_TTL_SECONDS);
+		} catch (error) {
+			app.log.error({ error }, `Error registering ${key} in cache tag set`);
+		}
 	}
 
 	async set(key: string, value: unknown, duration?: number) {
@@ -85,21 +104,24 @@ export class Cache implements ICacheBase {
 		}
 	}
 
-	async rememberForever<T>(
-		key: string,
-		fetchFunction: () => Promise<T>
-	): Promise<T> {
+	async invalidateDomain({ domain, establishmentId }: CacheTagScope) {
 		try {
-			const cachedValue = await this.get<T>(key);
+			const setKeys = [this.tagSetKey(domain)];
 
-			if (cachedValue) return cachedValue;
+			if (establishmentId) setKeys.push(this.tagSetKey(domain, establishmentId));
 
-			const value = await fetchFunction();
-			await this.set(key, value);
+			for (const setKey of setKeys) {
+				const keys = await redis.smembers(setKey);
 
-			return value;
+				if (keys.length > 0) await redis.del(...keys);
+
+				await redis.del(setKey);
+			}
 		} catch (error) {
-			app.log.error({ error }, `Error setting ${key} in cache`);
+			app.log.error(
+				{ error },
+				`Error invalidating cache domain ${domain}${establishmentId ? ` (establishment ${establishmentId})` : ""}`
+			);
 			throw error;
 		}
 	}
@@ -107,15 +129,18 @@ export class Cache implements ICacheBase {
 	async remember<T>(
 		key: string,
 		duration: number,
-		fetchFunction: () => Promise<T>
+		fetchFunction: () => Promise<T>,
+		scope?: CacheTagScope
 	): Promise<T> {
 		try {
 			const cachedValue = await this.get<T>(key);
 
-			if (cachedValue) return cachedValue;
+			if (cachedValue !== null) return cachedValue;
 
 			const value = await fetchFunction();
 			await this.set(key, value, duration);
+
+			if (scope) await this.registerKey(key, scope);
 
 			return value;
 		} catch (error) {
@@ -131,18 +156,15 @@ export class Cache implements ICacheBase {
 		baseCacheKey,
 		paramsToForget
 	}: ForgetAllListingCacheKeysParams) {
-		const prefixKey = getFilterParamsCacheKey(paramsToForget);
-		const forgetCacheKeysPromises = [];
-		const listingCacheKeys = [
-			`${prefixKey}${this.keys[baseCacheKey]}`,
-			`${prefixKey}total_${this.keys[baseCacheKey]}`,
-			`${prefixKey}all_${this.keys[baseCacheKey]}`
-		];
+		const establishmentId = paramsToForget?.establishment_id ?? null;
 
-		for (const key of listingCacheKeys) {
-			forgetCacheKeysPromises.push(this.forgetKeysContaining(key));
+		await this.invalidateDomain({
+			domain: baseCacheKey,
+			establishmentId
+		});
+
+		if (!establishmentId) {
+			await this.forgetKeysContaining(this.keys[baseCacheKey]);
 		}
-
-		await Promise.all(forgetCacheKeysPromises);
 	}
 }
