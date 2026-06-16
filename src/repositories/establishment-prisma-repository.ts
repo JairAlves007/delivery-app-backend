@@ -20,6 +20,27 @@ import type {
 	UpdateContentParams
 } from "@/types/crud.js";
 import type { EstablishmentFromRepository } from "@/types/establishment.js";
+import type {
+	HubCuisine,
+	HubEstablishmentFromRepository,
+	HubListFilter
+} from "@/types/hub.js";
+
+const HUB_INCLUDE = {
+	address: {
+		select: {
+			address: true
+		}
+	},
+	resources: {
+		select: {
+			resource: true
+		}
+	},
+	tags: true,
+	openingHours: true,
+	closures: true
+} satisfies Prisma.EstablishmentInclude;
 
 export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 	async listAll(
@@ -295,5 +316,95 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 				})
 			)
 		]);
+	}
+
+	private buildHubWhere(filter: HubListFilter): Prisma.EstablishmentWhereInput {
+		const { where } =
+			buildFilterQueryOptions<Prisma.EstablishmentOrderByWithRelationInput>({
+				search: filter.search ?? undefined,
+				sortField: undefined,
+				sortDirection: undefined,
+				searchableFields: ["name"],
+				defaultSortField: "name"
+			});
+
+		return {
+			deleted_at: null,
+			is_listed_in_hub: true,
+			next_billing_date: { gt: getBillingGraceCutoff() },
+			...(filter.cuisine
+				? { tags: { some: { type: filter.cuisine, deleted_at: null } } }
+				: {}),
+			...where
+		};
+	}
+
+	async paginateListedForHub({
+		page,
+		perPage,
+		filter
+	}: {
+		page: number;
+		perPage: number;
+		filter: HubListFilter;
+	}): Promise<HubEstablishmentFromRepository[]> {
+		return await prisma.establishment.findMany({
+			skip: (page - 1) * perPage,
+			take: perPage,
+			where: this.buildHubWhere(filter),
+			include: HUB_INCLUDE,
+			orderBy: { name: "asc" }
+		});
+	}
+
+	async cursorPaginateListedForHub({
+		limit,
+		cursor,
+		filter
+	}: {
+		limit: number;
+		cursor?: string | null;
+		filter: HubListFilter;
+	}): Promise<HubEstablishmentFromRepository[]> {
+		return await prisma.establishment.findMany({
+			where: this.buildHubWhere(filter),
+			include: HUB_INCLUDE,
+			orderBy: { id: "asc" },
+			take: limit + 1,
+			skip: cursor ? 1 : 0,
+			cursor: cursor ? { id: cursor } : undefined
+		});
+	}
+
+	async countListedForHub(filter: HubListFilter): Promise<number> {
+		return await prisma.establishment.count({
+			where: this.buildHubWhere(filter)
+		});
+	}
+
+	async listAllListedForHub(
+		filter: HubListFilter
+	): Promise<HubEstablishmentFromRepository[]> {
+		return await prisma.establishment.findMany({
+			where: this.buildHubWhere(filter),
+			include: HUB_INCLUDE,
+			orderBy: { name: "asc" }
+		});
+	}
+
+	async listDistinctHubCuisines(): Promise<HubCuisine[]> {
+		return await prisma.tag.findMany({
+			where: {
+				deleted_at: null,
+				establishment: {
+					deleted_at: null,
+					is_listed_in_hub: true,
+					next_billing_date: { gt: getBillingGraceCutoff() }
+				}
+			},
+			distinct: ["type"],
+			select: { type: true, label: true },
+			orderBy: { type: "asc" }
+		});
 	}
 }

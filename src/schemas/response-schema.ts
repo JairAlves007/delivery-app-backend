@@ -585,6 +585,41 @@ export const establishmentContextResponseSchema = z.object({
 });
 
 // ──────────────────────────────────────────────
+// Hub
+// ──────────────────────────────────────────────
+
+export const hubEstablishmentAddressSchema = z.object({
+	city: z.string(),
+	state: z.string(),
+	neighborhood: z.string()
+});
+
+export const hubEstablishmentCardSchema = z.object({
+	id: z.string(),
+	slug: z.string(),
+	name: z.string(),
+	description: z.string(),
+	coverImage: z.string().nullable(),
+	isOpen: z.boolean(),
+	only_delivery: z.boolean(),
+	accepts_credit_card: z.boolean(),
+	tags: z.array(tagResponseSchema),
+	address: hubEstablishmentAddressSchema.nullable()
+});
+
+export const hubEstablishmentListResponseSchema = z.union([
+	paginatedResponseSchema(hubEstablishmentCardSchema),
+	cursorPaginatedResponseSchema(hubEstablishmentCardSchema)
+]);
+
+export const hubCuisineSchema = z.object({
+	type: z.enum(TagType),
+	label: z.string()
+});
+
+export const hubFiltersResponseSchema = listResponseSchema(hubCuisineSchema);
+
+// ──────────────────────────────────────────────
 // Main (Catalog)
 // ──────────────────────────────────────────────
 
@@ -706,6 +741,13 @@ const registryItems = [
 		schema: establishmentContextResponseSchema,
 		id: "EstablishmentContextResponse"
 	},
+	{ schema: hubEstablishmentCardSchema, id: "HubEstablishmentCard" },
+	{
+		schema: hubEstablishmentListResponseSchema,
+		id: "HubEstablishmentListResponse"
+	},
+	{ schema: hubCuisineSchema, id: "HubCuisine" },
+	{ schema: hubFiltersResponseSchema, id: "HubFiltersResponse" },
 	{
 		schema: establishmentThemeResponseSchema,
 		id: "EstablishmentThemeResponse"

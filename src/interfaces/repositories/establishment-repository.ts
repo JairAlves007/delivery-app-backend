@@ -5,6 +5,11 @@ import type {
   WeekDay,
 } from "@/generated/prisma/client.js";
 import type { EstablishmentFromRepository } from "@/types/establishment.js";
+import type {
+  HubCuisine,
+  HubEstablishmentFromRepository,
+  HubListFilter,
+} from "@/types/hub.js";
 
 import type { ICRUDBase } from "../crud-base.js";
 
@@ -50,4 +55,19 @@ export interface IEstablishmentRepository extends ICRUDBase<
     establishmentId: string;
     items: SocialLinkUpsertItem[];
   }): Promise<void>;
+  paginateListedForHub(params: {
+    page: number;
+    perPage: number;
+    filter: HubListFilter;
+  }): Promise<HubEstablishmentFromRepository[]>;
+  cursorPaginateListedForHub(params: {
+    limit: number;
+    cursor?: string | null;
+    filter: HubListFilter;
+  }): Promise<HubEstablishmentFromRepository[]>;
+  countListedForHub(filter: HubListFilter): Promise<number>;
+  listAllListedForHub(
+    filter: HubListFilter,
+  ): Promise<HubEstablishmentFromRepository[]>;
+  listDistinctHubCuisines(): Promise<HubCuisine[]>;
 }

@@ -93,15 +93,18 @@ z.globalRegistry.add(createEstablishmentBodySchema, {
 	id: "CreateEstablishmentBody"
 });
 
-export const updateEstablishmentBodySchema =
-	createEstablishmentBodySchema.partial();
+export const updateEstablishmentBodySchema = createEstablishmentBodySchema
+	.partial()
+	.extend({ isListedInHub: z.boolean().optional() });
 
 z.globalRegistry.add(updateEstablishmentBodySchema, {
 	id: "UpdateEstablishmentBody"
 });
 
-export const updateMyEstablishmentBodySchema =
-	createEstablishmentBodySchema.omit({ nextBillingDate: true }).partial();
+export const updateMyEstablishmentBodySchema = createEstablishmentBodySchema
+	.omit({ nextBillingDate: true })
+	.partial()
+	.extend({ isListedInHub: z.boolean().optional() });
 
 z.globalRegistry.add(updateMyEstablishmentBodySchema, {
 	id: "UpdateMyEstablishmentBody"
