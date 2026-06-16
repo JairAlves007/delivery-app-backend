@@ -7,6 +7,7 @@ export default class Constants {
 
 	// Strings
 	public static readonly TOKEN_TYPE: string = "Bearer";
+	public static readonly PUBLIC_API_KEY_HEADER: string = "x-api-key";
 
 	// Numbers
 	public static readonly PRICE_MULTIPLIER: number = 100;

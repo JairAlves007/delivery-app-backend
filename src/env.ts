@@ -18,6 +18,9 @@ const envSchema = z.object({
   DATABASE_PASSWORD: z.string().min(1, "Database password is required"),
   DATABASE_NAME: z.string().min(1, "Database name is required"),
   JWT_SECRET: z.string().min(32, "JWT secret must be at least 32 characters"),
+  PUBLIC_API_KEY: z
+    .string()
+    .min(16, "Public API key must be at least 16 characters"),
   CLOUDFLARE_ENDPOINT: z.url("Cloudflare endpoint is required"),
   CLOUDFLARE_ACCESS_KEY_ID: z
     .string()
