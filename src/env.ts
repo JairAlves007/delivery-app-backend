@@ -3,42 +3,41 @@ import "dotenv/config";
 import z from "zod";
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(["development", "production"]).default("development"),
-  PORT: z.coerce.number().default(3333),
-  BASE_URL: z.url("Base url is required").default("http://localhost:3333"),
-  ALLOWED_ORIGINS: z
-    .string()
-    .default("https://app.delivery.com.br,https://admin.delivery.com.br"),
-  PUBLIC_BUCKET_URL: z
-    .url("Public bucket url is required")
-    .min(1, "Public bucket url is required"),
-  APP_URL: z.url("App url is required").min(1, "App url is required"),
-  DATABASE_URL: z.url(),
-  DATABASE_USER: z.string().min(1, "Database user is required"),
-  DATABASE_PASSWORD: z.string().min(1, "Database password is required"),
-  DATABASE_NAME: z.string().min(1, "Database name is required"),
-  JWT_SECRET: z.string().min(32, "JWT secret must be at least 32 characters"),
-  PUBLIC_API_KEY: z
-    .string()
-    .min(16, "Public API key must be at least 16 characters"),
-  CLOUDFLARE_ENDPOINT: z.url("Cloudflare endpoint is required"),
-  CLOUDFLARE_ACCESS_KEY_ID: z
-    .string()
-    .min(1, "Cloudflare access key id is required"),
-  CLOUDFLARE_SECRET_ACCESS_KEY: z
-    .string()
-    .min(1, "Cloudflare secret access key is required"),
-  CLOUDFLARE_BUCKET_NAME: z
-    .string()
-    .min(1, "Cloudflare bucket name is required"),
-  REDIS_HOST: z.string().default("127.0.0.1"),
-  REDIS_PORT: z.coerce.number().default(6379),
-  REDIS_PASSWORD: z.string().optional(),
-  EVOLUTION_API_URL: z.url("Evolution API url é obrigatória"),
-  EVOLUTION_API_KEY: z.string().min(1, "Evolution API key é obrigatória"),
-  EVOLUTION_WEBHOOK_TOKEN: z
-    .string()
-    .min(16, "Evolution webhook token deve ter ao menos 16 caracteres"),
+	NODE_ENV: z.enum(["development", "production"]).default("development"),
+	PORT: z.coerce.number().default(3333),
+	BASE_URL: z.url("Base url is required").default("http://localhost:3333"),
+	ALLOWED_ORIGINS: z
+		.string()
+		.default("https://app.delivery.com.br,https://admin.delivery.com.br"),
+	PUBLIC_BUCKET_URL: z
+		.url("Public bucket url is required")
+		.min(1, "Public bucket url is required"),
+	DATABASE_URL: z.url(),
+	DATABASE_USER: z.string().min(1, "Database user is required"),
+	DATABASE_PASSWORD: z.string().min(1, "Database password is required"),
+	DATABASE_NAME: z.string().min(1, "Database name is required"),
+	JWT_SECRET: z.string().min(32, "JWT secret must be at least 32 characters"),
+	PUBLIC_API_KEY: z
+		.string()
+		.min(16, "Public API key must be at least 16 characters"),
+	CLOUDFLARE_ENDPOINT: z.url("Cloudflare endpoint is required"),
+	CLOUDFLARE_ACCESS_KEY_ID: z
+		.string()
+		.min(1, "Cloudflare access key id is required"),
+	CLOUDFLARE_SECRET_ACCESS_KEY: z
+		.string()
+		.min(1, "Cloudflare secret access key is required"),
+	CLOUDFLARE_BUCKET_NAME: z
+		.string()
+		.min(1, "Cloudflare bucket name is required"),
+	REDIS_HOST: z.string().default("127.0.0.1"),
+	REDIS_PORT: z.coerce.number().default(6379),
+	REDIS_PASSWORD: z.string().optional(),
+	EVOLUTION_API_URL: z.url("Evolution API url é obrigatória"),
+	EVOLUTION_API_KEY: z.string().min(1, "Evolution API key é obrigatória"),
+	EVOLUTION_WEBHOOK_TOKEN: z
+		.string()
+		.min(16, "Evolution webhook token deve ter ao menos 16 caracteres")
 });
 
 export const env = envSchema.parse(process.env);

@@ -153,3 +153,12 @@ z.globalRegistry.add(updateProductBodySchema, { id: "UpdateProductBody" });
 export const productParamsSchema = z.object({
   id: z.ulid().min(1, "O id do produto deve ser preenchido"),
 });
+
+export const batchProductsBodySchema = z.object({
+  ids: z
+    .array(z.ulid("O id do produto deve ser preenchido corretamente"))
+    .min(1, "Envie ao menos um id")
+    .max(100, "Máximo de 100 ids por requisição"),
+});
+
+z.globalRegistry.add(batchProductsBodySchema, { id: "BatchProductsBody" });

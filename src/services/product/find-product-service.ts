@@ -4,37 +4,18 @@ import { ProductNotFound } from "@/errors/product/not-found-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import Constants from "@/helpers/constants.js";
 import { getFilterParamsCacheKey } from "@/helpers/crud.js";
-import { transformPriceFromDatabase } from "@/helpers/price.js";
 import type { IProductAddonCategoryRepository } from "@/interfaces/repositories/product-addon-category-repository.js";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
 import { productParamsSchema } from "@/schemas/product-schema.js";
-import { mapProduct } from "@/services/product/map-product.js";
+import {
+  mapProduct,
+  mapProductAddonCategories,
+} from "@/services/product/map-product.js";
 import type { FilterField } from "@/types/crud.js";
 import type { ProductDetail } from "@/types/product.js";
-import type { ProductAddonCategoryFromRepository } from "@/types/product-addon-category.js";
 
 type FindProductServiceRequest = z.infer<typeof productParamsSchema> &
   FilterField;
-
-const mapProductAddonCategories = (
-  items: ProductAddonCategoryFromRepository[],
-): ProductDetail["addonCategories"] =>
-  items.map((item) => ({
-    id: item.addonCategory.id,
-    name: item.addonCategory.name,
-    type: item.addonCategory.type,
-    pricing_strategy: item.addonCategory.pricing_strategy,
-    parts_count: item.addonCategory.parts_count,
-    min_selection: item.min_selection,
-    max_selection: item.max_selection,
-    is_required: item.is_required,
-    display_order: item.display_order,
-    addons: item.addonCategory.addons.map((addon) => ({
-      id: addon.id,
-      name: addon.name,
-      price: transformPriceFromDatabase(addon.price),
-    })),
-  }));
 
 export class FindProductService {
   constructor(
