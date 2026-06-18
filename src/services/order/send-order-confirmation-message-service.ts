@@ -207,6 +207,7 @@ export class SendOrderConfirmationMessageService {
 		address,
 		coupon,
 		district,
+		scheduledAt,
 		orderItemsToProcess
 	}: SendOrderConfirmationMessageParams): string {
 		const subSectionsTemplates = Constants.ORDER_SUB_SECTIONS_MESSAGE_TEMPLATES;
@@ -237,6 +238,12 @@ export class SendOrderConfirmationMessageService {
 			.replaceAll("{subtotal}", formatCents(breakdown.subtotalGrossCents))
 			.replaceAll("{total_price}", formatCents(breakdown.totalToPayCents))
 			.replaceAll("{order_created_at}", formatDateToHumanReadable(new Date()))
+			.replaceAll(
+				"{scheduled_at}",
+				scheduledAt
+					? `> 📅 Agendado para: ${formatDateToHumanReadable(new Date(scheduledAt))}\n\n`
+					: ""
+			)
 			.replaceAll(
 				"{address}",
 				!!address && !!district

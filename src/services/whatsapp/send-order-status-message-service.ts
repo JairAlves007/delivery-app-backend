@@ -8,6 +8,7 @@ import {
 import { getStatusLabel } from "@/helpers/order.js";
 import { normalizeToBrazilianJid } from "@/helpers/phone.js";
 import {
+  DEFAULT_SCHEDULED_STATUS_TEMPLATES,
   DEFAULT_STATUS_TEMPLATES,
   renderTemplate,
 } from "@/helpers/whatsapp-templates.js";
@@ -73,12 +74,27 @@ export class SendOrderStatusMessageService {
   private async resolveText(job: SendWhatsappMessageJob): Promise<string> {
     if (job.body) return job.body;
 
-    const template = await this.templateRepository.findByEstablishmentAndStatus({
+    const isScheduled = !!job.context?.scheduledAt;
+
+    let template = await this.templateRepository.findByEstablishmentAndStatus({
       establishmentId: job.establishmentId,
       status: job.orderStatus,
+      isScheduled,
     });
 
-    const body = template?.body ?? DEFAULT_STATUS_TEMPLATES[job.orderStatus];
+    if (!template && isScheduled) {
+      template = await this.templateRepository.findByEstablishmentAndStatus({
+        establishmentId: job.establishmentId,
+        status: job.orderStatus,
+        isScheduled: false,
+      });
+    }
+
+    const defaults = isScheduled
+      ? DEFAULT_SCHEDULED_STATUS_TEMPLATES
+      : DEFAULT_STATUS_TEMPLATES;
+
+    const body = template?.body ?? defaults[job.orderStatus];
 
     const establishment = await this.establishmentRepository.findById({
       id: job.establishmentId,
@@ -91,6 +107,7 @@ export class SendOrderStatusMessageService {
       establishmentName: establishment?.name ?? "",
       orderTotal: job.context?.orderTotal ?? "",
       orderCreatedAt: job.context?.orderCreatedAt ?? "",
+      scheduledAt: job.context?.scheduledAt ?? "",
     });
   }
 

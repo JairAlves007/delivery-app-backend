@@ -15,7 +15,10 @@ import {
   apiSuccessResponseSchema,
   apiValidationErrorResponseSchema,
 } from "@/schemas/api-schema.js";
-import { orderStatusTemplateParamsSchema } from "@/schemas/whatsapp-schema.js";
+import {
+  orderStatusTemplateParamsSchema,
+  orderStatusTemplateQuerySchema,
+} from "@/schemas/whatsapp-schema.js";
 
 export const deleteOrderStatusTemplateRoute = async (app: FastifyInstance) => {
   app.withTypeProvider<ZodTypeProvider>().delete(
@@ -26,6 +29,7 @@ export const deleteOrderStatusTemplateRoute = async (app: FastifyInstance) => {
         tags: adminTags("Whatsapp"),
         summary: "Remover o template de um status (volta ao padrão)",
         params: orderStatusTemplateParamsSchema,
+        querystring: orderStatusTemplateQuerySchema,
         response: {
           200: apiSuccessResponseSchema(z.object({})),
           401: apiDefaultErrorResponseSchema,
@@ -41,6 +45,7 @@ export const deleteOrderStatusTemplateRoute = async (app: FastifyInstance) => {
     },
     async (request, reply) => {
       const { status } = request.params;
+      const { scheduled } = request.query;
       const establishmentId = getUserEstablishmentId(request.user);
 
       const deleteOrderStatusTemplateService =
@@ -49,6 +54,7 @@ export const deleteOrderStatusTemplateRoute = async (app: FastifyInstance) => {
       await deleteOrderStatusTemplateService.handle({
         establishmentId,
         status,
+        isScheduled: scheduled,
       });
 
       return reply

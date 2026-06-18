@@ -6,7 +6,11 @@ import {
 	PaymentMethodType
 } from "@/generated/prisma/client.js";
 
-import { addressLocationSchema, phoneSchema } from "./generic-schema.js";
+import {
+	addressLocationSchema,
+	listQueryParamsSchema,
+	phoneSchema
+} from "./generic-schema.js";
 
 export const createOrderBodySchema = z
 	.object({
@@ -90,7 +94,8 @@ export const createOrderBodySchema = z
 						.nullable()
 				})
 			)
-			.min(1, "O pedido deve ter ao menos um item")
+			.min(1, "O pedido deve ter ao menos um item"),
+		scheduledAt: z.iso.datetime("Data de agendamento inválida").nullish()
 	})
 	.superRefine((data, ctx) => {
 		if (
@@ -147,4 +152,13 @@ z.globalRegistry.add(updateOrderStatusBodySchema, {
 
 export const orderParamsSchema = z.object({
 	id: z.ulid().min(1, "O id do pedido deve ser preenchido")
+});
+
+export const listOrdersQueryParamsSchema = listQueryParamsSchema.extend({
+	dateStart: z.iso.date("Data inicial inválida").optional(),
+	dateEnd: z.iso.date("Data final inválida").optional(),
+	includeScheduled: z
+		.enum(["true", "false"])
+		.optional()
+		.transform(value => value === "true")
 });

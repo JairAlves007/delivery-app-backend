@@ -28,11 +28,12 @@ export class CreateNotificationService {
     type,
     title,
     description,
+    scheduledAt,
     metadata,
   }: CreateNotificationJob): Promise<void> {
     const { expiresInDays } = Constants.NOTIFICATION_DEFAULTS[type];
 
-    const expiresAt = new Date();
+    const expiresAt = scheduledAt ? new Date(scheduledAt) : new Date();
     expiresAt.setDate(expiresAt.getDate() + expiresInDays);
 
     const link = await this.resolveNotificationLinkService.handle({

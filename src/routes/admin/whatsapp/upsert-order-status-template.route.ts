@@ -17,6 +17,7 @@ import {
 } from "@/schemas/api-schema.js";
 import {
   orderStatusTemplateParamsSchema,
+  orderStatusTemplateQuerySchema,
   upsertOrderStatusTemplateBodySchema,
 } from "@/schemas/whatsapp-schema.js";
 
@@ -29,6 +30,7 @@ export const upsertOrderStatusTemplateRoute = async (app: FastifyInstance) => {
         tags: adminTags("Whatsapp"),
         summary: "Criar ou atualizar o template de um status do pedido",
         params: orderStatusTemplateParamsSchema,
+        querystring: orderStatusTemplateQuerySchema,
         body: upsertOrderStatusTemplateBodySchema,
         response: {
           200: apiSuccessResponseSchema(z.object({})),
@@ -45,6 +47,7 @@ export const upsertOrderStatusTemplateRoute = async (app: FastifyInstance) => {
     },
     async (request, reply) => {
       const { status } = request.params;
+      const { scheduled } = request.query;
       const { body, isActive } = request.body;
       const establishmentId = getUserEstablishmentId(request.user);
 
@@ -54,6 +57,7 @@ export const upsertOrderStatusTemplateRoute = async (app: FastifyInstance) => {
       await upsertOrderStatusTemplateService.handle({
         establishmentId,
         status,
+        isScheduled: scheduled,
         body,
         isActive,
       });

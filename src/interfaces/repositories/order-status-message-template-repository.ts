@@ -6,6 +6,7 @@ import type {
 export type UpsertOrderStatusMessageTemplateParams = {
   establishmentId: string;
   status: OrderStatusType;
+  isScheduled: boolean;
   body: string;
   isActive?: boolean;
 };
@@ -14,6 +15,7 @@ export interface IOrderStatusMessageTemplateRepository {
   findByEstablishmentAndStatus(params: {
     establishmentId: string;
     status: OrderStatusType;
+    isScheduled: boolean;
   }): Promise<OrderStatusMessageTemplate | null>;
   listByEstablishment(
     establishmentId: string,
@@ -24,5 +26,6 @@ export interface IOrderStatusMessageTemplateRepository {
   softDelete(params: {
     establishmentId: string;
     status: OrderStatusType;
+    isScheduled: boolean;
   }): Promise<void>;
 }

@@ -42,8 +42,16 @@ export const orderStatusTemplateParamsSchema = z.object({
   status: z.enum(OrderStatusType, "O status do pedido deve ser preenchido"),
 });
 
+export const orderStatusTemplateQuerySchema = z.object({
+  scheduled: z
+    .enum(["true", "false"])
+    .optional()
+    .transform((value) => value === "true"),
+});
+
 export const orderStatusTemplateResponseSchema = z.object({
   status: z.enum(OrderStatusType),
+  isScheduled: z.boolean(),
   body: z.string(),
   isActive: z.boolean(),
   isDefault: z.boolean(),

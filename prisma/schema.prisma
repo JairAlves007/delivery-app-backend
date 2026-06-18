@@ -762,6 +762,7 @@ model Order {
   establishment_id     String
   coupon_id            String?
   idempotency_key      String?               @unique @map("idempotency_key")
+  scheduled_at         DateTime?             @db.Timestamptz
   created_at           DateTime              @default(now()) @db.Timestamptz
   updated_at           DateTime              @updatedAt @db.Timestamptz
   deleted_at           DateTime?             @db.Timestamptz
@@ -776,6 +777,7 @@ model Order {
   @@index([establishment_id], name: "idx_orders_establishment_id")
   @@index([coupon_id], name: "idx_orders_coupon_id")
   @@index([created_at], name: "idx_orders_created_at")
+  @@index([scheduled_at], name: "idx_orders_scheduled_at")
   @@map("orders")
 }
 
@@ -872,6 +874,7 @@ model OrderStatusMessageTemplate {
   id               String          @id @default(ulid())
   establishment_id String
   status           OrderStatusType
+  is_scheduled     Boolean         @default(false)
   body             String          @db.VarChar(4000)
   is_active        Boolean         @default(true)
   created_at       DateTime        @default(now()) @db.Timestamptz
@@ -879,7 +882,7 @@ model OrderStatusMessageTemplate {
   deleted_at       DateTime?       @db.Timestamptz
   establishment    Establishment   @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@unique([establishment_id, status])
+  @@unique([establishment_id, status, is_scheduled])
   @@index([establishment_id], name: "idx_order_status_templates_establishment_id")
   @@map("order_status_message_templates")
 }

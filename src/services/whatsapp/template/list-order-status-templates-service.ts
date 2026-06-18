@@ -1,5 +1,8 @@
 import { OrderStatusType } from "@/generated/prisma/client.js";
-import { DEFAULT_STATUS_TEMPLATES } from "@/helpers/whatsapp-templates.js";
+import {
+  DEFAULT_SCHEDULED_STATUS_TEMPLATES,
+  DEFAULT_STATUS_TEMPLATES,
+} from "@/helpers/whatsapp-templates.js";
 import type { IOrderStatusMessageTemplateRepository } from "@/interfaces/repositories/order-status-message-template-repository.js";
 import type { EstablishmentID } from "@/types/establishment.js";
 
@@ -9,6 +12,7 @@ type ListOrderStatusTemplatesRequest = {
 
 type OrderStatusTemplateItem = {
   status: OrderStatusType;
+  isScheduled: boolean;
   body: string;
   isActive: boolean;
   isDefault: boolean;
@@ -31,23 +35,33 @@ export class ListOrderStatusTemplatesService {
     const templates =
       await this.templateRepository.listByEstablishment(establishmentId);
 
-    const byStatus = new Map(
-      templates.map((template) => [template.status, template]),
+    const byKey = new Map(
+      templates.map((template) => [
+        `${template.status}:${template.is_scheduled}`,
+        template,
+      ]),
     );
 
     const allStatuses = Object.values(OrderStatusType);
+    const variants = [false, true];
 
     return {
-      templates: allStatuses.map((status) => {
-        const custom = byStatus.get(status);
+      templates: allStatuses.flatMap((status) =>
+        variants.map((isScheduled) => {
+          const custom = byKey.get(`${status}:${isScheduled}`);
+          const defaults = isScheduled
+            ? DEFAULT_SCHEDULED_STATUS_TEMPLATES
+            : DEFAULT_STATUS_TEMPLATES;
 
-        return {
-          status,
-          body: custom?.body ?? DEFAULT_STATUS_TEMPLATES[status],
-          isActive: custom?.is_active ?? true,
-          isDefault: !custom,
-        };
-      }),
+          return {
+            status,
+            isScheduled,
+            body: custom?.body ?? defaults[status],
+            isActive: custom?.is_active ?? true,
+            isDefault: !custom,
+          };
+        }),
+      ),
     };
   }
 }

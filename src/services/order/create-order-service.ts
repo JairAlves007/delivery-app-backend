@@ -4,6 +4,7 @@ import { makeValidateAddonsFromOrderService } from "@/factories/services/order/v
 import { makeValidateDeliveryFromOrderService } from "@/factories/services/order/validations/make-validate-delivery-from-order-service.js";
 import { makeValidateEstablishmentFromOrderService } from "@/factories/services/order/validations/make-validate-establishment-from-order-service.js";
 import { makeValidateProductFromOrderService } from "@/factories/services/order/validations/make-validate-product-from-order-service.js";
+import { makeValidateScheduledAtFromOrderService } from "@/factories/services/order/validations/make-validate-scheduled-at-from-order-service.js";
 import {
   type Coupon,
   DiscountType,
@@ -104,6 +105,7 @@ export class CreateOrderService {
     shippingCost,
     subtotal,
     idempotencyKey,
+    scheduledAt,
     orderItemsToProcess,
   }: BuildOrderItemsParams): Prisma.OrderCreateInput {
     const couponData = this.getOrderCouponInputData(coupon);
@@ -122,6 +124,7 @@ export class CreateOrderService {
       comment,
       subtotal,
       idempotency_key: idempotencyKey,
+      scheduled_at: scheduledAt ? new Date(scheduledAt) : null,
       establishment: {
         connect: {
           id: establishmentId,
@@ -171,6 +174,7 @@ export class CreateOrderService {
       customerPhone,
       address: orderAddressInput,
       comment,
+      scheduledAt,
       items,
     } = order;
 
@@ -180,6 +184,8 @@ export class CreateOrderService {
     const validateDeliveryService = makeValidateDeliveryFromOrderService();
     const validateProductService = makeValidateProductFromOrderService();
     const validateAddonsService = makeValidateAddonsFromOrderService();
+    const validateScheduledAtService =
+      makeValidateScheduledAtFromOrderService();
     const calculateCouponDiscountService =
       makeCalculateCouponDiscountFromOrderService();
 
@@ -199,6 +205,10 @@ export class CreateOrderService {
         couponId,
         districtId,
         address: orderAddressInput,
+      }),
+      validateScheduledAtService.handle({
+        establishmentId,
+        scheduledAt,
       }),
     ]);
 
@@ -277,6 +287,7 @@ export class CreateOrderService {
       changeAmount,
       comment,
       idempotencyKey,
+      scheduledAt,
       orderItemsToProcess,
     });
 
@@ -295,6 +306,7 @@ export class CreateOrderService {
       address,
       coupon,
       district,
+      scheduledAt,
       orderItemsToProcess,
     };
   }
@@ -338,6 +350,8 @@ export class CreateOrderService {
       customerPhone: plan.customerPhone,
       changeAmount: plan.changeAmount,
       comment: plan.comment,
+      scheduledAt: plan.scheduledAt,
+      orderId,
       orderItemsToProcess: plan.orderItemsToProcess,
     });
 
@@ -346,6 +360,7 @@ export class CreateOrderService {
       type: NotificationType.ORDER_CREATED,
       title: "Novo pedido recebido",
       description: `Pedido de ${plan.customerName}`,
+      scheduledAt: plan.scheduledAt,
       metadata: {
         orderId,
         customerName: plan.customerName,

@@ -16,6 +16,12 @@ export function parseHourToToday(hour: string): Date {
   return date;
 }
 
+export const startOfDayInTimezone = (date: string): Date =>
+  new Date(`${date}T00:00:00.000${Constants.DASHBOARD_TIMEZONE_OFFSET}`);
+
+export const endOfDayInTimezone = (date: string): Date =>
+  new Date(`${date}T23:59:59.999${Constants.DASHBOARD_TIMEZONE_OFFSET}`);
+
 export const formatDateToHumanReadable = (date: Date): string => {
   const options: Intl.DateTimeFormatOptions = {
     day: "2-digit",

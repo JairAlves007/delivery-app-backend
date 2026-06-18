@@ -80,7 +80,14 @@ export type BuildOrderItemsParams = {
   shippingCost: number;
   subtotal: number;
   idempotencyKey: string;
+  scheduledAt?: string | null;
   orderItemsToProcess: OrderItemsToProcess[];
+};
+
+export type OrderListFilters = {
+  dateStart?: Date | null;
+  dateEnd?: Date | null;
+  includeScheduled?: boolean;
 };
 
 export type SendOrderConfirmationMessageParams = {
@@ -95,6 +102,7 @@ export type SendOrderConfirmationMessageParams = {
   coupon: Coupon | null;
   address: GuestAddress | null;
   district: District | null;
+  scheduledAt?: string | null;
   orderItemsToProcess: OrderItemsToProcess[];
 };
 
@@ -141,6 +149,7 @@ export type OrderIntent = {
   paymentMethod: PaymentMethodType;
   deliveryType: DeliveryType;
   changeAmount?: number | null;
+  scheduledAt?: string | null;
   items: OrderItems[];
 };
 
@@ -182,5 +191,6 @@ export type CreateOrderPlan = {
   address: GuestAddress | null;
   coupon: Coupon | null;
   district: District | null;
+  scheduledAt?: string | null;
   orderItemsToProcess: OrderItemsToProcess[];
 } & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;

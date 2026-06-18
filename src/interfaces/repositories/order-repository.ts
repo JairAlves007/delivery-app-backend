@@ -2,7 +2,8 @@ import type {
   Prisma,
   ProductPricingMode,
 } from "@/generated/prisma/client.js";
-import type { OrderFromRepository } from "@/types/order.js";
+import type { FilterParams, PaginationParams } from "@/types/crud.js";
+import type { OrderFromRepository, OrderListFilters } from "@/types/order.js";
 
 import type { ICRUDBase } from "../crud-base.js";
 import type { CursorPagination } from "../cursor-pagination.js";
@@ -41,7 +42,7 @@ export interface IOrderRepository
         Prisma.OrderUpdateInput,
         string
       >,
-      "create"
+      "create" | "listAll" | "count" | "paginate"
     >,
     CursorPagination<OrderFromRepository, string> {
   create(
@@ -49,4 +50,16 @@ export interface IOrderRepository
     options?: CreateOrderRepositoryOptions,
   ): Promise<CreateOrderRepositoryResult>;
   existsByIdempotencyKey(idempotencyKey: string): Promise<boolean>;
+  listAll(
+    filterParams?: FilterParams,
+    orderFilters?: OrderListFilters,
+  ): Promise<OrderFromRepository[]>;
+  count(
+    filterParams?: FilterParams,
+    orderFilters?: OrderListFilters,
+  ): Promise<number>;
+  paginate(
+    paginationParams: PaginationParams,
+    orderFilters?: OrderListFilters,
+  ): Promise<OrderFromRepository[]>;
 }

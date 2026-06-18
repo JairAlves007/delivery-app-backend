@@ -17,6 +17,8 @@ export default class Constants {
 	public static readonly MAX_LISTING_LIMIT: number = 200;
 	public static readonly DASHBOARD_TOP_N: number = 10;
 	public static readonly DASHBOARD_TIMEZONE: string = "America/Fortaleza";
+	public static readonly DASHBOARD_TIMEZONE_OFFSET: string = "-03:00";
+	public static readonly SCHEDULING_WINDOW_MONTHS: number = 3;
 	public static readonly DIGITAL_MENU_STORAGE_DIR: string = "storage/menus";
 	public static readonly DIGITAL_MENU_MAX_UPLOAD_BYTES: number =
 		10 * 1024 * 1024;
@@ -229,7 +231,7 @@ export default class Constants {
 		{discount}
 		💰 Total a pagar: {total_price}
 
-		> ⏰ Data/Hora do pedido: {order_created_at}
+		{scheduled_at}> ⏰ Data/Hora do pedido: {order_created_at}
 
 		> 🔗 Este pedido foi feito via sistema
 	`;

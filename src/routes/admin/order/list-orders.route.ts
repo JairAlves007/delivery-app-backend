@@ -14,7 +14,7 @@ import {
 	apiSuccessResponseSchema,
 	apiValidationErrorResponseSchema
 } from "@/schemas/api-schema.js";
-import { listQueryParamsSchema } from "@/schemas/generic-schema.js";
+import { listOrdersQueryParamsSchema } from "@/schemas/order-schema.js";
 import { orderListResponseSchema } from "@/schemas/response-schema.js";
 
 export const listOrdersRoute = async (app: FastifyInstance) => {
@@ -25,7 +25,7 @@ export const listOrdersRoute = async (app: FastifyInstance) => {
 				operationId: "listOrders",
 				tags: adminTags("Orders"),
 				summary: "Listar pedidos",
-				querystring: listQueryParamsSchema,
+				querystring: listOrdersQueryParamsSchema,
 				response: {
 					200: apiSuccessResponseSchema(orderListResponseSchema),
 					401: apiDefaultErrorResponseSchema,

@@ -94,7 +94,10 @@ export class UpdateOrderService {
 				customerName: order.customer_name,
 				orderId: id,
 				orderTotal,
-				orderCreatedAt: formatDateToHumanReadable(order.created_at)
+				orderCreatedAt: formatDateToHumanReadable(order.created_at),
+				scheduledAt: order.scheduled_at
+					? formatDateToHumanReadable(order.scheduled_at)
+					: null
 			}
 		});
 	}

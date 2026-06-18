@@ -384,6 +384,7 @@ export const orderPayloadSchema = z.object({
 	subtotal: z.number(),
 	customer_name: z.string(),
 	customer_phone: z.string(),
+	scheduled_at: nullableDateStringSchema,
 	created_at: dateStringSchema,
 	updated_at: dateStringSchema,
 	items: z.array(orderItemSchema),

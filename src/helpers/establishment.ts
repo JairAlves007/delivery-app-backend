@@ -53,18 +53,17 @@ const getZonedWeekdayAndMinutes = (
   };
 };
 
-export function isEstablishmentOpen(
+export function isEstablishmentOpenAt(
   establishment: Pick<EstablishmentsList, "closures" | "openingHours">,
+  date: Date,
 ): boolean {
-  const now = new Date();
-
   const activeClosure = establishment.closures.find(
-    (c) => c.starts_at <= now && (c.ends_at == null || c.ends_at >= now),
+    (c) => c.starts_at <= date && (c.ends_at == null || c.ends_at >= date),
   );
 
   if (activeClosure) return false;
 
-  const { weekdayIndex, minutesOfDay } = getZonedWeekdayAndMinutes(now);
+  const { weekdayIndex, minutesOfDay } = getZonedWeekdayAndMinutes(date);
   const todayWeekDay = WEEK_DAYS[weekdayIndex];
   const previousWeekDay = WEEK_DAYS[(weekdayIndex + 6) % 7];
 
@@ -97,4 +96,16 @@ export function isEstablishmentOpen(
   }
 
   return false;
+}
+
+export function isEstablishmentOpen(
+  establishment: Pick<EstablishmentsList, "closures" | "openingHours">,
+): boolean {
+  return isEstablishmentOpenAt(establishment, new Date());
+}
+
+export function hasConfiguredOpeningHours(
+  establishment: Pick<EstablishmentsList, "openingHours">,
+): boolean {
+  return establishment.openingHours.some((h) => !h.is_closed);
 }

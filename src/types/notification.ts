@@ -11,6 +11,7 @@ export type CreateNotificationJob = {
   type: NotificationType;
   title: string;
   description: string;
+  scheduledAt?: string | null;
   metadata?: Prisma.InputJsonValue;
 };
 

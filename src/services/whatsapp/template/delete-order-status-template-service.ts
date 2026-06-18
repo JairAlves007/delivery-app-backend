@@ -5,6 +5,7 @@ import type { EstablishmentID } from "@/types/establishment.js";
 type DeleteOrderStatusTemplateRequest = {
   establishmentId: EstablishmentID;
   status: OrderStatusType;
+  isScheduled: boolean;
 };
 
 export class DeleteOrderStatusTemplateService {
@@ -17,7 +18,12 @@ export class DeleteOrderStatusTemplateService {
   async handle({
     establishmentId,
     status,
+    isScheduled,
   }: DeleteOrderStatusTemplateRequest): Promise<void> {
-    await this.templateRepository.softDelete({ establishmentId, status });
+    await this.templateRepository.softDelete({
+      establishmentId,
+      status,
+      isScheduled,
+    });
   }
 }

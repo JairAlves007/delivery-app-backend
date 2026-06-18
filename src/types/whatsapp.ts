@@ -9,6 +9,7 @@ export type OrderStatusMessageContext = {
   orderId: string;
   orderTotal: string;
   orderCreatedAt: string;
+  scheduledAt?: string | null;
 };
 
 export type SendWhatsappMessageJob = {
@@ -27,6 +28,7 @@ export type WhatsappTemplateVariables = {
   establishmentName: string;
   orderTotal: string;
   orderCreatedAt: string;
+  scheduledAt: string;
 };
 
 export type CreateInstanceProviderParams = {

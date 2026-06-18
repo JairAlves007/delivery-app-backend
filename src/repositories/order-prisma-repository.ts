@@ -17,7 +17,29 @@ import type {
   PaginationParams,
   UpdateContentParams,
 } from "@/types/crud.js";
-import type { OrderFromRepository } from "@/types/order.js";
+import type { OrderFromRepository, OrderListFilters } from "@/types/order.js";
+
+const buildOrderScheduleWhere = (
+  orderFilters?: OrderListFilters,
+): Prisma.OrderWhereInput => {
+  if (!orderFilters) return {};
+
+  const { dateStart, dateEnd, includeScheduled } = orderFilters;
+  const hasRange = !!dateStart && !!dateEnd;
+
+  if (!hasRange) return {};
+
+  const immediateInRange: Prisma.OrderWhereInput = {
+    scheduled_at: null,
+    created_at: { gte: dateStart, lte: dateEnd },
+  };
+
+  const scheduledCondition: Prisma.OrderWhereInput = includeScheduled
+    ? { scheduled_at: { not: null } }
+    : { scheduled_at: { gte: dateStart, lte: dateEnd } };
+
+  return { OR: [immediateInRange, scheduledCondition] };
+};
 
 const orderInclude = {
   coupon: true,
@@ -32,13 +54,17 @@ const orderInclude = {
 } satisfies Prisma.OrderInclude;
 
 export class OrderPrismaRepository implements IOrderRepository {
-  async listAll(filterParams?: FilterParams): Promise<OrderFromRepository[]> {
+  async listAll(
+    filterParams?: FilterParams,
+    orderFilters?: OrderListFilters,
+  ): Promise<OrderFromRepository[]> {
     const params = transformValidFilterParams(filterParams);
 
     return await prisma.order.findMany({
       where: {
         deleted_at: null,
         ...params,
+        ...buildOrderScheduleWhere(orderFilters),
       },
       take: Constants.MAX_LISTING_LIMIT,
       include: orderInclude,
@@ -48,22 +74,25 @@ export class OrderPrismaRepository implements IOrderRepository {
     });
   }
 
-  async count(filterParams?: FilterParams): Promise<number> {
+  async count(
+    filterParams?: FilterParams,
+    orderFilters?: OrderListFilters,
+  ): Promise<number> {
     const params = transformValidFilterParams(filterParams);
 
     return await prisma.order.count({
       where: {
         deleted_at: null,
         ...params,
+        ...buildOrderScheduleWhere(orderFilters),
       },
     });
   }
 
-  async paginate({
-    page,
-    perPage,
-    filterParams,
-  }: PaginationParams): Promise<OrderFromRepository[]> {
+  async paginate(
+    { page, perPage, filterParams }: PaginationParams,
+    orderFilters?: OrderListFilters,
+  ): Promise<OrderFromRepository[]> {
     const params = transformValidFilterParams(filterParams);
 
     return await prisma.order.findMany({
@@ -72,6 +101,7 @@ export class OrderPrismaRepository implements IOrderRepository {
       where: {
         deleted_at: null,
         ...params,
+        ...buildOrderScheduleWhere(orderFilters),
       },
       include: orderInclude,
       orderBy: {
