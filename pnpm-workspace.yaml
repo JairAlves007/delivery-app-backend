@@ -1,4 +1,6 @@
-onlyBuiltDependencies:
-  - "@prisma/engines"
-  - msgpackr-extract
-  - prisma
+allowBuilds:
+  '@prisma/engines': true
+  esbuild: true
+  msgpackr-extract: true
+  prisma: true
+  puppeteer: true

@@ -25,6 +25,7 @@ export default class Constants {
 	public static readonly DIGITAL_MENU_MAX_UPLOAD_BYTES: number =
 		10 * 1024 * 1024;
 	public static readonly DIGITAL_MENU_MIME_TYPE: string = "application/pdf";
+	public static readonly MAX_UPLOAD_FILE_SIZE_BYTES: number = 2 * 1024 * 1024;
 	public static readonly DASHBOARD_EXPORT_MIME_TYPES = {
 		xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 		csv: "text/csv; charset=utf-8"

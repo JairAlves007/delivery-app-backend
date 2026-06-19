@@ -4,6 +4,7 @@ import { IncorrectResourceSize } from "@/errors/resource/incorrect-resource-size
 import { InvalidResource } from "@/errors/resource/invalid-resource-error.js";
 import { UnavailableResourceMimeType } from "@/errors/resource/unavailable-resource-mime-type-error.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
+import { ForObjectResourceType } from "@/generated/prisma/client.js";
 import Constants from "@/helpers/constants.js";
 import {
 	forgetCacheByForResource,
@@ -11,6 +12,8 @@ import {
 	mapMimeTypeToFileFormat
 } from "@/helpers/resource.js";
 import { SignedUrl } from "@/helpers/signed-url.js";
+import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.js";
+import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
 import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.js";
 import { enqueueDeleteR2Object } from "@/queues/resource-queue.js";
 import { uploadSignedUrlBodySchema } from "@/schemas/upload-schema.js";
@@ -30,9 +33,17 @@ interface SignedUrlDetail {
 
 export class GenerateSignedUrlForUploadService {
 	private resourceRepository: IResourceRepository;
+	private productRepository: IProductRepository;
+	private productCategoryRepository: IProductCategoryRepository;
 
-	constructor(resourceRepository: IResourceRepository) {
+	constructor(
+		resourceRepository: IResourceRepository,
+		productRepository: IProductRepository,
+		productCategoryRepository: IProductCategoryRepository
+	) {
 		this.resourceRepository = resourceRepository;
+		this.productRepository = productRepository;
+		this.productCategoryRepository = productCategoryRepository;
 	}
 
 	private async validateResourceRule({
@@ -66,10 +77,45 @@ export class GenerateSignedUrlForUploadService {
 		if (!isMimeTypeValid) throw new UnavailableResourceMimeType();
 	}
 
+	private async validateObjectOwnership({
+		forResource,
+		objectId,
+		establishmentId
+	}: {
+		forResource: ForObjectResourceType;
+		objectId: string;
+		establishmentId: EstablishmentID;
+	}): Promise<void> {
+		if (forResource === ForObjectResourceType.ESTABLISHMENT) {
+			if (objectId !== establishmentId) throw new InvalidResource();
+			return;
+		}
+
+		if (forResource === ForObjectResourceType.PRODUCT) {
+			const product = await this.productRepository.findById({
+				id: objectId,
+				filterParams: { establishment_id: establishmentId }
+			});
+
+			if (!product) throw new InvalidResource();
+			return;
+		}
+
+		if (forResource === ForObjectResourceType.CATEGORY) {
+			const category = await this.productCategoryRepository.findById({
+				id: objectId,
+				filterParams: { establishment_id: establishmentId }
+			});
+
+			if (!category) throw new InvalidResource();
+		}
+	}
+
 	async handle({
 		establishmentId,
 		resourceId,
 		objectId,
+		size,
 		resource
 	}: GenerateSignedUrlForUploadServiceRequest): Promise<SignedUrlDetail> {
 		const resourceIntent: ResourceIntent = resource;
@@ -78,6 +124,12 @@ export class GenerateSignedUrlForUploadService {
 
 		await this.validateResourceRule({
 			resourceIntent
+		});
+
+		await this.validateObjectOwnership({
+			forResource: resourceIntent.for,
+			objectId,
+			establishmentId
 		});
 
 		const oldLocation = resourceId
@@ -91,7 +143,8 @@ export class GenerateSignedUrlForUploadService {
 
 		const { signedUrl, fileKey } = await SignedUrl.createUploadSignedUrl(
 			path,
-			resourceIntent.mimeType
+			resourceIntent.mimeType,
+			size
 		);
 
 		const resourceInput = {

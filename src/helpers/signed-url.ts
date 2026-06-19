@@ -15,6 +15,7 @@ export class SignedUrl {
   static async createUploadSignedUrl(
     prefixPath: string,
     contentType: string,
+    contentLength: number,
   ): Promise<CreateUploadSignedUrlResponse> {
     const finalPrefixPath = prefixPath.replace(/^\/+|\/+$/g, "");
     const extension = contentType.split("/")[1];
@@ -28,9 +29,11 @@ export class SignedUrl {
         Bucket: env.CLOUDFLARE_BUCKET_NAME,
         Key: `${finalPrefixPath}/${fileKey}`,
         ContentType: contentType,
+        ContentLength: contentLength,
       }),
       {
         expiresIn: Constants.SIGNED_URL_EXPIRES_IN_MINUTES,
+        signableHeaders: new Set(["content-length"]),
       },
     );
 
