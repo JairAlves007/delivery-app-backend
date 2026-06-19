@@ -15,6 +15,7 @@ export const setupCreateOrderWorker = () => {
       await createOrderService.persist(plan);
     },
     {
+      concurrency: 5,
       onFinalFailure: async ({ jobId, data, error }) => {
         const failedJobRepository = makeFailedJobRepository();
 

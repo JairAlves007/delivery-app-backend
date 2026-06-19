@@ -5,6 +5,7 @@ import { z } from "zod";
 import { makeCreateOrderService } from "@/factories/services/order/make-create-order-service.js";
 import { makeValidateCustomerPhoneFromOrderService } from "@/factories/services/order/validations/make-validate-customer-phone-from-order-service.js";
 import { ApiResponse } from "@/helpers/api.js";
+import Constants from "@/helpers/constants.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import { customerTags } from "@/http/swagger-tags.js";
 import { createOrderQueue } from "@/queues/order-queue.js";
@@ -19,6 +20,7 @@ export const createOrderRoute = async (app: FastifyInstance) => {
   app.withTypeProvider<ZodTypeProvider>().post(
     "/",
     {
+      config: { rateLimit: Constants.RATE_LIMIT.createOrder },
       schema: {
         operationId: "createOrder",
         tags: customerTags("Orders"),

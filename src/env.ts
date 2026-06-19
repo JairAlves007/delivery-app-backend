@@ -37,7 +37,11 @@ const envSchema = z.object({
 	EVOLUTION_API_KEY: z.string().min(1, "Evolution API key é obrigatória"),
 	EVOLUTION_WEBHOOK_TOKEN: z
 		.string()
-		.min(16, "Evolution webhook token deve ter ao menos 16 caracteres")
+		.min(16, "Evolution webhook token deve ter ao menos 16 caracteres"),
+	TRUST_PROXY: z
+		.enum(["true", "false"])
+		.default("false")
+		.transform(value => value === "true")
 });
 
 export const env = envSchema.parse(process.env);

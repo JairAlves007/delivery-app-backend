@@ -86,6 +86,42 @@ const replySendErrorPlugin: FastifyPluginAsync = async (fastify) => {
       return this.status(errorCode).send(errorResponse);
     }
 
+    const frameworkError = error as {
+      statusCode?: number;
+      code?: string;
+      details?: { error?: { message?: string } };
+    } | null;
+    const frameworkStatusCode = frameworkError?.statusCode;
+
+    if (
+      typeof frameworkStatusCode === "number" &&
+      frameworkStatusCode >= 400 &&
+      frameworkStatusCode < 500
+    ) {
+      const isRateLimit =
+        frameworkStatusCode === HTTPStatusCodes.TOO_MANY_REQUESTS;
+
+      const forwardedMessage =
+        frameworkError?.details?.error?.message ??
+        (error instanceof Error ? error.message : undefined);
+
+      return this.status(frameworkStatusCode).send({
+        success: false,
+        code:
+          frameworkError?.code ??
+          (isRateLimit ? "RATE_LIMIT_ERROR" : "REQUEST_ERROR"),
+        details: {
+          error: {
+            message:
+              forwardedMessage ??
+              (isRateLimit
+                ? "Limite de requisições excedido. Tente novamente em instantes."
+                : "Requisição inválida."),
+          },
+        },
+      });
+    }
+
     if (error instanceof Error) {
       error.name = "INTERNAL_SERVER";
 

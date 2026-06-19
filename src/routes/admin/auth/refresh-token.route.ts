@@ -18,6 +18,7 @@ export const refreshTokenRoute = async (app: FastifyInstance) => {
 	app.withTypeProvider<ZodTypeProvider>().post(
 		"/refresh-token",
 		{
+			config: { rateLimit: Constants.RATE_LIMIT.refresh },
 			schema: {
 				operationId: "adminRefreshToken",
 				tags: adminTags("Auth"),

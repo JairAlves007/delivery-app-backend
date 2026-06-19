@@ -12,7 +12,7 @@ export interface INotificationRepository {
     params: ListNotificationsParams,
   ): Promise<NotificationFromRepository[]>;
   countUnseen(params: NotificationUserScope): Promise<number>;
-  findById(notificationId: string): Promise<Notification | null>;
+  findById(params: NotificationStateParams): Promise<Notification | null>;
   markSeen(params: NotificationStateParams): Promise<void>;
   markAllSeen(params: NotificationUserScope): Promise<void>;
   dismiss(params: NotificationStateParams): Promise<void>;

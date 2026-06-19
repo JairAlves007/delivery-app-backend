@@ -1160,7 +1160,7 @@ async function seedEstablishment(
 		data: {
 			name: seed.ownerName,
 			email: seed.ownerEmail,
-			password: await hash("owner123", Constants.HASH_SALT_LENGTH),
+			password: await hash("owner123", Constants.BCRYPT_COST),
 			role_id: establishmentOwnerRoleId
 		}
 	});
@@ -1454,7 +1454,7 @@ async function main() {
 		data: {
 			name: "Admin",
 			email: "admin@delivery.com",
-			password: await hash("admin123", Constants.HASH_SALT_LENGTH),
+			password: await hash("admin123", Constants.BCRYPT_COST),
 			role_id: adminRole.id
 		}
 	});

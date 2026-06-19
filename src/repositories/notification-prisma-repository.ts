@@ -60,9 +60,12 @@ export class NotificationPrismaRepository implements INotificationRepository {
     });
   }
 
-  async findById(notificationId: string): Promise<Notification | null> {
-    return await prisma.notification.findUnique({
-      where: { id: notificationId },
+  async findById({
+    notificationId,
+    establishmentId,
+  }: NotificationStateParams): Promise<Notification | null> {
+    return await prisma.notification.findFirst({
+      where: { id: notificationId, establishment_id: establishmentId },
     });
   }
 
@@ -102,18 +105,26 @@ export class NotificationPrismaRepository implements INotificationRepository {
     if (unseen.length === 0) return;
 
     const now = new Date();
+    const notificationIds = unseen.map(({ id }) => id);
 
-    await prisma.$transaction(
-      unseen.map(({ id }) =>
-        prisma.notificationUserState.upsert({
-          where: {
-            uq_notification_user: { notification_id: id, user_id: userId },
-          },
-          create: { notification_id: id, user_id: userId, seen_at: now },
-          update: { seen_at: now },
-        }),
-      ),
-    );
+    await prisma.$transaction([
+      prisma.notificationUserState.updateMany({
+        where: {
+          user_id: userId,
+          notification_id: { in: notificationIds },
+          seen_at: null,
+        },
+        data: { seen_at: now },
+      }),
+      prisma.notificationUserState.createMany({
+        data: notificationIds.map((notificationId) => ({
+          notification_id: notificationId,
+          user_id: userId,
+          seen_at: now,
+        })),
+        skipDuplicates: true,
+      }),
+    ]);
   }
 
   async dismiss({

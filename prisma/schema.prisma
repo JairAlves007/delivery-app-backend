@@ -529,7 +529,7 @@ model Product {
   addonCategories     ProductAddonCategory[]
 
   @@unique([slug, establishment_id])
-  @@index([establishment_id], name: "idx_products_establishment_id")
+  @@index([establishment_id, category_id], name: "idx_products_establishment_category")
   @@index([category_id], name: "idx_products_category_id")
   @@map("products")
 }
@@ -774,10 +774,9 @@ model Order {
   orderDeliveryAddress OrderDeliveryAddress?
   whatsappMessageLogs  WhatsappMessageLog[]
 
-  @@index([establishment_id], name: "idx_orders_establishment_id")
+  @@index([establishment_id, created_at(sort: Desc)], name: "idx_orders_establishment_created")
+  @@index([establishment_id, scheduled_at], name: "idx_orders_establishment_scheduled")
   @@index([coupon_id], name: "idx_orders_coupon_id")
-  @@index([created_at], name: "idx_orders_created_at")
-  @@index([scheduled_at], name: "idx_orders_scheduled_at")
   @@map("orders")
 }
 

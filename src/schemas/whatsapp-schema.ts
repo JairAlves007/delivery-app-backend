@@ -69,10 +69,6 @@ z.globalRegistry.add(listOrderStatusTemplatesResponseSchema, {
   id: "ListOrderStatusTemplatesResponse",
 });
 
-export const whatsappWebhookParamsSchema = z.object({
-  token: z.string().min(1, "Token do webhook é obrigatório"),
-});
-
 export const whatsappWebhookBodySchema = z.looseObject({
   event: z.string(),
   instance: z.string(),

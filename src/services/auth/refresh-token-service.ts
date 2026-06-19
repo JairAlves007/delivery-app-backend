@@ -1,4 +1,4 @@
-import { hash } from "bcrypt-ts";
+import { compare, hash } from "bcrypt-ts";
 
 import { InvalidRefreshToken } from "@/errors/user/invalid-refresh-token-error.js";
 import { makeFindUserService } from "@/factories/services/user/make-find-user-service.js";
@@ -27,20 +27,47 @@ export class RefreshTokenService {
 		this.refreshTokenRepository = refreshTokenRepository;
 	}
 
+	private parseToken(token: string): { id: number; secret: string } | null {
+		const separatorIndex = token.indexOf(".");
+		if (separatorIndex <= 0) return null;
+
+		const id = Number(token.slice(0, separatorIndex));
+		const secret = token.slice(separatorIndex + 1);
+
+		if (!Number.isInteger(id) || id <= 0 || secret.length === 0) return null;
+
+		return { id, secret };
+	}
+
+	private async resolveValidToken(token: string) {
+		const parsed = this.parseToken(token);
+		if (!parsed) return null;
+
+		const refreshToken = await this.refreshTokenRepository.findValidById(
+			parsed.id
+		);
+		if (!refreshToken) return null;
+
+		const secretIsValid = await compare(parsed.secret, refreshToken.token_hash);
+		if (!secretIsValid) return null;
+
+		return refreshToken;
+	}
+
 	async create({
 		userId,
 		activeTenantId,
 		primaryTenantId
 	}: CreateRefreshTokenParams): Promise<string> {
-		const token = crypto.randomUUID();
-		const tokenHash = await hash(token, Constants.HASH_SALT_LENGTH);
+		const secret = crypto.randomUUID();
+		const tokenHash = await hash(secret, Constants.BCRYPT_COST);
 
 		const expiresAt = new Date();
 		expiresAt.setSeconds(
 			expiresAt.getSeconds() + Constants.REFRESH_TOKEN_EXPIRATION_IN_SECONDS
 		);
 
-		await this.refreshTokenRepository.create({
+		const created = await this.refreshTokenRepository.create({
 			user: { connect: { id: userId } },
 			token_hash: tokenHash,
 			active_tenant_id: activeTenantId,
@@ -48,11 +75,11 @@ export class RefreshTokenService {
 			expires_at: expiresAt
 		});
 
-		return token;
+		return `${created.id}.${secret}`;
 	}
 
 	async validate(token: string): Promise<RefreshTokenPayload> {
-		const refreshToken = await this.refreshTokenRepository.findByToken(token);
+		const refreshToken = await this.resolveValidToken(token);
 
 		if (!refreshToken) throw new InvalidRefreshToken();
 
@@ -70,7 +97,7 @@ export class RefreshTokenService {
 	}
 
 	async revoke(token: string): Promise<void> {
-		const refreshToken = await this.refreshTokenRepository.findByToken(token);
+		const refreshToken = await this.resolveValidToken(token);
 
 		if (!refreshToken) return;
 

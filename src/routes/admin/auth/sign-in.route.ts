@@ -20,6 +20,7 @@ export const signInRoute = async (app: FastifyInstance) => {
 	app.withTypeProvider<ZodTypeProvider>().post(
 		"/sign-in",
 		{
+			config: { rateLimit: Constants.RATE_LIMIT.auth },
 			schema: {
 				operationId: "adminSignIn",
 				tags: adminTags("Admin Auth"),

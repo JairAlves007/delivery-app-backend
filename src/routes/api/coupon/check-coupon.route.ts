@@ -3,6 +3,7 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 
 import { makeCheckCouponService } from "@/factories/services/coupon/make-check-coupon-service.js";
 import { ApiResponse } from "@/helpers/api.js";
+import Constants from "@/helpers/constants.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
 import { customerTags } from "@/http/swagger-tags.js";
 import {
@@ -17,6 +18,7 @@ export const checkCouponRoute = async (app: FastifyInstance) => {
 	app.withTypeProvider<ZodTypeProvider>().post(
 		"/check",
 		{
+			config: { rateLimit: Constants.RATE_LIMIT.checkCoupon },
 			schema: {
 				operationId: "checkCoupon",
 				tags: customerTags("Coupons"),

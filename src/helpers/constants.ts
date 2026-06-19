@@ -3,11 +3,13 @@ import type { OrderSubSectionMessage } from "@/types/order.js";
 
 export default class Constants {
 	// Hash
-	public static readonly HASH_SALT_LENGTH: number = 6;
+	public static readonly BCRYPT_COST: number = 12;
 
 	// Strings
 	public static readonly TOKEN_TYPE: string = "Bearer";
 	public static readonly PUBLIC_API_KEY_HEADER: string = "x-api-key";
+	public static readonly WHATSAPP_WEBHOOK_HEADER: string = "x-webhook-token";
+	public static readonly WHATSAPP_WEBHOOK_DEDUP_TTL_SECONDS: number = 300;
 
 	// Numbers
 	public static readonly PRICE_MULTIPLIER: number = 100;
@@ -66,8 +68,19 @@ export default class Constants {
 		60 * 60 * 24 * 7;
 	public static readonly REFRESH_TOKEN_EXPIRATION_TIME: string = "7d";
 
+	// Rate limits por rota (override do limite global)
+	public static readonly RATE_LIMIT = {
+		auth: { max: 5, timeWindow: "1 minute" },
+		refresh: { max: 10, timeWindow: "1 minute" },
+		createOrder: { max: 10, timeWindow: "1 minute" },
+		checkCoupon: { max: 20, timeWindow: "1 minute" }
+	} as const;
+
 	// Cache
 	public static readonly CACHE_TAG_SET_TTL_SECONDS: number = 60 * 60 * 24;
+	public static readonly CACHE_LOCK_TTL_SECONDS: number = 10;
+	public static readonly CACHE_LOCK_MAX_RETRIES: number = 10;
+	public static readonly CACHE_LOCK_RETRY_DELAY_MS: number = 100;
 
 	public static readonly CACHE_KEYS = {
 		products: "products",

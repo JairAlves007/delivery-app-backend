@@ -53,7 +53,7 @@ export class CreateEstablishmentOwnerService {
     );
     if (!role) throw new UserUnauthorized();
 
-    const password_hash = await hash(password, Constants.HASH_SALT_LENGTH);
+    const password_hash = await hash(password, Constants.BCRYPT_COST);
 
     await this.userRepository.create({
       name,

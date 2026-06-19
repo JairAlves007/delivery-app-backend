@@ -6,8 +6,11 @@ import type { SendWhatsappMessageJob } from "@/types/whatsapp.js";
 export const setupSendWhatsappMessageWorker = () => {
   const whatsappQueue = makeQueue<SendWhatsappMessageJob>(whatsappQueueName);
 
-  whatsappQueue.registerProcessor(async (payload) => {
-    const sendOrderStatusMessageService = makeSendOrderStatusMessageService();
-    await sendOrderStatusMessageService.handle(payload);
-  });
+  whatsappQueue.registerProcessor(
+    async (payload) => {
+      const sendOrderStatusMessageService = makeSendOrderStatusMessageService();
+      await sendOrderStatusMessageService.handle(payload);
+    },
+    { concurrency: 5 },
+  );
 };

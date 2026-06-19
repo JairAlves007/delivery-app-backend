@@ -137,12 +137,38 @@ export class Cache implements ICacheBase {
 
 			if (cachedValue !== null) return cachedValue;
 
-			const value = await fetchFunction();
-			await this.set(key, value, duration);
+			const lockKey = `${key}:lock`;
+			const lockAcquired = await redis.set(
+				lockKey,
+				"1",
+				"EX",
+				Constants.CACHE_LOCK_TTL_SECONDS,
+				"NX"
+			);
 
-			if (scope) await this.registerKey(key, scope);
+			if (!lockAcquired) {
+				for (let attempt = 0; attempt < Constants.CACHE_LOCK_MAX_RETRIES; attempt++) {
+					await new Promise(resolve =>
+						setTimeout(resolve, Constants.CACHE_LOCK_RETRY_DELAY_MS)
+					);
 
-			return value;
+					const value = await this.get<T>(key);
+					if (value !== null) return value;
+				}
+
+				return await fetchFunction();
+			}
+
+			try {
+				const value = await fetchFunction();
+				await this.set(key, value, duration);
+
+				if (scope) await this.registerKey(key, scope);
+
+				return value;
+			} finally {
+				await redis.del(lockKey);
+			}
 		} catch (error) {
 			app.log.error(
 				{ error },

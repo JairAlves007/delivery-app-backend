@@ -9,6 +9,7 @@ export class HTTPStatusCodes {
   public static readonly NOT_FOUND = 404;
   public static readonly CONFLICT = 409;
   public static readonly UNPROCESSABLE_ENTITY = 422;
+  public static readonly TOO_MANY_REQUESTS = 429;
   public static readonly INTERNAL_SERVER_ERROR = 500;
   public static readonly BAD_GATEWAY = 502;
 }

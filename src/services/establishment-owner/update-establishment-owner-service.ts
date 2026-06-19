@@ -53,7 +53,7 @@ export class UpdateEstablishmentOwnerService {
 		if (name) data.name = name;
 		if (email) data.email = email;
 		if (password)
-			data.password = await hash(password, Constants.HASH_SALT_LENGTH);
+			data.password = await hash(password, Constants.BCRYPT_COST);
 
 		if (establishmentId) {
 			const establishment = await this.establishmentRepository.findById({

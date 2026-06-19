@@ -27,15 +27,19 @@ import { setupWorkers } from "@/workers/setup.js";
 const isProduction = env.NODE_ENV === "production";
 
 const app = fastify({
-	logger: {
-		transport: {
-			target: "pino-pretty",
-			options: {
-				translateTime: "HH:MM:ss Z",
-				ignore: "pid,hostname"
-			}
-		}
-	},
+	bodyLimit: 262_144,
+	trustProxy: env.TRUST_PROXY,
+	logger: isProduction
+		? true
+		: {
+				transport: {
+					target: "pino-pretty",
+					options: {
+						translateTime: "HH:MM:ss Z",
+						ignore: "pid,hostname"
+					}
+				}
+			},
 	genReqId: () => randomUUID()
 });
 
@@ -135,6 +139,7 @@ app.register(fastifyRateLimit, {
 		return userId ? `${ip}:${userId}` : ip;
 	},
 	errorResponseBuilder: (_request, context) => ({
+		statusCode: HTTPStatusCodes.TOO_MANY_REQUESTS,
 		success: false,
 		code: "RATE_LIMIT_ERROR",
 		details: {

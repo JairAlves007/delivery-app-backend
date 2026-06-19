@@ -88,13 +88,16 @@ export const createOrderBodySchema = z
 											.default(1)
 									})
 								)
+								.max(30, "Máximo de 30 adicionais por categoria")
 							})
 						)
+						.max(20, "Máximo de 20 categorias de adicionais por item")
 						.optional()
 						.nullable()
 				})
 			)
-			.min(1, "O pedido deve ter ao menos um item"),
+			.min(1, "O pedido deve ter ao menos um item")
+			.max(50, "O pedido deve ter no máximo 50 itens"),
 		scheduledAt: z.iso.datetime("Data de agendamento inválida").nullish()
 	})
 	.superRefine((data, ctx) => {

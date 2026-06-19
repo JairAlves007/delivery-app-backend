@@ -14,12 +14,13 @@ export class MarkNotificationSeenService {
     establishmentId,
     userId,
   }: NotificationStateParams): Promise<void> {
-    const notification =
-      await this.notificationRepository.findById(notificationId);
+    const notification = await this.notificationRepository.findById({
+      notificationId,
+      establishmentId,
+      userId,
+    });
 
-    if (!notification || notification.establishment_id !== establishmentId) {
-      throw new NotificationNotFound();
-    }
+    if (!notification) throw new NotificationNotFound();
 
     await this.notificationRepository.markSeen({
       notificationId,

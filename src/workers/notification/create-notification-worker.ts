@@ -8,9 +8,12 @@ export const setupCreateNotificationWorker = () => {
     notificationQueueName,
   );
 
-  notificationQueue.registerProcessor(async (payload) => {
-    const createNotificationService = makeCreateNotificationService();
+  notificationQueue.registerProcessor(
+    async (payload) => {
+      const createNotificationService = makeCreateNotificationService();
 
-    await createNotificationService.handle(payload);
-  });
+      await createNotificationService.handle(payload);
+    },
+    { concurrency: 5 },
+  );
 };
