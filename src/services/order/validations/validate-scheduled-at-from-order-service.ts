@@ -28,11 +28,18 @@ export class ValidateScheduledAtFromOrderService {
     if (!scheduledAt) {
       if (enforceOpeningHours && !isEstablishmentOpenAt(establishment, new Date()))
         throw new OrderSchedulingError(
-          "Estabelecimento fechado no momento. Agende seu pedido.",
+          establishment.accepts_scheduling
+            ? "Estabelecimento fechado no momento. Agende seu pedido."
+            : "Estabelecimento fechado no momento.",
         );
 
       return;
     }
+
+    if (!establishment.accepts_scheduling)
+      throw new OrderSchedulingError(
+        "Este estabelecimento não aceita agendamento de pedidos.",
+      );
 
     const scheduledDate = new Date(scheduledAt);
 

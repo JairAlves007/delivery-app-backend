@@ -313,6 +313,7 @@ model Establishment {
   cnpj                   String?                 @unique @db.VarChar(18)
   only_delivery          Boolean
   accepts_credit_card    Boolean
+  accepts_scheduling     Boolean                 @default(false)
   is_listed_in_hub       Boolean                 @default(false)
   next_billing_date      DateTime                @db.Timestamptz
   owner_id               String?                 @unique

@@ -79,6 +79,7 @@ type EstablishmentSeed = {
 	email: string;
 	cnpj?: string;
 	accepts_credit_card: boolean;
+	accepts_scheduling: boolean;
 	only_delivery: boolean;
 	ownerEmail: string;
 	ownerName: string;
@@ -135,6 +136,7 @@ const milkShakeMix: EstablishmentSeed = {
 	email: "contato@milkshakemixacarape.com.br",
 	cnpj: "12.345.678/0001-91",
 	accepts_credit_card: true,
+	accepts_scheduling: true,
 	only_delivery: false,
 	ownerEmail: "donocarlos@milkshakemixacarape.com.br",
 	ownerName: "Carlos Eduardo",
@@ -366,6 +368,7 @@ const pizzariaBellaNapoli: EstablishmentSeed = {
 	email: "contato@bellanapoli.com.br",
 	cnpj: "23.456.789/0001-82",
 	accepts_credit_card: true,
+	accepts_scheduling: false,
 	only_delivery: false,
 	ownerEmail: "marco@bellanapoli.com.br",
 	ownerName: "Marco Antônio",
@@ -619,6 +622,7 @@ const churrascariaBoiGordo: EstablishmentSeed = {
 	email: "reservas@churrascariaboigordo.com.br",
 	cnpj: "34.567.890/0001-73",
 	accepts_credit_card: true,
+	accepts_scheduling: true,
 	only_delivery: false,
 	ownerEmail: "jose@churrascariaboigordo.com.br",
 	ownerName: "José Augusto",
@@ -892,6 +896,7 @@ const sushiRyu: EstablishmentSeed = {
 	email: "contato@sushiryu.com.br",
 	cnpj: "45.678.901/0001-64",
 	accepts_credit_card: true,
+	accepts_scheduling: false,
 	only_delivery: true,
 	ownerEmail: "takeshi@sushiryu.com.br",
 	ownerName: "Takeshi Nakamura",
@@ -1173,6 +1178,7 @@ async function seedEstablishment(
 			email: seed.email,
 			cnpj: seed.cnpj,
 			accepts_credit_card: seed.accepts_credit_card,
+			accepts_scheduling: seed.accepts_scheduling,
 			only_delivery: seed.only_delivery,
 			next_billing_date: new Date("2030-06-12T12:06:24"),
 			owner_id: owner.id

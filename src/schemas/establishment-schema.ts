@@ -80,6 +80,9 @@ export const createEstablishmentBodySchema = z.object({
 		"Precisamos saber se o estabelecimento só aceita entregas"
 	),
 	acceptsCreditCard: z.boolean("Precisamos saber se aceita cartão de crédito"),
+	acceptsScheduling: z.boolean(
+		"Precisamos saber se o estabelecimento aceita agendamento de pedidos"
+	),
 	nextBillingDate: z.coerce
 		.date("Precisamos saber a data de próximo pagamento")
 		.refine(val => val >= new Date(), {

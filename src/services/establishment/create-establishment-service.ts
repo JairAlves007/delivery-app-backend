@@ -26,6 +26,7 @@ export class CreateEstablishmentService {
       ...address
     },
     acceptsCreditCard: accepts_credit_card,
+    acceptsScheduling: accepts_scheduling,
     onlyDelivery: only_delivery,
     nextBillingDate: next_billing_date,
     openingHours,
@@ -43,6 +44,7 @@ export class CreateEstablishmentService {
       name,
       slug: slugify(name),
       accepts_credit_card,
+      accepts_scheduling,
       only_delivery,
       next_billing_date,
       address: {

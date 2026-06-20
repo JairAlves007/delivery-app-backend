@@ -240,6 +240,7 @@ export const establishmentResponseSchema = z.object({
 	cnpj: z.string().nullable(),
 	only_delivery: z.boolean(),
 	accepts_credit_card: z.boolean(),
+	accepts_scheduling: z.boolean(),
 	is_listed_in_hub: z.boolean(),
 	next_billing_date: dateStringSchema,
 	address: establishmentAddressSchema,

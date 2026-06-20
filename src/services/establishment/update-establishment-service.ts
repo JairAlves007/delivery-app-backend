@@ -25,6 +25,7 @@ export class UpdateEstablishmentService {
 		address,
 		nextBillingDate: next_billing_date,
 		acceptsCreditCard: accepts_credit_card,
+		acceptsScheduling: accepts_scheduling,
 		onlyDelivery: only_delivery,
 		isListedInHub: is_listed_in_hub,
 		openingHours,
@@ -36,6 +37,7 @@ export class UpdateEstablishmentService {
 			...data,
 			next_billing_date,
 			accepts_credit_card,
+			accepts_scheduling,
 			only_delivery,
 			is_listed_in_hub
 		};
