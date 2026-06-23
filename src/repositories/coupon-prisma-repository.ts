@@ -5,7 +5,7 @@ import {
 } from "@/helpers/crud.js";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.js";
 import prisma from "@/lib/prisma.js";
-import type { CouponWithUserCoupons } from "@/types/coupon.js";
+import type { CouponWithScope, CouponWithUserCoupons } from "@/types/coupon.js";
 import type {
 	DeleteContentParams,
 	FilterParams,
@@ -110,12 +110,31 @@ export class CouponPrismaRepository implements ICouponRepository {
 		});
 	}
 
+	async findByIdWithScope({
+		id,
+		filterParams
+	}: FindByIdParams<string>): Promise<CouponWithScope | null> {
+		const params = transformValidFilterParams(filterParams);
+
+		return await prisma.coupon.findUnique({
+			where: {
+				id,
+				deleted_at: null,
+				...params
+			},
+			include: {
+				couponProducts: { select: { product_id: true } },
+				couponCategories: { select: { category_id: true } }
+			}
+		});
+	}
+
 	async check(
 		code: string,
 		establishmentId: EstablishmentID,
 		customerPhone?: string | null
 	): Promise<CouponWithUserCoupons | null> {
-		return await prisma.coupon.findUnique({
+		return await prisma.coupon.findFirst({
 			where: {
 				code,
 				establishment_id: establishmentId,
@@ -123,7 +142,9 @@ export class CouponPrismaRepository implements ICouponRepository {
 			},
 			include: {
 				userCoupons: {
-					where: customerPhone ? { customer_phone: customerPhone } : { customer_phone: "" }
+					where: customerPhone
+						? { customer_phone: customerPhone }
+						: { customer_phone: "" }
 				},
 				_count: {
 					select: { userCoupons: true }

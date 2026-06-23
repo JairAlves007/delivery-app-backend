@@ -50,6 +50,10 @@ export default class Constants {
 		"check-billing-due";
 	public static readonly BILLING_DUE_DAYS_BEFORE: number = 3;
 	public static readonly BILLING_GRACE_PERIOD_DAYS: number = 3;
+	public static readonly RECOMMENDATION_CRON: string = "0 4 * * *";
+	public static readonly RECOMMENDATION_SCHEDULER_ID: string =
+		"compute-product-recommendations";
+	public static readonly RECOMMENDATION_MAX_PER_PRODUCT: number = 8;
 	public static readonly NOTIFICATION_CHANNEL_PREFIX: string =
 		"notifications:establishment:";
 	public static readonly SSE_TICKET_PREFIX: string = "sse-ticket:";
@@ -103,7 +107,10 @@ export default class Constants {
 		favorites: "favorites",
 		establishmentTheme: "establishment_theme",
 		digitalMenu: "digital_menu",
-		whatsappNumberCheck: "whatsapp_number_check"
+		whatsappNumberCheck: "whatsapp_number_check",
+		promotions: "promotions",
+		combos: "combos",
+		recommendations: "recommendations"
 	};
 
 	public static readonly THEME_SCHEMA_VERSION: string = "1";
@@ -161,6 +168,12 @@ export default class Constants {
 		digitalMenu: 60 * 60,
 		/** Distritos/áreas de entrega — 1 h */
 		districts: 60 * 60,
+		/** Promoções (janelas/limites) — 5 min */
+		promotions: 60 * 5,
+		/** Combos — 30 min */
+		combos: 60 * 30,
+		/** Recomendações de produto — 1 h */
+		recommendations: 60 * 60,
 		/** Menus estruturais — 12 h */
 		menus: 60 * 60 * 12,
 		/** Regras de upload (schema) — 24 h */
@@ -218,7 +231,15 @@ export default class Constants {
 			changeAmount: `💵 Troco para: {change_amount_value}`,
 			comment: `📝 Observações: {comment_value}`,
 			discountOrder: `🎟️ Desconto no pedido: - {discount_value}`,
-			discountShipping: `🎟️ Desconto no frete: - {discount_value}`
+			discountShipping: `🎟️ Desconto no frete: - {discount_value}`,
+			comboBlock: `
+				🥡 {combo_name} × {combo_quantity}
+				{combo_selections}
+				• Total do combo: {combo_total}
+			`,
+			comboSelection: "    - {selection_name}{selection_extra}",
+			promotionApplied: "🎉 {promotion_name}: - {promotion_value}",
+			discountPromotion: `🎉 Desconto em promoções: - {discount_value}`
 		};
 
 	public static readonly ORDER_MESSAGE_TEMPLATE = `
@@ -232,7 +253,10 @@ export default class Constants {
 
 		{order_items}
 
+		{combos}
+
 		{coupon}
+		{promotions}
 
 		💳 Forma de pagamento: {payment_method}
 		{change_amount}
@@ -240,8 +264,9 @@ export default class Constants {
 		{comment}
 
 		🚚 Tipo de entrega: {delivery_type}
-		🧾 Subtotal dos itens: {subtotal}
+		🧾 Subtotal: {subtotal}
 		📦 Frete: {shipping_cost}
+		{promotion_discount}
 		{discount}
 		💰 Total a pagar: {total_price}
 

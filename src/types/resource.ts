@@ -57,5 +57,6 @@ export type ResourceWithJoinCounts = Resource & {
     establishmentResources: number;
     productCategoryResources: number;
     bannerResources: number;
+    comboResources: number;
   };
 };

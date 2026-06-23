@@ -2,11 +2,13 @@ import type { FastifyInstance } from "fastify";
 
 import { validateApiKey } from "@/middlewares/validate-api-key.js";
 
+import { comboCatalogRoutes } from "./combo/index.js";
 import { couponRoutes } from "./coupon/index.js";
 import { districtCatalogRoutes } from "./district/index.js";
 import { hubRoutes } from "./hub/index.js";
 import { mainRoutes } from "./main/index.js";
 import { orderRoutes } from "./order/index.js";
+import { promotionCatalogRoutes } from "./promotion/index.js";
 import { whatsappWebhookRoutes } from "./whatsapp/index.js";
 
 export const apiRoutes = (app: FastifyInstance) => {
@@ -18,6 +20,8 @@ export const apiRoutes = (app: FastifyInstance) => {
 		api.register(couponRoutes, { prefix: "/coupon" });
 		api.register(orderRoutes, { prefix: "/order" });
 		api.register(districtCatalogRoutes, { prefix: "/district" });
+		api.register(promotionCatalogRoutes, { prefix: "/promotion" });
+		api.register(comboCatalogRoutes, { prefix: "/combo" });
 	});
 
 	app.register(whatsappWebhookRoutes, { prefix: "/whatsapp" });

@@ -57,6 +57,28 @@ export const transformOrderByStatus = (
               : order.coupon.value,
         }
       : null,
+    promotion_discount: transformPriceFromDatabase(order.promotion_discount),
+    promotions: order.orderPromotions.map((promotion) => ({
+      id: promotion.id,
+      name: promotion.name,
+      type: promotion.type,
+      discount: transformPriceFromDatabase(promotion.discount_cents),
+    })),
+    combos: order.orderCombos.map((combo) => ({
+      id: combo.id,
+      combo_name: combo.combo_name,
+      combo_price: transformPriceFromDatabase(combo.combo_price),
+      quantity: combo.quantity,
+      selections: combo.selections.map((selection) => ({
+        id: selection.id,
+        product_id: selection.product_id,
+        product_name: selection.product_name,
+        quantity: selection.quantity,
+        additional_price: transformPriceFromDatabase(
+          selection.additional_price,
+        ),
+      })),
+    })),
     status: {
       label: order.statuses[0].label,
       value: order.statuses[0].value,

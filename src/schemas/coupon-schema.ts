@@ -1,6 +1,10 @@
 import z from "zod";
 
-import { CouponType, DiscountType } from "@/generated/prisma/client.js";
+import {
+  CouponScopeType,
+  CouponType,
+  DiscountType,
+} from "@/generated/prisma/client.js";
 import { phoneSchema } from "@/schemas/generic-schema.js";
 
 const createCouponBodyBaseSchema = z.object({
@@ -13,6 +17,21 @@ const createCouponBodyBaseSchema = z.object({
     .max(50, "O código deve ter no máximo 50 caracteres")
     .transform((val) => val.toUpperCase()),
   discountType: z.enum(DiscountType, "Tipo de desconto inválido"),
+  scope: z.enum(CouponScopeType, "Escopo inválido").default(CouponScopeType.ALL),
+  minOrderValue: z.coerce
+    .number()
+    .min(0, "O valor mínimo não pode ser negativo")
+    .nullable()
+    .default(null),
+  perCustomerLimit: z.coerce
+    .number()
+    .int("O limite por cliente deve ser um número inteiro")
+    .min(1, "O limite por cliente deve ser maior que zero")
+    .nullable()
+    .default(null),
+  isActive: z.coerce.boolean().default(true),
+  productIds: z.array(z.ulid("Produto inválido")).default([]),
+  categoryIds: z.array(z.ulid("Categoria inválida")).default([]),
   startsAt: z.coerce
     .date("A data de inicio deve ser preenchida")
     .refine((val) => val >= new Date(), "A data de inicio deve ser futura")
@@ -39,6 +58,28 @@ export const createCouponBodySchema = createCouponBodyBaseSchema.superRefine(
         inclusive: true,
         origin: "number",
         message: "O valor percentual não pode ser maior que 100",
+      });
+    }
+
+    if (
+      data.scope === CouponScopeType.PRODUCTS &&
+      data.productIds.length === 0
+    ) {
+      ctx.addIssue({
+        path: ["productIds"],
+        code: "custom",
+        message: "Selecione ao menos um produto para o escopo do cupom",
+      });
+    }
+
+    if (
+      data.scope === CouponScopeType.CATEGORIES &&
+      data.categoryIds.length === 0
+    ) {
+      ctx.addIssue({
+        path: ["categoryIds"],
+        code: "custom",
+        message: "Selecione ao menos uma categoria para o escopo do cupom",
       });
     }
 
@@ -77,6 +118,10 @@ export const checkCouponBodySchema = z.object({
     .max(50, "O código deve ter no máximo 50 caracteres")
     .transform((val) => val.toUpperCase()),
   customerPhone: phoneSchema.optional(),
+  subtotal: z.coerce
+    .number()
+    .min(0, "O subtotal não pode ser negativo")
+    .optional(),
 });
 
 z.globalRegistry.add(checkCouponBodySchema, { id: "CheckCouponBody" });

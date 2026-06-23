@@ -1,12 +1,13 @@
 import { makeSendOrderConfirmationMessageService } from "@/factories/services/order/make-send-order-confirmation-message.js";
 import { makeCalculateCouponDiscountFromOrderService } from "@/factories/services/order/validations/make-calculate-coupon-discount-from-order-service.js";
 import { makeValidateAddonsFromOrderService } from "@/factories/services/order/validations/make-validate-addons-from-order-service.js";
+import { makeValidateCombosFromOrderService } from "@/factories/services/order/validations/make-validate-combo-from-order-service.js";
 import { makeValidateDeliveryFromOrderService } from "@/factories/services/order/validations/make-validate-delivery-from-order-service.js";
 import { makeValidateEstablishmentFromOrderService } from "@/factories/services/order/validations/make-validate-establishment-from-order-service.js";
 import { makeValidateProductFromOrderService } from "@/factories/services/order/validations/make-validate-product-from-order-service.js";
 import { makeValidateScheduledAtFromOrderService } from "@/factories/services/order/validations/make-validate-scheduled-at-from-order-service.js";
+import { makeListActivePromotionsService } from "@/factories/services/promotion/make-list-active-promotions-service.js";
 import {
-  type Coupon,
   DiscountType,
   type District,
   NotificationType,
@@ -22,6 +23,8 @@ import prisma from "@/lib/prisma.js";
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
 import { createNotificationQueue } from "@/queues/notification-queue.js";
 import { buildOrderJobId } from "@/queues/order-queue.js";
+import type { ComboToProcess } from "@/types/combo.js";
+import type { CouponWithScope } from "@/types/coupon.js";
 import type {
   BuildOrderItemsParams,
   CreateOrderParams,
@@ -39,7 +42,7 @@ export class CreateOrderService {
   }
 
   private getOrderCouponInputData(
-    coupon: Coupon | null,
+    coupon: CouponWithScope | null,
   ): Partial<Prisma.OrderCreateInput> | undefined {
     if (!coupon) return undefined;
 
@@ -91,6 +94,52 @@ export class CreateOrderService {
     };
   }
 
+  private getOrderPromotionsInputData(
+    appliedPromotions: BuildOrderItemsParams["appliedPromotions"],
+  ): Partial<Prisma.OrderCreateInput> | undefined {
+    if (appliedPromotions.length === 0) return undefined;
+
+    return {
+      orderPromotions: {
+        create: appliedPromotions.map((promotion) => ({
+          name: promotion.name,
+          type: promotion.type,
+          discount_cents: promotion.discount_cents,
+          promotion: {
+            connect: {
+              id: promotion.promotion_id,
+            },
+          },
+        })),
+      },
+    };
+  }
+
+  private getOrderCombosInputData(
+    combosToProcess: ComboToProcess[],
+  ): Partial<Prisma.OrderCreateInput> | undefined {
+    if (combosToProcess.length === 0) return undefined;
+
+    return {
+      orderCombos: {
+        create: combosToProcess.map((combo) => ({
+          combo_name: combo.comboName,
+          combo_price: combo.comboPriceCents,
+          quantity: combo.quantity,
+          combo: { connect: { id: combo.comboId } },
+          selections: {
+            create: combo.selections.map((selection) => ({
+              product_name: selection.productName,
+              quantity: selection.quantity,
+              additional_price: selection.additionalPriceCents,
+              product: { connect: { id: selection.productId } },
+            })),
+          },
+        })),
+      },
+    };
+  }
+
   private buildOrderItems({
     customerName,
     customerPhone,
@@ -104,11 +153,16 @@ export class CreateOrderService {
     district,
     shippingCost,
     subtotal,
+    promotionDiscount,
+    appliedPromotions,
+    combosToProcess,
     idempotencyKey,
     scheduledAt,
     orderItemsToProcess,
   }: BuildOrderItemsParams): Prisma.OrderCreateInput {
     const couponData = this.getOrderCouponInputData(coupon);
+    const promotionData = this.getOrderPromotionsInputData(appliedPromotions);
+    const comboData = this.getOrderCombosInputData(combosToProcess);
     const orderAddress = this.getOrderAddressDistrictInputData(
       address,
       district,
@@ -123,6 +177,7 @@ export class CreateOrderService {
       change_amount: changeAmount,
       comment,
       subtotal,
+      promotion_discount: promotionDiscount,
       idempotency_key: idempotencyKey,
       scheduled_at: scheduledAt ? new Date(scheduledAt) : null,
       establishment: {
@@ -156,6 +211,8 @@ export class CreateOrderService {
       },
       ...orderAddress,
       ...couponData,
+      ...promotionData,
+      ...comboData,
     };
   }
 
@@ -176,6 +233,7 @@ export class CreateOrderService {
       comment,
       scheduledAt,
       items,
+      combos = [],
     } = order;
 
     const idempotencyKey = buildOrderJobId({ order, paramsToForget });
@@ -188,10 +246,12 @@ export class CreateOrderService {
       makeValidateScheduledAtFromOrderService();
     const calculateCouponDiscountService =
       makeCalculateCouponDiscountFromOrderService();
+    const listActivePromotionsService = makeListActivePromotionsService();
+    const validateCombosService = makeValidateCombosFromOrderService();
 
     const itemsValidated: OrderItems[] = removeDuplicateItems(items);
 
-    const [, delivery] = await Promise.all([
+    const [, delivery, , promotions, combosToProcess] = await Promise.all([
       validateEstablishment.handle({
         establishmentId,
         deliveryType,
@@ -210,9 +270,16 @@ export class CreateOrderService {
         establishmentId,
         scheduledAt,
       }),
+      listActivePromotionsService.handle({ establishmentId }),
+      validateCombosService.handle({ establishmentId, combos }),
     ]);
 
     const { address, coupon, district } = delivery;
+
+    const combosSubtotalCents = combosToProcess.reduce(
+      (acc, combo) => acc + combo.comboPriceCents * combo.quantity,
+      0,
+    );
 
     const orderItemsToProcess: OrderItemsToProcess[] = await Promise.all(
       itemsValidated.map(async (item) => {
@@ -250,11 +317,13 @@ export class CreateOrderService {
       }),
     );
 
-    const { shippingCost, subtotal, couponDiscount } =
+    const { shippingCost, subtotal, couponDiscount, promotionDiscount, appliedPromotions } =
       calculateCouponDiscountService.handle({
         coupon,
         district,
         orderItemsToProcess,
+        promotions,
+        combosSubtotalCents,
       });
 
     const stockDecrements = orderItemsToProcess
@@ -276,12 +345,15 @@ export class CreateOrderService {
       address,
       coupon,
       couponDiscount,
+      promotionDiscount,
+      appliedPromotions,
       deliveryType,
       district,
       establishmentId,
       paymentMethod,
       shippingCost,
       subtotal,
+      combosToProcess,
       customerName,
       customerPhone,
       changeAmount,
@@ -308,6 +380,8 @@ export class CreateOrderService {
       district,
       scheduledAt,
       orderItemsToProcess,
+      promotions,
+      combosToProcess,
     };
   }
 
@@ -353,6 +427,8 @@ export class CreateOrderService {
       scheduledAt: plan.scheduledAt,
       orderId,
       orderItemsToProcess: plan.orderItemsToProcess,
+      promotions: plan.promotions,
+      combosToProcess: plan.combosToProcess,
     });
 
     await createNotificationQueue({

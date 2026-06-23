@@ -1,7 +1,7 @@
 import { CouponNotFound } from "@/errors/coupon/not-found.js";
 import { makeCheckCouponService } from "@/factories/services/coupon/make-check-coupon-service.js";
 import { makeFindCouponService } from "@/factories/services/coupon/make-find-coupon-service.js";
-import type { Coupon } from "@/generated/prisma/client.js";
+import type { CouponWithScope } from "@/types/coupon.js";
 import type { EstablishmentID } from "@/types/establishment.js";
 
 type ValidateCouponFromOrderServiceRequest = {
@@ -15,7 +15,7 @@ export class ValidateCouponFromOrderService {
     establishmentId,
     couponId,
     customerPhone,
-  }: ValidateCouponFromOrderServiceRequest): Promise<Coupon> {
+  }: ValidateCouponFromOrderServiceRequest): Promise<CouponWithScope> {
     const filterParams = { establishment_id: establishmentId };
 
     const findCouponService = makeFindCouponService();

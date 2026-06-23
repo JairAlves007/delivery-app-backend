@@ -41,6 +41,29 @@ enum DiscountType {
   FIXED
 }
 
+enum CouponScopeType {
+  ALL
+  PRODUCTS
+  CATEGORIES
+}
+
+enum PromotionType {
+  MIN_ORDER_DISCOUNT
+  HAPPY_HOUR
+  BUY_X_PAY_Y
+  FREE_SHIPPING_THRESHOLD
+}
+
+enum RecommendationSource {
+  MANUAL
+  AUTO
+}
+
+enum ComboType {
+  FIXED
+  BUILD_YOUR_OWN
+}
+
 enum AddonType {
   SINGLE_CHOICE
   MULTIPLE_CHOICE
@@ -141,6 +164,9 @@ enum PermissionType {
   MANAGE_COUPONS
   MANAGE_WHATSAPP
   MANAGE_DIGITAL_MENU
+  MANAGE_PROMOTIONS
+  MANAGE_COMBOS
+  MANAGE_RECOMMENDATIONS
 
   // Admin
   MANAGE_ESTABLISHMENTS
@@ -203,6 +229,7 @@ enum ForObjectResourceType {
   PRODUCT
   CATEGORY
   BANNER
+  COMBO
 }
 
 enum FileFormatType {
@@ -233,6 +260,9 @@ enum ViewType {
   VIEW_DISTRICTS
   VIEW_TAGS
   VIEW_DIGITAL_MENU
+  VIEW_PROMOTIONS
+  VIEW_COMBOS
+  VIEW_RECOMMENDATIONS
 }
 
 // ─── Core: Auth & RBAC ──────────────────────────────────────────────
@@ -341,6 +371,9 @@ model Establishment {
   whatsappMessageLogs    WhatsappMessageLog[]
   digitalMenu            EstablishmentDigitalMenu?
   notifications          Notification[]
+  promotions             Promotion[]
+  productRecommendations ProductRecommendation[]
+  combos                 Combo[]
 
   @@index([is_listed_in_hub, deleted_at, next_billing_date], name: "idx_establishments_hub_visibility")
   @@map("establishments")
@@ -495,9 +528,11 @@ model ProductCategory {
   order            Int?
   deleted_at       DateTime?                 @db.Timestamptz
   establishment    Establishment             @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  products         Product[]
-  banners          Banner[]
-  resources        ProductCategoryResource[]
+  products            Product[]
+  banners             Banner[]
+  resources           ProductCategoryResource[]
+  couponCategories    CouponCategory[]
+  promotionCategories PromotionCategory[]
 
   @@unique([slug, establishment_id])
   @@index([establishment_id], name: "idx_product_categories_establishment_id")
@@ -528,6 +563,13 @@ model Product {
   tags                ProductTag[]
   resources           ProductResource[]
   addonCategories     ProductAddonCategory[]
+  couponProducts       CouponProduct[]
+  promotionProducts    PromotionProduct[]
+  recommendationsFrom  ProductRecommendation[] @relation("RecommendationFrom")
+  recommendationsTo    ProductRecommendation[] @relation("RecommendationTo")
+  comboItems           ComboItem[]
+  comboGroupOptions    ComboGroupOption[]
+  orderComboSelections OrderComboSelection[]
 
   @@unique([slug, establishment_id])
   @@index([establishment_id, category_id], name: "idx_products_establishment_category")
@@ -571,6 +613,106 @@ model ProductTag {
   @@id([product_id, tag_id])
   @@index([tag_id], name: "idx_product_tags_tag_id")
   @@map("product_tags")
+}
+
+model ProductRecommendation {
+  id                     String               @id @default(ulid())
+  establishment_id       String
+  product_id             String
+  recommended_product_id String
+  source                 RecommendationSource
+  score                  Float                @default(0)
+  created_at             DateTime             @default(now()) @db.Timestamptz
+  establishment          Establishment        @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product                Product              @relation("RecommendationFrom", fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  recommended_product    Product              @relation("RecommendationTo", fields: [recommended_product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([product_id, recommended_product_id])
+  @@index([establishment_id], name: "idx_product_recommendations_establishment_id")
+  @@index([product_id], name: "idx_product_recommendations_product_id")
+  @@map("product_recommendations")
+}
+
+model Combo {
+  id                  String          @id @default(ulid())
+  establishment_id    String
+  name                String          @db.VarChar(255)
+  slug                String          @db.VarChar(255)
+  description         String?         @db.VarChar(2000)
+  combo_type          ComboType
+  price               Int
+  discount_percentage Float?
+  is_active           Boolean         @default(true)
+  valid_until         DateTime?       @db.Timestamptz
+  order               Int?
+  created_at          DateTime        @default(now()) @db.Timestamptz
+  updated_at          DateTime        @updatedAt @db.Timestamptz
+  deleted_at          DateTime?       @db.Timestamptz
+  establishment       Establishment   @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  items               ComboItem[]
+  groups              ComboGroup[]
+  resources           ComboResource[]
+  orderCombos         OrderCombo[]
+
+  @@unique([slug, establishment_id])
+  @@index([establishment_id], name: "idx_combos_establishment_id")
+  @@index([deleted_at], name: "idx_combos_deleted_at")
+  @@map("combos")
+}
+
+model ComboItem {
+  id         Int     @id @default(autoincrement())
+  combo_id   String
+  product_id String
+  quantity   Int
+  combo      Combo   @relation(fields: [combo_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([combo_id], name: "idx_combo_items_combo_id")
+  @@index([product_id], name: "idx_combo_items_product_id")
+  @@map("combo_items")
+}
+
+model ComboGroup {
+  id            String             @id @default(ulid())
+  combo_id      String
+  name          String             @db.VarChar(255)
+  min_selection Int
+  max_selection Int
+  display_order Int                @default(0)
+  combo         Combo              @relation(fields: [combo_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  options       ComboGroupOption[]
+
+  @@index([combo_id], name: "idx_combo_groups_combo_id")
+  @@map("combo_groups")
+}
+
+model ComboGroupOption {
+  id               String     @id @default(ulid())
+  combo_group_id   String
+  product_id       String
+  additional_price Int        @default(0)
+  group            ComboGroup @relation(fields: [combo_group_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product          Product    @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([combo_group_id], name: "idx_combo_group_options_combo_group_id")
+  @@index([product_id], name: "idx_combo_group_options_product_id")
+  @@map("combo_group_options")
+}
+
+model ComboResource {
+  id          String   @id @default(ulid())
+  resource_id String
+  combo_id    String
+  created_at  DateTime @default(now()) @db.Timestamptz
+  updated_at  DateTime @updatedAt @db.Timestamptz
+  resource    Resource @relation(fields: [resource_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  combo       Combo    @relation(fields: [combo_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([combo_id, resource_id])
+  @@index([combo_id], name: "idx_combo_resources_combo_id")
+  @@index([resource_id], name: "idx_combo_resources_resource_id")
+  @@map("combo_resources")
 }
 
 // ─── Addons ─────────────────────────────────────────────────────────
@@ -718,23 +860,54 @@ model Banner {
 // ─── Coupons ────────────────────────────────────────────────────────
 
 model Coupon {
-  id               String        @id @default(ulid())
-  establishment_id String
-  code             String        @unique @db.VarChar(50)
-  type             CouponType
-  discount_type    DiscountType
-  value            Float
-  starts_at        DateTime?     @db.Timestamptz
-  ends_at          DateTime?     @db.Timestamptz
-  deleted_at       DateTime?     @db.Timestamptz
-  max_uses         Int?
-  establishment    Establishment @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  orders           Order[]
-  userCoupons      UserCoupon[]
+  id                 String           @id @default(ulid())
+  establishment_id   String
+  code               String           @db.VarChar(50)
+  type               CouponType
+  discount_type      DiscountType
+  value              Float
+  scope              CouponScopeType  @default(ALL)
+  min_order_value    Int?
+  per_customer_limit Int?
+  is_active          Boolean          @default(true)
+  starts_at          DateTime?        @db.Timestamptz
+  ends_at            DateTime?        @db.Timestamptz
+  deleted_at         DateTime?        @db.Timestamptz
+  max_uses           Int?
+  establishment      Establishment    @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orders             Order[]
+  userCoupons        UserCoupon[]
+  couponProducts     CouponProduct[]
+  couponCategories   CouponCategory[]
 
+  @@unique([code, establishment_id])
   @@index([establishment_id], name: "idx_coupons_establishment_id")
   @@index([deleted_at], name: "idx_coupons_deleted_at")
   @@map("coupons")
+}
+
+model CouponProduct {
+  coupon_id  String
+  product_id String
+  coupon     Coupon  @relation(fields: [coupon_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([coupon_id, product_id])
+  @@index([coupon_id], name: "idx_coupon_products_coupon_id")
+  @@index([product_id], name: "idx_coupon_products_product_id")
+  @@map("coupon_products")
+}
+
+model CouponCategory {
+  coupon_id   String
+  category_id String
+  coupon      Coupon          @relation(fields: [coupon_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  category    ProductCategory @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([coupon_id, category_id])
+  @@index([coupon_id], name: "idx_coupon_categories_coupon_id")
+  @@index([category_id], name: "idx_coupon_categories_category_id")
+  @@map("coupon_categories")
 }
 
 model UserCoupon {
@@ -748,6 +921,72 @@ model UserCoupon {
   @@map("user_coupons")
 }
 
+// ─── Promotions ─────────────────────────────────────────────────────
+
+model Promotion {
+  id                    String              @id @default(ulid())
+  establishment_id      String
+  name                  String              @db.VarChar(255)
+  type                  PromotionType
+  discount_type         DiscountType?
+  value                 Float?
+  scope                 CouponScopeType     @default(ALL)
+  min_order_value       Int?
+  buy_quantity          Int?
+  pay_quantity          Int?
+  priority              Int                 @default(0)
+  stackable_with_coupon Boolean             @default(false)
+  is_active             Boolean             @default(true)
+  starts_at             DateTime?           @db.Timestamptz
+  ends_at               DateTime?           @db.Timestamptz
+  deleted_at            DateTime?           @db.Timestamptz
+  establishment         Establishment       @relation(fields: [establishment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  windows               PromotionWindow[]
+  promotionProducts     PromotionProduct[]
+  promotionCategories   PromotionCategory[]
+  orderPromotions       OrderPromotion[]
+
+  @@index([establishment_id], name: "idx_promotions_establishment_id")
+  @@index([deleted_at], name: "idx_promotions_deleted_at")
+  @@map("promotions")
+}
+
+model PromotionWindow {
+  id           Int       @id @default(autoincrement())
+  promotion_id String
+  day_of_week  WeekDay
+  opens_at     String    @db.VarChar(5)
+  closes_at    String    @db.VarChar(5)
+  promotion    Promotion @relation(fields: [promotion_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([promotion_id], name: "idx_promotion_windows_promotion_id")
+  @@map("promotion_windows")
+}
+
+model PromotionProduct {
+  promotion_id String
+  product_id   String
+  promotion    Promotion @relation(fields: [promotion_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product      Product   @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([promotion_id, product_id])
+  @@index([promotion_id], name: "idx_promotion_products_promotion_id")
+  @@index([product_id], name: "idx_promotion_products_product_id")
+  @@map("promotion_products")
+}
+
+model PromotionCategory {
+  promotion_id String
+  category_id  String
+  promotion    Promotion       @relation(fields: [promotion_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  category     ProductCategory @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([promotion_id, category_id])
+  @@index([promotion_id], name: "idx_promotion_categories_promotion_id")
+  @@index([category_id], name: "idx_promotion_categories_category_id")
+  @@map("promotion_categories")
+}
+
 // ─── Orders ─────────────────────────────────────────────────────────
 
 model Order {
@@ -758,6 +997,7 @@ model Order {
   delivery_type        DeliveryType
   shipping_fee         Int
   subtotal             Int
+  promotion_discount   Int                   @default(0)
   customer_name        String                @db.VarChar(255)
   customer_phone       String                @db.VarChar(20)
   establishment_id     String
@@ -774,6 +1014,8 @@ model Order {
   orderCoupon          OrderCoupon?
   orderDeliveryAddress OrderDeliveryAddress?
   whatsappMessageLogs  WhatsappMessageLog[]
+  orderPromotions      OrderPromotion[]
+  orderCombos          OrderCombo[]
 
   @@index([establishment_id, created_at(sort: Desc)], name: "idx_orders_establishment_created")
   @@index([establishment_id, scheduled_at], name: "idx_orders_establishment_scheduled")
@@ -803,6 +1045,54 @@ model OrderCoupon {
   order          Order        @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("order_coupons")
+}
+
+model OrderPromotion {
+  id            Int           @id @default(autoincrement())
+  order_id      String
+  promotion_id  String?
+  name          String        @db.VarChar(255)
+  type          PromotionType
+  discount_cents Int
+  created_at    DateTime      @default(now()) @db.Timestamptz
+  order         Order         @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  promotion     Promotion?    @relation(fields: [promotion_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([order_id], name: "idx_order_promotions_order_id")
+  @@index([promotion_id], name: "idx_order_promotions_promotion_id")
+  @@map("order_promotions")
+}
+
+model OrderCombo {
+  id          String                @id @default(ulid())
+  order_id    String
+  combo_id    String?
+  combo_name  String                @db.VarChar(255)
+  combo_price Int
+  quantity    Int
+  created_at  DateTime              @default(now()) @db.Timestamptz
+  order       Order                 @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  combo       Combo?                @relation(fields: [combo_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  selections  OrderComboSelection[]
+
+  @@index([order_id], name: "idx_order_combos_order_id")
+  @@index([combo_id], name: "idx_order_combos_combo_id")
+  @@map("order_combos")
+}
+
+model OrderComboSelection {
+  id               Int        @id @default(autoincrement())
+  order_combo_id   String
+  product_id       String
+  product_name     String     @db.VarChar(255)
+  quantity         Int
+  additional_price Int        @default(0)
+  orderCombo       OrderCombo @relation(fields: [order_combo_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product          Product    @relation(fields: [product_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([order_combo_id], name: "idx_order_combo_selections_order_combo_id")
+  @@index([product_id], name: "idx_order_combo_selections_product_id")
+  @@map("order_combo_selections")
 }
 
 model OrderItem {
@@ -948,6 +1238,7 @@ model Resource {
   establishmentResources   EstablishmentResource[]
   productCategoryResources ProductCategoryResource[]
   bannerResources          BannerResource[]
+  comboResources           ComboResource[]
 
   @@unique([establishment_id, file_key])
   @@index([establishment_id], name: "idx_resources_establishment_id")

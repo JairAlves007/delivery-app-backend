@@ -197,6 +197,74 @@ export class SendOrderConfirmationMessageService {
 		return "";
 	}
 
+	private renderCombos(
+		combosToProcess: SendOrderConfirmationMessageParams["combosToProcess"]
+	): string {
+		if (combosToProcess.length === 0) return "";
+
+		const subSections = Constants.ORDER_SUB_SECTIONS_MESSAGE_TEMPLATES;
+
+		const blocks = combosToProcess
+			.map(combo => {
+				const selections = combo.selections
+					.map(selection =>
+						subSections.comboSelection
+							.replaceAll(
+								"{selection_name}",
+								selection.quantity > 1
+									? `${selection.quantity}x ${selection.productName}`
+									: selection.productName
+							)
+							.replaceAll(
+								"{selection_extra}",
+								selection.additionalPriceCents > 0
+									? ` (+${formatCents(selection.additionalPriceCents)})`
+									: ""
+							)
+					)
+					.join("\n");
+
+				return subSections.comboBlock
+					.replaceAll("{combo_name}", combo.comboName)
+					.replaceAll("{combo_quantity}", combo.quantity.toString())
+					.replaceAll("{combo_selections}", selections)
+					.replaceAll(
+						"{combo_total}",
+						formatCents(combo.comboPriceCents * combo.quantity)
+					);
+			})
+			.join("\n");
+
+		return `🥡 Combos do Pedido:\n${blocks}`;
+	}
+
+	private renderPromotionsList(
+		breakdown: OrderPricingBreakdown
+	): string {
+		if (breakdown.appliedPromotions.length === 0) return "";
+
+		const subSections = Constants.ORDER_SUB_SECTIONS_MESSAGE_TEMPLATES;
+
+		return breakdown.appliedPromotions
+			.map(promotion =>
+				subSections.promotionApplied
+					.replaceAll("{promotion_name}", promotion.name)
+					.replaceAll("{promotion_value}", formatCents(promotion.discount_cents))
+			)
+			.join("\n");
+	}
+
+	private renderPromotionDiscountLine(
+		breakdown: OrderPricingBreakdown
+	): string {
+		if (breakdown.promotionDiscountCents <= 0) return "";
+
+		return Constants.ORDER_SUB_SECTIONS_MESSAGE_TEMPLATES.discountPromotion.replaceAll(
+			"{discount_value}",
+			formatCents(breakdown.promotionDiscountCents)
+		);
+	}
+
 	private generateMessage({
 		customerName,
 		customerPhone,
@@ -208,15 +276,24 @@ export class SendOrderConfirmationMessageService {
 		coupon,
 		district,
 		scheduledAt,
-		orderItemsToProcess
+		orderItemsToProcess,
+		promotions,
+		combosToProcess
 	}: SendOrderConfirmationMessageParams): string {
 		const subSectionsTemplates = Constants.ORDER_SUB_SECTIONS_MESSAGE_TEMPLATES;
 		const template = Constants.ORDER_MESSAGE_TEMPLATE;
 
+		const combosSubtotalCents = combosToProcess.reduce(
+			(acc, combo) => acc + combo.comboPriceCents * combo.quantity,
+			0
+		);
+
 		const breakdown = calculateOrderPricing({
 			coupon,
 			district,
-			orderItemsToProcess
+			orderItemsToProcess,
+			promotions,
+			combosSubtotalCents
 		});
 
 		let orderItemsMessage = "";
@@ -227,6 +304,12 @@ export class SendOrderConfirmationMessageService {
 
 		return template
 			.replaceAll("{order_items}", orderItemsMessage.trim())
+			.replaceAll("{combos}", this.renderCombos(combosToProcess))
+			.replaceAll("{promotions}", this.renderPromotionsList(breakdown))
+			.replaceAll(
+				"{promotion_discount}",
+				this.renderPromotionDiscountLine(breakdown)
+			)
 			.replaceAll("{customer_name}", customerName)
 			.replaceAll("{customer_phone}", this.applyPhoneMask(customerPhone))
 			.replaceAll("{delivery_type}", getDeliveryTypeLabel(deliveryType))

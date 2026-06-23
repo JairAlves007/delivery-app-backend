@@ -1,6 +1,6 @@
 import z from "zod";
 
-import { DiscountType } from "@/generated/prisma/client.js";
+import { CouponScopeType, DiscountType } from "@/generated/prisma/client.js";
 import { transformPriceToDatabase } from "@/helpers/price.js";
 import type { ICouponRepository } from "@/interfaces/repositories/coupon-repository.js";
 import { forgetAllListingCacheKeysQueue } from "@/queues/cache-queue.js";
@@ -24,6 +24,12 @@ export class CreateCouponService {
 		establishmentId,
 		value,
 		discountType: discount_type,
+		scope,
+		minOrderValue,
+		perCustomerLimit: per_customer_limit,
+		isActive: is_active,
+		productIds,
+		categoryIds,
 		startsAt: starts_at,
 		endsAt: ends_at,
 		maxUses: max_uses,
@@ -37,6 +43,11 @@ export class CreateCouponService {
 					? value
 					: transformPriceToDatabase(value),
 			discount_type,
+			scope,
+			min_order_value:
+				minOrderValue == null ? null : transformPriceToDatabase(minOrderValue),
+			per_customer_limit,
+			is_active,
 			starts_at,
 			ends_at,
 			max_uses,
@@ -44,7 +55,21 @@ export class CreateCouponService {
 				connect: {
 					id: establishmentId
 				}
-			}
+			},
+			...(scope === CouponScopeType.PRODUCTS && {
+				couponProducts: {
+					create: productIds.map((product_id) => ({
+						product: { connect: { id: product_id } }
+					}))
+				}
+			}),
+			...(scope === CouponScopeType.CATEGORIES && {
+				couponCategories: {
+					create: categoryIds.map((category_id) => ({
+						category: { connect: { id: category_id } }
+					}))
+				}
+			})
 		});
 
 		await forgetAllListingCacheKeysQueue({

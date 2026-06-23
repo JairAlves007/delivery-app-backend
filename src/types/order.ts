@@ -1,7 +1,6 @@
 import type { z } from "zod";
 
 import type {
-  Coupon,
   DeliveryType,
   District,
   PaymentMethodType,
@@ -12,8 +11,11 @@ import type { orderPayloadSchema } from "@/schemas/response-schema.js";
 
 import type { AddonFromRepository } from "./addon.js";
 import type { ForgetAllListingCacheKeysParams } from "./cache.js";
+import type { ComboOrderInput, ComboToProcess } from "./combo.js";
+import type { CouponWithScope } from "./coupon.js";
 import type { EstablishmentID } from "./establishment.js";
 import type { ProductFromRepository } from "./product.js";
+import type { AppliedPromotion, PromotionWithRelations } from "./promotion.js";
 
 export type OrderFromRepository = Prisma.OrderGetPayload<{
   include: {
@@ -21,6 +23,8 @@ export type OrderFromRepository = Prisma.OrderGetPayload<{
     items: { include: { addons: true } };
     orderCoupon: true;
     orderDeliveryAddress: true;
+    orderPromotions: true;
+    orderCombos: { include: { selections: true } };
     statuses: {
       select: {
         label: true;
@@ -74,11 +78,14 @@ export type BuildOrderItemsParams = {
   establishmentId: EstablishmentID;
   changeAmount?: number | null;
   couponDiscount: number;
-  coupon: Coupon | null;
+  promotionDiscount: number;
+  appliedPromotions: AppliedPromotion[];
+  coupon: CouponWithScope | null;
   address: GuestAddress | null;
   district: District | null;
   shippingCost: number;
   subtotal: number;
+  combosToProcess: ComboToProcess[];
   idempotencyKey: string;
   scheduledAt?: string | null;
   orderItemsToProcess: OrderItemsToProcess[];
@@ -99,15 +106,17 @@ export type SendOrderConfirmationMessageParams = {
   deliveryType: DeliveryType;
   paymentMethod: PaymentMethodType;
   changeAmount?: number | null;
-  coupon: Coupon | null;
+  coupon: CouponWithScope | null;
   address: GuestAddress | null;
   district: District | null;
   scheduledAt?: string | null;
   orderItemsToProcess: OrderItemsToProcess[];
+  promotions: PromotionWithRelations[];
+  combosToProcess: ComboToProcess[];
 };
 
 export type OrderInfo = {
-  coupon: Coupon | null;
+  coupon: CouponWithScope | null;
   address: GuestAddress | null;
   district: District | null;
 };
@@ -151,6 +160,7 @@ export type OrderIntent = {
   changeAmount?: number | null;
   scheduledAt?: string | null;
   items: OrderItems[];
+  combos?: ComboOrderInput[];
 };
 
 export type OrderSubSectionMessage = {
@@ -171,6 +181,10 @@ export type OrderSubSectionMessage = {
   comment: string;
   discountOrder: string;
   discountShipping: string;
+  comboBlock: string;
+  comboSelection: string;
+  promotionApplied: string;
+  discountPromotion: string;
 };
 
 export type CreateOrderParams = {
@@ -189,8 +203,10 @@ export type CreateOrderPlan = {
   deliveryType: DeliveryType;
   paymentMethod: PaymentMethodType;
   address: GuestAddress | null;
-  coupon: Coupon | null;
+  coupon: CouponWithScope | null;
   district: District | null;
   scheduledAt?: string | null;
   orderItemsToProcess: OrderItemsToProcess[];
+  promotions: PromotionWithRelations[];
+  combosToProcess: ComboToProcess[];
 } & Pick<ForgetAllListingCacheKeysParams, "paramsToForget">;

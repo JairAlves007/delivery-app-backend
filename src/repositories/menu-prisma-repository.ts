@@ -150,6 +150,27 @@ const defaultMenus: DefaultMenu[] = [
 		order: 10,
 		for_audience: MenuAudienceType.ESTABLISHMENT_OWNER
 	},
+	{
+		label: "Promoções",
+		slug: "promotions",
+		view_type: ViewType.VIEW_PROMOTIONS,
+		order: 11,
+		for_audience: MenuAudienceType.ESTABLISHMENT_OWNER
+	},
+	{
+		label: "Combos",
+		slug: "combos",
+		view_type: ViewType.VIEW_COMBOS,
+		order: 12,
+		for_audience: MenuAudienceType.ESTABLISHMENT_OWNER
+	},
+	{
+		label: "Recomendações",
+		slug: "recommendations",
+		view_type: ViewType.VIEW_RECOMMENDATIONS,
+		order: 13,
+		for_audience: MenuAudienceType.ESTABLISHMENT_OWNER
+	},
 
 	// Admin
 	{
@@ -254,6 +275,27 @@ const defaultMenus: DefaultMenu[] = [
 		slug: "digital-menu",
 		view_type: ViewType.VIEW_DIGITAL_MENU,
 		order: 10,
+		for_audience: MenuAudienceType.ADMIN
+	},
+	{
+		label: "Promoções",
+		slug: "promotions",
+		view_type: ViewType.VIEW_PROMOTIONS,
+		order: 11,
+		for_audience: MenuAudienceType.ADMIN
+	},
+	{
+		label: "Combos",
+		slug: "combos",
+		view_type: ViewType.VIEW_COMBOS,
+		order: 12,
+		for_audience: MenuAudienceType.ADMIN
+	},
+	{
+		label: "Recomendações",
+		slug: "recommendations",
+		view_type: ViewType.VIEW_RECOMMENDATIONS,
+		order: 13,
 		for_audience: MenuAudienceType.ADMIN
 	}
 ];

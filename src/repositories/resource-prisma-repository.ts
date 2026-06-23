@@ -61,6 +61,7 @@ export class ResourcePrismaRepository implements IResourceRepository {
             establishmentResources: true,
             productCategoryResources: true,
             bannerResources: true,
+            comboResources: true,
           },
         },
       },

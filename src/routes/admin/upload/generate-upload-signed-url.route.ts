@@ -40,6 +40,7 @@ export const generateUploadSignedUrlRoute = async (app: FastifyInstance) => {
           PermissionType.MANAGE_ESTABLISHMENTS,
           PermissionType.MANAGE_BANNERS,
           PermissionType.MANAGE_PRODUCTS,
+          PermissionType.MANAGE_COMBOS,
         ]),
       ],
     },

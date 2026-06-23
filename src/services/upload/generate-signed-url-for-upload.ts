@@ -12,6 +12,7 @@ import {
 	mapMimeTypeToFileFormat
 } from "@/helpers/resource.js";
 import { SignedUrl } from "@/helpers/signed-url.js";
+import type { IComboRepository } from "@/interfaces/repositories/combo-repository.js";
 import type { IProductCategoryRepository } from "@/interfaces/repositories/product-category-repository.js";
 import type { IProductRepository } from "@/interfaces/repositories/product-repository.js";
 import type { IResourceRepository } from "@/interfaces/repositories/resource-repository.js";
@@ -35,15 +36,18 @@ export class GenerateSignedUrlForUploadService {
 	private resourceRepository: IResourceRepository;
 	private productRepository: IProductRepository;
 	private productCategoryRepository: IProductCategoryRepository;
+	private comboRepository: IComboRepository;
 
 	constructor(
 		resourceRepository: IResourceRepository,
 		productRepository: IProductRepository,
-		productCategoryRepository: IProductCategoryRepository
+		productCategoryRepository: IProductCategoryRepository,
+		comboRepository: IComboRepository
 	) {
 		this.resourceRepository = resourceRepository;
 		this.productRepository = productRepository;
 		this.productCategoryRepository = productCategoryRepository;
+		this.comboRepository = comboRepository;
 	}
 
 	private async validateResourceRule({
@@ -108,6 +112,16 @@ export class GenerateSignedUrlForUploadService {
 			});
 
 			if (!category) throw new InvalidResource();
+			return;
+		}
+
+		if (forResource === ForObjectResourceType.COMBO) {
+			const combo = await this.comboRepository.findById({
+				id: objectId,
+				filterParams: { establishment_id: establishmentId }
+			});
+
+			if (!combo) throw new InvalidResource();
 		}
 	}
 

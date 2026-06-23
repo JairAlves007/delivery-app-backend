@@ -41,6 +41,9 @@ export class DeleteResourceService {
     if (resource._count.bannerResources > 0)
       forResources.push(ForObjectResourceType.BANNER);
 
+    if (resource._count.comboResources > 0)
+      forResources.push(ForObjectResourceType.COMBO);
+
     const bucketKey = `${resource.path}/${resource.file_key}`;
 
     await enqueueDeleteResource({

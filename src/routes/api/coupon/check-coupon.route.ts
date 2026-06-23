@@ -32,7 +32,8 @@ export const checkCouponRoute = async (app: FastifyInstance) => {
 			},
 		},
 		async (request, reply) => {
-			const { establishmentId, code, customerPhone } = request.body;
+			const { establishmentId, code, customerPhone, subtotal } =
+				request.body;
 
 			const checkCouponService = makeCheckCouponService();
 
@@ -40,6 +41,7 @@ export const checkCouponRoute = async (app: FastifyInstance) => {
 				code,
 				establishmentId,
 				customerPhone,
+				subtotal,
 			});
 
 			return reply

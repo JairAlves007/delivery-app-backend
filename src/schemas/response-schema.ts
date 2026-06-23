@@ -4,6 +4,8 @@ import {
 	AddonPricingStrategy,
 	AddonType,
 	BannerLinkType,
+	ComboType,
+	CouponScopeType,
 	CouponType,
 	DeliveryType,
 	DigitalMenuSource,
@@ -15,6 +17,8 @@ import {
 	OrderStatusType,
 	PaymentMethodType,
 	ProductPricingMode,
+	PromotionType,
+	RecommendationSource,
 	ResourceType,
 	RoleType,
 	SocialPlatform,
@@ -158,9 +162,15 @@ export const couponResponseSchema = z.object({
 	type: z.enum(CouponType),
 	discount_type: z.enum(DiscountType),
 	value: z.number(),
+	scope: z.enum(CouponScopeType),
+	min_order_value: z.number().nullable(),
+	per_customer_limit: z.number().nullable(),
+	is_active: z.boolean(),
 	starts_at: nullableDateStringSchema,
 	ends_at: nullableDateStringSchema,
-	max_uses: z.number().nullable()
+	max_uses: z.number().nullable(),
+	product_ids: z.array(z.string()).default([]),
+	category_ids: z.array(z.string()).default([])
 });
 
 export const couponListResponseSchema =
@@ -172,8 +182,180 @@ export const checkCouponResponseSchema = z.object({
 	type: z.enum(CouponType),
 	discount_type: z.enum(DiscountType),
 	value: z.number(),
+	scope: z.enum(CouponScopeType),
+	min_order_value: z.number().nullable(),
+	per_customer_limit: z.number().nullable(),
 	ends_at: nullableDateStringSchema
 });
+
+const appliedPromotionSchema = z.object({
+	promotion_id: z.string(),
+	name: z.string(),
+	type: z.enum(PromotionType),
+	discount: z.number()
+});
+
+export const quoteOrderResponseSchema = z.object({
+	subtotal: z.number(),
+	subtotal_gross: z.number(),
+	shipping_cost: z.number(),
+	shipping_cost_gross: z.number(),
+	order_discount: z.number(),
+	shipping_discount: z.number(),
+	coupon_discount: z.number(),
+	promotion_discount: z.number(),
+	promotions: z.array(appliedPromotionSchema).default([]),
+	total: z.number()
+});
+
+// ──────────────────────────────────────────────
+// Promotion
+// ──────────────────────────────────────────────
+
+const promotionWindowResponseSchema = z.object({
+	id: z.number(),
+	day_of_week: z.enum(WeekDay),
+	opens_at: z.string(),
+	closes_at: z.string()
+});
+
+export const promotionResponseSchema = z.object({
+	id: z.string(),
+	name: z.string(),
+	type: z.enum(PromotionType),
+	discount_type: z.enum(DiscountType).nullable(),
+	value: z.number().nullable(),
+	scope: z.enum(CouponScopeType),
+	min_order_value: z.number().nullable(),
+	buy_quantity: z.number().nullable(),
+	pay_quantity: z.number().nullable(),
+	priority: z.number(),
+	stackable_with_coupon: z.boolean(),
+	is_active: z.boolean(),
+	starts_at: nullableDateStringSchema,
+	ends_at: nullableDateStringSchema,
+	windows: z.array(promotionWindowResponseSchema).default([]),
+	product_ids: z.array(z.string()).default([]),
+	category_ids: z.array(z.string()).default([])
+});
+
+export const promotionListResponseSchema = paginatedResponseSchema(
+	promotionResponseSchema
+);
+
+export const activePromotionResponseSchema = z.object({
+	id: z.string(),
+	name: z.string(),
+	type: z.enum(PromotionType),
+	discount_type: z.enum(DiscountType).nullable(),
+	value: z.number().nullable(),
+	scope: z.enum(CouponScopeType),
+	min_order_value: z.number().nullable()
+});
+
+export const activePromotionListResponseSchema = z.array(
+	activePromotionResponseSchema
+);
+
+// ──────────────────────────────────────────────
+// Recommendation & Tag Combination
+// ──────────────────────────────────────────────
+
+const recommendationProductSchema = z.object({
+	id: z.string(),
+	name: z.string()
+});
+
+export const recommendationResponseSchema = z.object({
+	id: z.string(),
+	source: z.enum(RecommendationSource),
+	product: recommendationProductSchema,
+	recommended_product: recommendationProductSchema
+});
+
+export const recommendationListResponseSchema = z.array(
+	recommendationResponseSchema
+);
+
+const tagCombinationTagSchema = z.object({
+	id: z.number(),
+	label: z.string(),
+	type: z.enum(TagType)
+});
+
+export const tagCombinationResponseSchema = z.object({
+	id: z.number(),
+	from_tag: tagCombinationTagSchema,
+	to_tag: tagCombinationTagSchema
+});
+
+export const tagCombinationListResponseSchema = z.array(
+	tagCombinationResponseSchema
+);
+
+// ──────────────────────────────────────────────
+// Combo
+// ──────────────────────────────────────────────
+
+const comboProductSummarySchema = z.object({
+	id: z.string(),
+	name: z.string(),
+	price: z.number()
+});
+
+const comboItemResponseSchema = z.object({
+	id: z.number(),
+	quantity: z.number(),
+	product: comboProductSummarySchema
+});
+
+const comboGroupOptionResponseSchema = z.object({
+	id: z.string(),
+	additional_price: z.number(),
+	product: comboProductSummarySchema
+});
+
+const comboGroupResponseSchema = z.object({
+	id: z.string(),
+	name: z.string(),
+	min_selection: z.number(),
+	max_selection: z.number(),
+	display_order: z.number(),
+	options: z.array(comboGroupOptionResponseSchema)
+});
+
+export const comboResponseSchema = z.object({
+	id: z.string(),
+	name: z.string(),
+	slug: z.string(),
+	description: z.string().nullable(),
+	combo_type: z.enum(ComboType),
+	price: z.number(),
+	discount_percentage: z.number().nullable(),
+	is_active: z.boolean(),
+	valid_until: nullableDateStringSchema,
+	order: z.number().nullable(),
+	image: z.string().nullable(),
+	items: z.array(comboItemResponseSchema).default([]),
+	groups: z.array(comboGroupResponseSchema).default([])
+});
+
+export const comboListItemSchema = z.object({
+	id: z.string(),
+	name: z.string(),
+	slug: z.string(),
+	combo_type: z.enum(ComboType),
+	price: z.number(),
+	discount_percentage: z.number().nullable(),
+	is_active: z.boolean(),
+	valid_until: nullableDateStringSchema,
+	order: z.number().nullable()
+});
+
+export const comboListResponseSchema =
+	paginatedResponseSchema(comboListItemSchema);
+
+export const comboCatalogListResponseSchema = z.array(comboResponseSchema);
 
 // ──────────────────────────────────────────────
 // District
@@ -375,6 +557,29 @@ const orderStatusSchema = z.object({
 	value: z.enum(OrderStatusType)
 });
 
+const orderPromotionSchema = z.object({
+	id: z.number(),
+	name: z.string(),
+	type: z.enum(PromotionType),
+	discount: z.number()
+});
+
+const orderComboSelectionSchema = z.object({
+	id: z.number(),
+	product_id: z.string(),
+	product_name: z.string(),
+	quantity: z.number(),
+	additional_price: z.number()
+});
+
+const orderComboSchema = z.object({
+	id: z.string(),
+	combo_name: z.string(),
+	combo_price: z.number(),
+	quantity: z.number(),
+	selections: z.array(orderComboSelectionSchema)
+});
+
 export const orderPayloadSchema = z.object({
 	id: z.string(),
 	comment: z.string().nullable(),
@@ -383,6 +588,7 @@ export const orderPayloadSchema = z.object({
 	delivery_type: z.enum(DeliveryType),
 	shipping_fee: z.number(),
 	subtotal: z.number(),
+	promotion_discount: z.number(),
 	customer_name: z.string(),
 	customer_phone: z.string(),
 	scheduled_at: nullableDateStringSchema,
@@ -390,6 +596,8 @@ export const orderPayloadSchema = z.object({
 	updated_at: dateStringSchema,
 	items: z.array(orderItemSchema),
 	coupon: orderCouponSchema.nullable(),
+	promotions: z.array(orderPromotionSchema).default([]),
+	combos: z.array(orderComboSchema).default([]),
 	status: orderStatusSchema
 });
 
@@ -706,6 +914,17 @@ const registryItems = [
 	{ schema: couponResponseSchema, id: "CouponResponse" },
 	{ schema: couponListResponseSchema, id: "CouponListResponse" },
 	{ schema: checkCouponResponseSchema, id: "CheckCouponResponse" },
+	{ schema: quoteOrderResponseSchema, id: "QuoteOrderResponse" },
+	{ schema: promotionResponseSchema, id: "PromotionResponse" },
+	{ schema: promotionListResponseSchema, id: "PromotionListResponse" },
+	{
+		schema: activePromotionResponseSchema,
+		id: "ActivePromotionResponse"
+	},
+	{ schema: recommendationResponseSchema, id: "RecommendationResponse" },
+	{ schema: tagCombinationResponseSchema, id: "TagCombinationResponse" },
+	{ schema: comboResponseSchema, id: "ComboResponse" },
+	{ schema: comboListResponseSchema, id: "ComboListResponse" },
 	{ schema: districtResponseSchema, id: "DistrictResponse" },
 	{ schema: districtListResponseSchema, id: "DistrictListResponse" },
 	{ schema: establishmentResponseSchema, id: "EstablishmentResponse" },

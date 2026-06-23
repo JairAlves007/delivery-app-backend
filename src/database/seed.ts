@@ -5,11 +5,13 @@ import {
 	AddonPricingStrategy,
 	AddonType,
 	BannerLinkType,
+	ComboType,
 	CouponType,
 	DiscountType,
 	FileFormatType,
 	PermissionType,
 	ProductPricingMode,
+	PromotionType,
 	RoleType,
 	SocialPlatform,
 	TagType,
@@ -1361,6 +1363,127 @@ async function seedEstablishment(
 		}))
 	});
 
+	await prisma.promotion.create({
+		data: {
+			establishment_id: establishment.id,
+			name: "10% acima de R$50",
+			type: PromotionType.MIN_ORDER_DISCOUNT,
+			discount_type: DiscountType.PERCENTAGE,
+			value: 10,
+			min_order_value: transformPriceToDatabase(50),
+			priority: 1
+		}
+	});
+
+	await prisma.promotion.create({
+		data: {
+			establishment_id: establishment.id,
+			name: "Frete grátis acima de R$80",
+			type: PromotionType.FREE_SHIPPING_THRESHOLD,
+			min_order_value: transformPriceToDatabase(80),
+			priority: 2
+		}
+	});
+
+	await prisma.promotion.create({
+		data: {
+			establishment_id: establishment.id,
+			name: "Happy Hour (Sex 18h-21h)",
+			type: PromotionType.HAPPY_HOUR,
+			discount_type: DiscountType.PERCENTAGE,
+			value: 15,
+			priority: 3,
+			windows: {
+				create: [
+					{
+						day_of_week: WeekDay.FRIDAY,
+						opens_at: "18:00",
+						closes_at: "21:00"
+					}
+				]
+			}
+		}
+	});
+
+	if (products.length >= 2) {
+		const [first, second, third] = products;
+
+		const comboDoDiaResource = await prisma.resource.create({
+			data: {
+				type: "THUMBNAIL",
+				path: "combo/thumbnail",
+				file_key: "seed-combo-do-dia.jpg",
+				establishment_id: establishment.id
+			}
+		});
+
+		await prisma.combo.create({
+			data: {
+				establishment_id: establishment.id,
+				name: "Combo do Dia",
+				slug: slugify("Combo do Dia"),
+				description: "Combinação especial com desconto.",
+				combo_type: ComboType.FIXED,
+				price: Math.round((first.price + second.price) * 0.9),
+				is_active: true,
+				order: 1,
+				items: {
+					create: [
+						{ product_id: first.id, quantity: 1 },
+						{ product_id: second.id, quantity: 1 }
+					]
+				},
+				resources: {
+					create: { resource_id: comboDoDiaResource.id }
+				}
+			}
+		});
+
+		if (third) {
+			const monteSeuComboResource = await prisma.resource.create({
+				data: {
+					type: "THUMBNAIL",
+					path: "combo/thumbnail",
+					file_key: "seed-monte-seu-combo.jpg",
+					establishment_id: establishment.id
+				}
+			});
+
+			await prisma.combo.create({
+				data: {
+					establishment_id: establishment.id,
+					name: "Monte seu Combo",
+					slug: slugify("Monte seu Combo"),
+					description: "Escolha seus itens favoritos.",
+					combo_type: ComboType.BUILD_YOUR_OWN,
+					price: first.price,
+					is_active: true,
+					order: 2,
+					groups: {
+						create: [
+							{
+								name: "Escolha 1 item",
+								min_selection: 1,
+								max_selection: 1,
+								display_order: 0,
+								options: {
+									create: [first, second, third].map((p, index) => ({
+										product_id: p.id,
+										additional_price:
+											index === 0 ? 0 : transformPriceToDatabase(2)
+									}))
+								}
+							}
+						]
+					},
+					resources: {
+						create: { resource_id: monteSeuComboResource.id }
+					}
+				}
+			});
+		}
+	}
+
 	for (const banner of seed.banners) {
 		const product = productByName.get(banner.product_name);
 		if (!product) continue;
@@ -1415,6 +1538,9 @@ async function main() {
 		PermissionType.MANAGE_COUPONS,
 		PermissionType.MANAGE_WHATSAPP,
 		PermissionType.MANAGE_DIGITAL_MENU,
+		PermissionType.MANAGE_PROMOTIONS,
+		PermissionType.MANAGE_COMBOS,
+		PermissionType.MANAGE_RECOMMENDATIONS,
 		PermissionType.MANAGE_ESTABLISHMENT_OWNERS,
 		PermissionType.VIEW_DASHBOARD
 	];
@@ -1480,7 +1606,9 @@ async function main() {
 			{ type: "THUMBNAIL", for: "PRODUCT", width: 320, height: 320 },
 			{ type: "THUMBNAIL", for: "CATEGORY", width: 320, height: 320 },
 			{ type: "BANNER", for: "CATEGORY", width: 1920, height: 1080 },
-			{ type: "BANNER", for: "BANNER", width: 1920, height: 1080 }
+			{ type: "BANNER", for: "BANNER", width: 1920, height: 1080 },
+			{ type: "THUMBNAIL", for: "COMBO", width: 320, height: 320 },
+			{ type: "BANNER", for: "COMBO", width: 1920, height: 1080 }
 		]
 	});
 

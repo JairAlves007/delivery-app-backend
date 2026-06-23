@@ -3,7 +3,7 @@ import type { EstablishmentsList } from "@/types/establishment.js";
 
 import Constants from "./constants.js";
 
-const WEEK_DAYS: WeekDay[] = [
+export const WEEK_DAYS: WeekDay[] = [
   WeekDay.SUNDAY,
   WeekDay.MONDAY,
   WeekDay.TUESDAY,
@@ -13,12 +13,12 @@ const WEEK_DAYS: WeekDay[] = [
   WeekDay.SATURDAY,
 ];
 
-const parseHourToMinutes = (hour: string): number => {
+export const parseHourToMinutes = (hour: string): number => {
   const [h, m] = hour.split(":").map(Number);
   return h * 60 + m;
 };
 
-const getZonedWeekdayAndMinutes = (
+export const getZonedWeekdayAndMinutes = (
   now: Date,
 ): { weekdayIndex: number; minutesOfDay: number } => {
   const formatter = new Intl.DateTimeFormat("en-US", {

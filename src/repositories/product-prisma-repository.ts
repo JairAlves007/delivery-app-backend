@@ -244,48 +244,77 @@ export class ProductPrismaRepository implements IProductRepository {
 		establishmentId: EstablishmentID;
 		limit: number;
 	}): Promise<ProductFromRepository[]> {
-		const currentTags = await prisma.productTag.findMany({
-			where: { product_id: productId },
-			select: { tag_id: true }
+		// 1. Recomendações explícitas (AUTO antes de MANUAL, score desc)
+		const recommendations = await prisma.productRecommendation.findMany({
+			where: { product_id: productId, establishment_id: establishmentId },
+			orderBy: [{ source: "asc" }, { score: "desc" }],
+			select: { recommended_product_id: true },
+			take: limit
 		});
 
-		const tagIds = currentTags.map(t => t.tag_id);
-
-		if (tagIds.length === 0) return [];
-
-		const combinations = await prisma.tagCombination.findMany({
-			where: { from_tag_id: { in: tagIds } },
-			select: { to_tag_id: true }
-		});
-
-		const suggestedTagIds = Array.from(
-			new Set(combinations.map(c => c.to_tag_id))
+		const orderedIds: string[] = recommendations.map(
+			r => r.recommended_product_id
 		);
 
-		if (suggestedTagIds.length === 0) return [];
+		// 2. Fallback por combinação de tags, preenchendo o restante
+		if (orderedIds.length < limit) {
+			const currentTags = await prisma.productTag.findMany({
+				where: { product_id: productId },
+				select: { tag_id: true }
+			});
 
-		return await prisma.product.findMany({
+			const tagIds = currentTags.map(t => t.tag_id);
+
+			if (tagIds.length > 0) {
+				const combinations = await prisma.tagCombination.findMany({
+					where: { from_tag_id: { in: tagIds } },
+					select: { to_tag_id: true }
+				});
+
+				const suggestedTagIds = Array.from(
+					new Set(combinations.map(c => c.to_tag_id))
+				);
+
+				if (suggestedTagIds.length > 0) {
+					const fallback = await prisma.product.findMany({
+						where: {
+							deleted_at: null,
+							establishment_id: establishmentId,
+							id: { not: productId, notIn: orderedIds },
+							tags: { some: { tag_id: { in: suggestedTagIds } } },
+							OR: [{ valid_until: null }, { valid_until: { gt: new Date() } }]
+						},
+						select: { id: true },
+						take: limit - orderedIds.length
+					});
+
+					orderedIds.push(...fallback.map(p => p.id));
+				}
+			}
+		}
+
+		if (orderedIds.length === 0) return [];
+
+		// 3. Carrega os produtos válidos e reordena pela relevância
+		const products = await prisma.product.findMany({
 			where: {
+				id: { in: orderedIds },
 				deleted_at: null,
 				establishment_id: establishmentId,
-				id: { not: productId },
-				tags: { some: { tag_id: { in: suggestedTagIds } } },
 				OR: [{ valid_until: null }, { valid_until: { gt: new Date() } }]
 			},
 			include: {
-				resources: {
-					select: {
-						resource: true
-					}
-				},
-				tags: {
-					select: {
-						tag: true
-					}
-				}
-			},
-			take: limit
+				resources: { select: { resource: true } },
+				tags: { select: { tag: true } }
+			}
 		});
+
+		const productById = new Map(products.map(p => [p.id, p]));
+
+		return orderedIds
+			.map(id => productById.get(id))
+			.filter((product): product is ProductFromRepository => Boolean(product))
+			.slice(0, limit);
 	}
 
 	async deleteOldTags(id: string): Promise<void> {

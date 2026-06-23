@@ -2,10 +2,11 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 
 import { makeListCouponService } from "@/factories/services/coupon/make-list-coupon-service.js";
-import { PermissionType } from "@/generated/prisma/client.js";
+import { DiscountType, PermissionType } from "@/generated/prisma/client.js";
 import { ApiResponse } from "@/helpers/api.js";
 import { getUserEstablishmentId } from "@/helpers/get-user-establishment-id.js";
 import { HTTPStatusCodes } from "@/helpers/http-request-codes.js";
+import { transformPriceFromDatabase } from "@/helpers/price.js";
 import { adminTags } from "@/http/swagger-tags.js";
 import { ensureUserHasPermission } from "@/middlewares/ensure-user-has-permission.js";
 import { isAuthenticated } from "@/middlewares/is-auth.js";
@@ -54,9 +55,22 @@ export const listCouponsRoute = async (app: FastifyInstance) => {
         },
       });
 
-      return reply
-        .status(HTTPStatusCodes.OK)
-        .send(ApiResponse.success("Cupons listados com sucesso", coupons));
+      return reply.status(HTTPStatusCodes.OK).send(
+        ApiResponse.success("Cupons listados com sucesso", {
+          ...coupons,
+          items: coupons.items.map((coupon) => ({
+            ...coupon,
+            value:
+              coupon.discount_type === DiscountType.FIXED
+                ? transformPriceFromDatabase(coupon.value)
+                : coupon.value,
+            min_order_value:
+              coupon.min_order_value == null
+                ? null
+                : transformPriceFromDatabase(coupon.min_order_value),
+          })),
+        }),
+      );
     },
   );
 };

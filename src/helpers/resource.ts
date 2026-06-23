@@ -88,6 +88,17 @@ export const getInfoByForResource = (
           },
         },
       };
+    case ForObjectResourceType.COMBO:
+      return {
+        path,
+        attachData: {
+          comboResources: {
+            create: {
+              combo_id: objectId,
+            },
+          },
+        },
+      };
     default:
       return {
         path,
@@ -113,6 +124,9 @@ export const forgetCacheByForResource = async (
       break;
     case ForObjectResourceType.CATEGORY:
       key = cache.keys.productCategories;
+      break;
+    case ForObjectResourceType.COMBO:
+      key = cache.keys.combos;
       break;
   }
 

@@ -46,6 +46,8 @@ const orderInclude = {
   items: { include: { addons: true } },
   orderCoupon: true,
   orderDeliveryAddress: true,
+  orderPromotions: true,
+  orderCombos: { include: { selections: true } },
   statuses: {
     select: { label: true, value: true },
     orderBy: { created_at: "desc" },
