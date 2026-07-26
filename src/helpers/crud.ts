@@ -44,7 +44,7 @@ export const getFilterParamsCacheKey = (
 const quoteIdentifier = (field: string): Prisma.Sql =>
   Prisma.raw(`"${field.replace(/"/g, '""')}"`);
 
-export const buildUnaccentSearchSql = <Field>({
+const buildUnaccentSearchSql = <Field>({
   search,
   searchableFields,
   similarityThreshold,
@@ -66,7 +66,7 @@ export const buildUnaccentSearchSql = <Field>({
   return Prisma.sql`(${Prisma.join(fragments, " OR ")})`;
 };
 
-export const buildUnaccentRankingSql = <Field>({
+const buildUnaccentRankingSql = <Field>({
   search,
   searchableFields,
 }: {

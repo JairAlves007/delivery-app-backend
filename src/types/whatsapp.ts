@@ -4,7 +4,7 @@ import type {
 } from "@/generated/prisma/client.js";
 import type { EstablishmentID } from "@/types/establishment.js";
 
-export type OrderStatusMessageContext = {
+type OrderStatusMessageContext = {
   customerName: string;
   orderId: string;
   orderTotal: string;
@@ -87,7 +87,7 @@ export type CleanupWhatsappInstanceJob = {
   establishmentId: EstablishmentID;
 };
 
-export type WhatsappWebhookData = {
+type WhatsappWebhookData = {
   key?: {
     id?: string;
     remoteJid?: string;

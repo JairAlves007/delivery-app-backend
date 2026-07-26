@@ -1,21 +1,5 @@
 import Constants from "./constants.js";
 
-export function parseHourToToday(hour: string): Date {
-  const [hours, minutes] = hour.split(":").map(Number);
-
-  const now = new Date();
-  const date = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    hours,
-    minutes,
-    0,
-  );
-
-  return date;
-}
-
 export const startOfDayInTimezone = (date: string): Date =>
   new Date(`${date}T00:00:00.000${Constants.DASHBOARD_TIMEZONE_OFFSET}`);
 

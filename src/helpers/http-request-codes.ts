@@ -12,5 +12,4 @@ export class HTTPStatusCodes {
   public static readonly TOO_MANY_REQUESTS = 429;
   public static readonly INTERNAL_SERVER_ERROR = 500;
   public static readonly BAD_GATEWAY = 502;
-  public static readonly SERVICE_UNAVAILABLE = 503;
 }

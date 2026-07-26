@@ -21,7 +21,7 @@ export const transformPriceFromDatabase = (price: number): number => {
   return price / Constants.PRICE_MULTIPLIER;
 };
 
-export const transformValueToPercentageFromDatabase = (
+const transformValueToPercentageFromDatabase = (
   value: number,
 ): number => {
   return value / 100;

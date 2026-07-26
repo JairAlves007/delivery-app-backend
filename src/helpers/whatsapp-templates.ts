@@ -24,16 +24,6 @@ export const DEFAULT_SCHEDULED_STATUS_TEMPLATES: Record<OrderStatusType, string>
       "Olá {customer_name}. ❌ Seu pedido agendado em {establishment_name} para {scheduled_at} foi cancelado. Em caso de dúvidas, fale conosco.",
   };
 
-export const TEMPLATE_PLACEHOLDERS = [
-  "{customer_name}",
-  "{order_id}",
-  "{status_label}",
-  "{establishment_name}",
-  "{order_total}",
-  "{order_created_at}",
-  "{scheduled_at}",
-] as const;
-
 export const renderTemplate = (
   body: string,
   variables: WhatsappTemplateVariables,

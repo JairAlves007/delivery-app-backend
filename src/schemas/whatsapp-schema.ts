@@ -49,7 +49,7 @@ export const orderStatusTemplateQuerySchema = z.object({
     .transform((value) => value === "true"),
 });
 
-export const orderStatusTemplateResponseSchema = z.object({
+const orderStatusTemplateResponseSchema = z.object({
   status: z.enum(OrderStatusType),
   isScheduled: z.boolean(),
   body: z.string(),

@@ -52,7 +52,7 @@ export type DigitalMenuCategory = {
   products: DigitalMenuProduct[];
 };
 
-export type DigitalMenuColors = {
+type DigitalMenuColors = {
   primary: string;
   secondary: string;
   background: string;

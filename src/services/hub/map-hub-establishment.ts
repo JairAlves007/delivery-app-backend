@@ -6,7 +6,7 @@ import type {
   HubEstablishmentFromRepository,
 } from "@/types/hub.js";
 
-export const mapHubEstablishment = (
+const mapHubEstablishment = (
   establishment: HubEstablishmentFromRepository,
 ): HubEstablishmentCard => {
   const resources = mapObjectResourcesList(establishment.resources);

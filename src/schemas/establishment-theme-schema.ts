@@ -25,6 +25,3 @@ z.globalRegistry.add(updateEstablishmentThemeBodySchema, {
 	id: "UpdateEstablishmentThemeBody"
 });
 
-export const establishmentThemeParamsSchema = z.object({
-	id: z.ulid().min(1, "O id do estabelecimento deve ser preenchido")
-});

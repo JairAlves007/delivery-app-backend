@@ -7,7 +7,7 @@ import { addressLocationSchema, userEmailSchema } from "./generic-schema.js";
 
 const HH_MM_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
 
-export const openingHourInputSchema = z
+const openingHourInputSchema = z
 	.object({
 		dayOfWeek: z.enum(WeekDay, "Dia da semana inválido"),
 		opensAt: z
@@ -50,7 +50,7 @@ export const openingHourInputSchema = z
 
 z.globalRegistry.add(openingHourInputSchema, { id: "OpeningHourInput" });
 
-export const socialLinkInputSchema = z.object({
+const socialLinkInputSchema = z.object({
 	platform: z.enum(SocialPlatform, "Plataforma de rede social inválida"),
 	url: z.url("URL da rede social inválida").max(2048).nullable()
 });

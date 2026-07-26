@@ -9,7 +9,7 @@ export const apiSuccessResponseSchema = <T extends z.ZodTypeAny>(
     details: detailsSchema.optional(),
   });
 
-export const apiErrorResponseSchema = <T extends z.ZodTypeAny>(
+const apiErrorResponseSchema = <T extends z.ZodTypeAny>(
   detailsSchema: T,
 ) =>
   z.object({
@@ -51,10 +51,6 @@ export const apiValidationErrorResponseSchema = apiErrorResponseSchema(
   ]),
 );
 
-export const apiNoContentResponseSchema = apiSuccessResponseSchema(
-  z.object({}),
-);
-
 export const apiEmptyDetailsResponseSchema = apiSuccessResponseSchema(
   z.object({}),
 );
@@ -65,10 +61,6 @@ z.globalRegistry.add(apiDefaultErrorResponseSchema, {
 
 z.globalRegistry.add(apiValidationErrorResponseSchema, {
   id: "ApiValidationErrorResponse",
-});
-
-z.globalRegistry.add(apiNoContentResponseSchema, {
-  id: "ApiNoContentResponse",
 });
 
 z.globalRegistry.add(apiEmptyDetailsResponseSchema, {

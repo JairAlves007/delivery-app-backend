@@ -147,7 +147,7 @@ export type OrderAddons = {
   quantity: number;
 };
 
-export type OrderIntent = {
+type OrderIntent = {
   establishmentId: EstablishmentID;
   customerName: string;
   customerPhone: string;

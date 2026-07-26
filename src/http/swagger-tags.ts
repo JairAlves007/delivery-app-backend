@@ -1,4 +1,4 @@
-export const SCOPE = {
+const SCOPE = {
   admin: "scope:admin",
   customer: "scope:customer",
   shared: "scope:shared",

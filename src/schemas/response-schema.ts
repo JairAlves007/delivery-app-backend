@@ -51,7 +51,7 @@ z.globalRegistry.add(resourceTypeSchema, { id: "ResourceType" });
 // Resource
 // ──────────────────────────────────────────────
 
-export const resourceResponseSchema = z.object({
+const resourceResponseSchema = z.object({
 	id: z.string(),
 	type: resourceTypeSchema,
 	path: z.string(),
@@ -110,7 +110,7 @@ export const addonCategoryResponseSchema = z.object({
 		.optional()
 });
 
-export const productAddonCategoryResponseSchema = z.object({
+const productAddonCategoryResponseSchema = z.object({
 	id: z.number(),
 	name: z.string(),
 	type: z.enum(AddonType),
@@ -243,7 +243,7 @@ export const promotionListResponseSchema = paginatedResponseSchema(
 	promotionResponseSchema
 );
 
-export const activePromotionResponseSchema = z.object({
+const activePromotionResponseSchema = z.object({
 	id: z.string(),
 	name: z.string(),
 	type: z.enum(PromotionType),
@@ -266,7 +266,7 @@ const recommendationProductSchema = z.object({
 	name: z.string()
 });
 
-export const recommendationResponseSchema = z.object({
+const recommendationResponseSchema = z.object({
 	id: z.string(),
 	source: z.enum(RecommendationSource),
 	product: recommendationProductSchema,
@@ -283,7 +283,7 @@ const tagCombinationTagSchema = z.object({
 	type: z.enum(TagType)
 });
 
-export const tagCombinationResponseSchema = z.object({
+const tagCombinationResponseSchema = z.object({
 	id: z.number(),
 	from_tag: tagCombinationTagSchema,
 	to_tag: tagCombinationTagSchema
@@ -340,7 +340,7 @@ export const comboResponseSchema = z.object({
 	groups: z.array(comboGroupResponseSchema).default([])
 });
 
-export const comboListItemSchema = z.object({
+const comboListItemSchema = z.object({
 	id: z.string(),
 	name: z.string(),
 	slug: z.string(),
@@ -479,7 +479,7 @@ export const productCategoryListResponseSchema = paginatedResponseSchema(
 // Tag
 // ──────────────────────────────────────────────
 
-export const tagResponseSchema = z.object({
+const tagResponseSchema = z.object({
 	id: z.number(),
 	label: z.string(),
 	type: z.enum(TagType)
@@ -773,7 +773,7 @@ export const meResponseSchema = z.object({
 	menu: authMenuSchema
 });
 
-export const themeColorsSchema = z.object({
+const themeColorsSchema = z.object({
 	primary: z.string(),
 	secondary: z.string(),
 	destructive: z.string(),
@@ -799,7 +799,7 @@ export const establishmentContextResponseSchema = z.object({
 // Hub
 // ──────────────────────────────────────────────
 
-export const hubEstablishmentAddressSchema = z.object({
+const hubEstablishmentAddressSchema = z.object({
 	city: z.string(),
 	state: z.string(),
 	neighborhood: z.string()
@@ -834,7 +834,7 @@ export const hubFiltersResponseSchema = listResponseSchema(hubCuisineSchema);
 // Main (Catalog)
 // ──────────────────────────────────────────────
 
-export const bannersCatalogResponseSchema =
+const bannersCatalogResponseSchema =
 	listResponseSchema(bannerResponseSchema);
 
 export const productCategoriesCatalogResponseSchema =
@@ -865,7 +865,7 @@ export const digitalMenuStatusResponseSchema = z.object({
 // Notifications
 // ──────────────────────────────────────────────
 
-export const notificationResponseSchema = z.object({
+const notificationResponseSchema = z.object({
 	id: z.string(),
 	type: z.enum(NotificationType),
 	title: z.string(),
@@ -894,21 +894,6 @@ export const sseTicketResponseSchema = z.object({
 // Health
 // ──────────────────────────────────────────────
 
-export const healthResponseSchema = z.object({
-	status: z.string()
-});
-
-export const readinessResponseSchema = z.object({
-	status: z.enum(["ready", "degraded"]),
-	checks: z.array(
-		z.object({
-			name: z.enum(["database", "cache"]),
-			status: z.enum(["up", "down"]),
-			latencyMs: z.number(),
-			error: z.string().nullable()
-		})
-	)
-});
 
 const registryItems = [
 	{ schema: resourceResponseSchema, id: "ResourceResponse" },
@@ -1007,8 +992,6 @@ const registryItems = [
 		schema: searchProductsCatalogResponseSchema,
 		id: "SearchProductsCatalogResponse"
 	},
-	{ schema: healthResponseSchema, id: "HealthResponse" },
-	{ schema: readinessResponseSchema, id: "ReadinessResponse" },
 	{ schema: notificationResponseSchema, id: "NotificationResponse" },
 	{
 		schema: notificationListResponseSchema,

@@ -21,6 +21,3 @@ export const manualClosureBodySchema = z
 
 z.globalRegistry.add(manualClosureBodySchema, { id: "ManualClosureBody" });
 
-export const establishmentClosureParamsSchema = z.object({
-	id: z.ulid().min(1, "O id do estabelecimento deve ser preenchido")
-});

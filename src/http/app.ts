@@ -46,49 +46,51 @@ const app = fastify({
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
-app.register(fastifySwagger, {
-	openapi: {
-		info: {
-			title: "Food Delivery API",
-			description: "Documentação da API de um SaaS de Delivery",
-			version: "1.0.0"
-		},
-		components: {
-			securitySchemes: {
-				bearerAuth: {
-					type: "http",
-					scheme: "bearer",
-					bearerFormat: "JWT"
+if (!isProduction) {
+	app.register(fastifySwagger, {
+		openapi: {
+			info: {
+				title: "Food Delivery API",
+				description: "Documentação da API de um SaaS de Delivery",
+				version: "1.0.0"
+			},
+			components: {
+				securitySchemes: {
+					bearerAuth: {
+						type: "http",
+						scheme: "bearer",
+						bearerFormat: "JWT"
+					}
 				}
 			}
-		}
-	},
-	transform: createJsonSchemaTransform({
-		zodToJsonConfig: {
-			target: "openapi-3.0"
-		}
-	}),
-	transformObject: createJsonSchemaTransformObject({
-		zodToJsonConfig: {
-			target: "openapi-3.0"
-		}
-	})
-});
-
-app.register(scalarApiReference, {
-	routePrefix: "/docs",
-	configuration: {
-		title: "Food Delivery API",
-		theme: "deepSpace",
-		sources: [
-			{
-				url: "/api/swagger.json",
-				title: "Documentação da API de um SaaS de Delivery",
-				slug: "documentacao-da-api-de-um-saas-de-delivery"
+		},
+		transform: createJsonSchemaTransform({
+			zodToJsonConfig: {
+				target: "openapi-3.0"
 			}
-		]
-	}
-});
+		}),
+		transformObject: createJsonSchemaTransformObject({
+			zodToJsonConfig: {
+				target: "openapi-3.0"
+			}
+		})
+	});
+
+	app.register(scalarApiReference, {
+		routePrefix: "/docs",
+		configuration: {
+			title: "Food Delivery API",
+			theme: "deepSpace",
+			sources: [
+				{
+					url: "/api/swagger.json",
+					title: "Documentação da API de um SaaS de Delivery",
+					slug: "documentacao-da-api-de-um-saas-de-delivery"
+				}
+			]
+		}
+	});
+}
 
 app.register(fastifyHelmet, {
 	global: true,

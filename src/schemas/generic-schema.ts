@@ -10,11 +10,7 @@ export const establishmentParamsSchema = z.object({
 	establishmentId: establishmentIdSchema
 });
 
-export const establishmentSlugSchema = z.object({
-	slug: z.string().trim().min(1, "O slug deve ser preenchido").max(255)
-});
-
-export const sortDirectionSchema = z.enum(
+const sortDirectionSchema = z.enum(
 	["asc", "desc"],
 	"Ordenação inválida"
 );

@@ -83,14 +83,9 @@ export default class Constants {
 		refresh: { max: 10, timeWindow: "1 minute" },
 		createOrder: { max: 10, timeWindow: "1 minute" },
 		checkCoupon: { max: 20, timeWindow: "1 minute" },
-		digitalMenu: { max: 30, timeWindow: "1 minute" },
-		health: { max: 60, timeWindow: "1 minute" }
+		digitalMenu: { max: 30, timeWindow: "1 minute" }
 	} as const;
 
-	// Health
-	public static readonly HEALTH_CHECK_TIMEOUT_MS: number = 2_000;
-	public static readonly HEALTH_READINESS_CACHE_MS: number = 2_000;
-	public static readonly HEALTH_CACHE_CONTROL: string = "no-store";
 
 	// Cache
 	public static readonly CACHE_TAG_SET_TTL_SECONDS: number = 60 * 60 * 24;

@@ -55,9 +55,9 @@ export type CursorPaginationParams<CursorType> = FilterField & {
   cursor?: CursorType | null;
 };
 
-export type PaginationResponse = z.infer<typeof paginationResponseSchema>;
+type PaginationResponse = z.infer<typeof paginationResponseSchema>;
 
-export type CursorPaginationResponse = z.infer<
+type CursorPaginationResponse = z.infer<
   typeof cursorPaginationResponseSchema
 >;
 

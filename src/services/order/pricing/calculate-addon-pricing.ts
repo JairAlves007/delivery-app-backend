@@ -3,7 +3,7 @@ import {
   AddonType,
 } from "@/generated/prisma/client.js";
 
-export type AddonPricingInput = {
+type AddonPricingInput = {
   priceCents: number;
   quantity: number;
 };

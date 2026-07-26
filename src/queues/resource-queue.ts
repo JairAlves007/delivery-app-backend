@@ -9,8 +9,8 @@ import type {
 
 export const resourceQueueName = "resource-queue";
 
-export const deleteResourceJobName = "delete-resource";
-export const deleteR2ObjectJobName = "delete-r2-object";
+const deleteResourceJobName = "delete-resource";
+const deleteR2ObjectJobName = "delete-r2-object";
 
 export const enqueueDeleteResource = async (
   payload: Omit<DeleteResourceJobPayload, "kind">,

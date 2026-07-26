@@ -92,7 +92,7 @@ export type DashboardCouponUsageRow = {
 	discountTotal: number;
 };
 
-export type DashboardExportFormat = "xlsx" | "csv";
+type DashboardExportFormat = "xlsx" | "csv";
 
 export type DashboardExportServiceInput = DashboardServiceInput & {
 	format: DashboardExportFormat;
