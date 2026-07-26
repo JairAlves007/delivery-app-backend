@@ -1,17 +1,14 @@
-import { writeFile } from "node:fs/promises";
-import path from "node:path";
-
 import { InvalidDigitalMenuFile } from "@/errors/digital-menu/invalid-digital-menu-file.js";
 import { makeCache } from "@/factories/services/cache/make-cache.js";
 import { DigitalMenuSource } from "@/generated/prisma/client.js";
 import Constants from "@/helpers/constants.js";
 import {
-  buildDigitalMenuFilePath,
-  ensureDigitalMenuStorageDir,
+  buildDigitalMenuBucketKey,
   generateDigitalMenuFileKey,
-  removeDigitalMenuFile,
+  putDigitalMenuObject,
 } from "@/helpers/digital-menu.js";
 import type { IDigitalMenuRepository } from "@/interfaces/repositories/digital-menu-repository.js";
+import { enqueueDeleteR2Object } from "@/queues/resource-queue.js";
 
 type UploadDigitalMenuParams = {
   establishmentId: string;
@@ -57,29 +54,9 @@ export class UploadDigitalMenuService {
       await this.digitalMenuRepository.findByEstablishmentId(establishmentId);
 
     const fileKey = generateDigitalMenuFileKey();
-    const filePath = buildDigitalMenuFilePath(establishmentId, fileKey);
-    const storageDir = await ensureDigitalMenuStorageDir(establishmentId);
+    const bucketKey = buildDigitalMenuBucketKey(establishmentId, fileKey);
 
-    await writeFile(path.join(storageDir, fileKey), buffer);
-
-    // TODO(R2): quando a entrega migrar para a Cloudflare, substituir a
-    // escrita local acima pelo upload abaixo e remover o arquivo do disco.
-    // import { PutObjectCommand } from "@aws-sdk/client-s3";
-    // import { env } from "@/env.js";
-    // import { r2 } from "@/lib/cloudflare.js";
-    //
-    // await r2.send(
-    //   new PutObjectCommand({
-    //     Bucket: env.CLOUDFLARE_BUCKET_NAME,
-    //     Key: `menus/${establishmentId}/${fileKey}`,
-    //     Body: buffer,
-    //     ContentType: Constants.DIGITAL_MENU_MIME_TYPE,
-    //   }),
-    // );
-    //
-    // O file_path passaria a ser `menus/${establishmentId}/${fileKey}` e a
-    // limpeza do arquivo antigo deve reusar enqueueDeleteR2Object do
-    // resource-queue em vez de removeDigitalMenuFile.
+    await putDigitalMenuObject({ bucketKey, body: buffer });
 
     await this.digitalMenuRepository.upsert({
       establishmentId,
@@ -87,12 +64,12 @@ export class UploadDigitalMenuService {
     });
     await this.digitalMenuRepository.markReady({
       establishmentId,
-      filePath,
+      filePath: bucketKey,
       fileKey,
     });
 
-    if (previousMenu?.file_path && previousMenu.file_path !== filePath)
-      await removeDigitalMenuFile(previousMenu.file_path);
+    if (previousMenu?.file_path && previousMenu.file_path !== bucketKey)
+      await enqueueDeleteR2Object({ bucketKey: previousMenu.file_path });
 
     const cache = makeCache();
     await cache.forgetKeysContaining(

@@ -1,5 +1,3 @@
-import { createReadStream } from "node:fs";
-
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 
@@ -13,6 +11,7 @@ export const getDigitalMenuPdfRoute = async (app: FastifyInstance) => {
   app.withTypeProvider<ZodTypeProvider>().get(
     "/:slug/digital-menu",
     {
+      config: { rateLimit: Constants.RATE_LIMIT.digitalMenu },
       schema: {
         operationId: "getDigitalMenuPdf",
         tags: customerTags("Main (Home)"),
@@ -25,15 +24,19 @@ export const getDigitalMenuPdfRoute = async (app: FastifyInstance) => {
 
       const serveDigitalMenuService = makeServeDigitalMenuService();
 
-      const { absolutePath, fileName } = await serveDigitalMenuService.handle({
-        slug,
-      });
+      const { stream, fileName, contentLength, etag } =
+        await serveDigitalMenuService.handle({ slug });
 
-      return reply
+      reply
         .status(HTTPStatusCodes.OK)
         .header("Content-Type", Constants.DIGITAL_MENU_MIME_TYPE)
         .header("Content-Disposition", `inline; filename="${fileName}"`)
-        .send(createReadStream(absolutePath));
+        .header("Cache-Control", Constants.DIGITAL_MENU_PROXY_CACHE_CONTROL);
+
+      if (contentLength !== null) reply.header("Content-Length", contentLength);
+      if (etag) reply.header("ETag", etag);
+
+      return reply.send(stream);
     },
   );
 };

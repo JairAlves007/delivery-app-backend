@@ -1,8 +1,26 @@
-import { mkdir, rm } from "node:fs/promises";
-import path from "node:path";
+import { Readable } from "node:stream";
 import { fileURLToPath } from "node:url";
 
+import {
+  GetObjectCommand,
+  NoSuchKey,
+  PutObjectCommand,
+} from "@aws-sdk/client-s3";
+
+import { env } from "@/env.js";
 import Constants from "@/helpers/constants.js";
+import { r2 } from "@/lib/cloudflare.js";
+
+type PutDigitalMenuObjectParams = {
+  bucketKey: string;
+  body: Uint8Array;
+};
+
+type DigitalMenuObject = {
+  stream: Readable;
+  contentLength: number | null;
+  etag: string | null;
+};
 
 export const generateDigitalMenuFileKey = (): string => {
   const uniqueString =
@@ -11,44 +29,57 @@ export const generateDigitalMenuFileKey = (): string => {
   return `${uniqueString}.pdf`;
 };
 
-export const getDigitalMenuStorageDir = (establishmentId: string): string => {
-  return path.resolve(
-    process.cwd(),
-    Constants.DIGITAL_MENU_STORAGE_DIR,
-    establishmentId,
-  );
-};
-
-export const buildDigitalMenuFilePath = (
+export const buildDigitalMenuBucketKey = (
   establishmentId: string,
   fileKey: string,
 ): string => {
-  return path.join(
-    Constants.DIGITAL_MENU_STORAGE_DIR,
-    establishmentId,
-    fileKey,
+  return `${Constants.DIGITAL_MENU_BUCKET_PREFIX}/${establishmentId}/${fileKey}`;
+};
+
+export const buildDigitalMenuFileName = (slug: string): string => {
+  const safeSlug = slug.replace(/[^a-zA-Z0-9-_]/g, "");
+
+  return `cardapio-${safeSlug}.pdf`;
+};
+
+export const putDigitalMenuObject = async ({
+  bucketKey,
+  body,
+}: PutDigitalMenuObjectParams): Promise<void> => {
+  await r2.send(
+    new PutObjectCommand({
+      Bucket: env.CLOUDFLARE_BUCKET_NAME,
+      Key: bucketKey,
+      Body: body,
+      ContentType: Constants.DIGITAL_MENU_MIME_TYPE,
+      CacheControl: Constants.DIGITAL_MENU_CACHE_CONTROL,
+    }),
   );
 };
 
-export const resolveDigitalMenuAbsolutePath = (filePath: string): string => {
-  return path.resolve(process.cwd(), filePath);
-};
+export const getDigitalMenuObject = async (
+  bucketKey: string,
+): Promise<DigitalMenuObject | null> => {
+  try {
+    const result = await r2.send(
+      new GetObjectCommand({
+        Bucket: env.CLOUDFLARE_BUCKET_NAME,
+        Key: bucketKey,
+      }),
+    );
 
-export const ensureDigitalMenuStorageDir = async (
-  establishmentId: string,
-): Promise<string> => {
-  const dir = getDigitalMenuStorageDir(establishmentId);
-  await mkdir(dir, { recursive: true });
+    if (!(result.Body instanceof Readable)) return null;
 
-  return dir;
-};
+    return {
+      stream: result.Body,
+      contentLength: result.ContentLength ?? null,
+      etag: result.ETag ?? null,
+    };
+  } catch (error) {
+    if (error instanceof NoSuchKey) return null;
 
-export const removeDigitalMenuFile = async (
-  filePath: string | null,
-): Promise<void> => {
-  if (!filePath) return;
-
-  await rm(resolveDigitalMenuAbsolutePath(filePath), { force: true });
+    throw error;
+  }
 };
 
 export const getDigitalMenuTemplatePath = (): string => {

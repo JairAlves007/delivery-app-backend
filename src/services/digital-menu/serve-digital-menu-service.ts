@@ -1,7 +1,10 @@
-import { access } from "node:fs/promises";
+import type { Readable } from "node:stream";
 
 import { DigitalMenuNotFound } from "@/errors/digital-menu/digital-menu-not-found.js";
-import { resolveDigitalMenuAbsolutePath } from "@/helpers/digital-menu.js";
+import {
+  buildDigitalMenuFileName,
+  getDigitalMenuObject,
+} from "@/helpers/digital-menu.js";
 import type { IDigitalMenuRepository } from "@/interfaces/repositories/digital-menu-repository.js";
 
 type ServeDigitalMenuParams = {
@@ -9,8 +12,10 @@ type ServeDigitalMenuParams = {
 };
 
 type ServeDigitalMenuResult = {
-  absolutePath: string;
+  stream: Readable;
   fileName: string;
+  contentLength: number | null;
+  etag: string | null;
 };
 
 export class ServeDigitalMenuService {
@@ -28,21 +33,15 @@ export class ServeDigitalMenuService {
 
     if (!menu?.file_path) throw new DigitalMenuNotFound();
 
-    // TODO(R2): quando o arquivo estiver na Cloudflare, em vez de servir o
-    // arquivo local basta redirecionar para a URL pública:
-    // return { redirectUrl: `${env.PUBLIC_BUCKET_URL}/${menu.file_path}` };
+    const object = await getDigitalMenuObject(menu.file_path);
 
-    const absolutePath = resolveDigitalMenuAbsolutePath(menu.file_path);
-
-    try {
-      await access(absolutePath);
-    } catch {
-      throw new DigitalMenuNotFound();
-    }
+    if (!object) throw new DigitalMenuNotFound();
 
     return {
-      absolutePath,
-      fileName: `cardapio-${slug}.pdf`,
+      stream: object.stream,
+      fileName: buildDigitalMenuFileName(slug),
+      contentLength: object.contentLength,
+      etag: object.etag,
     };
   }
 }

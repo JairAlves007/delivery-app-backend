@@ -21,10 +21,14 @@ export default class Constants {
 	public static readonly DASHBOARD_TIMEZONE: string = "America/Fortaleza";
 	public static readonly DASHBOARD_TIMEZONE_OFFSET: string = "-03:00";
 	public static readonly SCHEDULING_WINDOW_MONTHS: number = 3;
-	public static readonly DIGITAL_MENU_STORAGE_DIR: string = "storage/menus";
+	public static readonly DIGITAL_MENU_BUCKET_PREFIX: string = "menus";
 	public static readonly DIGITAL_MENU_MAX_UPLOAD_BYTES: number =
 		10 * 1024 * 1024;
 	public static readonly DIGITAL_MENU_MIME_TYPE: string = "application/pdf";
+	public static readonly DIGITAL_MENU_CACHE_CONTROL: string =
+		"public, max-age=31536000, immutable";
+	public static readonly DIGITAL_MENU_PROXY_CACHE_CONTROL: string =
+		"public, max-age=300";
 	public static readonly MAX_UPLOAD_FILE_SIZE_BYTES: number = 2 * 1024 * 1024;
 	public static readonly DASHBOARD_EXPORT_MIME_TYPES = {
 		xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -78,7 +82,8 @@ export default class Constants {
 		auth: { max: 5, timeWindow: "1 minute" },
 		refresh: { max: 10, timeWindow: "1 minute" },
 		createOrder: { max: 10, timeWindow: "1 minute" },
-		checkCoupon: { max: 20, timeWindow: "1 minute" }
+		checkCoupon: { max: 20, timeWindow: "1 minute" },
+		digitalMenu: { max: 30, timeWindow: "1 minute" }
 	} as const;
 
 	// Cache
