@@ -34,6 +34,7 @@ export type WhatsappTemplateVariables = {
 export type CreateInstanceProviderParams = {
   instanceName: string;
   webhookUrl: string;
+  webhookHeaders: Record<string, string>;
 };
 
 export type CreateInstanceProviderResult = {

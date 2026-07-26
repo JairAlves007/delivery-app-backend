@@ -58,6 +58,7 @@ export class EvolutionWhatsappProvider implements IWhatsappProvider {
   async createInstance({
     instanceName,
     webhookUrl,
+    webhookHeaders,
   }: CreateInstanceProviderParams): Promise<CreateInstanceProviderResult> {
     const data = await evolutionRequest<CreateInstanceResponse>({
       method: "POST",
@@ -72,6 +73,7 @@ export class EvolutionWhatsappProvider implements IWhatsappProvider {
           byEvents: false,
           base64: true,
           events: WEBHOOK_EVENTS,
+          headers: webhookHeaders,
         },
       },
     });

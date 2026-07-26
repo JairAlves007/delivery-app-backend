@@ -1,5 +1,6 @@
 import { env } from "@/env.js";
 import { WhatsappConnectionStatus } from "@/generated/prisma/client.js";
+import Constants from "@/helpers/constants.js";
 import type { IWhatsappProvider } from "@/interfaces/integrations/whatsapp-provider.js";
 import type { IEstablishmentWhatsappIntegrationRepository } from "@/interfaces/repositories/establishment-whatsapp-integration-repository.js";
 import type { EstablishmentID } from "@/types/establishment.js";
@@ -10,7 +11,11 @@ type ConnectEstablishmentWhatsappRequest = {
 };
 
 const buildWebhookUrl = (): string =>
-  `${env.BASE_URL}/api/whatsapp/webhook/${env.EVOLUTION_WEBHOOK_TOKEN}`;
+  `${env.BASE_URL}/api/whatsapp/webhook`;
+
+const buildWebhookHeaders = (): Record<string, string> => ({
+  [Constants.WHATSAPP_WEBHOOK_HEADER]: env.EVOLUTION_WEBHOOK_TOKEN,
+});
 
 export class ConnectEstablishmentWhatsappService {
   private integrationRepository: IEstablishmentWhatsappIntegrationRepository;
@@ -37,6 +42,7 @@ export class ConnectEstablishmentWhatsappService {
       const created = await this.whatsappProvider.createInstance({
         instanceName,
         webhookUrl: buildWebhookUrl(),
+        webhookHeaders: buildWebhookHeaders(),
       });
 
       instanceToken = created.instanceToken;
