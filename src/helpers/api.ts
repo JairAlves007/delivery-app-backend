@@ -1,4 +1,8 @@
-import type { ErrorResponse, SuccessResponse } from "@/types/response.js";
+import type {
+  DefaultErrorResponse,
+  ErrorResponse,
+  SuccessResponse,
+} from "@/types/response.js";
 
 export class ApiResponse {
   static success<T>(message: string, details?: T): SuccessResponse<T> {
@@ -9,11 +13,20 @@ export class ApiResponse {
     };
   }
 
-  static error(error: Error, details?: unknown): ErrorResponse {
-    if (!details) {
-      details = {
-        error: {
-          message: error.message,
+  static error(error: Error): DefaultErrorResponse;
+  static error<T>(error: Error, details: T): ErrorResponse<T>;
+  static error<T>(
+    error: Error,
+    details?: T,
+  ): ErrorResponse<T> | DefaultErrorResponse {
+    if (details === undefined) {
+      return {
+        success: false,
+        code: error.name,
+        details: {
+          error: {
+            message: error.message,
+          },
         },
       };
     }

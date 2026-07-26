@@ -898,6 +898,18 @@ export const healthResponseSchema = z.object({
 	status: z.string()
 });
 
+export const readinessResponseSchema = z.object({
+	status: z.enum(["ready", "degraded"]),
+	checks: z.array(
+		z.object({
+			name: z.enum(["database", "cache"]),
+			status: z.enum(["up", "down"]),
+			latencyMs: z.number(),
+			error: z.string().nullable()
+		})
+	)
+});
+
 const registryItems = [
 	{ schema: resourceResponseSchema, id: "ResourceResponse" },
 	{ schema: mappedResourceRecordSchema, id: "ResourceItem" },
@@ -996,6 +1008,7 @@ const registryItems = [
 		id: "SearchProductsCatalogResponse"
 	},
 	{ schema: healthResponseSchema, id: "HealthResponse" },
+	{ schema: readinessResponseSchema, id: "ReadinessResponse" },
 	{ schema: notificationResponseSchema, id: "NotificationResponse" },
 	{
 		schema: notificationListResponseSchema,

@@ -1,6 +1,7 @@
 import type { CacheTagScope } from "@/types/cache.js";
 
 export interface ICacheBase {
+  ping(): Promise<void>;
   set(key: string, value: unknown, duration?: number): Promise<void>;
   get<T>(key: string): Promise<T | null>;
   forget(key: string): Promise<void>;

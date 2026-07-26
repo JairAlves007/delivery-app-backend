@@ -18,6 +18,10 @@ export class Cache implements ICacheBase {
 		return this.instance;
 	}
 
+	async ping() {
+		await redis.ping();
+	}
+
 	private tagSetKey(domain: CacheKeys, establishmentId?: string | null) {
 		const base = `cachetag:${this.keys[domain]}`;
 		return establishmentId ? `${base}:est_${establishmentId}` : base;
