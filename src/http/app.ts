@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { createRequire } from "node:module";
 
 import fastifyCors from "@fastify/cors";
 import fastifyHelmet from "@fastify/helmet";
@@ -26,12 +27,22 @@ import { setupWorkers } from "@/workers/setup.js";
 
 const isProduction = env.NODE_ENV === "production";
 
+const hasPrettyLogger = () => {
+	try {
+		createRequire(import.meta.url).resolve("pino-pretty");
+		return true;
+	} catch {
+		return false;
+	}
+};
+
+const usePrettyLogger = !isProduction && hasPrettyLogger();
+
 const app = fastify({
 	bodyLimit: 262_144,
 	trustProxy: env.TRUST_PROXY,
-	logger: isProduction
-		? true
-		: {
+	logger: usePrettyLogger
+		? {
 				transport: {
 					target: "pino-pretty",
 					options: {
@@ -39,7 +50,8 @@ const app = fastify({
 						ignore: "pid,hostname"
 					}
 				}
-			},
+			}
+		: true,
 	genReqId: () => randomUUID()
 });
 

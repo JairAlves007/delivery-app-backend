@@ -1,7 +1,9 @@
-import type { Establishment, Prisma } from "@/generated/prisma/client.js";
+import type { Establishment } from "@/generated/prisma/client.js";
+import { Prisma } from "@/generated/prisma/client.js";
 import { getBillingGraceCutoff } from "@/helpers/billing.js";
 import {
 	buildFilterQueryOptions,
+	buildHybridSearchSql,
 	transformValidFilterParams
 } from "@/helpers/crud.js";
 import type {
@@ -318,15 +320,56 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		]);
 	}
 
-	private buildHubWhere(filter: HubListFilter): Prisma.EstablishmentWhereInput {
-		const { where } =
-			buildFilterQueryOptions<Prisma.EstablishmentOrderByWithRelationInput>({
-				search: filter.search ?? undefined,
-				sortField: undefined,
-				sortDirection: undefined,
-				searchableFields: ["name"],
-				defaultSortField: "name"
+	private async resolveHubSearchIds(search: string): Promise<string[]> {
+		const { ftsWhereSql, fallbackWhereSql } =
+			buildHybridSearchSql<Prisma.EstablishmentOrderByWithRelationInput>({
+				search,
+				searchableFields: ["name", "description"],
+				fuzzyFields: ["name"]
 			});
+
+		const scopeSql = Prisma.sql`e.deleted_at IS NULL
+			AND e.is_listed_in_hub = true`;
+
+		if (!ftsWhereSql) {
+			const fallbackRows = await prisma.$queryRaw<{ id: string }[]>`
+				SELECT e.id
+				FROM establishments e
+				WHERE ${scopeSql}
+					AND ${fallbackWhereSql}
+			`;
+
+			return fallbackRows.map(row => row.id);
+		}
+
+		const rows = await prisma.$queryRaw<{ id: string }[]>`
+			WITH fts AS (
+				SELECT e.id
+				FROM establishments e
+				WHERE ${scopeSql}
+					AND ${ftsWhereSql}
+			),
+			fallback AS (
+				SELECT e.id
+				FROM establishments e
+				WHERE ${scopeSql}
+					AND ${fallbackWhereSql}
+					AND NOT EXISTS (SELECT 1 FROM fts)
+			)
+			SELECT id FROM fts
+			UNION ALL
+			SELECT id FROM fallback
+		`;
+
+		return rows.map(row => row.id);
+	}
+
+	private async buildHubWhere(
+		filter: HubListFilter
+	): Promise<Prisma.EstablishmentWhereInput> {
+		const searchIds = filter.search
+			? await this.resolveHubSearchIds(filter.search)
+			: null;
 
 		return {
 			deleted_at: null,
@@ -335,7 +378,7 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 			...(filter.cuisine
 				? { tags: { some: { type: filter.cuisine, deleted_at: null } } }
 				: {}),
-			...where
+			...(searchIds ? { id: { in: searchIds } } : {})
 		};
 	}
 
@@ -351,7 +394,7 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		return await prisma.establishment.findMany({
 			skip: (page - 1) * perPage,
 			take: perPage,
-			where: this.buildHubWhere(filter),
+			where: await this.buildHubWhere(filter),
 			include: HUB_INCLUDE,
 			orderBy: { name: "asc" }
 		});
@@ -367,7 +410,7 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		filter: HubListFilter;
 	}): Promise<HubEstablishmentFromRepository[]> {
 		return await prisma.establishment.findMany({
-			where: this.buildHubWhere(filter),
+			where: await this.buildHubWhere(filter),
 			include: HUB_INCLUDE,
 			orderBy: { id: "asc" },
 			take: limit + 1,
@@ -378,7 +421,7 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 
 	async countListedForHub(filter: HubListFilter): Promise<number> {
 		return await prisma.establishment.count({
-			where: this.buildHubWhere(filter)
+			where: await this.buildHubWhere(filter)
 		});
 	}
 
@@ -386,7 +429,7 @@ export class EstablishmentPrismaRepository implements IEstablishmentRepository {
 		filter: HubListFilter
 	): Promise<HubEstablishmentFromRepository[]> {
 		return await prisma.establishment.findMany({
-			where: this.buildHubWhere(filter),
+			where: await this.buildHubWhere(filter),
 			include: HUB_INCLUDE,
 			orderBy: { name: "asc" }
 		});

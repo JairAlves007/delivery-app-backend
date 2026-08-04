@@ -1,6 +1,7 @@
 import { Prisma } from "@/generated/prisma/client.js";
 import {
 	buildFilterQueryOptions,
+	buildHybridSearchSql,
 	transformValidFilterParams
 } from "@/helpers/crud.js";
 import type {
@@ -333,6 +334,63 @@ export class ProductPrismaRepository implements IProductRepository {
 		});
 	}
 
+	private buildCatalogMatchesCte({
+		establishmentId,
+		categoryId,
+		search,
+		similarityThreshold
+	}: Omit<SearchCatalogParams, "page" | "perPage">): Prisma.Sql {
+		const { ftsWhereSql, ftsRankSql, fallbackWhereSql, fallbackRankSql } =
+			buildHybridSearchSql<Prisma.ProductOrderByWithRelationInput>({
+				search,
+				searchableFields: ["name", "description"],
+				fuzzyFields: ["name"],
+				similarityThreshold
+			});
+
+		const establishmentScopeSql = Prisma.sql`p.deleted_at IS NULL
+			AND p.establishment_id = ${establishmentId}`;
+
+		const scopeSql = Prisma.sql`${establishmentScopeSql}
+			${categoryId ? Prisma.sql`AND p.category_id = ${categoryId}` : Prisma.empty}`;
+
+		if (!ftsWhereSql || !ftsRankSql)
+			return Prisma.sql`
+				WITH matches AS (
+					SELECT p.id, p.created_at, ${fallbackRankSql} AS rank
+					FROM products p
+					WHERE ${scopeSql}
+						AND ${fallbackWhereSql}
+				)`;
+
+		return Prisma.sql`
+			WITH fts_scope AS (
+				SELECT 1
+				FROM products p
+				WHERE ${establishmentScopeSql}
+					AND ${ftsWhereSql}
+				LIMIT 1
+			),
+			fts AS (
+				SELECT p.id, p.created_at, ${ftsRankSql} AS rank
+				FROM products p
+				WHERE ${scopeSql}
+					AND ${ftsWhereSql}
+			),
+			fallback AS (
+				SELECT p.id, p.created_at, ${fallbackRankSql} AS rank
+				FROM products p
+				WHERE ${scopeSql}
+					AND ${fallbackWhereSql}
+					AND NOT EXISTS (SELECT 1 FROM fts_scope)
+			),
+			matches AS (
+				SELECT id, created_at, rank FROM fts
+				UNION ALL
+				SELECT id, created_at, rank FROM fallback
+			)`;
+	}
+
 	async searchCatalog({
 		establishmentId,
 		categoryId,
@@ -341,33 +399,22 @@ export class ProductPrismaRepository implements IProductRepository {
 		perPage,
 		similarityThreshold
 	}: SearchCatalogParams): Promise<ProductFromRepository[]> {
-		const { searchSql, rankingSql } =
-			buildFilterQueryOptions<Prisma.ProductOrderByWithRelationInput>({
-				search,
-				searchableFields: ["name", "description"],
-				defaultSortField: "created_at",
-				useUnaccent: true,
-				similarityThreshold
-			});
-
-		if (!searchSql || !rankingSql) return [];
+		const matchesCte = this.buildCatalogMatchesCte({
+			establishmentId,
+			categoryId,
+			search,
+			similarityThreshold
+		});
 
 		const offset = (page - 1) * perPage;
 
 		const rows = await prisma.$queryRaw<{ id: string }[]>`
-			SELECT p.id
-			FROM products p
-			WHERE p.deleted_at IS NULL
-				AND p.establishment_id = ${establishmentId}
-				${
-					categoryId
-						? Prisma.sql`AND p.category_id = ${categoryId}`
-						: Prisma.empty
-				}
-				AND ${searchSql}
-			ORDER BY ${rankingSql} DESC,
-				p.created_at DESC,
-				p.id ASC
+			${matchesCte}
+			SELECT id
+			FROM matches
+			ORDER BY rank DESC,
+				created_at DESC,
+				id ASC
 			LIMIT ${perPage}
 			OFFSET ${offset}
 		`;
@@ -396,28 +443,17 @@ export class ProductPrismaRepository implements IProductRepository {
 		search,
 		similarityThreshold
 	}: Omit<SearchCatalogParams, "page" | "perPage">): Promise<number> {
-		const { searchSql } =
-			buildFilterQueryOptions<Prisma.ProductOrderByWithRelationInput>({
-				search,
-				searchableFields: ["name", "description"],
-				defaultSortField: "created_at",
-				useUnaccent: true,
-				similarityThreshold
-			});
-
-		if (!searchSql) return 0;
+		const matchesCte = this.buildCatalogMatchesCte({
+			establishmentId,
+			categoryId,
+			search,
+			similarityThreshold
+		});
 
 		const rows = await prisma.$queryRaw<{ count: bigint }[]>`
+			${matchesCte}
 			SELECT COUNT(*)::bigint AS count
-			FROM products p
-			WHERE p.deleted_at IS NULL
-				AND p.establishment_id = ${establishmentId}
-				${
-					categoryId
-						? Prisma.sql`AND p.category_id = ${categoryId}`
-						: Prisma.empty
-				}
-				AND ${searchSql}
+			FROM matches
 		`;
 
 		return Number(rows[0]?.count ?? 0);
